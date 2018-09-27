@@ -1,0 +1,12 @@
+#This is a guideline
+#to show you how to run turnserver.
+first. you need to set some parameters into turnserver.sh.
+	extIP: external IP address
+	udpport: the binding port of udp socket. default "3478"
+	tcpport: the binding port of tcp socket. default "3433"
+	realm: a symbol of your company. For example "agora.io"
+then. you need to create some users and write them to turnserver.conf.
+	the format in turnserver.conf is: 'username=key'.
+	you can generate the key by 'echo -n "<username>:<realm>:<password>" | md5sum'.
+finally. you can run the turnserver by turnserver.sh.
+	usage: ./turnserver.sh [start/stop]

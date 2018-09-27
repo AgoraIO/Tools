@@ -1,0 +1,13 @@
+{
+  "name": "agora_sign_server",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+     "express": "3.4.8"
+  },
+  "main": "DemoServer.js",
+  "author": "agora"
+}

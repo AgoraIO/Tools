@@ -1,0 +1,28 @@
+{
+  "name": "DynamicKeyServer",
+  "description": "Dynamic Key Server",
+  "keywords": [
+    "Agora",
+    "Agora.io",
+    "DynamicKey",
+    "ChannelKey",
+    "RecordingKey",
+    "video",
+    "voice",
+    "communications",
+    "recording",
+    "ARS"
+  ],
+  "website": "http://www.agora.io",
+  "repository": "https://github.com/AgoraLab/DynamicKeyServer-nodejs",
+  "env": {
+    "APP_ID": {
+      "description": "Agora.io App ID: Login to the Agora.io Developer Dashboard (http://dashboard.agora.io), and navigate to the \"Projects\" tab to get this value",
+      "required": true
+    },
+    "APP_CERTIFICATE": {
+      "description": "Agora.io App Certificate: Login to the Agora.io Developer Dashboard (http://dashboard.agora.io), and navigate to the \"Projects\" tab to get this value",
+      "required": true
+    }
+  }
+}

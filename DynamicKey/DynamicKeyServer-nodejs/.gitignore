@@ -1,0 +1,4 @@
+AgoraDynamicKey/
+node_modules/
+*.pkg
+*.exe
