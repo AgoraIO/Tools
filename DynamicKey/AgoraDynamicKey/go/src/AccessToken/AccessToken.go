@@ -79,6 +79,13 @@ func CreateAccessToken(appID, appCertificate, channelName string, uid uint32) Ac
     return AccessToken{appID, appCertificate, channelName, uidStr, ts, salt, message, "", 0, 0, ""}
 }
 
+func CreateAccessToken2(appID, appCertificate, channelName string, uid string) AccessToken {
+	ts := uint32(time.Now().Unix()) + 24 * 3600
+	salt := uint32(random(1, 99999999))
+	message := make(map[uint16]uint32)
+    return AccessToken{appID, appCertificate, channelName, uid, ts, salt, message, "", 0, 0, ""}
+}
+
 func (token *AccessToken) FromString(originToken string) bool {
 	defer panichandler()
 	

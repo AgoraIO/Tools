@@ -61,6 +61,10 @@ func CreateSimpleTokenBuilder(appID, appCertificate, channelName string, uid uin
     return SimpleTokenBuilder{AccessToken.CreateAccessToken(appID, appCertificate, channelName, uid)}
 }
 
+func CreateSimpleTokenBuilder2(appID, appCertificate, channelName string, uid string) SimpleTokenBuilder {
+    return SimpleTokenBuilder{AccessToken.CreateAccessToken2(appID, appCertificate, channelName, uid)}
+}
+
 func (builder *SimpleTokenBuilder) InitPrivileges(role Role) {
 	rolepri := uint16(role)
 	for key, value := range RolePrivileges[rolepri] {
