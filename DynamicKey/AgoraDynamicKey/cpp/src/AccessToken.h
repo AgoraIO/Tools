@@ -28,6 +28,9 @@ struct AccessToken {
     kInvitePublishDataStream = 12,
 
     kAdministrateChannel = 101,
+
+
+    kRtmLogin = 1000,
   };
 
   typedef std::map<uint16_t, uint32_t> PrivilegeMessageMap;
