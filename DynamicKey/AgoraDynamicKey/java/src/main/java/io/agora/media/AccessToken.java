@@ -23,7 +23,9 @@ public class AccessToken {
         kInvitePublishVideoStream(11),
         kInvitePublishDataStream(12),
 
-        kAdministrateChannel(101);
+        kAdministrateChannel(101),
+
+        kRtmLogin(1000);
 
         public short intValue;
 
