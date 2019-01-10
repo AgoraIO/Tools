@@ -21,6 +21,7 @@ kInvitePublishAudioStream = 10
 kInvitePublishVideoStream = 11
 kInvitePublishDataStream = 12
 kAdministrateChannel = 101
+kRtmLogin = 1000
 
 VERSION_LENGTH = 3
 APP_ID_LENGTH = 32
