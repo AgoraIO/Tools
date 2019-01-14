@@ -1,7 +1,7 @@
-package io.agora.media.sample;
+package io.agora.rtm.sample;
 
 import io.agora.media.AccessToken;
-import io.agora.media.RtmTokenBuilder;
+import io.agora.rtm.RtmTokenBuilder;
 
 public class RtmTokenBuilderSample {
     static String appId = "970CA35de60c44645bbae8a215061b33";
