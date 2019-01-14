@@ -1,4 +1,6 @@
-package io.agora.media;
+package io.agora.rtm;
+
+import io.agora.media.AccessToken;
 
 public class RtmTokenBuilder {
     public AccessToken mTokenCreator;
