@@ -1,0 +1,77 @@
+{
+    "golems":[0],
+
+    "global_settings":{
+        "key":"put_your_appid_here",
+        "channel_name":"put_your_channel_name_here",
+        "mode":{
+            "type":"broadcast",
+            "role":"broadcaster",
+            "comment":"type:[broadcast, communicat], role:[audience, broadcaster]"
+            },
+        "dual_stream":true,
+        "web_interoperability":false,
+        "start_interval_sec":2
+    },
+
+    "golem_settings":[
+        {
+            "index":0,
+            "uid":0,
+            "parameters":[
+                {"che.video.moreFecSchemeEnable":true}
+            ],
+            "video_profile":-1,
+            "video_profile_ex":{
+                "width":640,
+                "height":360,
+                "fps":15,
+                "kbps":400
+            },
+            "audio_codec":"OPUSFB",
+            "mute":{
+                "remote":{
+                    "video":true,
+                    "audio":true
+                },
+                "local":{
+                    "video":false,
+                    "audio":false
+                }
+            },
+            "video_file":"./input.yuv",
+            "audio_file":"./input.pcm"
+        },
+
+        {
+            "index":1,
+            "uid":0,
+            "parameters":[
+                {"che.audio.live_for_comm":true},
+                {"che.video.moreFecSchemeEnable":true},
+                {"che.video.lowBitRateStreamParameter":{"width":320,"height":180,"frameRate":15,"bitRate":160}}
+            ],
+            "video_profile":-1,
+            "video_profile_ex":{
+                "width":640,
+                "height":360,
+                "fps":15,
+                "kbps":400
+            },
+            "audio_codec":"OPUSFB",
+            "mute":{
+                "remote":{
+                    "video":true,
+                    "audio":true
+                },
+                "local":{
+                    "video":false,
+                    "audio":false
+                }
+            },
+            "video_file":"./input.yuv",
+            "audio_file":"./input.pcm"
+            
+        }
+    ]
+}
