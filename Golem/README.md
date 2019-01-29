@@ -8,15 +8,29 @@ Golem is a tool to fake user(s) in Agora channel running on Linux x64(verified o
 2. Copy include/ to Golem/include
 3. Copy libs/ to Golem/libs
 4. make
-```
-make clean & make
+``` bash
+make clean 
+make
 ```
 ## Configuration
 ### In config.json
 * **key** : String, Specifies appID, you can get it from [here](http://agora.io).
 * **channel_name** : String, Specifies the channel name.
 * **uid** : Integer, Specifies the uid except 0. Golem will get dynamic uid from SDK if set uid 0.
+* **video_file** : String, Specifies the yuv file path. example:
+``` json
+"video_file":"/home/username/Tools/Golem/input.yuv"
+```
+* **audio_file** : String, Specifies the pcm file path. example:
+``` json
+"audio_file":"/home/username/Tools/Golem/input.pcm"
+```
 ## Run
+* export the Golem/libs to LD_LIBRARY_PATH. example:
+``` bash
+export LD_LIBRARY_PATH=/home/username/Tools/Golem/libs:$LD_LIBRARY_PATH
+```
+
 ```
 python ./golem_run.py
 ```
