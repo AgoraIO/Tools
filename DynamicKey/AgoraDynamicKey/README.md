@@ -25,6 +25,7 @@ Sample Code for generating AccessToken are available on the following platforms:
  + Node.js
  + Python
  + PHP
+ + Perl
 
 > You can use either the following SimpleTokenBuilder or AccessToken sample code to generate an AccessToken. SimpleTokenBuilder encapsulates the underlying AccessToken sample code and is easy to use.
 
@@ -57,6 +58,11 @@ Sample Code for generating AccessToken are available on the following platforms:
 
 + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/src/SimpleTokenBuilder.php
 + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/src/AccessToken.php
+
+### Perl
+
++ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/src/Agora/SimpleTokenBuilder.pm
++ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/src/Agora/AccessToken.pm
 
 ### **YOUR IMPLEMENTATIONS ARE VERY WELCOME.**
 
@@ -256,4 +262,20 @@ media_channel_key = DynamicKey5.gen_media_channel_key(app_id, app_certificate, c
 puts "media_channel_key:#{media_channel_key}"
 
 
+```
+### Perl
+```perl
+use Agora::DynamicKey5;
+
+my $app_id          = "970ca35de60c44645bbae8a215061b33";
+my $app_certificate = "5cfd2fd1755d40ecb72977518be15d3b";
+my $channel_name    = "7d72365eb983485397e3e3f9d460bdda";
+my $unix_ts         = time();
+my $uid             = 2882341273;
+my $random_int      = -2147483647;
+my $expired_ts      = 0;
+
+my $media_channel_key = Agora::DynamicKey5::gen_media_channel_key($app_id, $app_certificate, $channel_name, $unix_ts, $random_int, $uid, $expired_ts);
+
+say "media_channel_key:$media_channel_key";
 ```
