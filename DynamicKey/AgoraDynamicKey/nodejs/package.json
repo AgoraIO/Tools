@@ -1,15 +1,9 @@
 {
   "name": "agora-access-token",
-  "version": "1.0.1",
+  "version": "1.0.2-alpha.2",
   "description": "",
   "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
   "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
-  "files": [
-    "./"
-  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

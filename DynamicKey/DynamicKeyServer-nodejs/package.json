@@ -3,12 +3,11 @@
   "version": "0.0.1",
   "main": "index.js",
   "scripts": {
-    "install": "napa https://github.com/AgoraLab/AgoraDynamicKey",
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "3.4.8"
-    , "napa": "2.3.0"
+    "agora-access-token": "^1.0.2",
+    "express": "^4.16.4"
   },
   "author": "Agora.IO",
   "repository": {
