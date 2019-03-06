@@ -1,6 +1,6 @@
 ## Dynamic Key Server
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AgoraIO/Tools/DynamicKey/DynamicKeyServer-nodejs)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/AgoraIO/Tools/tree/master/DynamicKey/DynamicKeyServer-nodejs)
 
 Simply click the link above, and put in your AppID and App Certificate.
 
