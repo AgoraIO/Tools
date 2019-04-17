@@ -15,7 +15,7 @@ expiredTs = unixts + 1800  # Valid 30 minutes after authorization
 
 
 def main():
-    print(SignalingToken.getToken(account, appID, appCertificate, expiredTs))
+    print(SignalingToken.generateSignalingToken(account, appID, appCertificate, expiredTs))
 
 
 if __name__ == '__main__':
