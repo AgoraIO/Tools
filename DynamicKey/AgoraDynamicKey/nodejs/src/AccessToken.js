@@ -94,7 +94,8 @@ module.exports.priviledges = {
     kInvitePublishAudioStream: 10,
     kInvitePublishVideoStream: 11,
     kInvitePublishDataStream: 12,
-    kAdministrateChannel: 101
+    kAdministrateChannel: 101,
+    kRtmLogin: 1000
 };
 
 var encodeHMac = function (key, message) {
