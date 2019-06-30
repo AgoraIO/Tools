@@ -39,6 +39,7 @@ class golem : private rtc::IRtcEngineEventHandler,
   virtual void onUserJoined(uid_t uid, int elapsed);
   virtual void onUserOffline(uid_t uid, rtc::USER_OFFLINE_REASON_TYPE reason);
   virtual void onRtcStats(const rtc::RtcStats &stats);
+  virtual void onLocalUserRegistered(uid_t uid, const char* userAccount);
 
   // inherited from IRtcEngineEventHandlerEx
   virtual void onLogEvent(int level, const char *msg, int length);

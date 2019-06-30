@@ -49,7 +49,7 @@ def runRobots():
 
         print("\n############# ROBOT %d #############" %i)
         cmd = './Golem --global_settings %s --golem_settings %s &' % (global_settings_text, golem_settings_text)
-
+        print("\n%s" %cmd)
         runCmd(cmd)
         time.sleep(interval)
 

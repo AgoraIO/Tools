@@ -40,6 +40,7 @@ void golem::dump_settings()
   std::cout << "  -- key                  : " << settings_.key << std::endl;
   std::cout << "  -- channel name         : " << settings_.channel_name << std::endl;
   std::cout << "  -- uid                  : " << settings_.uid << std::endl;
+  std::cout << "  -- account              : " << settings_.account << std::endl;
   std::cout << "  -- mode                 : " << (settings_.mode == MODE_BROADCAST ? "broadcast" : "communicat") << std::endl;
   std::cout << "  -- role                 : " << (settings_.role == ROLE_BROADCASTER ? "broadcaster" : "audience") << std::endl;
   std::cout << "  -- dual stream          : " << (settings_.dual_stream == 1 ? "true" : "false") << std::endl;
@@ -189,9 +190,18 @@ int golem::run()
   parameter.muteAllRemoteVideoStreams(settings_.mute.remote_video);
 
   // Join channel
-  if (rtc_engine->joinChannel(settings_.key.c_str(), settings_.channel_name.c_str(), NULL, settings_.uid) < 0) {
-    SAFE_LOG(ERROR) << "Failed to create the channel " << settings_.channel_name;
-    return -2;
+  if(settings_.account != "") {
+    std::cout << "Join with user account" << settings_.account << std::endl;
+    if (rtc_engine->joinChannelWithUserAccount(settings_.key.c_str(), settings_.channel_name.c_str(), settings_.account.c_str()) < 0) {
+      SAFE_LOG(ERROR) << "Failed to create the channel " << settings_.channel_name;
+      return -2;
+    }
+  } else {
+    std::cout << "Join with uid" << settings_.uid << std::endl;
+    if (rtc_engine->joinChannel(settings_.key.c_str(), settings_.channel_name.c_str(), NULL, settings_.uid) < 0) {
+      SAFE_LOG(ERROR) << "Failed to create the channel " << settings_.channel_name;
+      return -2;
+    }
   }
   
   return run_interactive();
@@ -260,6 +270,12 @@ void golem::onUserOffline(uid_t uid, USER_OFFLINE_REASON_TYPE reason)
 
 void golem::onRtcStats(const rtc::RtcStats &stats) 
 {
+}
+
+void golem::onLocalUserRegistered(uid_t uid, const char* userAccount)
+{
+  LOG(INFO, "onLocalUserRegistered %d: %s", uid, userAccount);
+  std::cout << "onLocalUserRegistered " << uid << ": " << userAccount << std::endl;
 }
 
 void golem::onLogEvent(int level, const char *msg, int length) 

@@ -36,6 +36,7 @@ class settings_t
     {  
         key = other_settings.key;
         channel_name = other_settings.channel_name;
+        account = other_settings.account;
         uid = other_settings.uid;
         mode = other_settings.mode;
         role= other_settings.role;
@@ -74,6 +75,7 @@ class settings_t
     mute_stst_t mute;
     std::string video_file;
     std::string audio_file;
+    std::string account;
 };
 
 class json_parser
