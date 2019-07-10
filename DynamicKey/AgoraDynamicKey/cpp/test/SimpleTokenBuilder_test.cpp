@@ -92,9 +92,6 @@ class SimpleTokenBuilder_test : public testing::Test {
   uint32_t expiredTs;
 };
 
-TEST_F(SimpleTokenBuilder_test, testSimpleTokenBuilderWithErrorUid) {
-  testSimpleTokenBuilderWithErrorUid();
-}
 TEST_F(SimpleTokenBuilder_test, testSimpleTokenBuilderWithIntUid) {
   testSimpleTokenBuilderWithIntUid();
 }
