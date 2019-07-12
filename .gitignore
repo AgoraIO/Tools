@@ -19,3 +19,4 @@ Golem/base/cJSON/*.d
 Golem/libs/*
 Golem/include/*
 .DS_Store
+.vs
