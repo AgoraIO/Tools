@@ -1,8 +1,8 @@
 /**
  * build with command:
- * g++ -std=c++0x -O0 -I../../ sample_builder.cpp  -lz -lcrypto -lpthread -o sample_builder
+ * g++ -std=c++0x -O0 -I../../ sample_builder2.cpp  -lz -lcrypto -o sample_builder2
  */
-#include "../src/SimpleTokenBuilder.h"
+#include "../src/SimpleTokenBuilder2.h"
 #include <iostream>
 #include <cstdint>
 using namespace agora::tools;
@@ -13,17 +13,14 @@ int main(int argc, char const *argv[]) {
   std::string  appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
   std::string channelName= "7d72365eb983485397e3e3f9d460bdda";
   uint32_t uid = 2882341273;
+  std::string userAccount = "2882341273";
   uint32_t expireTimestamp = 0;
-
-  SimpleTokenBuilder builder(appID, appCertificate, channelName, uid);
-  builder.initPrivileges(Role::Role_Attendee);
-  builder.setPrivilege(AccessToken::Privileges::kJoinChannel, expireTimestamp);
-  builder.setPrivilege(AccessToken::Privileges::kPublishAudioStream, expireTimestamp);
-  builder.setPrivilege(AccessToken::Privileges::kPublishVideoStream, expireTimestamp);
-  builder.setPrivilege(AccessToken::Privileges::kPublishDataStream, expireTimestamp);
-  
-  std::string result = builder.buildToken();
+  std::string result;
+  result = SimpleTokenBuilder2::buildTokenWithUid(
+      appID, appCertificate, channelName, uid, UserRole::Role_Attendee, expireTimestamp);
   std::cout << result << std::endl;
-
+  result = SimpleTokenBuilder2::buildTokenWithUserAccount(
+      appID, appCertificate, channelName, userAccount, UserRole::Role_Attendee, expireTimestamp);
+  std::cout << result << std::endl;
   return 0;
 }
