@@ -9,51 +9,30 @@
 #include "cpp/src/AccessToken.h"
 
 namespace agora {
-    namespace tools {
+namespace tools {
 
-        struct RtmTokenBuilder {
-            RtmTokenBuilder();
-            RtmTokenBuilder(const std::string& appId, const std::string& appCertificate,
-                               const std::string& userId);
-            bool initTokenBuilder(const std::string& originToken);
+enum RtmUserRole {
+  Rtm_User = 1,
+};
 
-            void setPrivilege(AccessToken::Privileges privilege, uint32_t expireTimestamp = 0);
-            void removePrivilege(AccessToken::Privileges privilege);
-            std::string buildToken();
+class RtmTokenBuilder {
+ public:
+  static std::string buildToken(const std::string& appId,
+                                const std::string& appCertificate,
+                                const std::string& userAccount,
+                                RtmUserRole userRole,
+                                uint32_t privilegeExpiredTs = 0);
+};
 
-            AccessToken m_tokenCreator;
-        };
-
-        RtmTokenBuilder::RtmTokenBuilder()
-        : m_tokenCreator()
-        {
-        }
-
-        RtmTokenBuilder::RtmTokenBuilder(const std::string& appId, const std::string& appCertificate,
-                           const std::string& userId)
-        : m_tokenCreator(appId, appCertificate, userId, "")
-        {
-        }
-
-        bool RtmTokenBuilder::initTokenBuilder(const std::string& originToken)
-        {
-            m_tokenCreator.FromString(originToken);
-            return true;
-        }
-
-        void RtmTokenBuilder::setPrivilege(AccessToken::Privileges privilege, uint32_t expireTimestamp)
-        {
-            m_tokenCreator.message_.messages[privilege] = expireTimestamp;
-        }
-
-        void RtmTokenBuilder::removePrivilege(AccessToken::Privileges privilege)
-        {
-            m_tokenCreator.message_.messages.erase(privilege);
-        }
-
-        std::string RtmTokenBuilder::buildToken()
-        {
-            return m_tokenCreator.Build();
-        }
-    }  // namespace tools
+inline std::string RtmTokenBuilder::buildToken(
+    const std::string& appId,
+    const std::string& appCertificate,
+    const std::string& userAccount,
+    RtmUserRole userRole,
+    uint32_t privilegeExpiredTs) {
+  AccessToken generator(appId, appCertificate, userAccount, "");
+  generator.AddPrivilege(AccessToken::Privileges::kRtmLogin, privilegeExpiredTs);
+  return generator.Build();
+}
+}  // namespace tools
 }  // namespace agora
