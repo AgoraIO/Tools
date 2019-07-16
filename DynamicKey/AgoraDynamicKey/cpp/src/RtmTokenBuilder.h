@@ -21,14 +21,17 @@ class RtmTokenBuilder {
                                 const std::string& appCertificate,
                                 const std::string& userAccount,
                                 RtmUserRole userRole,
-                                uint32_t expiredTs);
+                                uint32_t privilegeExpiredTs = 0);
 };
 
 inline std::string RtmTokenBuilder::buildToken(
-    const std::string& appId, const std::string& appCertificate,
-    const std::string& userAccount, RtmUserRole userRole, uint32_t expiredTs) {
+    const std::string& appId,
+    const std::string& appCertificate,
+    const std::string& userAccount,
+    RtmUserRole userRole,
+    uint32_t privilegeExpiredTs) {
   AccessToken generator(appId, appCertificate, userAccount, "");
-  generator.AddPrivilege(AccessToken::Privileges::kRtmLogin, expiredTs);
+  generator.AddPrivilege(AccessToken::Privileges::kRtmLogin, privilegeExpiredTs);
   return generator.Build();
 }
 }  // namespace tools
