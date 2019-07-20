@@ -19,7 +19,7 @@ enum UserRole {
 };
 
 
-class SimpleTokenBuilder {
+class RtcTokenBuilder {
  public:
    // appID: The App ID issued to you by Agora. Apply for a new App ID from 
    //        Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -64,7 +64,7 @@ class SimpleTokenBuilder {
       uint32_t privilegeExpiredTs = 0);
 };
 
-inline std::string SimpleTokenBuilder::buildTokenWithUid(
+inline std::string RtcTokenBuilder::buildTokenWithUid(
                                   const std::string& appId,
                                   const std::string& appCertificate,
                                   const std::string& channelName,
@@ -75,7 +75,7 @@ inline std::string SimpleTokenBuilder::buildTokenWithUid(
   if (uid != 0) {
     str = std::to_string(uid);
   }
-  return SimpleTokenBuilder::buildTokenWithUserAccount(appId,
+  return RtcTokenBuilder::buildTokenWithUserAccount(appId,
                                    appCertificate,
                                    channelName,
                                    str,
@@ -83,7 +83,7 @@ inline std::string SimpleTokenBuilder::buildTokenWithUid(
                                    privilegeExpiredTs);
 }
 
-inline std::string SimpleTokenBuilder::buildTokenWithUserAccount(
+inline std::string RtcTokenBuilder::buildTokenWithUserAccount(
                                           const std::string& appId,
                                           const std::string& appCertificate,
                                           const std::string& channelName,
