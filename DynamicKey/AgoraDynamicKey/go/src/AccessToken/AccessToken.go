@@ -1,59 +1,61 @@
 package AccessToken
 
 import (
-	"fmt"
-	"time"
-	"math/rand"
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/binary"
 	"encoding/hex"
-	"io"
-	"sort"
+	"fmt"
 	"hash/crc32"
+	"io"
+	"math/rand"
+	"sort"
+	"time"
 )
 
 const VERSION_LENGTH = 3
 const APP_ID_LENGTH = 32
 
 type Privileges uint16
-const (
-	KJoinChannel = 1
-    KPublishAudioStream = 2
-    KPublishVideoStream = 3
-    KPublishDataStream = 4
 
-	KPublishAudiocdn = 5
-    KPublishVideoCdn = 6
-    KRequestPublishAudioStream = 7
-    KRequestPublishVideoStream = 8
-    KRequestPublishDataStream = 9
-    KInvitePublishAudioStream = 10
-    KInvitePublishVideoStream = 11
-	KInvitePublishDataStream = 12
-	
+const (
+	KJoinChannel        = 1
+	KPublishAudioStream = 2
+	KPublishVideoStream = 3
+	KPublishDataStream  = 4
+
+	KPublishAudiocdn           = 5
+	KPublishVideoCdn           = 6
+	KRequestPublishAudioStream = 7
+	KRequestPublishVideoStream = 8
+	KRequestPublishDataStream  = 9
+	KInvitePublishAudioStream  = 10
+	KInvitePublishVideoStream  = 11
+	KInvitePublishDataStream   = 12
+
 	KAdministrateChannel = 101
+	KLoginRtm            = 1000
 )
 
 type AccessToken struct {
 	AppID          string
 	AppCertificate string
-	ChannelName string
-	UidStr  string
-	Ts  uint32
-	Salt uint32
-	Message map[uint16]uint32
-	Signature string
+	ChannelName    string
+	UidStr         string
+	Ts             uint32
+	Salt           uint32
+	Message        map[uint16]uint32
+	Signature      string
 	CrcChannelName uint32
-	CrcUid uint32
-	MsgRawContent string
+	CrcUid         uint32
+	MsgRawContent  string
 }
 
 func random(min int, max int) int {
 	rand.Seed(time.Now().UnixNano())
-    return rand.Intn(max-min) + min
+	return rand.Intn(max-min) + min
 }
 
 func panichandler() {
@@ -68,30 +70,30 @@ func getVersion() string {
 
 func CreateAccessToken(appID, appCertificate, channelName string, uid uint32) AccessToken {
 	var uidStr string
-	if (uid == 0) {
+	if uid == 0 {
 		uidStr = ""
 	} else {
 		uidStr = fmt.Sprintf("%d", uid)
 	}
-	ts := uint32(time.Now().Unix()) + 24 * 3600
+	ts := uint32(time.Now().Unix()) + 24*3600
 	salt := uint32(random(1, 99999999))
 	message := make(map[uint16]uint32)
-    return AccessToken{appID, appCertificate, channelName, uidStr, ts, salt, message, "", 0, 0, ""}
+	return AccessToken{appID, appCertificate, channelName, uidStr, ts, salt, message, "", 0, 0, ""}
 }
 
 func CreateAccessToken2(appID, appCertificate, channelName string, uid string) AccessToken {
-	ts := uint32(time.Now().Unix()) + 24 * 3600
+	ts := uint32(time.Now().Unix()) + 24*3600
 	salt := uint32(random(1, 99999999))
 	message := make(map[uint16]uint32)
-    return AccessToken{appID, appCertificate, channelName, uid, ts, salt, message, "", 0, 0, ""}
+	return AccessToken{appID, appCertificate, channelName, uid, ts, salt, message, "", 0, 0, ""}
 }
 
 func (token *AccessToken) FromString(originToken string) bool {
 	defer panichandler()
-	
+
 	dk6version := getVersion()
 	originVersion := originToken[:VERSION_LENGTH]
-	if(originVersion != dk6version) {
+	if originVersion != dk6version {
 		return false
 	}
 
@@ -110,7 +112,7 @@ func (token *AccessToken) FromString(originToken string) bool {
 	token.CrcChannelName = crc_channel_name_
 	token.CrcUid = crc_uid_
 	token.MsgRawContent = msg_raw_content_
-	
+
 	salt_, ts_, messages_, err := unPackMessages(token.MsgRawContent)
 	if err != nil {
 		return false
@@ -175,7 +177,6 @@ func (token *AccessToken) Build() (string, error) {
 	ret = version + token.AppID + base64.StdEncoding.EncodeToString(bytes_content)
 	return ret, nil
 }
-
 
 func packUint16(w io.Writer, n uint16) error {
 	return binary.Write(w, binary.LittleEndian, n)
@@ -278,7 +279,7 @@ func unPackContent(buff []byte) (string, uint32, uint32, string, error) {
 	if err != nil {
 		return "", 0, 0, "", err
 	}
-	
+
 	crc_channel_name, err := unPackUint32(in)
 	if err != nil {
 		return "", 0, 0, "", err
@@ -291,7 +292,7 @@ func unPackContent(buff []byte) (string, uint32, uint32, string, error) {
 	if err != nil {
 		return "", 0, 0, "", err
 	}
-	
+
 	return sig, crc_channel_name, crc_uid, m, nil
 }
 
@@ -309,7 +310,7 @@ func unPackMessages(msg_str string) (uint32, uint32, map[uint16]uint32, error) {
 	if err != nil {
 		return 0, 0, msg_map, err
 	}
-	
+
 	len, err := unPackUint16(in)
 	if err != nil {
 		return 0, 0, msg_map, err
@@ -328,4 +329,3 @@ func unPackMessages(msg_str string) (uint32, uint32, map[uint16]uint32, error) {
 
 	return salt, ts, msg_map, nil
 }
-
