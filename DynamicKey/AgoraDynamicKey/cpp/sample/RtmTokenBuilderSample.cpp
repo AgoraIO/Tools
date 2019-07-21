@@ -1,6 +1,6 @@
 /**
  * build with command:
- * g++ -std=c++0x -O0 -I../../ rtm_builder.cpp  -lz -lcrypto -o rtm_builder
+ * g++ -std=c++0x -O0 -I../../ RtmTokenBuilderSample.cpp  -lz -lcrypto -o RtmTokenBuilderSample
  */
 #include "../src/RtmTokenBuilder.h"
 #include <iostream>

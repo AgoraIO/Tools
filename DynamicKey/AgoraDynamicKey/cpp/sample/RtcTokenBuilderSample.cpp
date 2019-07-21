@@ -1,8 +1,8 @@
 /**
  * build with command:
- * g++ -std=c++0x -O0 -I../../ sample_builder.cpp  -lz -lcrypto -o sample_builder
+ * g++ -std=c++0x -O0 -I../../ RtcTokenBuilderSample.cpp  -lz -lcrypto -o RtcTokenBuilderSample
  */
-#include "../src/SimpleTokenBuilder.h"
+#include "../src/RtcTokenBuilder.h"
 #include <iostream>
 #include <cstdint>
 using namespace agora::tools;
@@ -18,11 +18,11 @@ int main(int argc, char const *argv[]) {
   uint32_t currentTimeStamp = time(NULL);
   uint32_t privilegeExpiredTs = currentTimeStamp + expirationTimeInSeconds;
   std::string result;
-  result = SimpleTokenBuilder::buildTokenWithUid(
+  result = RtcTokenBuilder::buildTokenWithUid(
       appID, appCertificate, channelName, uid, UserRole::Role_Attendee,
       privilegeExpiredTs);
   std::cout << "Token With Int Uid:" << result << std::endl;
-  result = SimpleTokenBuilder::buildTokenWithUserAccount(
+  result = RtcTokenBuilder::buildTokenWithUserAccount(
       appID, appCertificate, channelName, userAccount, UserRole::Role_Attendee,
       privilegeExpiredTs);
   std::cout << "Token With UserAccount:" << result << std::endl;
