@@ -3,9 +3,9 @@ package io.agora.media;
 import java.util.TreeMap;
 
 import static io.agora.media.AccessToken.Privileges.*;
-import static io.agora.media.RtcTokenBuilder.Role.*;
+import static io.agora.media.SimpleTokenBuilder.Role.*;
 
-public class RtcTokenBuilder {
+public class SimpleTokenBuilder {
     public AccessToken mTokenCreator;
 
     public static TreeMap<Short, Integer> attendeePrivileges = new TreeMap<Short, Integer>();
@@ -72,11 +72,11 @@ public class RtcTokenBuilder {
         }
     }
 
-    public RtcTokenBuilder(String appId, String appCertificate, String channelName, String uid) {
+    public SimpleTokenBuilder(String appId, String appCertificate, String channelName, String uid) {
         mTokenCreator = new AccessToken(appId, appCertificate, channelName, uid);
     }
 
-    public RtcTokenBuilder(String appId, String appCertificate, String channelName, int uid) {
+    public SimpleTokenBuilder(String appId, String appCertificate, String channelName, int uid) {
         mTokenCreator = new AccessToken(appId, appCertificate, channelName, uid);
     }
 
