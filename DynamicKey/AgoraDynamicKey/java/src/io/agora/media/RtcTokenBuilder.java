@@ -1,65 +1,7 @@
 package io.agora.media;
 
-import java.util.TreeMap;
-
-import static io.agora.media.AccessToken.Privileges.*;
-import static io.agora.media.RtcTokenBuilder.Role.*;
-
 public class RtcTokenBuilder {
-    public AccessToken mTokenCreator;
-
-    public static TreeMap<Short, Integer> attendeePrivileges = new TreeMap<Short, Integer>();
-
-    static {
-        attendeePrivileges.put(kJoinChannel.intValue, 0);
-        attendeePrivileges.put(kPublishAudioStream.intValue, 0);
-        attendeePrivileges.put(kPublishVideoStream.intValue, 0);
-        attendeePrivileges.put(kPublishDataStream.intValue, 0);
-    }
-
-    public static TreeMap<Short, Integer> publisherPrivileges = new TreeMap<Short, Integer>();
-
-    static {
-        publisherPrivileges.put(kJoinChannel.intValue, 0);
-        publisherPrivileges.put(kPublishAudioStream.intValue, 0);
-        publisherPrivileges.put(kPublishVideoStream.intValue, 0);
-        publisherPrivileges.put(kPublishDataStream.intValue, 0);
-        publisherPrivileges.put(kPublishAudiocdn.intValue, 0);
-        publisherPrivileges.put(kPublishVideoCdn.intValue, 0);
-        publisherPrivileges.put(kInvitePublishAudioStream.intValue, 0);
-        publisherPrivileges.put(kInvitePublishVideoStream.intValue, 0);
-        publisherPrivileges.put(kInvitePublishDataStream.intValue, 0);
-    }
-
-    public static TreeMap<Short, Integer> subscriberPrivileges = new TreeMap<Short, Integer>();
-
-    static {
-        subscriberPrivileges.put(kJoinChannel.intValue, 0);
-        subscriberPrivileges.put(kRequestPublishAudioStream.intValue, 0);
-        subscriberPrivileges.put(kRequestPublishVideoStream.intValue, 0);
-        subscriberPrivileges.put(kRequestPublishDataStream.intValue, 0);
-    }
-
-    public static TreeMap<Short, Integer> adminPrivileges = new TreeMap<Short, Integer>();
-
-    static {
-        adminPrivileges.put(kJoinChannel.intValue, 0);
-        adminPrivileges.put(kPublishAudioStream.intValue, 0);
-        adminPrivileges.put(kPublishVideoStream.intValue, 0);
-        adminPrivileges.put(kPublishDataStream.intValue, 0);
-        adminPrivileges.put(kAdministrateChannel.intValue, 0);
-    }
-
-    public static TreeMap<Integer, TreeMap<Short, Integer>> gRolePrivileges = new TreeMap<Integer, TreeMap<Short, Integer>>();
-
-    static {
-        gRolePrivileges.put(Role_Attendee.initValue, attendeePrivileges);
-        gRolePrivileges.put(Role_Publisher.initValue, publisherPrivileges);
-        gRolePrivileges.put(Role_Subscriber.initValue, subscriberPrivileges);
-        gRolePrivileges.put(Role_Admin.initValue, adminPrivileges);
-    }
-
-    public enum Role {
+	public enum Role {
         Role_Attendee(0),  // for communication
         Role_Publisher(1), // for live broadcast
         Role_Subscriber(2),  // for live broadcast
@@ -71,38 +13,62 @@ public class RtcTokenBuilder {
             this.initValue = initValue;
         }
     }
+	
+    public AccessToken mTokenCreator;
 
-    public RtcTokenBuilder(String appId, String appCertificate, String channelName, String uid) {
-        mTokenCreator = new AccessToken(appId, appCertificate, channelName, uid);
+    /**
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from 
+     *        Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in 
+     *        the Agora Dashboard. See Get an App Certificate.
+     * @param channelName Unique channel name for the AgoraRTC session in the string format
+     * @param uid  User ID. A 32-bit unsigned integer with a value ranging from 
+     *        1 to (232-1). optionalUid must be unique.
+     * @param role Role_Publisher = 1: A broadcaster (host) in a live-broadcast profile.
+     *             Role_Subscriber = 2: (Default) A audience in a live-broadcast profile.
+     * @param privilegeTs represented by the number of seconds elapsed since 1/1/1970.
+     *        If, for example, you want to access the Agora Service within 10 minutes
+     *        after the token is generated, set expireTimestamp as the current time stamp
+     *        + 600 (seconds).                             
+     */
+    public String buildTokenWithUid(String appId, String appCertificate, 
+    		String channelName, int uid, Role role, int privilegeTs) {
+    	String account = String.valueOf(uid);
+    	return buildTokenWithUserAccount(appId, appCertificate, channelName, 
+    			account, role, privilegeTs);
     }
-
-    public RtcTokenBuilder(String appId, String appCertificate, String channelName, int uid) {
-        mTokenCreator = new AccessToken(appId, appCertificate, channelName, uid);
-    }
-
-    public boolean initTokenBuilder(String originToken) {
-        mTokenCreator.fromString(originToken);
-        return true;
-    }
-
-    public boolean initPrivileges(Role role) {
-        TreeMap<Short, Integer> value = gRolePrivileges.get(role.initValue);
-        if (value == null) {
-            return false;
-        }
-        mTokenCreator.message.messages = value;
-        return true;
-    }
-
-    public void setPrivilege(AccessToken.Privileges privilege, int expireTimestamp) {
-        mTokenCreator.message.messages.put(privilege.intValue, expireTimestamp);
-    }
-
-    public void removePrivilege(AccessToken.Privileges privilege) {
-        mTokenCreator.message.messages.remove(privilege.intValue);
-    }
-
-    public String buildToken() throws Exception {
-        return mTokenCreator.build();
+    
+    /**
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from 
+     *        Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in 
+     *        the Agora Dashboard. See Get an App Certificate.
+     * @param channelName Unique channel name for the AgoraRTC session in the string format
+     * @param account  User account
+     * @param role Role_Publisher = 1: A broadcaster (host) in a live-broadcast profile.
+     *             Role_Subscriber = 2: (Default) A audience in a live-broadcast profile.
+     * @param privilegeTs represented by the number of seconds elapsed since 1/1/1970.
+     *        If, for example, you want to access the Agora Service within 10 minutes
+     *        after the token is generated, set expireTimestamp as the current time stamp
+     *        + 600 (seconds).                             
+     */
+    public String buildTokenWithUserAccount(String appId, String appCertificate, 
+    		String channelName, String account, Role role, int privilegeTs) {
+    	
+    	// Assign appropriate access privileges to each role.
+    	AccessToken builder = new AccessToken(appId, appCertificate, channelName, account);
+    	builder.addPrivilege(AccessToken.Privileges.kJoinChannel, privilegeTs);
+    	if (role == Role.Role_Publisher || role == Role.Role_Subscriber || role == Role.Role_Admin) {
+    		builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, privilegeTs);
+    		builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);
+    		builder.addPrivilege(AccessToken.Privileges.kPublishDataStream, privilegeTs);
+    	}
+    	
+    	try {
+			return builder.build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
     }
 }

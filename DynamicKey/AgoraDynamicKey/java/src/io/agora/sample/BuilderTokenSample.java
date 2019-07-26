@@ -1,7 +1,7 @@
 package io.agora.sample;
 
-import io.agora.media.AccessToken;
 import io.agora.media.RtcTokenBuilder;
+import io.agora.media.RtcTokenBuilder.Role;
 
 public class BuilderTokenSample {
     static String appId = "970CA35de60c44645bbae8a215061b33";
@@ -11,14 +11,9 @@ public class BuilderTokenSample {
     static int expireTimestamp = 0;
 
     public static void main(String[] args) throws Exception {
-        RtcTokenBuilder token = new RtcTokenBuilder(appId, appCertificate, channelName, uid);
-        token.initPrivileges(RtcTokenBuilder.Role.Role_Attendee);
-        token.setPrivilege(AccessToken.Privileges.kJoinChannel, expireTimestamp);
-        token.setPrivilege(AccessToken.Privileges.kPublishAudioStream, expireTimestamp);
-        token.setPrivilege(AccessToken.Privileges.kPublishVideoStream, expireTimestamp);
-        token.setPrivilege(AccessToken.Privileges.kPublishDataStream, expireTimestamp);
-
-        String result = token.buildToken();
+        RtcTokenBuilder token = new RtcTokenBuilder();
+        String result = token.buildTokenWithUserAccount(appId, appCertificate, 
+        		channelName, uid, Role.Role_Publisher, expireTimestamp);
         System.out.println(result);
     }
 }

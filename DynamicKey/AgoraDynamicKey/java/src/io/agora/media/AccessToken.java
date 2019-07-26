@@ -7,26 +7,28 @@ import java.util.TreeMap;
 import static io.agora.media.Utils.crc32;
 
 public class AccessToken {
-
     public enum Privileges {
         kJoinChannel(1),
         kPublishAudioStream(2),
         kPublishVideoStream(3),
         kPublishDataStream(4),
-
-        kPublishAudiocdn(5),
-        kPublishVideoCdn(6),
-        kRequestPublishAudioStream(7),
-        kRequestPublishVideoStream(8),
-        kRequestPublishDataStream(9),
-        kInvitePublishAudioStream(10),
-        kInvitePublishVideoStream(11),
-        kInvitePublishDataStream(12),
-
-        kAdministrateChannel(101),
-
+        
+        // For RTM only
         kRtmLogin(1000);
-
+    	
+        // The following privileges have not 
+    	// been implemented yet.
+        
+        //kPublishAudiocdn(5),
+        //kPublishVideoCdn(6),
+        //kRequestPublishAudioStream(7),
+        //kRequestPublishVideoStream(8),
+        //kRequestPublishDataStream(9),
+        //kInvitePublishAudioStream(10),
+        //kInvitePublishVideoStream(11),
+        //kInvitePublishDataStream(12),
+        //kAdministrateChannel(101),
+        
         public short intValue;
 
         Privileges(int value) {
@@ -34,6 +36,8 @@ public class AccessToken {
         }
     }
 
+    private static final String VER = "006";
+    
     public String appId;
     public String appCertificate;
     public String channelName;
@@ -43,61 +47,34 @@ public class AccessToken {
     public int crcChannelName;
     public int crcUid;
     public PrivilegeMessage message;
-
     public int expireTimestamp;
-
-    public AccessToken(String appId, String appCertificate, String channelName) {
-        this(appId, appCertificate, channelName, "");
-    }
-
-    public AccessToken(String appId, String appCertificate, String channelName, int uid) {
-        this.appId = appId;
-        this.appCertificate = appCertificate;
-        this.channelName = channelName;
-        if (uid == 0){
-            this.uid = "";
-        }else {
-            this.uid = String.valueOf(uid);
-        }
-
-        this.crcChannelName = 0;
-        this.crcUid = 0;
-
-        this.message = new PrivilegeMessage();
-    }
 
     public AccessToken(String appId, String appCertificate, String channelName, String uid) {
         this.appId = appId;
         this.appCertificate = appCertificate;
         this.channelName = channelName;
         this.uid = uid;
-
         this.crcChannelName = 0;
         this.crcUid = 0;
-
         this.message = new PrivilegeMessage();
     }
 
     public String build() throws Exception {
-        if (! Utils.isUUID(this.appId)) {
+        if (! Utils.isUUID(appId)) {
             return "";
         }
 
-        if (! Utils.isUUID(this.appCertificate)) {
+        if (!Utils.isUUID(appCertificate)) {
             return "";
         }
 
-        this.messageRawContent = Utils.pack(this.message);
-        this.signature = generateSignature(appCertificate
-                , appId
-                , channelName
-                , uid
-                , messageRawContent);
+        messageRawContent = Utils.pack(message);
+        signature = generateSignature(appCertificate, 
+        		appId, channelName, uid, messageRawContent);
+        crcChannelName = crc32(channelName);
+        crcUid = crc32(uid);
 
-        this.crcChannelName = crc32(this.channelName);
-        this.crcUid = crc32(this.uid);
-
-        PackContent packContent = new PackContent(signature, crcChannelName, crcUid, this.messageRawContent);
+        PackContent packContent = new PackContent(signature, crcChannelName, crcUid, messageRawContent);
         byte[] content = Utils.pack(packContent);
         return getVersion() + this.appId + Utils.base64Encode(content);
     }
@@ -107,14 +84,12 @@ public class AccessToken {
     }
 
     public static String getVersion() {
-        return "006";
+        return VER;
     }
 
-    public static byte[] generateSignature(String appCertificate
-            , String appID
-            , String channelName
-            , String uid
-            , byte[] message) throws Exception {
+    public static byte[] generateSignature(String appCertificate, 
+    		String appID, String channelName, String uid, byte[] message) throws Exception {
+    	
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             baos.write(appID.getBytes());
@@ -131,19 +106,21 @@ public class AccessToken {
         if (!getVersion().equals(token.substring(0, Utils.VERSION_LENGTH))) {
             return false;
         }
+        
         try {
-            this.appId = token.substring(Utils.VERSION_LENGTH, Utils.VERSION_LENGTH + Utils.APP_ID_LENGTH);
+            appId = token.substring(Utils.VERSION_LENGTH, Utils.VERSION_LENGTH + Utils.APP_ID_LENGTH);
             PackContent packContent = new PackContent();
             Utils.unpack(Utils.base64Decode(token.substring(Utils.VERSION_LENGTH + Utils.APP_ID_LENGTH, token.length())), packContent);
-            this.signature = packContent.signature;
-            this.crcChannelName = packContent.crcChannelName;
-            this.crcUid = packContent.crcUid;
-            this.messageRawContent = packContent.rawMessage;
-            Utils.unpack(this.messageRawContent, this.message);
+            signature = packContent.signature;
+            crcChannelName = packContent.crcChannelName;
+            crcUid = packContent.crcUid;
+            messageRawContent = packContent.rawMessage;
+            Utils.unpack(messageRawContent, message);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
+        
         return true;
     }
 
@@ -153,9 +130,9 @@ public class AccessToken {
         public TreeMap<Short, Integer> messages;
 
         public PrivilegeMessage() {
-            this.salt = Utils.randomInt();
-            this.ts = Utils.getTimestamp() + 24 * 3600;
-            this.messages = new TreeMap<>();
+            salt = Utils.randomInt();
+            ts = Utils.getTimestamp() + 24 * 3600;
+            messages = new TreeMap<>();
         }
 
         @Override
@@ -165,9 +142,9 @@ public class AccessToken {
 
         @Override
         public void unmarshal(ByteBuf in) {
-            this.salt = in.readInt();
-            this.ts = in.readInt();
-            this.messages = in.readIntMap();
+            salt = in.readInt();
+            ts = in.readInt();
+            messages = in.readIntMap();
         }
     }
 
@@ -178,8 +155,9 @@ public class AccessToken {
         public byte[] rawMessage;
 
         public PackContent() {
+        	// Nothing done
         }
-
+        
         public PackContent(byte[] signature, int crcChannelName, int crcUid, byte[] rawMessage) {
             this.signature = signature;
             this.crcChannelName = crcChannelName;
@@ -194,10 +172,10 @@ public class AccessToken {
 
         @Override
         public void unmarshal(ByteBuf in) {
-            this.signature = in.readBytes();
-            this.crcChannelName = in.readInt();
-            this.crcUid = in.readInt();
-            this.rawMessage = in.readBytes();
+            signature = in.readBytes();
+            crcChannelName = in.readInt();
+            crcUid = in.readInt();
+            rawMessage = in.readBytes();
         }
     }
 }

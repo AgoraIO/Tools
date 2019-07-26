@@ -16,7 +16,7 @@ public class AccessTokenSample {
         String result = token.build();
         System.out.println(result);
 
-        AccessToken t = new AccessToken("", "", "");
+        AccessToken t = new AccessToken("", "", "", "");
         t.fromString(result);
 
         System.out.println();
