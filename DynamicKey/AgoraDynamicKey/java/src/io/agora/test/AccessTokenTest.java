@@ -1,6 +1,8 @@
-package io.agora.media;
+package io.agora.test;
 
 import org.junit.Test;
+
+import io.agora.media.AccessToken;
 
 import static org.junit.Assert.assertEquals;
 

@@ -1,4 +1,4 @@
-package io.agora.rtm.sample;
+package io.agora.sample;
 
 import io.agora.media.AccessToken;
 import io.agora.rtm.RtmTokenBuilder;

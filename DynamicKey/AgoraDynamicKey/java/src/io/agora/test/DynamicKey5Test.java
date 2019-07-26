@@ -1,7 +1,9 @@
-package io.agora.media;
+package io.agora.test;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import io.agora.media.DynamicKey5;
 
 import static org.junit.Assert.assertEquals;
 

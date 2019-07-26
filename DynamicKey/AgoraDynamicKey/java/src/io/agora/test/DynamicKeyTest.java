@@ -1,13 +1,15 @@
-package io.agora.media;
+package io.agora.test;
 
 import org.junit.Test;
+
+import io.agora.media.DynamicKey;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by liwei on 5/4/16.
  */
-public class DynamicKey3Test {
+public class DynamicKeyTest {
 
     @Test
     public void testGenerate() throws Exception {
@@ -16,12 +18,11 @@ public class DynamicKey3Test {
         String channel  = "7d72365eb983485397e3e3f9d460bdda";
         int ts = 1446455472;
         int r = 58964981;
-        long uid = 2882341273L;
+        int uid = 999;
         int expiredTs = 1446455471;
+        String result = DynamicKey.generate(appID, appCertificate, channel, ts, r);
 
-        String result = DynamicKey3.generate(appID, appCertificate, channel, ts, r, uid, expiredTs);
-
-        String expected = "0037666966591a93ee5a3f712e22633f31f0cbc8f13970ca35de60c44645bbae8a215061b3314464554720383bbf528823412731446455471";
+        String expected = "870588aad271ff47094eb622617e89d6b5b5a615970ca35de60c44645bbae8a215061b3314464554720383bbf5";
         assertEquals(expected, result);
     }
 }

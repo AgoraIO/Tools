@@ -1,4 +1,4 @@
-package io.agora.rtm;
+package io.agora.test;
 
 import org.junit.Test;
 import io.agora.rtm.RtmTokenBuilder;
