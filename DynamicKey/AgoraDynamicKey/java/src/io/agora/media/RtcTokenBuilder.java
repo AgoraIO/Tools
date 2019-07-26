@@ -13,8 +13,6 @@ public class RtcTokenBuilder {
             this.initValue = initValue;
         }
     }
-	
-    public AccessToken mTokenCreator;
 
     /**
      * @param appId The App ID issued to you by Agora. Apply for a new App ID from 
