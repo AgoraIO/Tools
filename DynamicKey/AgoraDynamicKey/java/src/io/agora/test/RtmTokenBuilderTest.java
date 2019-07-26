@@ -2,6 +2,7 @@ package io.agora.test;
 
 import org.junit.Test;
 import io.agora.rtm.RtmTokenBuilder;
+import io.agora.rtm.RtmTokenBuilder.Role;
 import io.agora.media.AccessToken;
 import io.agora.media.Utils;
 
@@ -17,7 +18,8 @@ public class RtmTokenBuilderTest {
     public void testRtmTokenBuilderWithDefalutPriviledge() throws Exception {
         String expected =
             "006970CA35de60c44645bbae8a215061b33IAAsR0qgiCxv0vrpRcpkz5BrbfEWCBZ6kvR6t7qG/wJIQob86ogAAAAAEAABAAAAR/QQAAEA6AOvKDdW";
-        RtmTokenBuilder builder = new RtmTokenBuilder(appId, appCertificate, userId);
+        RtmTokenBuilder builder = new RtmTokenBuilder();
+        builder.mTokenCreator = new AccessToken(appId, appCertificate, userId, "");
         builder.mTokenCreator.message.salt = 1;
         builder.mTokenCreator.message.ts = 1111111;
         builder.setPrivilege(AccessToken.Privileges.kRtmLogin, expireTimestamp);
@@ -28,7 +30,8 @@ public class RtmTokenBuilderTest {
     public void testRtmTokenBuilderWithLimitPriviledge() throws Exception {
         String expected =
             "006970CA35de60c44645bbae8a215061b33IABR8ywaENKv6kia6iUU6P54g017Bi6Ym9sIGdt9f3sLLYb86ogAAAAAEAABAAAAR/QQAAEA6ANkAAAA";
-        RtmTokenBuilder builder = new RtmTokenBuilder(appId, appCertificate, userId);
+        RtmTokenBuilder builder = new RtmTokenBuilder();
+        builder.mTokenCreator = new AccessToken(appId, appCertificate, userId, ""); 
         builder.mTokenCreator.message.salt = 1;
         builder.mTokenCreator.message.ts = 1111111;
         builder.setPrivilege(AccessToken.Privileges.kRtmLogin, 100);
@@ -36,13 +39,14 @@ public class RtmTokenBuilderTest {
     }
 
     private void testRtmTokenBuilder(String expected, RtmTokenBuilder orgBuilder) throws Exception {
-        String result = orgBuilder.buildToken();
+        String result = orgBuilder.buildToken(appId, appCertificate, userId, Role.Rtm_User, expireTimestamp);
         assertEquals(expected, result);
 
         if (expected == "") {
           return;
         }
-        RtmTokenBuilder builder = new RtmTokenBuilder("", "", "");
+        
+        RtmTokenBuilder builder = new RtmTokenBuilder();
         boolean parsed = builder.initTokenBuilder(result);
         assertTrue(parsed);
         assertEquals(builder.mTokenCreator.appId, orgBuilder.mTokenCreator.appId);
