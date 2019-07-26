@@ -1,4 +1,4 @@
-package io.agora.media.sample;
+package io.agora.sample;
 
 import io.agora.media.DynamicKey5;
 import org.apache.commons.codec.binary.Hex;
