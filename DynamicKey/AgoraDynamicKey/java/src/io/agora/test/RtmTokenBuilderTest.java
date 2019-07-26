@@ -16,54 +16,15 @@ public class RtmTokenBuilderTest {
 
     @Test
     public void testRtmTokenBuilderWithDefalutPriviledge() throws Exception {
-        String expected =
-            "006970CA35de60c44645bbae8a215061b33IAAsR0qgiCxv0vrpRcpkz5BrbfEWCBZ6kvR6t7qG/wJIQob86ogAAAAAEAABAAAAR/QQAAEA6AOvKDdW";
-        RtmTokenBuilder builder = new RtmTokenBuilder();
-        builder.mTokenCreator = new AccessToken(appId, appCertificate, userId, "");
-        builder.mTokenCreator.message.salt = 1;
-        builder.mTokenCreator.message.ts = 1111111;
-        builder.setPrivilege(AccessToken.Privileges.kRtmLogin, expireTimestamp);
-        testRtmTokenBuilder(expected, builder);
+    	RtmTokenBuilder builder = new RtmTokenBuilder();
+    	String result = builder.buildToken(appId, appCertificate, userId, Role.Rtm_User, expireTimestamp);
+    	
+    	RtmTokenBuilder tester = new RtmTokenBuilder();
+    	tester.mTokenCreator = new AccessToken("", "", "", "");
+    	tester.mTokenCreator.fromString(result);
+    	
+    	assertEquals(builder.mTokenCreator.appId, tester.mTokenCreator.appId);
+    	assertEquals(builder.mTokenCreator.crcChannelName, tester.mTokenCreator.crcChannelName);
+    	assertEquals(builder.mTokenCreator.message.salt, tester.mTokenCreator.message.salt);
     }
-
-    @Test
-    public void testRtmTokenBuilderWithLimitPriviledge() throws Exception {
-        String expected =
-            "006970CA35de60c44645bbae8a215061b33IABR8ywaENKv6kia6iUU6P54g017Bi6Ym9sIGdt9f3sLLYb86ogAAAAAEAABAAAAR/QQAAEA6ANkAAAA";
-        RtmTokenBuilder builder = new RtmTokenBuilder();
-        builder.mTokenCreator = new AccessToken(appId, appCertificate, userId, ""); 
-        builder.mTokenCreator.message.salt = 1;
-        builder.mTokenCreator.message.ts = 1111111;
-        builder.setPrivilege(AccessToken.Privileges.kRtmLogin, 100);
-        testRtmTokenBuilder(expected, builder);
-    }
-
-    private void testRtmTokenBuilder(String expected, RtmTokenBuilder orgBuilder) throws Exception {
-        String result = orgBuilder.buildToken(appId, appCertificate, userId, Role.Rtm_User, expireTimestamp);
-        assertEquals(expected, result);
-
-        if (expected == "") {
-          return;
-        }
-        
-        RtmTokenBuilder builder = new RtmTokenBuilder();
-        boolean parsed = builder.initTokenBuilder(result);
-        assertTrue(parsed);
-        assertEquals(builder.mTokenCreator.appId, orgBuilder.mTokenCreator.appId);
-        assertEquals(builder.mTokenCreator.crcChannelName, orgBuilder.mTokenCreator.crcChannelName);
-        assertEquals(builder.mTokenCreator.crcUid, orgBuilder.mTokenCreator.crcUid);
-        int crcChannelName = Utils.crc32(orgBuilder.mTokenCreator.channelName);
-        int crcUid = Utils.crc32(orgBuilder.mTokenCreator.uid);
-        assertEquals(builder.mTokenCreator.crcChannelName, crcChannelName);
-        assertEquals(builder.mTokenCreator.crcUid, crcUid);
-        assertEquals(builder.mTokenCreator.message.ts, orgBuilder.mTokenCreator.message.ts);
-        assertEquals(builder.mTokenCreator.message.salt, orgBuilder.mTokenCreator.message.salt);
-        assertEquals(builder.mTokenCreator.message.messages.get(AccessToken.Privileges.kRtmLogin.intValue),
-                orgBuilder.mTokenCreator.message.messages.get(AccessToken.Privileges.kRtmLogin.intValue));
-
-        byte[] signature = AccessToken.generateSignature(
-                appCertificate, orgBuilder.mTokenCreator.appId, orgBuilder.mTokenCreator.channelName, orgBuilder.mTokenCreator.uid,
-                orgBuilder.mTokenCreator.messageRawContent);
-        assertArrayEquals(builder.mTokenCreator.signature, signature);
-      }
 }
