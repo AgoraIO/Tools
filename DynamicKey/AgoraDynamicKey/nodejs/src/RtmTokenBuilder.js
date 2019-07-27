@@ -1,29 +1,17 @@
-var AccessToken = require("../src/AccessToken").AccessToken;
+const AccessToken = require("../src/AccessToken").AccessToken
+const Priviledges = require('../src/AccessToken').priviledges
 
+const Role = {
+  Rtm_User: 1
+}
 class RtmTokenBuilder {
-  constructor(appID, appCertificate, account) {
-    this.key = new AccessToken(appID, appCertificate, account, 0);
-  }
 
-  buildToken() {
-    return this.key.build();
-  }
-
-  initPrivileges(role) {
-    let rolePri = RolePrivileges[role];
-    this.key.messages = JSON.parse(JSON.stringify(rolePri));
-  }
-
-  initTokenBuilder(originToken) {
-    return builder.key.fromString(originToken);
-  }
-  setPrivilege(privilege, expireTimestamp) {
-    this.key.messages[privilege] = expireTimestamp;
-  }
-
-  removePrivilege(privilege) {
-    delete this.key.messages[privilege];
+  static buildToken (appID, appCertificate, account, role, privilegeExpiredTs) {
+    const key = new AccessToken(appID, appCertificate, account, "")
+    key.addPriviledge(Priviledges.kRtmLogin, privilegeExpiredTs)
+    return key.build()
   }
 }
 
-module.exports.RtmTokenBuilder = RtmTokenBuilder;
+module.exports.RtmTokenBuilder = RtmTokenBuilder
+module.exports.Role = Role

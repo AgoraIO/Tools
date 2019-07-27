@@ -1,6 +1,5 @@
 const  RTCTokenBuilder = require('../src/RTCTokenBuilder').RTCTokenBuilder;
 const RTCRole = require('../src/RTCTokenBuilder').Role;
-const  Priviledges = require('../src/AccessToken').priviledges;
 
 const appID = '970CA35de60c44645bbae8a215061b33';
 const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b';
@@ -9,7 +8,11 @@ const uid = 2882341273;
 const account = "2882341273";
 const role = RTCRole.PUBLISHER;
 
-const privilegeExpiredTs = Math.floor((+Date.now() + 3600) / 1000)
+const expirationTimeInSeconds = 3600
+
+const currentTimestamp = Math.floor(Date.now() / 1000)
+
+const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 
 const tokenA = RTCTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
 
