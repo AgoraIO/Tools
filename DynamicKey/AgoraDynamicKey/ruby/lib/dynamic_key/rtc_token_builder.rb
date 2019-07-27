@@ -19,40 +19,37 @@ module AgoraDynamicKey
 
     class << self
 
-=begin
-    * @param app_id The App ID issued to you by Agora. Apply for a new App ID from 
-    *        Agora Dashboard if it is missing from your kit. See Get an App ID.
-    * @param app_certificate Certificate of the application that you registered in 
-    *        the Agora Dashboard. See Get an App Certificate.
-    * @param channel_name Unique channel name for the AgoraRTC session in the string format
-    * @param uid  User ID. A 32-bit unsigned integer with a value ranging from 
-    *        1 to (232-1). optionalUid must be unique.
-    * @param role AgoraDynamicKey::RTCTokenBuilder::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
-    *             AgoraDynamicKey::RTCTokenBuilder::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
-    * @param privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
-    *        If, for example, you want to access the Agora Service within 10 minutes
-    *        after the token is generated, set expireTimestamp as the current time stamp
-    *        + 600 (seconds).                             
-=end
+      #
+      # @param app_id The App ID issued to you by Agora. Apply for a new App ID from 
+      #        Agora Dashboard if it is missing from your kit. See Get an App ID.
+      # @param app_certificate Certificate of the application that you registered in 
+      #        the Agora Dashboard. See Get an App Certificate.
+      # @param channel_name Unique channel name for the AgoraRTC session in the string format
+      # @param uid  User ID. A 32-bit unsigned integer with a value ranging from 
+      #        1 to (232-1). optionalUid must be unique.
+      # @param role AgoraDynamicKey::RTCTokenBuilder::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
+      #             AgoraDynamicKey::RTCTokenBuilder::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
+      # @param privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
+      #        If, for example, you want to access the Agora Service within 10 minutes
+      #        after the token is generated, set expireTimestamp as the current time stamp
+      #        + 600 (seconds).                             
       def build_token_with_uid payload
         check! payload, %i[app_id app_certificate channel_name role uid privilege_expired_ts]
         build_token_with_account @params.merge(:account => @params[:uid])
       end
 
-=begin
-    * @param app_id The App ID issued to you by Agora. Apply for a new App ID from 
-    *        Agora Dashboard if it is missing from your kit. See Get an App ID.
-    * @param app_certificate Certificate of the application that you registered in 
-    *        the Agora Dashboard. See Get an App Certificate.
-    * @param channel_name Unique channel name for the AgoraRTC session in the string format
-    * @param account User account
-    * @param role AgoraDynamicKey::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
-    *             AgoraDynamicKey::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
-    * @param privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
-    *        If, for example, you want to access the Agora Service within 10 minutes
-    *        after the token is generated, set expireTimestamp as the current time stamp
-    *        + 600 (seconds).                             
-=end
+      # @param app_id The App ID issued to you by Agora. Apply for a new App ID from 
+      #        Agora Dashboard if it is missing from your kit. See Get an App ID.
+      # @param app_certificate Certificate of the application that you registered in 
+      #        the Agora Dashboard. See Get an App Certificate.
+      # @param channel_name Unique channel name for the AgoraRTC session in the string format
+      # @param account User account
+      # @param role AgoraDynamicKey::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
+      #             AgoraDynamicKey::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
+      # @param privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
+      #        If, for example, you want to access the Agora Service within 10 minutes
+      #        after the token is generated, set expireTimestamp as the current time stamp
+      #        + 600 (seconds).                             
       def build_token_with_account payload
         check! payload, %i[app_id app_certificate channel_name role account privilege_expired_ts]
         @params.merge!(:uid => @params[:account])
