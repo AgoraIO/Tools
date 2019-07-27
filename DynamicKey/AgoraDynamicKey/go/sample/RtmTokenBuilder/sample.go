@@ -1,29 +1,24 @@
 package main
 
 import (
+	rtmtokenbuilder "RtmTokenBuilder"
 	"fmt"
-
-	"../../src/AccessToken"
-	rtmtokenbuilder "../../src/RtmTokenBuilder"
+	"time"
 )
 
 func main() {
 
 	appID := "970CA35de60c44645bbae8a215061b33"
 	appCertificate := "5CFd2fd1755d40ecb72977518be15d3b"
-	account := "testaccount"
+	user := "test_user_id"
+	expireTimeInSeconds := uint32(3600)
+	currentTimestamp := uint32(time.Now().UTC().Unix())
+	expireTimestamp := currentTimestamp + expireTimeInSeconds
 
-	expireTimestamp := uint32(0)
-
-	builder := rtmtokenbuilder.CreateRtmTokenBuilder(appID, appCertificate, account)
-	//String uid
-	//builder := SimpleTokenBuilder.CreateSimpleTokenBuilder2(appID, appCertificate, channelName, uid)
-	builder.SetPrivilege(AccessToken.KLoginRtm, expireTimestamp)
-
-	result, err := builder.BuildToken()
+	result, err := rtmtokenbuilder.BuildToken(appID, appCertificate, user, rtmtokenbuilder.RoleRtmUser, expireTimestamp)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println(result)
+		fmt.Printf("Rtm Token: %s\n", result)
 	}
 }
