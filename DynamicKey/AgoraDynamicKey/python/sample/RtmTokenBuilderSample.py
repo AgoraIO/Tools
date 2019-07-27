@@ -10,17 +10,14 @@ import AccessToken
 
 appID = "970CA35de60c44645bbae8a215061b33"
 appCertificate = "5CFd2fd1755d40ecb72977518be15d3b"
-channelName = "7d72365eb983485397e3e3f9d460bdda"
-userId = "2882341273"
-expireTimestamp = 0
-
+user = "test_user_id"
+expirationTimeInSeconds = 3600
+currentTimestamp = int(time.time())
+privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 
 def main():
-    builder = RtmTokenBuilder(appID, appCertificate, userId)
-    builder.setPrivilege(AccessToken.kRtmLogin, expireTimestamp)
-
-    result = builder.buildToken()
-    print result
+    token = RtmTokenBuilder.buildToken(appID, appCertificate, user, Role_Rtm_User, privilegeExpiredTs)
+    print("Rtm Token: {}".format(token))
 
 
 if __name__ == "__main__":
