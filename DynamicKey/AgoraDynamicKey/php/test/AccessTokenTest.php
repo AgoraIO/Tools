@@ -1,5 +1,6 @@
 <?php
-include "../src/SimpleTokenBuilder.php";
+include "../src/RtcTokenBuilder.php";
+include "../src/RtmTokenBuilder.php";
 include "TestTool.php";
 
 $appID = "970CA35de60c44645bbae8a215061b33";
@@ -79,14 +80,17 @@ $channelName = "7d72365eb983485397e3e3f9d460bdda";
 $uid = 2882341273;
 
 
-$expected = "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW";
-$builder = new SimpleTokenBuilder($appID, $appCertificate, $channelName, $uid);
-$builder->token->message->ts = 1111111;
-$builder->token->message->salt = 1;
-$builder->token->setUid(2882341273);
-$builder->setPrivilege(AccessToken::Privileges["kJoinChannel"], $expiredTs);
-$result = $builder->buildToken();
-assertEqual($expected, $result);
+$token = RtcTokenBuilder::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, RtcTokenBuilder::RoleAttendee, $expiredTs);
+$parser = AccessToken::initWithToken($token, $appCertificate, $channelName, $uid);
+$privilegeKey = AccessToken::Privileges["kJoinChannel"];
+assertEqual($parser->message->privileges[$privilegeKey], $expiredTs);
+
+$userAccount = "test_user";
+
+$token = RtmTokenBuilder::buildToken($appID, $appCertificate, $userAccount, RtmTokenBuilder::RoleRtmUser, $expiredTs);
+$parser = AccessToken::initWithToken($token, $appCertificate, $channelName, $userAccount);
+$privilegeKey = AccessToken::Privileges["kRtmLogin"];
+assertEqual($parser->message->privileges[$privilegeKey], $expiredTs);
 
 $appID = "";
 //invalid values
