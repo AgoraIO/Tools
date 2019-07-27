@@ -3,7 +3,7 @@
  * nodeunit AccessTokenTest.js
  * see https://github.com/caolan/nodeunit
  */
-var AccessToken = require('../src/AccessToken');
+var AccessToken = require('../src/AccessToken').AccessToken;
 var SimpleTokenBuilder = require('../src/SimpleTokenBuilder');
 var Role = require('../src/SimpleTokenBuilder').Role;
 var Priviledges = require('../src/AccessToken').priviledges;
@@ -57,3 +57,38 @@ exports.SimpleTokenBuilder_Test = function (test) {
   test.done();
 };
 
+const RTCRole = require("../src/RTCTokenBuilder").Role;
+
+const RTCTokenBuilder_Test = function (test) {
+  const appID = '970CA35de60c44645bbae8a215061b33';
+  const certificate = '5CFd2fd1755d40ecb72977518be15d3b';
+  const expected = "006970CA35de60c44645bbae8a215061b33IACMv3I+fsRSejxy6luEwzA/1t/zbEHWfJCJ5m8ssFP/fLdIfRBXoFHlIgABAAAAR/QQAAQAAQCvKDdWAgCvKDdWAwCvKDdWBACvKDdW"
+
+  const channelName = "7d72365eb983485397e3e3f9d460bdda"
+
+  const uid = 2882341273
+
+  const salt = 1
+
+  const ts = 1111111
+
+  const privilegeExpiredsTs = 1446455471
+
+  const role = RTCRole.PUBLISHER
+
+  const key = new AccessToken(appID, certificate, channelName, uid)
+  key.addPriviledge(Priviledges.kJoinChannel, privilegeExpiredsTs)
+  key.salt = salt;
+  key.ts = ts;
+  if (role == RTCRole.PUBLISHER ||
+      role == RTCRole.SUBSCRIBER ||
+      role == RTCRole.ADMIN) {
+      key.addPriviledge(Priviledges.kPublishAudioStream, privilegeExpiredsTs)
+      key.addPriviledge(Priviledges.kPublishVideoStream, privilegeExpiredsTs)
+      key.addPriviledge(Priviledges.kPublishDataStream, privilegeExpiredsTs)
+  }
+  const actual = key.build();
+  test.equal(expected, actual);
+  test.done();
+}
+RTCTokenBuilder_Test()
