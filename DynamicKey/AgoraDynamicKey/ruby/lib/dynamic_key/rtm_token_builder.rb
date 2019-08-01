@@ -7,14 +7,15 @@ module AgoraDynamicKey
     class << self
       attr_accessor :token
 
-      #  
-      # @param app_id The App ID issued to you by Agora. Apply for a new App ID from 
+      # 
+      # @param payload
+      # :app_id app_id The App ID issued to you by Agora. Apply for a new App ID from 
       #        Agora Dashboard if it is missing from your kit. See Get an App ID.
-      # @param app_certificate Certificate of the application that you registered in 
+      # :app_certificate app_certificate Certificate of the application that you registered in 
       #        the Agora Dashboard. See Get an App Certificate.
-      # @param role AgoraDynamicKey::RTCTokenBuilder::Role::RTM_USER = 1: RTM USER
-      # @param account  User Account.
-      # @param privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
+      # :role role AgoraDynamicKey::RTCTokenBuilder::Role::RTM_USER = 1: RTM USER
+      # :account  User Account.
+      # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
       #        If, for example, you want to access the Agora Service within 10 minutes
       #        after the token is generated, set expireTimestamp as the current time stamp
       #        + 600 (seconds).                             

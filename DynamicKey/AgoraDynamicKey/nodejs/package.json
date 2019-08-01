@@ -1,6 +1,6 @@
 {
   "name": "agora-access-token",
-  "version": "1.0.2-alpha.2",
+  "version": "1.0.2-alpha.3",
   "description": "",
   "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
   "main": "index.js",
@@ -10,7 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "crc-32": "^1.2.0",
-    "cuint": "^0.2.2"
+    "crc-32": "1.2.0",
+    "cuint": "0.2.2"
   }
 }
