@@ -1,4 +1,4 @@
-package io.agora.signal;
+package io.agora.test;
 
 import io.agora.signal.SignalingToken;
 
