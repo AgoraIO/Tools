@@ -9,5 +9,5 @@ require_relative 'dynamic_key/rtc_token_builder'
 require_relative 'dynamic_key/rtm_token_builder'
 
 module AgoraDynamicKey
-  VERSION = "006"
+  VERSION = "0.1.0"
 end
