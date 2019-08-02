@@ -1,5 +1,5 @@
-- **RtcTokenBuilderSample.cpp**: Sample demo for generating an RTC token. You can replace the pseudo-App ID, App Certificate, channel name, uid (or userAccount) with your own to create your own token. You can also update the our codes based on your real business needs. 
-- **RtmTokenBuilderSample.cpp**: Sample demo for generating an RTM token. You can replace the pseudo-App ID, App Certificate, uid with your own to create your own token. You can also update the our codes based on your real business needs.
+- **RtcTokenBuilderSample.cpp**: Sample demo for generating an RTC token. You can replace the App ID, App Certificate, channel name, uid (or userAccount) with your own to create your own token. You can also update the our codes based on your real business needs.
+- **RtmTokenBuilderSample.cpp**: Sample demo for generating an RTM token. You can replace the App ID, App Certificate, uid with your own to create your own token. You can also update the our codes based on your real business needs.
 
 > <b>NOTE</b>
 >
