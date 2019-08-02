@@ -14,7 +14,7 @@ namespace tools {
 enum UserRole {
     
   /**
-   DEPRECATED. Role_Attendee has the same privileges as Role_Publiher.
+   DEPRECATED. Role_Attendee has the same privileges as Role_Publisher.
    */
   Role_Attendee = 0,
   
@@ -43,7 +43,7 @@ class RtcTokenBuilder {
 
     @param appId The App ID issued to you by Agora.
     @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
-    @param channelName Unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+    @param channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
     - The 26 lowercase English letters: a to z.
     - The 26 uppercase English letters: A to Z.
     - The 10 digits: 0 to 9.
