@@ -11,47 +11,65 @@ module AgoraDynamicKey
     end
 
     module Role
-      ATTENDEE = 0 # for communication
-      PUBLISHER = 1 # for live broadcast
-      SUBSCRIBER = 2 # for live broadcast 
+      # DEPRECATED. Role::ATTENDEE has the same privileges as Role::PUBLISHER.
+      ATTENDEE = 0
+
+      # RECOMMENDED. Use this role for a voice/video call or a live broadcast, if your scenario does not require authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in).
+      PUBLISHER = 1
+
+      # Only use this role if your scenario require authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in).
+      # @note In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role::SUBSCRIBER still has the same privileges as Role::PUBLISHER.
+      SUBSCRIBER = 2
+
+      # DEPRECATED. Role::ADMIN has the same privileges as Role::PUBLISHER.
       ADMIN = 101
     end
 
     class << self
 
       #
+      # Builds an RTC token using an Integer uid.
       # @param payload
-      # :app_id app_id The App ID issued to you by Agora. Apply for a new App ID from 
-      #        Agora Dashboard if it is missing from your kit. See Get an App ID.
-      # :app_certificate app_certificate Certificate of the application that you registered in 
-      #        the Agora Dashboard. See Get an App Certificate.
-      # :channel_name channel_name Unique channel name for the AgoraRTC session in the string format
-      # :uid uid  User ID. A 32-bit unsigned integer with a value ranging from 
-      #        1 to (232-1). optionalUid must be unique.
-      # :role role AgoraDynamicKey::RTCTokenBuilder::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
-      #             AgoraDynamicKey::RTCTokenBuilder::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
-      # :privilege_expired_ts privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
-      #        If, for example, you want to access the Agora Service within 10 minutes
-      #        after the token is generated, set expireTimestamp as the current time stamp
-      #        + 600 (seconds).                             
+      # :app_id The App ID issued to you by Agora.
+      # :app_certificate Certificate of the application that you registered in the Agora Dashboard.
+      # :channel_name The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+      # - The 26 lowercase English letters: a to z.
+      # - The 26 uppercase English letters: A to Z.
+      # - The 10 digits: 0 to 9.
+      # - The space.
+      # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+      # :uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
+      # :role See #userRole.
+      # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
+      # 
+      # @return The new Token.
+      #
       def build_token_with_uid payload
         check! payload, %i[app_id app_certificate channel_name role uid privilege_expired_ts]
         build_token_with_account @params.merge(:account => @params[:uid])
       end
 
+      #
+      # Builds an RTC token using a string user_account.
       # @param payload
-      # :app_id app_id The App ID issued to you by Agora. Apply for a new App ID from 
-      #        Agora Dashboard if it is missing from your kit. See Get an App ID.
-      # :app_certificate app_certificate Certificate of the application that you registered in 
-      #        the Agora Dashboard. See Get an App Certificate.
-      # :channel_name channel_name Unique channel name for the AgoraRTC session in the string format
-      # :account account User account
-      # :role role AgoraDynamicKey::Role::PUBLISHER = 1: A broadcaster (host) in a live-broadcast profile.
-      #             AgoraDynamicKey::Role::SUBSCRIBER = 2: (Default) A audience in a live-broadcast profile.
-      # :privilege_expired_ts privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
-      #        If, for example, you want to access the Agora Service within 10 minutes
-      #        after the token is generated, set expireTimestamp as the current time stamp
-      #        + 600 (seconds).                             
+      # :app_id The App ID issued to you by Agora.
+      # :app_certificate Certificate of the application that you registered in the Agora Dashboard.
+      # :channel_name The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+      # - The 26 lowercase English letters: a to z.
+      # - The 26 uppercase English letters: A to Z.
+      # - The 10 digits: 0 to 9.
+      # - The space.
+      # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+      # :account The user account.
+      # :role See #userRole.
+      # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
+      # 
+      # @return The new Token.
+      #                        
       def build_token_with_account payload
         check! payload, %i[app_id app_certificate channel_name role account privilege_expired_ts]
         @params.merge!(:uid => @params[:account])
