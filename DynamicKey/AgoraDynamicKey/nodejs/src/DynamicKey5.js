@@ -72,19 +72,19 @@ var encodeHMac = function(key, message) {
 };
 
 var hexDecode = function(str) {
-    return new Buffer(str, 'hex');
+    return Buffer.from(str, 'hex');
 };
 
 var ByteBuf = function() {
     var that = {
-        buffer: new Buffer(1024)
+        buffer: Buffer.alloc(1024)
         , position: 0
     };
 
     that.buffer.fill(0);
 
     that.pack = function() {
-        var out = new Buffer(that.position);
+        var out = Buffer.alloc(that.position);
         that.buffer.copy(out, 0, 0, out.length);
         return out;
     };
@@ -109,7 +109,7 @@ var ByteBuf = function() {
     };
 
     that.putString = function(str) {
-        return that.putBytes(new Buffer(str));
+        return that.putBytes(Buffer.from(str));
     };
 
     that.putTreeMap = function(map) {
