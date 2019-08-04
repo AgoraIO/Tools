@@ -96,7 +96,7 @@ class AccessToken
         return false;
     }
 
-    function init($appID, $appCertificate, $channelName, $uid)
+    static function init($appID, $appCertificate, $channelName, $uid)
     {
         $accessToken = new AccessToken();
 
@@ -115,7 +115,7 @@ class AccessToken
         return $accessToken;
     }
 
-    function initWithToken($token, $appCertificate, $channel, $uid)
+    static function initWithToken($token, $appCertificate, $channel, $uid)
     {
         $accessToken = new AccessToken();
         if (!$accessToken->extract($token, $appCertificate, $channel, $uid)) {
