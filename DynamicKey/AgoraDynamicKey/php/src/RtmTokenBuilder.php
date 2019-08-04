@@ -1,34 +1,27 @@
 <?php
 
-require "AccessToken.php";
+require_once "AccessToken.php";
 
 class RtmTokenBuilder
 {
-    public $token;
-    public function __construct($appID, $appCertificate, $account){
-        $this->token = new AccessToken();
-        $this->token->appID = $appID;
-        $this->token->appCertificate = $appCertificate;
-        $this->token->channelName = $account;
-        $this->token->setUid(0);
-    }
-    public static function initWithToken($token, $appCertificate, $channel, $uid){
-        $this->token = AccessToken::initWithToken($token, $appCertificate, $channel, $uid);
-    }
-    public function initPrivilege($role){
-        $p = self::RolePrivileges[$role];
-        foreach($p as $key => $value){
-            $this->setPrivilege($key, $value);
-        }
-    }
-    public function setPrivilege($privilege, $expireTimestamp){
-        $this->token->addPrivilege($privilege, $expireTimestamp);
-    }
-    public function removePrivilege($privilege){
-        unset($this->token->message->privileges[$privilege]);
-    }
-    public function buildToken(){
-        return $this->token->build();
+    const RoleRtmUser = 1;
+    # appID: The App ID issued to you by Agora. Apply for a new App ID from 
+    #        Agora Dashboard if it is missing from your kit. See Get an App ID.
+    # appCertificate:	Certificate of the application that you registered in 
+    #                  the Agora Dashboard. See Get an App Certificate.
+    # channelName:Unique channel name for the AgoraRTC session in the string format
+    # userAccount: The user account. 
+    # role: Role_Rtm_User = 1
+    # privilegeExpireTs: represented by the number of seconds elapsed since 
+    #                    1/1/1970. If, for example, you want to access the
+    #                    Agora Service within 10 minutes after the token is 
+    #                    generated, set expireTimestamp as the current 
+    #                    timestamp + 600 (seconds)./
+    public static function buildToken($appID, $appCertificate, $userAccount, $role, $privilegeExpireTs){
+        $token = AccessToken::init($appID, $appCertificate, $userAccount, "");
+        $Privileges = AccessToken::Privileges;
+        $token->addPrivilege($Privileges["kRtmLogin"], $privilegeExpireTs);
+        return $token->build();
     }
 }
 

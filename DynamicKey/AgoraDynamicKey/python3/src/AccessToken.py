@@ -120,7 +120,7 @@ def unPackMessages(buff):
 
 class AccessToken:
 
-    def __init__(self, appID, appCertificate, channelName, uid):
+    def __init__(self, appID='', appCertificate='', channelName='', uid=''):
         random.seed(time.time())
         self.appID = appID
         self.appCertificate = appCertificate

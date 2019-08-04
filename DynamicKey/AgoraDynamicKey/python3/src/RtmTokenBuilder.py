@@ -1,8 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-from AccessToken import *
+from .AccessToken import *
 
 Role_Rtm_User = 1
 

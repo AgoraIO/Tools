@@ -1,35 +1,35 @@
 package rtmtokenbuilder
 
-import "AccessToken"
+import (
+	"accesstoken"
+)
 
-//RtmTokenBuilder constructor
+// Role Type
+type Role uint16
+
+// Role consts
+const (
+	RoleRtmUser = 1
+)
+
+//RtmTokenBuilder class
 type RtmTokenBuilder struct {
-	Token AccessToken.AccessToken
 }
 
-//CreateRtmTokenBuilder static func to create a token builder with int uid
-func CreateRtmTokenBuilder(appID, appCertificate, account string) RtmTokenBuilder {
-	return RtmTokenBuilder{AccessToken.CreateAccessToken(appID, appCertificate, account, 0)}
-}
-
-//InitTokenBuilder initialize the token builder with existing token, usually used for renew token
-func (builder *RtmTokenBuilder) InitTokenBuilder(originToken string) bool {
-	return builder.Token.FromString(originToken)
-}
-
-//SetPrivilege set priviledge to an existing token
-func (builder *RtmTokenBuilder) SetPrivilege(privilege AccessToken.Privileges, expireTimestamp uint32) {
-	pri := uint16(privilege)
-	builder.Token.Message[pri] = expireTimestamp
-}
-
-//RemovePrivilege remove a priviledge from a token builder
-func (builder *RtmTokenBuilder) RemovePrivilege(privilege AccessToken.Privileges) {
-	pri := uint16(privilege)
-	delete(builder.Token.Message, pri)
-}
-
-//BuildToken build and return the result token
-func (builder *RtmTokenBuilder) BuildToken() (string, error) {
-	return builder.Token.Build()
+//BuildToken method
+// appID: The App ID issued to you by Agora. Apply for a new App ID from
+//        Agora Dashboard if it is missing from your kit. See Get an App ID.
+// appCertificate:	Certificate of the application that you registered in
+//                  the Agora Dashboard. See Get an App Certificate.
+// userAccount: The user account.
+// role: Role_Rtm_User = 1
+// privilegeExpireTs: represented by the number of seconds elapsed since
+//                    1/1/1970. If, for example, you want to access the
+//                    Agora Service within 10 minutes after the token is
+//                    generated, set expireTimestamp as the current
+//                    timestamp + 600 (seconds)./
+func BuildToken(appID string, appCertificate string, userAccount string, role Role, privilegeExpiredTs uint32) (string, error) {
+	token := accesstoken.CreateAccessToken2(appID, appCertificate, userAccount, "")
+	token.AddPrivilege(accesstoken.KLoginRtm, privilegeExpiredTs)
+	return token.Build()
 }

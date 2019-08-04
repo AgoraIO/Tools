@@ -1,4 +1,4 @@
-package AccessToken
+package accesstoken
 
 import (
 	"bytes"
