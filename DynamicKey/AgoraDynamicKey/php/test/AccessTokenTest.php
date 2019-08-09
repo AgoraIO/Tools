@@ -74,8 +74,8 @@ assertEqual($expected, $result2);
 
 
 
-$appID = "970CA35de60c44645bbae8a215061b33";
-$appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
+$appID = "3d76392019ca47599548a67ad27c9699";
+$appCertificate = "386668c56db0499791d32264810c2a29";
 $channelName = "7d72365eb983485397e3e3f9d460bdda";
 $uid = 2882341273;
 

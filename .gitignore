@@ -20,3 +20,4 @@ Golem/libs/*
 Golem/include/*
 .DS_Store
 .vs
+Gemfile.lock
