@@ -1,4 +1,4 @@
-const  RtcTokenBuilder = require('../src/RtcTokenBuilder').RTCTokenBuilder;
+const  RtcTokenBuilder = require('../src/RtcTokenBuilder').RtcTokenBuilder;
 const RtcRole = require('../src/RtcTokenBuilder').Role;
 
 const appID = '970CA35de60c44645bbae8a215061b33';
