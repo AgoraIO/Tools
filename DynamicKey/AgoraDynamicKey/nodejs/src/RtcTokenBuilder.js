@@ -17,7 +17,7 @@ const Role = {
     ADMIN: 101
 }
 
-class RTCTokenBuilder {
+class RtcTokenBuilder {
 
    /**
     * Builds an RTC token using an Integer uid.
@@ -71,5 +71,5 @@ class RTCTokenBuilder {
     }
 }
 
-module.exports.RTCTokenBuilder = RTCTokenBuilder;
+module.exports.RtcTokenBuilder = RtcTokenBuilder;
 module.exports.Role = Role;
