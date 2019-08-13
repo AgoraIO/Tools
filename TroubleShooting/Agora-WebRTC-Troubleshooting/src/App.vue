@@ -342,7 +342,7 @@ export default {
       testSuites: [
         {
           id: "0",
-          label: "Brower Compatibility",
+          label: "Browser Compatibility",
           notError: true,
           extra: ""
         },
