@@ -56,7 +56,7 @@ public class RtcTokenBuilder {
      */
     public String buildTokenWithUid(String appId, String appCertificate, 
     		String channelName, int uid, Role role, int privilegeTs) {
-    	String account = String.valueOf(uid);
+    	String account = uid == 0 ? "" : String.valueOf(uid);
     	return buildTokenWithUserAccount(appId, appCertificate, channelName, 
     			account, role, privilegeTs);
     }
