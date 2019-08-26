@@ -39,7 +39,7 @@ func BuildTokenWithUserAccount(appID string, appCertificate string, channelName 
 	token := accesstoken.CreateAccessToken2(appID, appCertificate, channelName, userAccount)
 	token.AddPrivilege(accesstoken.KJoinChannel, privilegeExpiredTs)
 
-	if role == RoleAttendee || role == RolePublisher || role == RoleAdmin {
+	if (role == RoleAttendee) || (role == RolePublisher) || (role == RoleAdmin) {
 		token.AddPrivilege(accesstoken.KPublishVideoStream, privilegeExpiredTs)
 		token.AddPrivilege(accesstoken.KPublishAudioStream, privilegeExpiredTs)
 		token.AddPrivilege(accesstoken.KPublishDataStream, privilegeExpiredTs)

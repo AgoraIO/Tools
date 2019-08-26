@@ -46,7 +46,7 @@ class RtcTokenBuilder:
     def buildTokenWithAccount(appId, appCertificate, channelName, account, role, privilegeExpiredTs):
         token = AccessToken(appId, appCertificate, channelName, account)
         token.addPrivilege(kJoinChannel, privilegeExpiredTs)
-        if role == Role_Attendee | role == Role_Admin | role == Role_Publisher:
+        if (role == Role_Attendee) | (role == Role_Admin) | (role == Role_Publisher):
             token.addPrivilege(kPublishVideoStream, privilegeExpiredTs)
             token.addPrivilege(kPublishAudioStream, privilegeExpiredTs)
             token.addPrivilege(kPublishDataStream, privilegeExpiredTs)
