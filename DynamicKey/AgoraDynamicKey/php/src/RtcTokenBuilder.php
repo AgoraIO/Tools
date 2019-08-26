@@ -43,9 +43,9 @@ class RtcTokenBuilder
         $token = AccessToken::init($appID, $appCertificate, $channelName, $userAccount);
         $Privileges = AccessToken::Privileges;
         $token->addPrivilege($Privileges["kJoinChannel"], $privilegeExpireTs);
-        if($role == RtcTokenBuilder::RoleAttendee ||
-            $role == RtcTokenBuilder::RolePublisher ||
-            $role == RtcTokenBuilder::RoleAdmin)
+        if(($role == RtcTokenBuilder::RoleAttendee) ||
+            ($role == RtcTokenBuilder::RolePublisher) ||
+            ($role == RtcTokenBuilder::RoleAdmin))
         {
             $token->addPrivilege($Privileges["kPublishVideoStream"], $privilegeExpireTs);
             $token->addPrivilege($Privileges["kPublishAudioStream"], $privilegeExpireTs);
