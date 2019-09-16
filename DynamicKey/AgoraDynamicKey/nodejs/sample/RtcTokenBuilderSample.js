@@ -1,4 +1,4 @@
-const  RtcTokenBuilder = require('../src/RtcTokenBuilder').RtcTokenBuilder;
+const RtcTokenBuilder = require('../src/RtcTokenBuilder').RtcTokenBuilder;
 const RtcRole = require('../src/RtcTokenBuilder').Role;
 
 const appID = '970CA35de60c44645bbae8a215061b33';
@@ -14,9 +14,12 @@ const currentTimestamp = Math.floor(Date.now() / 1000)
 
 const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 
+// IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+
+// Build token with uid
 const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
+console.log("Token With Integer Number Uid: " + tokenA);
 
-console.log("Token With Integer Number Uid: "+tokenA)
-
-const tokenB = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
-console.log("Token With UserAccount: "+tokenB);
+// Build token with user account
+const tokenB = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
+console.log("Token With UserAccount: " + tokenB);
