@@ -86,10 +86,10 @@ inline std::string AccessToken::GenerateSignature(
   return (HmacSign2(appCertificate, ss.str(), HMAC_SHA256_LENGTH));
 }
 
-AccessToken::AccessToken() : crc_channel_name_(0), crc_uid_(0) {
+inline AccessToken::AccessToken() : crc_channel_name_(0), crc_uid_(0) {
 }
 
-AccessToken::AccessToken(const std::string& appId,
+inline AccessToken::AccessToken(const std::string& appId,
     const std::string& appCertificate,
     const std::string& channelName,
     uint32_t uid) :
@@ -110,7 +110,7 @@ AccessToken::AccessToken(const std::string& appId,
     message_.ts = now + 24 * 3600;
   }
 
-AccessToken::AccessToken(const std::string& appId,
+inline AccessToken::AccessToken(const std::string& appId,
     const std::string& appCertificate,
     const std::string& channelName,
     const std::string& uid) :
