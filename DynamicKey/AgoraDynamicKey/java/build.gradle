@@ -23,7 +23,7 @@ dependencies {
 }
 
 jar.baseName = 'authentication'
-version = '1.6.0'
+version = '1.6.1'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
     classifier = 'sources'
@@ -51,7 +51,7 @@ bintray {
 		licenses = ['Apache-2.0']
 		vcsUrl = 'https://github.com/AgoraIO/Tools.git'
 		version {
-			name = '1.6.0'
+			name = '1.6.1'
 			desc = 'Agora’s Authentication Mechanisms'
 			released  = new Date()
 		}
