@@ -1063,9 +1063,9 @@ address@^1.0.3:
   version "1.0.3"
   resolved "http://registry.npm.taobao.org/address/download/address-1.0.3.tgz#b5f50631f8d6cec8bd20c963963afb55e06cbce9"
 
-agora-rtc-sdk@^2.3.1:
-  version "2.3.1"
-  resolved "http://registry.npm.taobao.org/agora-rtc-sdk/download/agora-rtc-sdk-2.3.1.tgz#ba99637ee0d28b3b6453965876e7e35f8d76cfd8"
+agora-rtc-sdk@^2.4.0:
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/agora-rtc-sdk/-/agora-rtc-sdk-2.9.0.tgz#e94ce100c67b16b9e3919ff314995daf6e4e5359"
 
 ajv-keywords@^2.1.0:
   version "2.1.1"
@@ -4201,8 +4201,8 @@ lodash.uniq@^4.5.0:
   resolved "http://registry.npm.taobao.org/lodash.uniq/download/lodash.uniq-4.5.0.tgz#d0225373aeb652adc1bc82e4945339a842754773"
 
 lodash@^4.13.1, lodash@^4.17.10, lodash@^4.17.3, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0:
-  version "4.17.10"
-  resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.10.tgz#1b7793cf7259ea38fb3661d4d38b3260af8ae4e7"
+  version "4.17.15"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
 
 log-symbols@^2.1.0, log-symbols@^2.2.0:
   version "2.2.0"
