@@ -12,7 +12,7 @@ public class RtmTokenBuilder {
         }
     }
 
-	public AccessToken mTokenCreator;
+    public AccessToken mTokenCreator;
 
     public String buildToken(String appId, String appCertificate,
             String uid, Role role, int privilegeTs) throws Exception {
