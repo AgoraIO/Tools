@@ -33,6 +33,9 @@ CentOS和Ubuntu下可以参考第三方安装教程：https://jingyan.baidu.com/
                 location /rs/ {
                         proxy_pass https://$arg_h:$arg_p/$arg_d;
                 }
+                location /ls/ {
+                        proxy_pass https://$arg_h:$arg_p/$arg_d;
+                }
                 location /ws/ {
                         proxy_pass https://$arg_h:$arg_p;
                         proxy_http_version 1.1;
