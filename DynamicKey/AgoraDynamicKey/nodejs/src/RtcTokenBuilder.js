@@ -60,8 +60,8 @@ class RtcTokenBuilder {
     static buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs) {
         this.key = new AccessToken(appID, appCertificate, channelName, account)
         this.key.addPriviledge(Priviledges.kJoinChannel, privilegeExpiredTs)
-        if (role == Role.PUBLISHER ||
-            role == Role.SUBSCRIBER ||
+        if (role == Role.ATTENDEE ||
+            role == Role.PUBLISHER ||
             role == Role.ADMIN) {
             this.key.addPriviledge(Priviledges.kPublishAudioStream, privilegeExpiredTs)
             this.key.addPriviledge(Priviledges.kPublishVideoStream, privilegeExpiredTs)
