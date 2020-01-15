@@ -105,7 +105,7 @@ inline AccessToken::AccessToken(const std::string& appId,
       uidStr << uid;
     }
     uid_ = uidStr.str();
-    uint32_t now = time(NULL);
+    uint32_t now = ::time(NULL);
     message_.salt = GenerateSalt();
     message_.ts = now + 24 * 3600;
   }
@@ -120,7 +120,7 @@ inline AccessToken::AccessToken(const std::string& appId,
   uid_(uid),
   crc_channel_name_(0),
   crc_uid_(0) {
-    uint32_t now = time(NULL);
+    uint32_t now = ::time(NULL);
     message_.salt = GenerateSalt();
     message_.ts = now + 24 * 3600;
   }
