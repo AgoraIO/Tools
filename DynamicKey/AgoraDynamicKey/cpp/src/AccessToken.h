@@ -180,7 +180,7 @@ inline void AccessToken::AddPrivilege(Privileges privilege, uint32_t expireTimes
 }
 
 inline void AccessToken::SetTokenExpiredTs(uint32_t seconds) {
-  message_.ts = time(NULL) + seconds;
+  message_.ts = ::time(NULL) + seconds;
 }
 }  // namespace tools
 }  // namespace agora
