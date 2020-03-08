@@ -2,17 +2,19 @@
 //var https = require('https');
 var http = require('http');
 var express = require('express');
-var AgoraSignGenerator = require('./lib/AgoraSignGenerator');
+var {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
 
 var PORT = 8080;
 
-// Fill the vendorkey and sign key given by Agora.io
-var VENDOR_KEY = "xxxx";
-var SIGN_KEY = "yyyy";
+// Fill the appID and appCertificate key given by Agora.io
+var appID = "<YOUR APP ID>";
+var appCertificate = "<YOUR APP CERTIFICATE>";
 
-//var private_key = fs.readFileSync(__dirname + '/../../cert/xxx.com.key');
-//var certificate = fs.readFileSync(__dirname + '/../../cert/xxx.com.crt');
-//var credentials = {key: private_key, cert: certificate, passphrase: "password"};
+// token expire time, hardcode to 3600 seconds = 1 hour
+var expirationTimeInSeconds = 3600
+var currentTimestamp = Math.floor(Date.now() / 1000)
+var privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+var role = RtcRole.PUBLISHER
 
 var app = express();
 app.disable('x-powered-by');
@@ -20,22 +22,37 @@ app.set('port', PORT);
 app.use(express.favicon());
 app.use(app.router);
 
-var generateDynamicKey = function(req, resp) {
+var generateRtcToken = function(req, resp) {
     var channelName = req.query.channelName;
+    // use 0 if uid is not specified
+    var uid = req.query.uid || 0
     if (!channelName) {
         return resp.status(400).json({ 'error': 'channel name is required' }).send();
     }
 
-    var ts = Math.round(new Date().getTime() / 1000);
-    var rnd = Math.round(Math.random() * 100000000);
-    var key = AgoraSignGenerator.generateDynamicKey('4c95c85a2c9849e1b4653c47f0ee415c', 'd75e69f2021c49cc9ac2e1894187000f', channelName, ts, rnd);
+
+    var key = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
 
     resp.header("Access-Control-Allow-Origin", "*")
         //resp.header("Access-Control-Allow-Origin", "http://ip:port")
     return resp.json({ 'key': key }).send();
 };
 
-app.get('/dynamic_key', generateDynamicKey);
+var generateRtmToken = function(req, resp) {
+    var account = req.query.account;
+    if (!account) {
+        return resp.status(400).json({ 'error': 'account is required' }).send();
+    }
+
+    var key = RtmTokenBuilder.buildToken(appID, appCertificate, account, RtmRole, privilegeExpiredTs);
+
+    resp.header("Access-Control-Allow-Origin", "*")
+        //resp.header("Access-Control-Allow-Origin", "http://ip:port")
+    return resp.json({ 'key': key }).send();
+};
+
+app.get('/rtcToken', generateRtcToken);
+app.get('/rtmToken', generateRtmToken);
 
 
 http.createServer(app).listen(app.get('port'), function() {

@@ -7,7 +7,7 @@ npm i agora-access-token
 
 ## Import
 ```javascript
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('./index')
+const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
 ```
 
 ### Generate
