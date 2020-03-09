@@ -12,8 +12,6 @@ var appCertificate = "<YOUR APP CERTIFICATE>";
 
 // token expire time, hardcode to 3600 seconds = 1 hour
 var expirationTimeInSeconds = 3600
-var currentTimestamp = Math.floor(Date.now() / 1000)
-var privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 var role = RtcRole.PUBLISHER
 
 var app = express();
@@ -23,6 +21,8 @@ app.use(express.favicon());
 app.use(app.router);
 
 var generateRtcToken = function(req, resp) {
+    var currentTimestamp = Math.floor(Date.now() / 1000)
+    var privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
     var channelName = req.query.channelName;
     // use 0 if uid is not specified
     var uid = req.query.uid || 0
@@ -39,6 +39,8 @@ var generateRtcToken = function(req, resp) {
 };
 
 var generateRtmToken = function(req, resp) {
+    var currentTimestamp = Math.floor(Date.now() / 1000)
+    var privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
     var account = req.query.account;
     if (!account) {
         return resp.status(400).json({ 'error': 'account is required' }).send();
