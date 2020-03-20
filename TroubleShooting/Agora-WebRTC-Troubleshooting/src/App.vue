@@ -1,17 +1,20 @@
 <template>
-  <v-app>
+  <v-app :class="text.lang">
     <!-- title bar -->
     <v-toolbar dark color="primary">
-      <v-toolbar-title>Agora WebRTC Precall Test</v-toolbar-title>
+      <v-toolbar-title>{{text.toolbar_title}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn disabled flat icon>
-        <v-icon>build</v-icon>
+      <v-btn v-on:click="switchLanguage" color="blue">
+        {{text.language}}
       </v-btn>
+      <!-- <v-btn disabled flat icon>
+        <v-icon>{{text.build}}</v-icon>
+      </v-btn> -->
       <v-btn v-if="!testing" color="success" @click.native="start">
-        Start
+        {{text.start_text}}
       </v-btn>
       <v-btn v-else color="error" disabled>
-        Running
+        {{text.running}}
       </v-btn>
     </v-toolbar>
     <!-- end -->
@@ -23,14 +26,14 @@
             <v-card style="margin-top: 60px">
               <v-card-title>
                 <div class="headline">
-                  Follow the steps below to check if everything works for Agora Web Real Time Communication!
+                  {{text.following_step}}
                 </div>
               </v-card-title>
               <v-card-text>
                 <v-list>
                   <v-list-tile v-for="item in testSuites" :key="item.id">
                     <v-list-tile-content>
-                      <v-list-tile-title>{{item.label}}</v-list-tile-title>
+                      <v-list-tile-title>{{t(item.label)}}</v-list-tile-title>
                     </v-list-tile-content>
                   </v-list-tile>
                 </v-list>
@@ -43,7 +46,7 @@
             <v-card style="margin-top: 60px">
               <v-toolbar color="info" dark>
                 <v-toolbar-title>
-                  Test Report
+                  {{text.test_report}}
                 </v-toolbar-title>
               </v-toolbar>
               <v-list>
@@ -51,7 +54,7 @@
                   <v-list-tile slot="activator">
                     <v-icon v-if="item.notError" color="success">done</v-icon>
                     <v-icon v-else color="error">close</v-icon>
-                    <span> {{item.label}}</span>
+                    <span>{{t(item.label)}}</span>
                   </v-list-tile>
                   <v-list-tile>
                     <v-list-tile-content v-html="item.extra"></v-list-tile-content>
@@ -69,7 +72,7 @@
                   :key="item.id" :step="item.id"
                   :complete="item.complete || (currentTestSuite > item.id)"
                   :rules="[() => item.notError]">
-                  {{item.label}}
+                  {{t(item.label)}}
                   <small v-if="!item.notError">{{item.extra}}</small>
                 </v-stepper-step>
               </v-stepper-header>
@@ -83,18 +86,18 @@
                         <v-card style="height: 100%" color="info" class="white--text">
                           <v-card-title>
                             <div class="headline">
-                              Browser Check
+                              {{text.browser_check}}
                             </div>
                           </v-card-title>
                           <v-card-text>
-                            In this step, we will check if the browser is supported by Agora Web SDK.
+                            {{text.support_desc}}
                           </v-card-text>
                         </v-card>
                       </v-flex>
                       <v-flex md6 xs12>
                         <v-card style="height: 100%">
                           <v-card-title>
-                            Checking {{browserInfo}}
+                            {{text.checking}} {{browserInfo}}
                           </v-card-title>
                           <v-card-text>
                             <v-progress-linear :indeterminate="true"></v-progress-linear>
@@ -112,18 +115,18 @@
                         <v-card color="info" style="height: 100%" class="white--text">
                           <v-card-title>
                             <div class="headline">
-                              Microphone Check
+                              {{text.microphone_check}}
                             </div>
                           </v-card-title>
                           <v-card-text>
-                            In this step, we will check if your mic works properly.
+                            {{text.microphone_check_desc}}
                           </v-card-text>
                         </v-card>
                       </v-flex>
                       <v-flex md6 xs12>
                         <v-card style="height: 100%">
                           <v-card-title>
-                            Say something to your microphone and see if the progress bar below changes.
+                            {{text.microphone_volume_check_desc}}
                           </v-card-title>
                           <v-card-text>
                             <v-progress-linear :value="inputVolume"></v-progress-linear>
@@ -141,14 +144,14 @@
                       <v-flex md6 xs12>
                         <v-card color="info" class="white--text" style="height: 100%">
                           <v-card-title>
-                            <div class="headline">Speaker Check</div>
+                            <div class="headline">{{text.speacker_check}}</div>
                           </v-card-title>
                           <v-card-text>
-                            Play the sample music on the right, and see if you can hear it.
+                            {{text.speaker_check_desc}}
                           </v-card-text>
                           <v-card-actions>
-                            <v-btn @click="resolveCheck">Yes</v-btn>
-                            <v-btn flat @click="rejectCheck">No</v-btn>
+                            <v-btn @click="resolveCheck">{{text.yes}}</v-btn>
+                            <v-btn flat @click="rejectCheck">{{text.no}}</v-btn>
                           </v-card-actions>
                         </v-card>
                       </v-flex>
@@ -156,12 +159,12 @@
                       <v-flex md6 xs12>
                         <v-card style="height: 100%">
                           <v-card-title>
-                            <div class="headline">Sample Music</div>
+                            <div class="headline">{{text.sample_music}}</div>
                           </v-card-title>
                           <v-card-text>
                             <audio id="sampleMusic" controls="controls">
                               <source src="./assets/music.mp3" type="audio/mp3">
-                              Your browser does not support the audio tag.
+                              {{text.sample_music_desc}}
                             </audio>
                           </v-card-text>
                         </v-card>
@@ -177,10 +180,10 @@
                       <v-flex md6 xs12>
                         <v-card color="info" class="white--text" style="height: 100%">
                           <v-card-title>
-                            <div class="headline">Resolution Check</div>
+                            <div class="headline">{{text.resolution_check}}</div>
                           </v-card-title>
                           <v-card-text>
-                            We will check if video of typical resolutions displays properly.
+                            {{text.resolution_check_desc}}
                           </v-card-text>
                         </v-card>
                       </v-flex>
@@ -188,7 +191,7 @@
                       <v-flex md6 xs12>
                         <v-card style="height: 100%">
                           <v-card-title>
-                            Resolutions
+                            {{text.resolution_list}}
                           </v-card-title>
                           <v-card-text>
                             <v-list>
@@ -218,7 +221,7 @@
                       <v-flex md12>
                         <v-card >
                           <v-card-title>
-                            <div>We will build a receiver and a sender to check the network connection.</div>
+                            <div>{{text.network_check_desc}}</div>
                           </v-card-title>
                           <v-card-text v-if="renderChart">
                             <v-layout row wrap>
@@ -246,20 +249,20 @@
             color="info"
             :timeout="0"
             >
-            Seeing is believing, let us open the camera and have a look?
+            {{text.notice}}
             <v-btn
               dark
               flat
               @click="haveATry"
             >
-              Yes
+              {{text.yes}}
             </v-btn>
             <v-btn
               dark
               flat
               @click="snackbar = false"
             >
-              No
+              {{text.no}}
             </v-btn>
           </v-snackbar>
           <!-- dialog -->
@@ -285,7 +288,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" flat @click.native="endTry">Close</v-btn>
+                <v-btn color="green darken-1" flat @click.native="endTry">{{text.close}}</v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
@@ -300,7 +303,7 @@
         tile
         color="grey lighten-5"
       >
-        <v-card-text style="text-align:right">SDK Version: {{sdkVersion}}</v-card-text>
+        <v-card-text style="text-align:right">SDK {{text.Version}}: {{sdkVersion}}</v-card-text>
       </v-card>
     </v-footer>
   </v-app>
@@ -308,11 +311,16 @@
 
 <script>
 import AgoraRtc from "agora-rtc-sdk";
+const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
+import * as i18n from './utils/i18n'
 export default {
   name: "App",
   components: {
     linechart: () => import("./components/linechart.vue")
+  },
+  mounted() {
+    document.title = this.text.toolbar_title
   },
   data() {
     this.bitrateChartSettings = {
@@ -327,7 +335,8 @@ export default {
     };
     this.browserInfo = navigator.appVersion || "Current Browser";
     return {
-      sdkVersion: AgoraRtc.VERSION || '2.4.0',
+      language: navigator.language.match(/^zh/) ? 0 : 1,
+      sdkVersion: AgoraRtc.VERSION,
       trying: false,
       snackbar: false,
       dialog: false,
@@ -342,31 +351,31 @@ export default {
       testSuites: [
         {
           id: "0",
-          label: "Browser Compatibility",
+          label: "browser_compatibility",
           notError: true,
           extra: ""
         },
         {
           id: "1",
-          label: "Microphone",
+          label: "microphone",
           notError: true,
           extra: ""
         },
         {
           id: "2",
-          label: "Speaker",
+          label: "speaker",
           notError: true,
           extra: ""
         },
         {
           id: "3",
-          label: "Resolution",
+          label: "resolution",
           notError: true,
           extra: ""
         },
         {
           id: "4",
-          label: "Connection",
+          label: "connection",
           notError: true,
           extra: ""
         }
@@ -385,7 +394,30 @@ export default {
     };
   },
 
+  computed: {
+    text() {
+      const lang = langs[this.language] || 'en'
+      const property = i18n[lang]['default']
+      const obj = {}
+      for (let key of Object.keys(property)) {
+        Object.assign(obj, {
+          [`${key}`]: property[key]
+        })
+      }
+      return obj;
+    }
+  },
+
   methods: {
+    t (key) {
+      const lang = langs[this.language] || 'en'
+      const property = i18n[lang]['default']
+      return property[key]
+    },
+    switchLanguage () {
+      this.language = this.language === 0 ? 1 : 0
+    },
+
     initialize() {
       this.ts = new Date().getTime();
       this.channel =
@@ -623,8 +655,8 @@ export default {
       setTimeout(() => {
         testSuite.notError = AgoraRtc.checkSystemRequirements();
         testSuite.notError
-          ? (testSuite.extra = "Fully supported")
-          : (testSuite.extra = "Some functions may be limited");
+          ? (testSuite.extra = this.t("fully_supported"))
+          : (testSuite.extra = this.t("some_functions_may_be_limited"));
         this.handleMicrophoneCheck();
       }, 3000);
     },
@@ -653,9 +685,9 @@ export default {
             this.sendStream.close();
             if (totalVolume < 60) {
               testSuite.notError = false;
-              testSuite.extra = "Can barely hear you";
+              testSuite.extra = this.t("can_barely_hear_you");
             } else {
-              testSuite.extra = "Microphone works well";
+              testSuite.extra = this.t("microphone_works_well");
             }
             this.handleSpeakerCheck();
           }, 7000);
@@ -681,7 +713,7 @@ export default {
 
     resolveCheck() {
       let testSuite = this.testSuites[this.currentTestSuite];
-      testSuite.extra = "Speaker works well";
+      testSuite.extra = this.t('speaker_works_well');
       let sound = document.querySelector("#sampleMusic");
       sound.pause();
       sound.currentTime = 0;
@@ -691,7 +723,7 @@ export default {
     rejectCheck() {
       let testSuite = this.testSuites[this.currentTestSuite];
       testSuite.notError = false;
-      testSuite.extra = "Something is wrong with the speaker";
+      testSuite.extra = this.t("speaker_wrong");
       let sound = document.querySelector("#sampleMusic");
       sound.pause();
       sound.currentTime = 0;
@@ -759,7 +791,7 @@ export default {
             this.bitrateArray.rows.length === 1 ||
             this.packetsArray.rows.length === 1
           ) {
-            testSuite.extra = "Poor connection";
+            testSuite.extra = this.t("poor_connection");
             testSuite.notError = false;
           }
           if (testSuite.notError) {
@@ -823,6 +855,9 @@ export default {
 </script>
 
 <style>
+.zh .headline {
+  font-size: 24px !important;
+}
 #test-send {
   width: 640px;
   height: 360px;
