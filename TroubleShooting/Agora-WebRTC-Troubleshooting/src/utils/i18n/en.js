@@ -39,5 +39,14 @@ export default {
   'speaker_wrong': 'Something is wrong with the speaker',
   'poor_connection': 'Poor connection',
   'fully_supported': 'Fully supported',
+  'not_support': 'not support',
+  'support': 'support',
+  'Video_Bitrate': 'Video Bitrate',
+  'Audio_Bitrate': 'Audio Bitrate',
+  'bitrate': 'bitrate',
+  'percent': 'Percent',
+  'packet_loss': 'Packet Loss',
+  'Video_Packet_Loss': 'Video Packet Loss',
+  'Audio_Packet_Loss': 'Audio Packet Loss',
   'some_functions_may_be_limited': 'Some functions may be limited'
 }
