@@ -1,9 +1,9 @@
 export default {
-  'toolbar_title': 'Agora WebRTC预呼测试',
+  'toolbar_title': 'Agora WebRTC 预呼测试',
   'language': '中文',
   'lang': 'zh',
   'build': '构建',
-  'start_text': 'Start',
+  'start_text': '开始',
   'running': '启动',
   'following_step': '请按照以下步骤检查Agora WebRTC是否一切正常！',
   'test_report': '测试报告',
@@ -39,5 +39,14 @@ export default {
   'speaker_wrong': '麦克风异常',
   'poor_connection': '网络连接较差',
   'fully_supported': '完全支持',
-  'some_functions_may_be_limited': '有些功能受限'
+  'not_support': '不支持',
+  'support': '支持',
+  'Video_Bitrate': '视频比特率',
+  'Audio_Bitrate': '音频比特率',
+  'bitrate': '比特率',
+  'percent': '百分比',
+  'packet_loss': '包丢失',
+  'Video_Packet_Loss': '视频包丢失',
+  'Audio_Packet_Loss': '音频包丢失',
+  'some_functions_may_be_limited': '有些功能受限',
 }

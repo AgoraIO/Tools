@@ -4,7 +4,7 @@
     <v-toolbar dark color="primary">
       <v-toolbar-title>{{text.toolbar_title}}</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn v-on:click="switchLanguage" color="blue">
+      <v-btn v-on:click="switchLanguage" color="blue" :disabled="languageDisabled">
         {{text.language}}
       </v-btn>
       <!-- <v-btn disabled flat icon>
@@ -226,10 +226,10 @@
                           <v-card-text v-if="renderChart">
                             <v-layout row wrap>
                               <v-flex md6 xs12>
-                                <linechart :grid="grid" :data="bitrateArray" :settings="bitrateChartSettings"></linechart>
+                                <linechart :grid="grid" :data="bitrateData" :settings="bitrateChartSettings"></linechart>
                               </v-flex>
                               <v-flex md6 xs12>
-                                <linechart :grid="grid" :data="packetsArray" :settings="packetsChartSettings"></linechart>
+                                <linechart :grid="grid" :data="packetsData" :settings="packetsChartSettings"></linechart>
                               </v-flex>
                             </v-layout>
                           </v-card-text>
@@ -323,18 +323,12 @@ export default {
     document.title = this.text.toolbar_title
   },
   data() {
-    this.bitrateChartSettings = {
-      yAxisName: ["bitrate (kbps)"]
-    };
-    this.packetsChartSettings = {
-      yAxisType: ["percent"],
-      yAxisName: ["packet loss"]
-    };
-    this.grid = {
-      left: 50
-    };
-    this.browserInfo = navigator.appVersion || "Current Browser";
     return {
+      grid: {
+        left: 50
+      },
+      languageDisabled: false,
+      browserInfo: navigator.appVersion || "Current Browser",
       language: navigator.language.match(/^zh/) ? 0 : 1,
       sdkVersion: AgoraRtc.VERSION,
       trying: false,
@@ -380,13 +374,25 @@ export default {
           extra: ""
         }
       ],
-      bitrateArray: {
-        columns: ["index", "Video Bitrate", "Audio Bitrate"],
-        rows: [{ index: 0, "Video Bitrate": 0, "Audio Bitrate": 0 }]
+      bitrateData: {
+          columns: ['index', 'tVideoBitrate', 'tAudioBitrate'],
+          rows: [
+            { 
+              index: 0, 
+              'tVideoBitrate': 0, 
+              'tAudioBitrate': 0 
+            },
+        ]
       },
-      packetsArray: {
-        columns: ["index", "Video Packet Loss", "Audio Packet Loss"],
-        rows: [{ index: 0, "Video Packet Loss": 0, "Audio Packet Loss": 0 }]
+      packetsData: {
+        columns: ["index", 'tVideoPacketLoss', 'tAudioPacketLoss'],
+        rows: [
+          { 
+            index: 0, 
+            'tVideoPacketLoss': 0, 
+            'tAudioPacketLoss': 0 
+          }
+        ]
       },
       errMsgForTry: "",
       ProfileForTry: ["480p_1", "720p_1", "1080p_1"],
@@ -405,7 +411,26 @@ export default {
         })
       }
       return obj;
-    }
+    },
+    bitrateChartSettings() {
+      return {
+        yAxisName: [this.t('bitrate') + '(kbps)'],
+        labelMap: {
+          tVideoBitrate: this.t('Video_Bitrate'),
+          tAudioBitrate: this.t('Audio_Bitrate')
+        },
+      }
+    },
+    packetsChartSettings() {
+      return {
+        yAxisType: ['percent'],
+        yAxisName: [this.t('packet_loss')],
+        labelMap: {
+          tVideoPacketLoss: this.t('Video_Packet_Loss'),
+          tAudioPacketLoss: this.t('Audio_Packet_Loss')
+        },
+      }
+    },
   },
 
   methods: {
@@ -485,8 +510,8 @@ export default {
                 this.recvClient.on("stream-added", evt => {
                   this.recvClient.subscribe(evt.stream, err => {
                     clearInterval(this.detectInterval);
-                    this.bitrateArray = [];
-                    this.packetsArray = [];
+                    this.bitrateData = {};
+                    this.packetsData = {};
                     this.testSuites["4"].notError = false;
                     this.testSuites["4"].extra = err.msg;
                     this.destructAll();
@@ -495,8 +520,8 @@ export default {
                 });
                 this.recvClient.on("stream-removed", () => {
                   clearInterval(this.detectInterval);
-                  this.bitrateArray = [];
-                  this.packetsArray = [];
+                  this.bitrateData = {};
+                  this.packetsData = {};
                   this.testSuites["4"].notError = false;
                   this.testSuites["4"].extra = "Disconnected";
                   this.destructAll();
@@ -509,22 +534,22 @@ export default {
                   let i = 1;
                   this.detectInterval = setInterval(() => {
                     this.recvStream.getStats(e => {
-                      this.bitrateArray.rows.push({
+                      this.bitrateData.rows.push({
                         index: i,
-                        "Video Bitrate": this._calcBitrate(
+                        tVideoBitrate: this._calcBitrate(
                           e.videoReceiveBytes, i
                         ),
-                        "Audio Bitrate": this._calcBitrate(
+                        tAudioBitrate: this._calcBitrate(
                           e.audioReceiveBytes, i
                         )
                       });
-                      this.packetsArray.rows.push({
+                      this.packetsData.rows.push({
                         index: i,
-                        "Video Packet Loss": this._calcPacketLoss(
+                        tVideoPacketLoss: this._calcPacketLoss(
                           e.videoReceivePackets,
                           e.videoReceivePacketsLost
                         ),
-                        "Audio Packet Loss": this._calcPacketLoss(
+                        tAudioPacketLoss: this._calcPacketLoss(
                           e.audioReceivePackets,
                           e.audioReceivePacketsLost
                         ),
@@ -554,7 +579,12 @@ export default {
     _calcPacketLoss(recvPackets, recvPacketsLost) {
       let recvPacketsNumber = Number(recvPackets);
       let recvPacketsLostNumber = Number(recvPacketsLost);
-      return Number.parseFloat(recvPacketsLostNumber/(recvPacketsNumber+recvPacketsLostNumber)).toFixed(4);
+      let totalPacketsNumber = recvPacketsNumber + recvPacketsLostNumber
+      if(totalPacketsNumber) {
+        return Number((recvPacketsLostNumber / totalPacketsNumber).toFixed(4));
+      } else {
+        return '-'
+      }
     },
 
     /**
@@ -622,6 +652,7 @@ export default {
       this.testing = true;
       this.snackbar = false;
       this.dialog = false;
+      this.languageDisabled = true;
       this.handleCompatibilityCheck();
     },
 
@@ -631,22 +662,34 @@ export default {
         item.extra = "";
         item.complete = false;
       });
-      (this.currentTestSuite = "-1"),
-        (this.inputVolume = 0),
-        (this.renderChart = false),
-        (this.testing = false),
-        (this.profiles = profileArray.map(item => {
-          item.status = "pending";
-          return item;
-        })),
-        (this.bitrateArray = {
-          columns: ["index", "Video Bitrate", "Audio Bitrate"],
-          rows: [{ index: 0, "Video Bitrate": 0, "Audio Bitrate": 0 }]
-        }),
-        (this.packetsArray = {
-          columns: ["index", "Video Packet Loss", "Audio Packet Loss"],
-          rows: [{ index: 0, "Video Packet Loss": 0, "Audio Packet Loss": 0 }]
-        });
+      this.currentTestSuite = "-1"
+      this.inputVolume = 0
+      this.renderChart = false
+      this.testing = false
+      this.profiles = profileArray.map(item => {
+        item.status = "pending";
+        return item;
+      })
+      this.bitrateData = {
+        columns: ["index", 'tVideoBitrate', 'tAudioBitrate'],
+        rows: [
+          { 
+            index: 0, 
+            'tVideoBitrate': 0, 
+            'tAudioBitrate': 0 
+          }
+        ]
+      }
+      this.packetsData = {
+        columns: ["index", 'tVideoPacketLoss', 'tAudioPacketLoss'],
+        rows: [
+          { 
+            index: 0, 
+            'tVideoPacketLoss': 0, 
+            'tAudioPacketLoss': 0 
+          }
+        ]
+      }
     },
 
     handleCompatibilityCheck() {
@@ -739,18 +782,19 @@ export default {
             this.sendStream && this.sendStream.close();
           })
           .catch(err => {
-            if (err !== "Resolution mismatched") {
+            if (err === "Resolution mismatched") {
               testSuite.notError = false;
               testSuite.extra = err.msg;
+              this.sendStream && this.sendStream.close();
             }
           });
       }
 
-      if (testSuite.notError) {
+      if (this.profiles) {
         let arr = [];
-        this.profiles.map(item => {
+        this.profiles.forEach(item => {
           let str = `${item.width} * ${item.height} ${
-            item.status === "resolve" ? "support" : "not support"
+            this.t(item.status === "resolve" ? "support" : "not_support")
           }`;
           arr.push(str);
         });
@@ -788,27 +832,34 @@ export default {
           this.currentTestSuite = "5";
           this.snackbar = true;
           if (
-            this.bitrateArray.rows.length === 1 ||
-            this.packetsArray.rows.length === 1
+            this.bitrateData.rows.length === 1 ||
+            this.packetsData.rows.length === 1
           ) {
-            testSuite.extra = this.t("poor_connection");
+            testSuite.extra = "poor_connection";
             testSuite.notError = false;
           }
-          if (testSuite.notError) {
-            let bitrateInfo = this.bitrateArray.rows.pop();
-            let packetInfo = this.packetsArray.rows.pop();
-            testSuite.extra = `Video Bitrate: ${
-              bitrateInfo["Video Bitrate"]
-            } kbps </br>
-                              Audio Bitrate: ${
-                                bitrateInfo["Audio Bitrate"]
-                              } kbps </br>
-                              Video Packet Loss: ${
-                                packetInfo["Video Packet Loss"]*100
-                              } % </br>
-                              Audio Packet Loss: ${
-                                packetInfo["Audio Packet Loss"]*100
-                              } % </br>`;
+          if (this.bitrateData && this.packetsData) {
+            let bitrateInfo = this.bitrateData.rows.pop();
+            let packetInfo = this.packetsData.rows.pop();
+          
+            let videoBitrate = bitrateInfo.tVideoBitrate
+            let audioBitrate = bitrateInfo.tAudioBitrate
+            let videoPacketLoss = packetInfo.tVideoPacketLoss
+            let audioPacketLoss = packetInfo.tAudioPacketLoss
+
+            if(videoBitrate == 0 || audioBitrate == 0) {
+               testSuite.notError = false;
+            }
+            if(videoPacketLoss !== '-') {
+              videoPacketLoss = videoPacketLoss * 100
+            }
+            if(audioPacketLoss !== '-') {
+              audioPacketLoss = audioPacketLoss * 100
+            }
+            testSuite.extra = `${ this.t('Video_Bitrate')}: ${ videoBitrate } kbps </br>
+            ${ this.t('Audio_Bitrate')}: ${ audioBitrate } kbps </br>
+            ${ this.t('Video_Packet_Loss')}: ${ videoPacketLoss } % </br>
+            ${ this.t('Audio_Packet_Loss')}: ${ audioPacketLoss } % </br>`;
           }
         }, 1500);
       }, 21500);
