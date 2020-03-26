@@ -3,7 +3,9 @@
     <!-- title bar -->
     <v-toolbar dark color="primary">
       <v-toolbar-title>{{text.toolbar_title}}</v-toolbar-title>
-       <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting" class="github"></a>
+      <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting" class="aperture">
+      <span class="github"></span>
+      </a>
       <v-spacer></v-spacer>
       <v-btn v-on:click="switchLanguage" color="blue" :disabled="languageDisabled">
         {{text.language}}
@@ -954,30 +956,35 @@ export default {
   background-repeat: no-repeat;
   position: absolute;
   background-image: url("./assets/github.png");
-  background-size: 56px;
+  background-size: 50px;
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
   margin: 20px;
   border-radius: 28px;
-  display: inline-block;
-  width: 56px !important;
-  height: 56px !important;
-  right: 220px;
-  /* top: 45%; */
-  z-index: 1999;
-  transform: translateY(-20px);
+  transform: translateY(-40px);
   -webkit-box-reflect: below;
-  -webkit-box-reflect:below 3px -webkit-linear-gradient(top,rgba(0,0,0,0) 10%,rgba(0,0,0,0.5));
+  -webkit-box-reflect:below 2px 
+  -webkit-linear-gradient(90deg, rgba(0,0,0,0) 15%,rgba(0,0,0,0.5));
  }
 
-.github::after {
+.aperture {
+  /* display: inline-block; */
+  width: 58px !important;
+  height: 58px !important;
+  position: absolute;
+  right: 260px;
+  top: 28px;
+  z-index: 1999;
+}
+
+.aperture::after {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
-    top: 0;
-    left: 0;
+    top: -24px;
+    left: 16px;
     border-radius: 50%;
     box-shadow: inset 0 0 10px #fff06a, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, 0 0 10px #fff06a, -6px 0 36px #f0f, 6px 0 36px #0ff;
     -webkit-animation: rotate 3s infinite linear;
