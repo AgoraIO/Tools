@@ -926,21 +926,44 @@ export default {
   height: 240px;
   margin: 0 auto;
 }
+@-webkit-keyframes rotate {
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg)
+  }
+
+  100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg)
+  }
+}
+
+@keyframes rotate {
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg)
+  }
+
+  100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg)
+  }
+}
 .github { 
   cursor: pointer;
   background-repeat: no-repeat;
   position: absolute;
   background-image: url("./assets/github.png");
-  background-size: 50px;
+  background-size: 56px;
   display: block;
-  width: 50px;
-  height: 50px;
+  width: 56px;
+  height: 56px;
   margin: 20px;
   border-radius: 28px;
   display: inline-block;
-  width: 50px !important;
-  height: 50px !important;
-  left: 250px;
+  width: 56px !important;
+  height: 56px !important;
+  right: 220px;
   /* top: 45%; */
   z-index: 1999;
   transform: translateY(-20px);
