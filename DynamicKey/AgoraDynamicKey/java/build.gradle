@@ -9,7 +9,7 @@ buildscript {
 plugins {
   id "com.jfrog.bintray" version "1.8.4"
   id "maven-publish"
-  id "java"
+  id "java-library"
 }
 
 repositories {
@@ -19,6 +19,7 @@ repositories {
 }
 
 dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar']) // DO NOT CHANGE, CI may needs it when packaging
     implementation "commons-codec:commons-codec:1.11"
 }
 
