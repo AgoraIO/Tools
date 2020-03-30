@@ -21,6 +21,7 @@ repositories {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar']) // DO NOT CHANGE, CI may needs it when packaging
     implementation "commons-codec:commons-codec:1.11"
+    implementation "junit:junit:4.12"
 }
 
 jar.baseName = 'authentication'
