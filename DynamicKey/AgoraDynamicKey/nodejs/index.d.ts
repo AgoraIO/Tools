@@ -87,6 +87,3 @@ export namespace RtmTokenBuilder {
      */
     export function buildToken(appID: string, appCertificate: string, account: string | number, role: number, privilegeExpiredTs: number): string;
 }
-
-module.exports.RtmTokenBuilder = RtmTokenBuilder
-module.exports.Role = Role
