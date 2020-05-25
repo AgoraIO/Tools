@@ -8,4 +8,4 @@ export const profileArray = [
   {resolution: '1080p_1', width: 1920, height: 1080}
 ]
 
-export const APP_ID = '316e30dceffa43729142b04333a8094a' // input your app id here
+export const APP_ID = '' // input your app id here
