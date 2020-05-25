@@ -271,18 +271,18 @@
           <v-dialog v-model="dialog" persistent max-width="360">
             <v-card>
               <v-card-title>
-                <v-tabs v-model="currentProfile">
+                <v-tabs>
                   <v-tab
                     v-for="(item, index) in ProfileForTry"
-                    @click="retry"
-                    :disabled="trying"
+                    @click="retry(index)"
                     :key="index"
                   >
-                    {{item}}
+                    {{item.resolution}}
                   </v-tab>
                 </v-tabs>
               </v-card-title>
               <v-card-text>
+                <div v-if="!showVideo">{{text.videoText}}</div>
                 <div id="modal-video" v-if="!errMsgForTry">
 
                 </div>
@@ -333,8 +333,8 @@ export default {
       browserInfo: navigator.appVersion || "Current Browser",
       language: navigator.language.match(/^zh/) ? 0 : 1,
       sdkVersion: AgoraRtc.VERSION,
-      trying: false,
       snackbar: false,
+      showVideo: false,
       dialog: false,
       currentTestSuite: "-1",
       inputVolume: 0,
@@ -397,7 +397,20 @@ export default {
         ]
       },
       errMsgForTry: "",
-      ProfileForTry: ["480p_1", "720p_1", "1080p_1"],
+      ProfileForTry: [
+        {
+          resolution: "480p_1",
+          isSuccess: false
+        },
+        {
+          resolution: "720p_1",
+          isSuccess: false
+        },
+        {
+          resolution: "1080p_1",
+          isSuccess: false
+        },
+      ],
       currentProfile: 0
     };
   },
@@ -619,7 +632,7 @@ export default {
           audio: true,
           screen: false
         });
-        this.sendStream.setVideoProfile(profile.enum);
+        this.sendStream.setVideoProfile(profile.resolution);
         this.sendStream.init(
           () => {
             this.sendStream.play("test-send");
@@ -870,14 +883,29 @@ export default {
     haveATry() {
       this.snackbar = false;
       this.dialog = true;
-      this.retry();
+      this.ProfileForTry.forEach((item) => {
+        let index = this.profiles.findIndex((profile) => {
+          return profile.resolution === item.resolution
+        })
+        if(index === -1) {
+          return
+        } 
+        item.isSuccess = this.profiles[index].status === 'resolve'
+      })
+      this.retry(0);
     },
 
-    retry() {
-      this.trying = true;
+    retry(currentIndex) {
       if (this.sendStream) {
         this.sendStream.stop();
         this.sendStream.close();
+      }
+      //If the resolution is equal to not supported, 1. Do not play video stream; 2. Give error prompt
+      if (this.ProfileForTry[currentIndex].isSuccess) {
+        this.showVideo = true
+      } else {
+        this.showVideo = false
+        return
       }
       this.sendStream = AgoraRtc.createStream({
         streamID: this.sendId,
@@ -885,15 +913,13 @@ export default {
         audio: true,
         screen: false
       });
-      this.sendStream.setVideoProfile(this.ProfileForTry[this.currentProfile]);
+      this.sendStream.setVideoProfile(this.ProfileForTry[currentIndex].resolution);
       this.sendStream.init(
         () => {
           this.sendStream.play("modal-video");
-          this.trying = false;
         },
         err => {
           this.errMsgForTry = err.msg;
-          this.trying = false;
         }
       );
     },
