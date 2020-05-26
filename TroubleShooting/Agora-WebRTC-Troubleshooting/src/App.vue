@@ -721,7 +721,7 @@ export default {
           ? (testSuite.extra = this.t("fully_supported"))
           : (testSuite.extra = this.t("some_functions_may_be_limited"));
         this.handleMicrophoneCheck();
-      }, 1000);
+      }, 3000);
     },
 
     handleMicrophoneCheck() {
@@ -753,7 +753,7 @@ export default {
               testSuite.extra = this.t("microphone_works_well");
             }
             this.handleSpeakerCheck();
-          }, 1000);
+          }, 7000);
         },
         err => {
           // do next test
@@ -823,7 +823,7 @@ export default {
 
       setTimeout(() => {
         this.handleConnectivityCheck();
-      }, 500);
+      }, 1500);
     },
 
     async handleConnectivityCheck() {
@@ -841,7 +841,7 @@ export default {
           this.testing = false;
           this.currentTestSuite = "5";
           this.snackbar = true;
-        }, 500);
+        }, 1500);
         return false;
       }
       // go on
@@ -881,8 +881,8 @@ export default {
             ${ this.t('Video_Packet_Loss')}: ${ videoPacketLoss } % </br>
             ${ this.t('Audio_Packet_Loss')}: ${ audioPacketLoss } % </br>`;
           }
-        }, 500);
-      }, 1500);
+        }, 1500);
+      }, 21500);
     },
 
     haveATry() {
@@ -901,7 +901,7 @@ export default {
     },
 
     retry(currentIndex) {
-      if (this.sendStream) {
+      if (this.sendStream && this.sendStream.isPlaying()) {
         this.sendStream.stop();
         this.sendStream.close();
       }
