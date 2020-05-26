@@ -317,9 +317,11 @@ const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
 
+const log = console.log.bind(console)
+
 // If need mobile phone terminal debugging
 // let vConsole = new VConsole()
-// console.log("test")
+// log("testVConsole")
 
 export default {
   name: "App",
@@ -643,10 +645,9 @@ export default {
             this.sendStream.play("test-send");
             setTimeout(() => {
               let videoElement = document.querySelector("#video" + this.sendId);
-              if (
-                videoElement.videoWidth === profile.width &&
-                videoElement.videoHeight === profile.height
-              ) {
+              let videoData = videoElement.videoWidth * videoElement.videoHeight
+              let profileData = profile.width * profile.height
+              if (videoData === profileData) {
                 profile.status = "resolve";
                 resolve();
               } else {
