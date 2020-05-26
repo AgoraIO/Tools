@@ -645,9 +645,9 @@ export default {
             this.sendStream.play("test-send");
             setTimeout(() => {
               let videoElement = document.querySelector("#video" + this.sendId);
-              let videoData = videoElement.videoWidth * videoElement.videoHeight
-              let profileData = profile.width * profile.height
-              if (videoData === profileData) {
+              let videoArea = videoElement.videoWidth * videoElement.videoHeight
+              let profileArea = profile.width * profile.height
+              if (videoArea === profileArea) {
                 profile.status = "resolve";
                 resolve();
               } else {
