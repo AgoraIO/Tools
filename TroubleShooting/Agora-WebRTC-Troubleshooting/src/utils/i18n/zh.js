@@ -49,4 +49,5 @@ export default {
   'Video_Packet_Loss': '视频包丢失',
   'Audio_Packet_Loss': '音频包丢失',
   'some_functions_may_be_limited': '有些功能受限',
+  'videoText': '设备不支持当前分辨率',
 }

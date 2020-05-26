@@ -22,3 +22,4 @@ yarn-error.log*
 
 local_settings.js
 deploy.sh
+package-lock.json

@@ -48,5 +48,6 @@ export default {
   'packet_loss': 'Packet Loss',
   'Video_Packet_Loss': 'Video Packet Loss',
   'Audio_Packet_Loss': 'Audio Packet Loss',
-  'some_functions_may_be_limited': 'Some functions may be limited'
+  'some_functions_may_be_limited': 'Some functions may be limited',
+  'videoText': 'The device does not support the current resolution'
 }
