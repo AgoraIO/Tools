@@ -282,9 +282,8 @@
                 </v-tabs>
               </v-card-title>
               <v-card-text>
-                <div v-if="!showVideo">{{text.videoText}}</div>
                 <div id="modal-video" v-if="!errMsgForTry">
-
+                  <div v-if="!showVideo">{{text.videoText}}</div>
                 </div>
                 <div v-else>{{errMsgForTry}}</div>
               </v-card-text>
@@ -312,10 +311,16 @@
 </template>
 
 <script>
+import  VConsole  from  'vconsole'
 import AgoraRtc from "agora-rtc-sdk";
 const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
+
+// If need mobile phone terminal debugging
+// let vConsole = new VConsole()
+// console.log("test")
+
 export default {
   name: "App",
   components: {
@@ -716,7 +721,7 @@ export default {
           ? (testSuite.extra = this.t("fully_supported"))
           : (testSuite.extra = this.t("some_functions_may_be_limited"));
         this.handleMicrophoneCheck();
-      }, 3000);
+      }, 1000);
     },
 
     handleMicrophoneCheck() {
@@ -748,7 +753,7 @@ export default {
               testSuite.extra = this.t("microphone_works_well");
             }
             this.handleSpeakerCheck();
-          }, 7000);
+          }, 1000);
         },
         err => {
           // do next test
@@ -818,7 +823,7 @@ export default {
 
       setTimeout(() => {
         this.handleConnectivityCheck();
-      }, 1500);
+      }, 500);
     },
 
     async handleConnectivityCheck() {
@@ -836,7 +841,7 @@ export default {
           this.testing = false;
           this.currentTestSuite = "5";
           this.snackbar = true;
-        }, 1500);
+        }, 500);
         return false;
       }
       // go on
@@ -876,8 +881,8 @@ export default {
             ${ this.t('Video_Packet_Loss')}: ${ videoPacketLoss } % </br>
             ${ this.t('Audio_Packet_Loss')}: ${ audioPacketLoss } % </br>`;
           }
-        }, 1500);
-      }, 21500);
+        }, 500);
+      }, 1500);
     },
 
     haveATry() {
