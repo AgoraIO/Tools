@@ -32,6 +32,25 @@
                   {{text.following_step}}
                 </div>
               </v-card-title>
+              <v-card-text class="proxy">
+                <v-label aria-colspan="40">{{text.cloudProxy}}：</v-label>
+
+                <v-btn-toggle v-model="isEnableCloudProxy" rounded>
+                  <v-btn :value=true @click.native="toggleProxy(true)">{{text.cloudProxy_enable}}</v-btn>
+                  <v-btn :value=false @click.native="toggleProxy(false)">{{text.cloudProxy_disable}}</v-btn>
+                </v-btn-toggle>
+              </v-card-text>
+              <v-card-text class="proxy" v-if="isEnableCloudProxy">
+                <v-label aria-colspan="40">{{text.cloudProxy_mode}}：</v-label>
+                <v-btn-toggle v-model="fixProxyPort" rounded>
+                  <v-btn :value=false @click.native="toggleProxyMode(false)">{{text.cloudProxy_default}}</v-btn>
+                  <v-btn :value=true @click.native="toggleProxyMode(true)">{{text.cloudProxy_fix}}</v-btn>
+                </v-btn-toggle>
+                <v-card-text class="tip" v-if="fixProxyPort">
+                  <span></span>{{text.cloudProxy_tips}}
+                  <a href="https://docs.agora.io/cn/Audio%20Broadcast/cloud_proxy_web?platform=Web">{{text.cloudProxy_tips_link}}</a>
+                </v-card-text>
+              </v-card-text>
               <v-card-text>
                 <v-list>
                   <v-list-tile v-for="item in testSuites" :key="item.id">
@@ -347,6 +366,8 @@ export default {
       inputVolume: 0,
       renderChart: false,
       testing: false,
+      isEnableCloudProxy: false,
+      fixProxyPort: false,
       profiles: profileArray.map(item => {
         item.status = "pending";
         return item;
@@ -474,6 +495,14 @@ export default {
       this.recvId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 2;
       this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
       this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
+      if(this.isEnableCloudProxy && this.fixProxyPort){
+        this.sendClient.startProxyServer(2);
+        this.recvClient.startProxyServer(2);
+      }
+      else if(this.isEnableCloudProxy && !this.fixProxyPort){
+        this.sendClient.startProxyServer();
+        this.recvClient.startProxyServer();
+      }
     },
 
     initSendClient() {
@@ -624,6 +653,10 @@ export default {
         this.sendClient.unpublish(this.sendStream);
         this.sendClient.leave();
         this.recvClient.leave();
+        if(this.isEnableCloudProxy){
+          this.sendClient.stopProxyServer();
+          this.recvClient.stopProxyServer();
+        }
         clearInterval(this.detectInterval);
       } catch (err) {
         throw(err);
@@ -792,6 +825,14 @@ export default {
       sound.pause();
       sound.currentTime = 0;
       this.handleCameraCheck();
+    },
+
+    toggleProxy(val) {
+      this.isEnableCloudProxy = val;
+    },
+
+    toggleProxyMode(val) {
+      this.fixProxyPort = val;
     },
 
     async handleCameraCheck() {
@@ -1027,4 +1068,41 @@ export default {
   min-height: 48px!important;
   height: auto!important;
 }
+
+  .proxy {
+    font-size: 12px;
+    margin-left: 20px;
+  }
+  .proxy .v-label {
+    font-size: 13px;
+    color: #333333;
+    width: 100px;
+    display: block;
+    float: left;
+    line-height: 36px;
+    height: 36px;
+  }
+  .proxy .v-btn__content {
+    font-size: 12px;
+  }
+  .proxy .v-btn-toggle .v-btn.v-btn--active {
+    background-color: dodgerblue;
+    color: white;
+  }
+  .tip {
+    color: #666666;
+    font-size: 12px;
+    padding-left: 36px;
+  }
+  .tip span{
+    background-repeat: no-repeat;
+    position: absolute;
+    background-image: url("./assets/info.png");
+    background-size: 18px;
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin-left: -24px;
+  }
+
 </style>
