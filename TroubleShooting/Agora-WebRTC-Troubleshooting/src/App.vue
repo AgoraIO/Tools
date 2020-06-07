@@ -1104,7 +1104,7 @@ export default {
     position: absolute;
     background-image: url("./assets/info.png");
     background-size: 18px;
-    display: block;
+    display: inline-block;
     width: 18px;
     height: 18px;
     margin-left: -24px;

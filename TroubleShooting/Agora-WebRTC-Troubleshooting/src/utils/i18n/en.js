@@ -50,12 +50,12 @@ export default {
   'Audio_Packet_Loss': 'Audio Packet Loss',
   'some_functions_may_be_limited': 'Some functions may be limited',
   'videoText': 'The device does not support the current resolution',
-  'cloudProxy': 'Configure Cloud Proxy',
+  'cloudProxy': 'Cloud Proxy',
   'cloudProxy_enable': 'enable',
   'cloudProxy_disable': 'disable',
-  'cloudProxy_mode': 'Configure Proxy Mode',
+  'cloudProxy_mode': 'Proxy Mode',
   'cloudProxy_default': 'default',
-  'cloudProxy_fix': 'TCP 443 only',
+  'cloudProxy_fix': 'TCP 443',
   'cloudProxy_tips': 'To use proxy via TCP port 443 only, please call startProxyServer(2), for details please check:',
   'cloudProxy_tips_link': 'here'
 
