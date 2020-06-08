@@ -50,4 +50,12 @@ export default {
   'Audio_Packet_Loss': '音频包丢失',
   'some_functions_may_be_limited': '有些功能受限',
   'videoText': '设备不支持当前分辨率',
+  'cloudProxy': '设置云代理',
+  'cloudProxy_enable': '启用',
+  'cloudProxy_disable': '禁用',
+  'cloudProxy_mode': '设置代理模式',
+  'cloudProxy_default': '默认',
+  'cloudProxy_fix': '固定TCP443',
+  'cloudProxy_tips': '若使用固定端口，调用云代理API时，请使用startProxyServer(2)，详见：',
+  'cloudProxy_tips_link': '文档'
 }
