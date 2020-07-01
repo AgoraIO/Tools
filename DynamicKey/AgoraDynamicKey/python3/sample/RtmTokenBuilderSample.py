@@ -1,21 +1,21 @@
-#! /usr/bin/python
-# ! -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
+__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
-import sys
 import os
-import time
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.RtmTokenBuilder import RtmTokenBuilder,Role_Rtm_User
+import sys
 
-appID = "970CA35de60c44645bbae8a215061b33"
-appCertificate = "5CFd2fd1755d40ecb72977518be15d3b"
-user = "test_user_id"
-expirationTimeInSeconds = 3600
-currentTimestamp = int(time.time())
-privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.RtmTokenBuilder import *
+
 
 def main():
-    token = RtmTokenBuilder.buildToken(appID, appCertificate, user, Role_Rtm_User, privilegeExpiredTs)
+    app_id = "970CA35de60c44645bbae8a215061b33"
+    app_certificate = "5CFd2fd1755d40ecb72977518be15d3b"
+    user_id = "test_user_id"
+    expiration_in_seconds = 3600
+
+    token = RtmTokenBuilder.build_token(app_id, app_certificate, user_id, expiration_in_seconds)
     print("Rtm Token: {}".format(token))
 
 

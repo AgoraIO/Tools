@@ -1,179 +1,218 @@
-import hmac
-from hashlib import sha256
-import ctypes
-import base64
-import struct
-from zlib import crc32
-import random
+# -*- coding: utf-8 -*-
+__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
+
+
 import time
+import hmac
+import zlib
+import struct
+import random
+
+from hashlib import sha256
 from collections import OrderedDict
 
-kJoinChannel = 1
-kPublishAudioStream = 2
-kPublishVideoStream = 3
-kPublishDataStream = 4
-kPublishAudiocdn = 5
-kPublishVideoCdn = 6
-kRequestPublishAudioStream = 7
-kRequestPublishVideoStream = 8
-kRequestPublishDataStream = 9
-kInvitePublishAudioStream = 10
-kInvitePublishVideoStream = 11
-kInvitePublishDataStream = 12
-kAdministrateChannel = 101
-kRtmLogin = 1000
 
 VERSION_LENGTH = 3
-APP_ID_LENGTH = 32
 
 
-def getVersion():
-    return '006'
+def get_version():
+    return b'007'
 
 
-def packUint16(x):
+def pack_uint16(x):
     return struct.pack('<H', int(x))
 
 
-def packUint32(x):
+def unpack_uint16(buffer):
+    data_length = struct.calcsize('H')
+    return struct.unpack('<H', buffer[:data_length])[0], buffer[data_length:]
+
+
+def pack_uint32(x):
     return struct.pack('<I', int(x))
 
 
-def packInt32(x):
-    return struct.pack('<i', int(x))
+def unpack_uint32(buffer):
+    data_length = struct.calcsize('I')
+    return struct.unpack('<I', buffer[:data_length])[0], buffer[data_length:]
 
 
-def packString(string):
-    return packUint16(len(string)) + string
+def pack_string(string):
+    return pack_uint16(len(string)) + string
 
 
-def packMap(m):
-    ret = packUint16(len(list(m.items())))
-    for k, v in list(m.items()):
-        ret += packUint16(k) + packString(v)
-    return ret
+def unpack_string(buffer):
+    data_length, buffer = unpack_uint16(buffer)
+    return struct.unpack('<{}s'.format(data_length), buffer[:data_length])[0], buffer[data_length:]
 
 
-def packMapUint32(m):
-    ret = packUint16(len(list(m.items())))
-    for k, v in list(m.items()):
-        ret += packUint16(k) + packUint32(v)
-    return ret
+def pack_map_uint32(m):
+    return pack_uint16(len(list(m.items()))) + b''.join([pack_uint16(k) + pack_uint32(v) for k, v in list(m.items())])
 
 
-class ReadByteBuffer:
+def unpack_map_uint32(buffer):
+    data_length, buffer = unpack_uint16(buffer)
 
-    def __init__(self, bytes):
-        self.buffer = bytes
-        self.position = 0
-
-    def unPackUint16(self):
-        len = struct.calcsize('H')
-        buff = self.buffer[self.position: self.position + len]
-        ret = struct.unpack('<H', buff)[0]
-        self.position += len
-        return ret
-
-    def unPackUint32(self):
-        len = struct.calcsize('I')
-        buff = self.buffer[self.position: self.position + len]
-        ret = struct.unpack('<I', buff)[0]
-        self.position += len
-        return ret
-
-    def unPackString(self):
-        strlen = self.unPackUint16()
-        buff = self.buffer[self.position: self.position + strlen]
-        ret = struct.unpack('<' + str(strlen) + 's', buff)[0]
-        self.position += strlen
-        return ret
-
-    def unPackMapUint32(self):
-        messages = {}
-        maplen = self.unPackUint16()
-
-        for index in range(maplen):
-            key = self.unPackUint16()
-            value = self.unPackUint32()
-            messages[key] = value
-        return messages
+    data = {}
+    for i in range(data_length):
+        k, buffer = unpack_uint16(buffer)
+        v, buffer = unpack_uint32(buffer)
+        data[k] = v
+    return data, buffer
 
 
-def unPackContent(buff):
-    readbuf = ReadByteBuffer(buff)
-    signature = readbuf.unPackString()
-    crc_channel_name = readbuf.unPackUint32()
-    crc_uid = readbuf.unPackUint32()
-    m = readbuf.unPackString()
+class Service:
+    def __init__(self, service_type):
+        self.__type = service_type
+        self.__privileges = {}
 
-    return signature, crc_channel_name, crc_uid, m
+    def __pack_type(self):
+        return pack_uint16(self.__type)
+
+    def __pack_privileges(self):
+        privileges = OrderedDict(sorted(iter(self.__privileges.items()), key=lambda x: int(x[0])))
+        return pack_map_uint32(privileges)
+
+    def add_privilege(self, privilege, expire):
+        self.__privileges[privilege] = expire
+
+    def service_type(self):
+        return self.__type
+
+    def pack(self):
+        return self.__pack_type() + self.__pack_privileges()
+
+    def unpack(self, buffer):
+        self.__privileges, buffer = unpack_map_uint32(buffer)
+        return buffer
 
 
-def unPackMessages(buff):
-    readbuf = ReadByteBuffer(buff)
-    salt = readbuf.unPackUint32()
-    ts = readbuf.unPackUint32()
-    messages = readbuf.unPackMapUint32()
+class ServiceRtc(Service):
+    kServiceType = 1
 
-    return salt, ts, messages
+    kPrivilegeJoinChannel = 1
+    kPrivilegePublishAudioStream = 2
+    kPrivilegePublishVideoStream = 3
+    kPrivilegePublishDataStream = 4
+
+    def __init__(self, channel_name='', uid=0):
+        super(ServiceRtc, self).__init__(ServiceRtc.kServiceType)
+        self.__channel_name = channel_name.encode('utf-8')
+        self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
+
+    def pack(self):
+        return super(ServiceRtc, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceRtc, self).unpack(buffer)
+        self.__channel_name, buffer = unpack_string(buffer)
+        self.__uid, buffer = unpack_string(buffer)
+        return buffer
+
+
+class ServiceRtm(Service):
+    kServiceType = 2
+
+    kPrivilegeLogin = 1
+
+    def __init__(self, user_id=''):
+        super(ServiceRtm, self).__init__(ServiceRtm.kServiceType)
+        self.__user_id = user_id.encode('utf-8')
+
+    def pack(self):
+        return super(ServiceRtm, self).pack() + pack_string(self.__user_id)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceRtm, self).unpack(buffer)
+        self.__user_id, buffer = unpack_string(buffer)
+        return buffer
+
+
+class ServiceStreaming(Service):
+    kServiceType = 3
+
+    kPrivilegePublishMixStream = 1
+    kPrivilegePublishRawStream = 2
+
+    def __init__(self, channel_name=''):
+        super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
+        self.__channel_name = channel_name.encode('utf-8')
+        self.__uid = b''
+
+    def pack(self):
+        return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceStreaming, self).unpack(buffer)
+        self.__channel_name, buffer = unpack_string(buffer)
+        self.__uid, buffer = unpack_string(buffer)
+        return buffer
 
 
 class AccessToken:
+    kServices = {
+        ServiceRtc.kServiceType: ServiceRtc,
+        ServiceRtm.kServiceType: ServiceRtm,
+        ServiceStreaming.kServiceType: ServiceStreaming
+    }
 
-    def __init__(self, appID='', appCertificate='', channelName='', uid=''):
+    def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
         random.seed(time.time())
-        self.appID = appID
-        self.appCertificate = appCertificate
-        self.channelName = channelName
-        self.ts = int(time.time()) + 24 * 3600
-        self.salt = random.randint(1, 99999999)
-        self.messages = {}
-        if (uid == 0):
-            self.uidStr = ""
-        else:
-            self.uidStr = str(uid)
 
-    def addPrivilege(self, privilege, expireTimestamp):
-        self.messages[privilege] = expireTimestamp
+        self.__app_id = app_id.encode('utf-8')
+        self.__app_cert = app_certificate.encode('utf-8')
 
-    def fromString(self, originToken):
-        try:
-            dk6version = getVersion()
-            originVersion = originToken[:VERSION_LENGTH]
-            if (originVersion != dk6version):
-                return False
+        self.__issue_ts = issue_ts if issue_ts != 0 else int(time.time())
+        self.__expire = expire
+        self.__salt = random.randint(1, 99999999)
 
-            originAppID = originToken[VERSION_LENGTH:(VERSION_LENGTH + APP_ID_LENGTH)]
-            originContent = originToken[(VERSION_LENGTH + APP_ID_LENGTH):]
-            originContentDecoded = base64.b64decode(originContent)
+        self.__service = {}
 
-            signature, crc_channel_name, crc_uid, m = unPackContent(originContentDecoded)
-            self.salt, self.ts, self.messages = unPackMessages(m)
+    def __signing(self):
+        signing = hmac.new(pack_uint32(self.__issue_ts), self.__app_cert, sha256).digest()
+        signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
+        return signing
 
-        except Exception as e:
-            print("error:", str(e))
-            return False
-
-        return True
+    def add_service(self, service):
+        self.__service[service.service_type()] = service
 
     def build(self):
+        signing = self.__signing()
 
-        self.messages = OrderedDict(sorted(iter(self.messages.items()), key=lambda x: int(x[0])))
+        signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
+            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
-        m = packUint32(self.salt) + packUint32(self.ts) \
-            + packMapUint32(self.messages)
+        for _, service in self.__service.items():
+            signing_info += service.pack()
 
-        val = self.appID.encode('utf-8') + self.channelName.encode('utf-8') + self.uidStr.encode('utf-8') + m
+        signature = hmac.new(signing, signing_info, sha256).digest()
 
-        signature = hmac.new(self.appCertificate.encode('utf-8'), val, sha256).digest()
-        crc_channel_name = crc32(self.channelName.encode('utf-8')) & 0xffffffff
-        crc_uid = crc32(self.uidStr.encode('utf-8')) & 0xffffffff
+        return get_version() + zlib.compress(pack_string(signature) + signing_info)
 
-        content = packString(signature) \
-                  + packUint32(crc_channel_name) \
-                  + packUint32(crc_uid) \
-                  + packString(m)
+    def from_string(self, origin_token):
+        if not isinstance(origin_token, bytes):
+            raise TypeError('Error: expect origin_token bytes, but got {}'.format(type(origin_token).__name__))
 
-        version = getVersion()
-        ret = version + self.appID + base64.b64encode(content).decode('utf-8')
-        return ret
+        try:
+            origin_version = origin_token[:VERSION_LENGTH]
+            if origin_version != get_version():
+                return False
+
+            buffer = zlib.decompress(origin_token[VERSION_LENGTH:])
+            signature, buffer = unpack_string(buffer)
+            self.__app_id, buffer = unpack_string(buffer)
+            self.__issue_ts, buffer = unpack_uint32(buffer)
+            self.__expire, buffer = unpack_uint32(buffer)
+            self.__salt, buffer = unpack_uint32(buffer)
+            service_count, buffer = unpack_uint16(buffer)
+
+            for i in range(service_count):
+                service_type, buffer = unpack_uint16(buffer)
+                service = AccessToken.kServices[service_type]()
+                buffer = service.unpack(buffer)
+                self.__service[service_type] = service
+        except Exception as e:
+            print('Error: {}'.format(repr(e)))
+            raise ValueError('Error: parse origin token failed')
+        return True
+

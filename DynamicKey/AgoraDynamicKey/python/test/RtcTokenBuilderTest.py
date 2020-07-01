@@ -18,7 +18,7 @@ ts = 1111111
 class RtcTokenBuilderTest(unittest.TestCase):
 
     def test_(self):
-        token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
+        token = RtcTokenBuilder.build_token_with_uid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
         parser = AccessToken()
         parser.fromString(token)
 

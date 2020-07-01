@@ -1,33 +1,63 @@
+# -*- coding: utf-8 -*-
+__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
+
+
+import os
 import sys
 import unittest
-import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.RtcTokenBuilder import RtcTokenBuilder,Role_Attendee,Role_Subscriber
-from src.AccessToken import AccessToken,kJoinChannel,kPublishVideoStream,kPublishAudioStream,kPublishDataStream
 
-appID = "970CA35de60c44645bbae8a215061b33"
-appCertificate = "5CFd2fd1755d40ecb72977518be15d3b"
-channelName = "7d72365eb983485397e3e3f9d460bdda"
-uid = 2882341273
-expireTimestamp = 1446455471
-salt = 1
-ts = 1111111
+from src.AccessToken import *
+from src.RtcTokenBuilder import *
 
 
 class RtcTokenBuilderTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.__app_id = '970CA35de60c44645bbae8a215061b33'
+        self.__app_cert = '5CFd2fd1755d40ecb72977518be15d3b'
+        self.__channel_name = '7d72365eb983485397e3e3f9d460bdda'
+        self.__uid = 2882341273
+        self.__account = '^ZSgT<%q:Fj*@`92>#OHL?"hkm~nGYiP'
+        self.__expire = 600
 
-    def test_(self):
-        token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
+    def test_token_with_uid(self):
+        token = RtcTokenBuilder.build_token_with_uid(self.__app_id, self.__app_cert, self.__channel_name, self.__uid,
+                                                     Role_Subscriber, self.__expire)
         parser = AccessToken()
-        parser.fromString(token)
+        parser.from_string(token)
 
-        self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
-        self.assertNotIn(kPublishVideoStream, parser.messages)
-        self.assertNotIn(kPublishAudioStream, parser.messages)
-        self.assertNotIn(kPublishDataStream, parser.messages)
+        self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
+        self.assertEqual(parser._AccessToken__expire, self.__expire)
+        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
 
+        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
 
+        self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceRtc__uid, str(self.__uid).encode('utf-8'))
+        self.assertIn(ServiceRtc.kPrivilegeJoinChannel, parser_service._Service__privileges)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegeJoinChannel], self.__expire)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
 
-if __name__ == "__main__":
-    unittest.main()
+    def test_token_with_account(self):
+        token = RtcTokenBuilder.build_token_with_account(self.__app_id, self.__app_cert, self.__channel_name,
+                                                         self.__account, Role_Subscriber, self.__expire)
+        parser = AccessToken()
+        parser.from_string(token)
+
+        self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
+        self.assertEqual(parser._AccessToken__expire, self.__expire)
+        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
+
+        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+
+        self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceRtc__uid, self.__account.encode('utf-8'))
+        self.assertIn(ServiceRtc.kPrivilegeJoinChannel, parser_service._Service__privileges)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegeJoinChannel], self.__expire)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
+        self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
+
