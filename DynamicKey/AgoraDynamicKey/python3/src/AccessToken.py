@@ -2,217 +2,108 @@
 __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
 
-import time
 import hmac
-import zlib
-import struct
+import time
+import base64
 import random
+import warnings
 
+from zlib import crc32
 from hashlib import sha256
 from collections import OrderedDict
 
+from .Packer import *
+
+
+warnings.warn('The AccessToken module is deprecated', DeprecationWarning)
+
+
+kJoinChannel = 1
+kPublishAudioStream = 2
+kPublishVideoStream = 3
+kPublishDataStream = 4
+
+kPublishAudioCdn = 5  # deprecated, unused
+kPublishVideoCdn = 6  # deprecated, unused
+kRequestPublishAudioStream = 7  # deprecated, unused
+kRequestPublishVideoStream = 8  # deprecated, unused
+kRequestPublishDataStream = 9  # deprecated, unused
+kInvitePublishAudioStream = 10  # deprecated, unused
+kInvitePublishVideoStream = 11  # deprecated, unused
+kInvitePublishDataStream = 12  # deprecated, unused
+kAdministrateChannel = 101  # deprecated, unused
+
+kRtmLogin = 1000
 
 VERSION_LENGTH = 3
+APP_ID_LENGTH = 32
 
 
-def get_version():
-    return b'007'
+def getVersion():
+    return '006'
 
 
-def pack_uint16(x):
-    return struct.pack('<H', int(x))
+def unPackContent(buff):
+    signature, buff = unpack_string(buff)
+    crc_channel_name, buff = unpack_uint32(buff)
+    crc_uid, buff = unpack_uint32(buff)
+    m, buff = unpack_string(buff)
+    return signature, crc_channel_name, crc_uid, m
 
 
-def unpack_uint16(buffer):
-    data_length = struct.calcsize('H')
-    return struct.unpack('<H', buffer[:data_length])[0], buffer[data_length:]
-
-
-def pack_uint32(x):
-    return struct.pack('<I', int(x))
-
-
-def unpack_uint32(buffer):
-    data_length = struct.calcsize('I')
-    return struct.unpack('<I', buffer[:data_length])[0], buffer[data_length:]
-
-
-def pack_string(string):
-    return pack_uint16(len(string)) + string
-
-
-def unpack_string(buffer):
-    data_length, buffer = unpack_uint16(buffer)
-    return struct.unpack('<{}s'.format(data_length), buffer[:data_length])[0], buffer[data_length:]
-
-
-def pack_map_uint32(m):
-    return pack_uint16(len(list(m.items()))) + b''.join([pack_uint16(k) + pack_uint32(v) for k, v in list(m.items())])
-
-
-def unpack_map_uint32(buffer):
-    data_length, buffer = unpack_uint16(buffer)
-
-    data = {}
-    for i in range(data_length):
-        k, buffer = unpack_uint16(buffer)
-        v, buffer = unpack_uint32(buffer)
-        data[k] = v
-    return data, buffer
-
-
-class Service:
-    def __init__(self, service_type):
-        self.__type = service_type
-        self.__privileges = {}
-
-    def __pack_type(self):
-        return pack_uint16(self.__type)
-
-    def __pack_privileges(self):
-        privileges = OrderedDict(sorted(iter(self.__privileges.items()), key=lambda x: int(x[0])))
-        return pack_map_uint32(privileges)
-
-    def add_privilege(self, privilege, expire):
-        self.__privileges[privilege] = expire
-
-    def service_type(self):
-        return self.__type
-
-    def pack(self):
-        return self.__pack_type() + self.__pack_privileges()
-
-    def unpack(self, buffer):
-        self.__privileges, buffer = unpack_map_uint32(buffer)
-        return buffer
-
-
-class ServiceRtc(Service):
-    kServiceType = 1
-
-    kPrivilegeJoinChannel = 1
-    kPrivilegePublishAudioStream = 2
-    kPrivilegePublishVideoStream = 3
-    kPrivilegePublishDataStream = 4
-
-    def __init__(self, channel_name='', uid=0):
-        super(ServiceRtc, self).__init__(ServiceRtc.kServiceType)
-        self.__channel_name = channel_name.encode('utf-8')
-        self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
-
-    def pack(self):
-        return super(ServiceRtc, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceRtc, self).unpack(buffer)
-        self.__channel_name, buffer = unpack_string(buffer)
-        self.__uid, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceRtm(Service):
-    kServiceType = 2
-
-    kPrivilegeLogin = 1
-
-    def __init__(self, user_id=''):
-        super(ServiceRtm, self).__init__(ServiceRtm.kServiceType)
-        self.__user_id = user_id.encode('utf-8')
-
-    def pack(self):
-        return super(ServiceRtm, self).pack() + pack_string(self.__user_id)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceRtm, self).unpack(buffer)
-        self.__user_id, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceStreaming(Service):
-    kServiceType = 3
-
-    kPrivilegePublishMixStream = 1
-    kPrivilegePublishRawStream = 2
-
-    def __init__(self, channel_name=''):
-        super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
-        self.__channel_name = channel_name.encode('utf-8')
-        self.__uid = b''
-
-    def pack(self):
-        return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceStreaming, self).unpack(buffer)
-        self.__channel_name, buffer = unpack_string(buffer)
-        self.__uid, buffer = unpack_string(buffer)
-        return buffer
+def unPackMessages(buff):
+    salt, buff = unpack_uint32(buff)
+    ts, buff = unpack_uint32(buff)
+    messages, buff = unpack_map_uint32(buff)
+    return salt, ts, messages
 
 
 class AccessToken:
-    kServices = {
-        ServiceRtc.kServiceType: ServiceRtc,
-        ServiceRtm.kServiceType: ServiceRtm,
-        ServiceStreaming.kServiceType: ServiceStreaming
-    }
-
-    def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
+    def __init__(self, appID='', appCertificate='', channelName='', uid=''):
         random.seed(time.time())
+        self.appID = appID
+        self.appCertificate = appCertificate
+        self.channelName = channelName
+        self.ts = int(time.time()) + 24 * 3600
+        self.salt = random.randint(1, 99999999)
+        self.messages = {}
+        self.uidStr = '' if uid == 0 else str(uid)
 
-        self.__app_id = app_id.encode('utf-8')
-        self.__app_cert = app_certificate.encode('utf-8')
+    def addPrivilege(self, privilege, expireTimestamp):
+        self.messages[privilege] = expireTimestamp
 
-        self.__issue_ts = issue_ts if issue_ts != 0 else int(time.time())
-        self.__expire = expire
-        self.__salt = random.randint(1, 99999999)
-
-        self.__service = {}
-
-    def __signing(self):
-        signing = hmac.new(pack_uint32(self.__issue_ts), self.__app_cert, sha256).digest()
-        signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
-        return signing
-
-    def add_service(self, service):
-        self.__service[service.service_type()] = service
-
-    def build(self):
-        signing = self.__signing()
-
-        signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
-
-        for _, service in self.__service.items():
-            signing_info += service.pack()
-
-        signature = hmac.new(signing, signing_info, sha256).digest()
-
-        return get_version() + zlib.compress(pack_string(signature) + signing_info)
-
-    def from_string(self, origin_token):
-        if not isinstance(origin_token, bytes):
-            raise TypeError('Error: expect origin_token bytes, but got {}'.format(type(origin_token).__name__))
-
+    def fromString(self, originToken):
         try:
-            origin_version = origin_token[:VERSION_LENGTH]
-            if origin_version != get_version():
+            dk6version = getVersion()
+            originVersion = originToken[:VERSION_LENGTH]
+            if originVersion != dk6version:
                 return False
 
-            buffer = zlib.decompress(origin_token[VERSION_LENGTH:])
-            signature, buffer = unpack_string(buffer)
-            self.__app_id, buffer = unpack_string(buffer)
-            self.__issue_ts, buffer = unpack_uint32(buffer)
-            self.__expire, buffer = unpack_uint32(buffer)
-            self.__salt, buffer = unpack_uint32(buffer)
-            service_count, buffer = unpack_uint16(buffer)
+            originAppID = originToken[VERSION_LENGTH:(VERSION_LENGTH + APP_ID_LENGTH)]
+            originContent = originToken[(VERSION_LENGTH + APP_ID_LENGTH):]
+            originContentDecoded = base64.b64decode(originContent)
 
-            for i in range(service_count):
-                service_type, buffer = unpack_uint16(buffer)
-                service = AccessToken.kServices[service_type]()
-                buffer = service.unpack(buffer)
-                self.__service[service_type] = service
+            signature, crc_channel_name, crc_uid, m = unPackContent(originContentDecoded)
+            self.salt, self.ts, self.messages = unPackMessages(m)
+
         except Exception as e:
-            print('Error: {}'.format(repr(e)))
-            raise ValueError('Error: parse origin token failed')
+            print("error:", str(e))
+            return False
+
         return True
 
+    def build(self):
+        self.messages = OrderedDict(sorted(iter(self.messages.items()), key=lambda x: int(x[0])))
+
+        m = pack_uint32(self.salt) + pack_uint32(self.ts) + pack_map_uint32(self.messages)
+        val = self.appID.encode('utf-8') + self.channelName.encode('utf-8') + self.uidStr.encode('utf-8') + m
+
+        signature = hmac.new(self.appCertificate.encode('utf-8'), val, sha256).digest()
+        crc_channel_name = crc32(self.channelName.encode('utf-8')) & 0xffffffff
+        crc_uid = crc32(self.uidStr.encode('utf-8')) & 0xffffffff
+
+        content = pack_string(signature) + pack_uint32(crc_channel_name) + pack_uint32(crc_uid) + pack_string(m)
+
+        version = getVersion()
+        ret = version + self.appID + base64.b64encode(content).decode('utf-8')
+        return ret
