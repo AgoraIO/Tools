@@ -6,6 +6,7 @@ import time
 import hmac
 import zlib
 import random
+import base64
 
 from hashlib import sha256
 from collections import OrderedDict
@@ -17,7 +18,7 @@ VERSION_LENGTH = 3
 
 
 def get_version():
-    return b'007'
+    return '007'
 
 
 class Service:
@@ -146,18 +147,15 @@ class AccessToken:
 
         signature = hmac.new(signing, signing_info, sha256).digest()
 
-        return get_version() + zlib.compress(pack_string(signature) + signing_info)
+        return get_version() + base64.b64encode(zlib.compress(pack_string(signature) + signing_info)).decode('utf-8')
 
     def from_string(self, origin_token):
-        if not isinstance(origin_token, bytes):
-            raise TypeError('Error: expect origin_token bytes, but got {}'.format(type(origin_token).__name__))
-
         try:
             origin_version = origin_token[:VERSION_LENGTH]
             if origin_version != get_version():
                 return False
 
-            buffer = zlib.decompress(origin_token[VERSION_LENGTH:])
+            buffer = zlib.decompress(base64.b64decode(origin_token[VERSION_LENGTH:]))
             signature, buffer = unpack_string(buffer)
             self.__app_id, buffer = unpack_string(buffer)
             self.__issue_ts, buffer = unpack_uint32(buffer)

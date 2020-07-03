@@ -31,11 +31,9 @@ class AccessToken2Test(unittest.TestCase):
         token.add_service(service)
         result = token.build()
 
-        expected = '303037789c5360105bb0c3272aaee9f477ff1dc217e6471ef5be75f240a24204abe59ae9e17d53bba514182ccd0d' \
-                   '9c1d8d4d5352cd0c924d4ccc4c4c939212532d128d0c4d0dcc0c938c8dddbf083044303130303280300482f80a0c' \
-                   'e629e646c666a6a9499616c62616a6c696e6a9c6a9c6699629266606492929895c0c46161646c6268646e6c600c2' \
-                   '6a24e3'
-        self.assertEqual(bytes.fromhex(expected), result)
+        expected = '007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
+                   'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
+        self.assertEqual(expected, result)
 
     def test_service_rtc_uid_0(self):
         token = AccessToken(self.__app_id, self.__app_cert, issue_ts=self.__ts, expire=self.__expire)
@@ -47,9 +45,7 @@ class AccessToken2Test(unittest.TestCase):
         token.add_service(service)
         result = token.build()
 
-        expected = '303037789c5360b87364fd3c2f16b53e0e7bf937176ffddc677c22e15ea46e96cea20d06d9d398936d14182ccd0d9' \
-                   'c1d8d4d5352cd0c924d4ccc4c4c939212532d128d0c4d0dcc0c938c8dddbf083044303130303280300482f80a0ce6' \
-                   '29e646c666a6a9499616c62616a6c696e6a9c6a9c6699629266606492929890c0c00369c226a'
-
-        self.assertEqual(bytes.fromhex(expected), result)
+        expected = '007eJxTYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
+                   'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMADacImo='
+        self.assertEqual(expected, result)
 
