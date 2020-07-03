@@ -21,31 +21,39 @@ class AccessToken2Test(unittest.TestCase):
         self.__salt = 1
         self.__ts = 1111111
 
-    def test_service_rtc(self):
-        token = AccessToken(self.__app_id, self.__app_cert, issue_ts=self.__ts, expire=self.__expire)
-        token._AccessToken__salt = self.__salt
+        self.__token = AccessToken(self.__app_id, self.__app_cert, issue_ts=self.__ts, expire=self.__expire)
+        self.__token._AccessToken__salt = self.__salt
 
+    def test_service_rtc(self):
         service = ServiceRtc(self.__channel_name, self.__uid)
         service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
 
-        token.add_service(service)
-        result = token.build()
+        self.__token.add_service(service)
+        result = self.__token.build()
 
         expected = '007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
                    'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
         self.assertEqual(expected, result)
 
     def test_service_rtc_uid_0(self):
-        token = AccessToken(self.__app_id, self.__app_cert, issue_ts=self.__ts, expire=self.__expire)
-        token._AccessToken__salt = self.__salt
-
         service = ServiceRtc(self.__channel_name, 0)
         service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
 
-        token.add_service(service)
-        result = token.build()
+        self.__token.add_service(service)
+        result = self.__token.build()
 
         expected = '007eJxTYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
                    'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMADacImo='
+        self.assertEqual(expected, result)
+
+    def test_service_rtc_account(self):
+        service = ServiceRtc(self.__channel_name, str(self.__uid))
+        service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+
+        self.__token.add_service(service)
+        result = self.__token.build()
+
+        expected = '007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
+                   'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
         self.assertEqual(expected, result)
 

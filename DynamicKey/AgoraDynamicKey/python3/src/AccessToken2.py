@@ -94,10 +94,10 @@ class ServiceStreaming(Service):
     kPrivilegePublishMixStream = 1
     kPrivilegePublishRawStream = 2
 
-    def __init__(self, channel_name=''):
+    def __init__(self, channel_name='', uid=0):
         super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
         self.__channel_name = channel_name.encode('utf-8')
-        self.__uid = b''
+        self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
 
     def pack(self):
         return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
@@ -119,8 +119,8 @@ class AccessToken:
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
         random.seed(time.time())
 
-        self.__app_id = app_id.encode('utf-8')
-        self.__app_cert = app_certificate.encode('utf-8')
+        self.__app_id = app_id
+        self.__app_cert = app_certificate
 
         self.__issue_ts = issue_ts if issue_ts != 0 else int(time.time())
         self.__expire = expire
@@ -133,12 +133,31 @@ class AccessToken:
         signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
         return signing
 
+    def __build_check(self):
+        def is_uuid(data):
+            if len(data) != 32:
+                return False
+            try:
+                bytes.fromhex(data)
+            except:
+                return False
+            return True
+        if not is_uuid(self.__app_id) or not is_uuid(self.__app_cert):
+            return False
+        if not self.__service:
+            return False
+        return True
+
     def add_service(self, service):
         self.__service[service.service_type()] = service
 
     def build(self):
-        signing = self.__signing()
+        if not self.__build_check():
+            return ''
 
+        self.__app_id = self.__app_id.encode('utf-8')
+        self.__app_cert = self.__app_cert.encode('utf-8')
+        signing = self.__signing()
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
             pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
