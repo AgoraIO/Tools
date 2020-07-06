@@ -1,11 +1,16 @@
-#pragma once
+// Copyright (c) 2014-2017 Agora.io, Inc.
+//
+
+#pragma once  // NOLINT(build/header_guard)
 
 #include <zlib.h>
+
 #include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
+
 #include "cpp/src/utils.h"
 
 namespace agora {
@@ -71,59 +76,53 @@ struct AccessToken {
   uint32_t crc_uid_;
 };
 
-inline std::string AccessToken::Version() { 
-  return "006";
-}
+inline std::string AccessToken::Version() { return "006"; }
 
 inline std::string AccessToken::GenerateSignature(
-    const std::string& appCertificate,
-    const std::string& appID,
-    const std::string& channelName,
-    const std::string& uid,
+    const std::string& appCertificate, const std::string& appID,
+    const std::string& channelName, const std::string& uid,
     const std::string& message) {
   std::stringstream ss;
   ss << appID << channelName << uid << message;
   return (HmacSign2(appCertificate, ss.str(), HMAC_SHA256_LENGTH));
 }
 
-inline AccessToken::AccessToken() : crc_channel_name_(0), crc_uid_(0) {
+inline AccessToken::AccessToken() : crc_channel_name_(0), crc_uid_(0) {}
+
+inline AccessToken::AccessToken(const std::string& appId,
+                                const std::string& appCertificate,
+                                const std::string& channelName, uint32_t uid)
+    : app_id_(appId),
+      app_cert_(appCertificate),
+      channel_name_(channelName),
+      crc_channel_name_(0),
+      crc_uid_(0) {
+  std::stringstream uidStr;
+  if (uid == 0) {
+    uidStr << "";
+  } else {
+    uidStr << uid;
+  }
+  uid_ = uidStr.str();
+  uint32_t now = ::time(NULL);
+  message_.salt = GenerateSalt();
+  message_.ts = now + 24 * 3600;
 }
 
 inline AccessToken::AccessToken(const std::string& appId,
-    const std::string& appCertificate,
-    const std::string& channelName,
-    uint32_t uid) :
-  app_id_(appId),
-  app_cert_(appCertificate),
-  channel_name_(channelName),
-  crc_channel_name_(0),
-  crc_uid_(0) {
-    std::stringstream uidStr;
-    if (uid == 0) {
-      uidStr << "";
-    } else {
-      uidStr << uid;
-    }
-    uid_ = uidStr.str();
-    uint32_t now = ::time(NULL);
-    message_.salt = GenerateSalt();
-    message_.ts = now + 24 * 3600;
-  }
-
-inline AccessToken::AccessToken(const std::string& appId,
-    const std::string& appCertificate,
-    const std::string& channelName,
-    const std::string& uid) :
-  app_id_(appId),
-  app_cert_(appCertificate),
-  channel_name_(channelName),
-  uid_(uid),
-  crc_channel_name_(0),
-  crc_uid_(0) {
-    uint32_t now = ::time(NULL);
-    message_.salt = GenerateSalt();
-    message_.ts = now + 24 * 3600;
-  }
+                                const std::string& appCertificate,
+                                const std::string& channelName,
+                                const std::string& uid)
+    : app_id_(appId),
+      app_cert_(appCertificate),
+      channel_name_(channelName),
+      uid_(uid),
+      crc_channel_name_(0),
+      crc_uid_(0) {
+  uint32_t now = ::time(NULL);
+  message_.salt = GenerateSalt();
+  message_.ts = now + 24 * 3600;
+}
 
 inline std::string AccessToken::Build() {
   if (!IsUUID(app_id_)) {
@@ -137,13 +136,12 @@ inline std::string AccessToken::Build() {
   }
   message_raw_content_ = Pack(message_);
   signature_ = GenerateSignature(app_cert_, app_id_, channel_name_, uid_,
-      message_raw_content_);
+                                 message_raw_content_);
   crc_channel_name_ = crc32(
       0, reinterpret_cast<Bytef*>(const_cast<char*>(channel_name_.c_str())),
       channel_name_.length());
-  crc_uid_ =
-    crc32(0, reinterpret_cast<Bytef*>(const_cast<char*>(uid_.c_str())),
-        uid_.length());
+  crc_uid_ = crc32(0, reinterpret_cast<Bytef*>(const_cast<char*>(uid_.c_str())),
+                   uid_.length());
   PackContent content;
   content.signature = signature_;
   content.crcChannelName = crc_channel_name_;
@@ -161,9 +159,9 @@ inline bool AccessToken::FromString(const std::string& channelKeyString) {
   try {
     app_id_ = channelKeyString.substr(VERSION_LENGTH, APP_ID_LENGTH);
     PackContent content;
-    Unpack(base64Decode(channelKeyString.substr(
-            VERSION_LENGTH + APP_ID_LENGTH, channelKeyString.size())),
-        content);
+    Unpack(base64Decode(channelKeyString.substr(VERSION_LENGTH + APP_ID_LENGTH,
+                                                channelKeyString.size())),
+           content);
     signature_ = content.signature;
     crc_channel_name_ = content.crcChannelName;
     crc_uid_ = content.crcUid;
@@ -175,12 +173,14 @@ inline bool AccessToken::FromString(const std::string& channelKeyString) {
   return true;
 }
 
-inline void AccessToken::AddPrivilege(Privileges privilege, uint32_t expireTimestamp) {
+inline void AccessToken::AddPrivilege(Privileges privilege,
+                                      uint32_t expireTimestamp) {
   message_.messages[privilege] = expireTimestamp;
 }
 
 inline void AccessToken::SetTokenExpiredTs(uint32_t seconds) {
   message_.ts = ::time(NULL) + seconds;
 }
+
 }  // namespace tools
 }  // namespace agora

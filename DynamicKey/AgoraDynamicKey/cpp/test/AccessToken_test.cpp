@@ -1,7 +1,13 @@
+// Copyright (c) 2014-2017 Agora.io, Inc.
+//
+
 #include "../src/AccessToken.h"
+
 #include <gtest/gtest.h>
-#include <string>
 #include <stdint.h>
+
+#include <string>
+
 using namespace agora::tools;
 
 class AccessToken_test : public testing::Test {
@@ -63,7 +69,8 @@ class AccessToken_test : public testing::Test {
 
   void testAccessTokenWithIntUidZero() {
     std::string expected =
-        "006970CA35de60c44645bbae8a215061b33IACw1o7htY6ISdNRtku3p9tjTPi0jCKf9t49UHJhzCmL6bdIfRAAAAAAEAABAAAAR/QQAAEAAQCvKDdW";
+        "006970CA35de60c44645bbae8a215061b33IACw1o7htY6ISdNRtku3p9tjTPi0jCKf9t4"
+        "9UHJhzCmL6bdIfRAAAAAAEAABAAAAR/QQAAEAAQCvKDdW";
     uint32_t uid_zero = 0;
     AccessToken key(appID, appCertificate, channelName, uid_zero);
     key.message_.salt = 1;
@@ -76,7 +83,7 @@ class AccessToken_test : public testing::Test {
     std::string expected =
         "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+"
         "72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW";
-    AccessToken key( appID, appCertificate, channelName, uidStr);
+    AccessToken key(appID, appCertificate, channelName, uidStr);
     key.message_.salt = 1;
     key.message_.ts = 1111111;
     key.message_.messages[AccessToken::Privileges::kJoinChannel] = expiredTs;
@@ -103,7 +110,7 @@ class AccessToken_test : public testing::Test {
 };
 
 // TEST_F(AccessToken_test, testAccessTokenWithErrorUid) {
-  // testAccessTokenWithErrorUid();
+// testAccessTokenWithErrorUid();
 // }
 TEST_F(AccessToken_test, testAccessTokenWithIntUid) {
   testAccessTokenWithIntUid();
