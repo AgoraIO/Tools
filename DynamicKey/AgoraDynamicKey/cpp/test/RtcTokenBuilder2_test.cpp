@@ -34,6 +34,9 @@ class RtcTokenBuilder2_test : public testing::Test {
 
     AccessToken2 parser;
     parser.FromString(token);
+
+    EXPECT_EQ(parser.signature_, parser.GenerateSignature(app_cert_));
+
     EXPECT_EQ(parser.app_id_, app_id_);
     EXPECT_EQ(parser.expire_, expire_);
     EXPECT_EQ(parser.services_.size(), 1);
@@ -60,6 +63,9 @@ class RtcTokenBuilder2_test : public testing::Test {
 
     AccessToken2 parser;
     parser.FromString(token);
+
+    EXPECT_EQ(parser.signature_, parser.GenerateSignature(app_cert_));
+
     EXPECT_EQ(parser.app_id_, app_id_);
     EXPECT_EQ(parser.expire_, expire_);
     EXPECT_EQ(parser.services_.size(), 1);

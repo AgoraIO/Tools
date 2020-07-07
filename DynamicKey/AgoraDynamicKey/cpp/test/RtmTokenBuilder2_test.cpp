@@ -27,6 +27,9 @@ class RtmTokenBuilder2_test : public testing::Test {
 
     AccessToken2 parser;
     bool parsed = parser.FromString(token);
+    
+    EXPECT_EQ(parser.signature_, parser.GenerateSignature(app_cert_));
+
     ASSERT_TRUE(parsed);
     EXPECT_EQ(parser.app_id_, app_id_);
     EXPECT_EQ(parser.expire_, expire_);

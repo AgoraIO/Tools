@@ -210,13 +210,7 @@ class AccessToken2 {
     if (!BuildCheck()) return "";
 
     auto signing = Signing();
-    auto signing_info = Pack(app_id_) + Pack(issue_ts_) + Pack(expire_) +
-                        Pack(salt_) +
-                        Pack(static_cast<uint16_t>(services_.size()));
-    for (auto it = services_.begin(); it != services_.end(); ++it) {
-      signing_info += it->second->PackService();
-    }
-
+    auto signing_info = SigningInfo();
     auto signature = Pack(HmacSign2(signing, signing_info, HMAC_SHA256_LENGTH));
     auto compressed = Compress(signature + signing_info);
     return Version() + base64Encode(compressed);
@@ -232,8 +226,7 @@ class AccessToken2 {
       Unpacker unpacker(buffer.data(), buffer.length());
 
       uint16_t service_count;
-      std::string signature;
-      unpacker >> signature >> app_id_ >> issue_ts_ >> expire_ >> salt_ >>
+      unpacker >> signature_ >> app_id_ >> issue_ts_ >> expire_ >> salt_ >>
           service_count;
 
       services_.clear();
@@ -251,12 +244,31 @@ class AccessToken2 {
     return true;
   }
 
- private:
+  std::string GenerateSignature(const std::string &app_certificate) {
+    app_cert_ = app_certificate;
+    if (!BuildCheck()) return "";
+
+    auto signing = Signing();
+    auto signing_info = SigningInfo();
+    auto signature = HmacSign2(signing, signing_info, HMAC_SHA256_LENGTH);
+    return signature;
+  }
+
   std::string Signing() {
     std::string signing;
     signing = HmacSign2(Pack(issue_ts_), app_cert_, HMAC_SHA256_LENGTH);
     signing = HmacSign2(Pack(salt_), signing, HMAC_SHA256_LENGTH);
     return signing;
+  }
+
+  std::string SigningInfo() {
+    auto signing_info = Pack(app_id_) + Pack(issue_ts_) + Pack(expire_) +
+                        Pack(salt_) +
+                        Pack(static_cast<uint16_t>(services_.size()));
+    for (auto it = services_.begin(); it != services_.end(); ++it) {
+      signing_info += it->second->PackService();
+    }
+    return signing_info;
   }
 
   bool BuildCheck() {
@@ -278,13 +290,14 @@ class AccessToken2 {
     return true;
   }
 
- private:
+ public:
   uint32_t issue_ts_;
   uint32_t expire_;
   uint32_t salt_;
 
   std::string app_id_;
   std::string app_cert_;
+  std::string signature_;
 
   std::map<uint16_t, std::unique_ptr<Service>> services_;
 };

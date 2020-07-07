@@ -78,6 +78,10 @@ class AccessToken2_test : public testing::Test {
     AccessToken2 k7;
     bool parsed = k7.FromString(result);
     ASSERT_TRUE(parsed);
+
+    auto signature = k7.GenerateSignature(app_certificate_);
+    EXPECT_EQ(k7.signature_, signature);
+
     EXPECT_EQ(k7.app_id_, key->app_id_);
     EXPECT_EQ(k7.expire_, key->expire_);
     EXPECT_EQ(k7.salt_, key->salt_);
