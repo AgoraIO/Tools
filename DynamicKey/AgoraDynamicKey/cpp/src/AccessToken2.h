@@ -224,20 +224,8 @@ class AccessToken2 {
     try {
       auto buffer = Decompress(base64Decode(token.substr(VERSION_LENGTH)));
       Unpacker unpacker(buffer.data(), buffer.length());
-
-      uint16_t service_count;
-      unpacker >> signature_ >> app_id_ >> issue_ts_ >> expire_ >> salt_ >>
-          service_count;
-
-      services_.clear();
-      for (auto i = 0; i < service_count; ++i) {
-        uint16_t service_type;
-        unpacker >> service_type;
-        auto service =
-            std::unique_ptr<Service>(kServiceCreator.at(service_type)());
-        service->UnpackService(&unpacker);
-        services_[service_type] = std::move(service);
-      }
+      unpacker >> signature_ >> app_id_ >> issue_ts_ >> expire_ >> salt_;
+      UnpackServices(&unpacker);
     } catch (std::exception &e) {
       return false;
     }
@@ -263,12 +251,32 @@ class AccessToken2 {
 
   std::string SigningInfo() {
     auto signing_info = Pack(app_id_) + Pack(issue_ts_) + Pack(expire_) +
-                        Pack(salt_) +
-                        Pack(static_cast<uint16_t>(services_.size()));
-    for (auto it = services_.begin(); it != services_.end(); ++it) {
-      signing_info += it->second->PackService();
-    }
+                        Pack(salt_) + PackServices();
     return signing_info;
+  }
+
+  std::string PackServices() {
+    auto services = Pack(static_cast<uint16_t>(services_.size()));
+    for (auto it = services_.begin(); it != services_.end(); ++it) {
+      services += it->second->PackService();
+    }
+    return services;
+  }
+
+  void UnpackServices(Unpacker *unpacker) {
+    uint16_t service_count;
+    *unpacker >> service_count;
+
+    services_.clear();
+    for (auto i = 0; i < service_count; ++i) {
+      uint16_t service_type;
+      *unpacker >> service_type;
+
+      auto service =
+          std::unique_ptr<Service>(kServiceCreator.at(service_type)());
+      service->UnpackService(unpacker);
+      services_[service_type] = std::move(service);
+    }
   }
 
   bool BuildCheck() {
