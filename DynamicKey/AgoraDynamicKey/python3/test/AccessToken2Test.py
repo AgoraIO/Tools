@@ -16,6 +16,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
         self.__channel_name = "7d72365eb983485397e3e3f9d460bdda"
+        self.__user_id = 'test_user'
         self.__uid = 2882341273
         self.__expire = 600
         self.__salt = 1
@@ -55,5 +56,24 @@ class AccessToken2Test(unittest.TestCase):
 
         expected = '007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
                    'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
+        self.assertEqual(expected, result)
+
+    def test_multi_service(self):
+        rtc = ServiceRtc(self.__channel_name, self.__uid)
+        rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+        rtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, self.__expire)
+        rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, self.__expire)
+        rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, self.__expire)
+
+        rtm = ServiceRtm(self.__user_id)
+        rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
+
+        self.__token.add_service(rtc)
+        self.__token.add_service(rtm)
+        result = self.__token.build()
+
+        expected = '007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBma' \
+                   'GScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI' \
+                   '2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4'
         self.assertEqual(expected, result)
 

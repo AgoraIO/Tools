@@ -7,7 +7,6 @@
 #include "../src/AccessToken2.h"
 
 #include <gtest/gtest.h>
-#include <stdint.h>
 
 #include <string>
 
@@ -19,6 +18,8 @@ class AccessToken2_test : public testing::Test {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_certificate_ = "5CFd2fd1755d40ecb72977518be15d3b";
     channel_name_ = "7d72365eb983485397e3e3f9d460bdda";
+    user_id_ = "test_user";
+
     uid_ = 2882341273u;
     account_ = "2882341273";
     expire_ = 600;
@@ -106,7 +107,7 @@ class AccessToken2_test : public testing::Test {
     }
   }
 
-  void testAccessTokenWithIntUid() {
+  void TestAccessToken2WithIntUid() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
 
@@ -123,7 +124,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
-  void testAccessTokenWithIntUidZero() {
+  void TestAccessToken2WithIntUidZero() {
     uint32_t uid_zero = 0;
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -141,7 +142,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
-  void testAccessTokenWithStringUid() {
+  void TestAccessToken2WithStringUid() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
 
@@ -158,22 +159,51 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  void TestAccessToken2WithMultiService() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> rtc(new ServiceRtc(channel_name_, uid_));
+    rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expire_);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishAudioStream, expire_);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, expire_);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, expire_);
+
+    std::unique_ptr<Service> rtm(new ServiceRtm(user_id_));
+    rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
+
+    key.AddService(std::move(rtc));
+    key.AddService(std::move(rtm));
+
+    std::string expected =
+        "007eJxTYOAQsrQ5s3TfH+"
+        "1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoam"
+        "BmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/"
+        "NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4";
+    VerifyAccessToken2(expected, &key);
+  }
+
  private:
   std::string app_id_;
   std::string app_certificate_;
   std::string channel_name_;
   std::string account_;
+  std::string user_id_;
+
   uint32_t uid_;
   uint32_t expire_;
   uint32_t issue_ts_;
 };
 
-TEST_F(AccessToken2_test, testAccessTokenWithIntUid) {
-  testAccessTokenWithIntUid();
+TEST_F(AccessToken2_test, testAccessToken2WithIntUid) {
+  TestAccessToken2WithIntUid();
 }
-TEST_F(AccessToken2_test, testAccessTokenWithIntUidZero) {
-  testAccessTokenWithIntUidZero();
+TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) {
+  TestAccessToken2WithIntUidZero();
 }
-TEST_F(AccessToken2_test, testAccessTokenWithStringUid) {
-  testAccessTokenWithStringUid();
+TEST_F(AccessToken2_test, testAccessToken2WithStringUid) {
+  TestAccessToken2WithStringUid();
+}
+TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
+  TestAccessToken2WithMultiService();
 }
