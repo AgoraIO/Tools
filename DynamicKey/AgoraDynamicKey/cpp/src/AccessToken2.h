@@ -16,12 +16,11 @@ namespace agora {
 namespace tools {
 
 class Service {
- protected:
+ public:
   Service(uint16_t type) { type_ = type; }
 
   virtual ~Service() = default;
 
- public:
   uint16_t ServiceType() { return type_; }
 
   void AddPrivilege(uint16_t privilege, uint32_t expire) {
