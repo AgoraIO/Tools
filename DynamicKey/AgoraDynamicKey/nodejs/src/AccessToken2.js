@@ -41,10 +41,6 @@ class Service {
 }
 
 const kRtcServiceType = 1
-const kRtcPrivilegeJoinChannel = 1
-const kRtcPrivilegePublishAudioStream = 2
-const kRtcPrivilegePublishVideoStream = 3
-const kRtcPrivilegePublishDataStream = 4
 class ServiceRtc extends Service{
     constructor(channel_name, uid) {
         super(kRtcServiceType)
@@ -62,6 +58,7 @@ class ServiceRtc extends Service{
 
     }
 }
+ServiceRtc.kPrivilegeJoinChannel = 1
 
 class AccessToken2{
     constructor(appID, appCertificate, issue_ts, expire) {
