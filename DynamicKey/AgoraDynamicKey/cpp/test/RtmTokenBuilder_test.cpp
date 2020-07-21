@@ -1,7 +1,13 @@
+// Copyright (c) 2014-2017 Agora.io, Inc.
+//
+
 #include "../src/RtmTokenBuilder.h"
+
 #include <gtest/gtest.h>
-#include <string>
 #include <stdint.h>
+
+#include <string>
+
 using namespace agora::tools;
 
 class RtmTokenBuilder_test : public testing::Test {
@@ -14,28 +20,23 @@ class RtmTokenBuilder_test : public testing::Test {
     crcUserAccount = crc32(
         0, reinterpret_cast<Bytef*>(const_cast<char*>(userAccount.c_str())),
         userAccount.length());
-
   }
 
   virtual void TearDown() {}
 
   void testRtmTokenBuilder() {
-      std::string token = RtmTokenBuilder::buildToken(
-          appID, appCertificate, userAccount,
-          RtmUserRole::Rtm_User, expiredTs);
-      AccessToken parser;
-      parser.FromString(token);
-      EXPECT_EQ(parser.app_id_, appID);
-      EXPECT_EQ(parser.crc_channel_name_ , crcUserAccount);
-      EXPECT_EQ(parser.crc_uid_,
-              crc32(0, reinterpret_cast<Bytef*>(const_cast<char*>("")),
-              0));
-      EXPECT_EQ(parser.message_.messages[AccessToken::kRtmLogin], expiredTs);
-      EXPECT_EQ(
-          AccessToken::GenerateSignature(
-            appCertificate, appID, userAccount,
-            "", parser.message_raw_content_),
-          parser.signature_);
+    std::string token = RtmTokenBuilder::buildToken(
+        appID, appCertificate, userAccount, RtmUserRole::Rtm_User, expiredTs);
+    AccessToken parser;
+    parser.FromString(token);
+    EXPECT_EQ(parser.app_id_, appID);
+    EXPECT_EQ(parser.crc_channel_name_, crcUserAccount);
+    EXPECT_EQ(parser.crc_uid_,
+              crc32(0, reinterpret_cast<Bytef*>(const_cast<char*>("")), 0));
+    EXPECT_EQ(parser.message_.messages[AccessToken::kRtmLogin], expiredTs);
+    EXPECT_EQ(AccessToken::GenerateSignature(appCertificate, appID, userAccount,
+                                             "", parser.message_raw_content_),
+              parser.signature_);
   }
 
  private:
@@ -46,8 +47,4 @@ class RtmTokenBuilder_test : public testing::Test {
   uint32_t crcUserAccount;
 };
 
-
-TEST_F(RtmTokenBuilder_test, testRtmTokenBuilder) {
-  testRtmTokenBuilder();
-}
-
+TEST_F(RtmTokenBuilder_test, testRtmTokenBuilder) { testRtmTokenBuilder(); }
