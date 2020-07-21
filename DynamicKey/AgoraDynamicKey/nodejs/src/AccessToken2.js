@@ -1,8 +1,6 @@
 var crypto = require('crypto');
-var crc32 = require('crc-32');
 const zlib = require('zlib');
 var UINT32 = require('cuint').UINT32;
-var version = "006";
 const VERSION_LENGTH = 3;
 const APP_ID_LENGTH = 32;
 
@@ -40,7 +38,8 @@ class Service {
     }
     unpack(buffer){
         let bufReader = new ReadByteBuf(buffer)
-        return bufReader.getTreeMapUInt32()
+        this.__privileges = bufReader.getTreeMapUInt32()
+        return bufReader
     }
 }
 
@@ -58,8 +57,11 @@ class ServiceRtc extends Service{
         return Buffer.concat([super.pack(),buffer.pack()])
     }
 
-    unpack(){
-
+    unpack(buffer){
+        let bufReader = super.unpack(buffer)
+        this.__channel_name = bufReader.getString()
+        this.__uid = bufReader.getString()
+        return bufReader
     }
 }
 ServiceRtc.kPrivilegeJoinChannel = 1
@@ -80,8 +82,10 @@ class ServiceRtm extends Service{
         return Buffer.concat([super.pack(),buffer.pack()])
     }
 
-    unpack(){
-
+    unpack(buffer){
+        let bufReader = super.unpack(buffer)
+        this.__user_id = bufReader.getString()
+        return bufReader
     }
 }
 ServiceRtm.kPrivilegeLogin = 1
@@ -105,7 +109,7 @@ class AccessToken2{
 
     __build_check() {
         let is_uuid = (data) => {
-            if(data.length !== 32) {
+            if(data.length !== APP_ID_LENGTH) {
                 return false
             }
             let buf = Buffer.from(data, 'hex')
@@ -159,6 +163,19 @@ class AccessToken2{
         let bufferReader = new ReadByteBuf(buffer)
 
         let signature = bufferReader.getString()
+        this.appID = bufferReader.getString()
+        this.issue_ts = bufferReader.getUint32()
+        this.expire = bufferReader.getUint32()
+        this.salt = bufferReader.getUint32()
+        let service_count = bufferReader.getUint16()
+
+        let remainBuf = bufferReader.pack()
+        for(let i = 0; i < service_count; i++) {
+            let service_type = bufferReader.getUint16()
+            let service = new AccessToken2.kServices[service_type]()
+            remainBuf = service.unpack(remainBuf).pack()
+            this.services[service_type] = service
+        }
     }
 }
 
@@ -276,6 +293,13 @@ var ReadByteBuf = function(bytes) {
         return map;
     };
 
+    that.pack = function () {
+        let length = that.buffer.length
+        var out = Buffer.alloc(length - that.position - 1);
+        that.buffer.copy(out, 0, that.position, out.length);
+        return out;
+    };
+
     return that;
 }
 var AccessTokenContent = function (options) {
@@ -322,5 +346,9 @@ var unPackMessages = function(bytes) {
     });
 }
 
+AccessToken2.kServices = {
+    kRtcServiceType: ServiceRtc,
+    kRtmServiceType: ServiceRtm
+}
 
 module.exports = {AccessToken2, ServiceRtc, ServiceRtm}
