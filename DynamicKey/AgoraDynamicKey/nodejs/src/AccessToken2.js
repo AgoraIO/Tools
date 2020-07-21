@@ -28,6 +28,10 @@ class Service {
         return buf.pack()
     }
 
+    service_type(){
+        return this.__type
+    }
+
     add_privilege(privilege, expire){
         this.__privileges[privilege] = expire
     }
@@ -59,6 +63,28 @@ class ServiceRtc extends Service{
     }
 }
 ServiceRtc.kPrivilegeJoinChannel = 1
+ServiceRtc.kPrivilegePublishAudioStream = 2
+ServiceRtc.kPrivilegePublishVideoStream = 3
+ServiceRtc.kPrivilegePublishDataStream = 4
+
+const kRtmServiceType = 2
+class ServiceRtm extends Service{
+    constructor(user_id) {
+        super(kRtmServiceType)
+        this.__user_id = user_id || ""
+    }
+
+    pack(){
+        let buffer = new ByteBuf()
+        buffer.putString(this.__user_id)
+        return Buffer.concat([super.pack(),buffer.pack()])
+    }
+
+    unpack(){
+
+    }
+}
+ServiceRtm.kPrivilegeLogin = 1
 
 class AccessToken2{
     constructor(appID, appCertificate, issue_ts, expire) {
@@ -98,7 +124,7 @@ class AccessToken2{
     }
 
     add_service(service){
-        this.services[service.service_type] = service
+        this.services[service.service_type()] = service
     }
 
     build(){
@@ -297,4 +323,4 @@ var unPackMessages = function(bytes) {
 }
 
 
-module.exports = {AccessToken2, ServiceRtc}
+module.exports = {AccessToken2, ServiceRtc, ServiceRtm}
