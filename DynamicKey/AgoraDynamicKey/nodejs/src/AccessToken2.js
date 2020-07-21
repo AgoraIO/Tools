@@ -72,8 +72,8 @@ class AccessToken2{
     }
 
     __signing() {
-        let signing = encodeHMac(this.appCertificate, new ByteBuf().putUint32(this.issue_ts).pack())
-        signing = encodeHMac(signing, new ByteBuf().putUint32(this.salt).pack())
+        let signing = encodeHMac(new ByteBuf().putUint32(this.issue_ts).pack(), this.appCertificate)
+        signing = encodeHMac(new ByteBuf().putUint32(this.salt).pack(), signing )
         return signing
     }
 
@@ -111,13 +111,14 @@ class AccessToken2{
                 .putUint32(this.issue_ts)
                 .putUint32(this.expire)
                 .putUint32(this.salt)
-                .putUint16(Object.keys(this.services).length)
+                .putUint16(Object.keys(this.services).length).pack()
         Object.values(this.services).forEach(service => {
-            signing_info.appendBytes(service.pack())
+            signing_info = Buffer.concat([signing_info, service.pack()])
         })
 
-        let signature = encodeHMac(signing, signing_info.pack())
-        let compressed = zlib.deflateSync((new ByteBuf().putString(signature).appendBytes(signing_info.pack())).pack())
+        let signature = encodeHMac(signing, signing_info)
+        let content = Buffer.concat([new ByteBuf().putString(signature).pack(),signing_info])
+        let compressed = zlib.deflateSync(content)
         return `${getVersion()}${Buffer.from(compressed).toString('base64')}`
     }
 
@@ -172,12 +173,6 @@ var ByteBuf = function () {
         that.position += bytes.length;
         return that;
     };
-
-    that.appendBytes = function(bytes) {
-        bytes.copy(that.buffer, that.position);
-        that.position += bytes.length;
-        return that;
-    }
 
     that.putString = function (str) {
         return that.putBytes(Buffer.from(str));
