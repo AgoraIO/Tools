@@ -43,7 +43,7 @@ class Service {
     return p;
   }
 
- protected:
+ public:
   uint16_t type_;
   std::map<uint16_t, uint32_t> privileges_;
 
@@ -94,7 +94,7 @@ class ServiceRtc : public Service {
     return p;
   }
 
- private:
+ public:
   std::string channel_name_;
   std::string account_;
 };
@@ -127,7 +127,7 @@ class ServiceRtm : public Service {
     return p;
   }
 
- private:
+ public:
   std::string user_id_;
 };
 
@@ -169,7 +169,7 @@ class ServiceStreaming : public Service {
     return p;
   }
 
- private:
+ public:
   std::string channel_name_;
   std::string account_;
 };
