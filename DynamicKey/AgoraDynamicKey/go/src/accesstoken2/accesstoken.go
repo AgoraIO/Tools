@@ -20,10 +20,14 @@ const (
     ServiceTypeStreaming = 3
 
     PrivilegeJoinChannel        = 1
-    PrivilegeLogin              = 1
     PrivilegePublishAudioStream = 2
     PrivilegePublishVideoStream = 3
     PrivilegePublishDataStream  = 4
+
+    PrivilegeLogin = 1
+
+    PrivilegePublishMixStream = 1
+    PrivilegePublishRawStream = 2
 )
 
 type IService interface {
@@ -219,9 +223,11 @@ func (accessToken *AccessToken) Build() (res string, err error) {
     // Sign
     var sign []byte
     sign, err = accessToken.getSign()
+
     if err != nil {
         return
     }
+
     // Services
     for _, service := range accessToken.Services {
         service.Pack(buf)
@@ -237,6 +243,7 @@ func (accessToken *AccessToken) Build() (res string, err error) {
         return
     }
     bufContent.Write(buf.Bytes())
+    p("1---%s", getVersion()+base64EncodeStr(compressZlib(bufContent.Bytes())))
 
     res = getVersion() + base64EncodeStr(compressZlib(bufContent.Bytes()))
     return

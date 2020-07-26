@@ -67,6 +67,73 @@ func Test_AssessToken_Build_Error_AppCertificate(t *testing.T) {
     AssertEqual(t, token, "")
 }
 
+func Test_AssessToken_Build_ServiceRtc(t *testing.T) {
+    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+    accessToken.IssueTs = DataMockIssueTs
+    accessToken.Salt = DataMockSalt
+
+    serviceRtc := NewServiceRtc(DataMockChannelName, DataMockUidStr)
+    serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
+    accessToken.AddService(serviceRtc)
+
+    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
+    AssertEqual(t, serviceRtc.Uid, DataMockUidStr)
+
+    token, err := accessToken.Build()
+    AssertNil(t, err)
+    AssertEqual(t, token, "007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=")
+}
+
+func Test_AssessToken_Build_ServiceRtc_Uid0(t *testing.T) {
+    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+    accessToken.IssueTs = DataMockIssueTs
+    accessToken.Salt = DataMockSalt
+
+    serviceRtc := NewServiceRtc(DataMockChannelName, "")
+    serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
+    accessToken.AddService(serviceRtc)
+
+    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
+    AssertEqual(t, serviceRtc.Uid, "")
+
+    token, err := accessToken.Build()
+    AssertNil(t, err)
+    AssertEqual(t, token, "007eJxSYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMgAAAAP//Npwiag==")
+}
+
+func Test_AssessToken_Build_ServiceRtm(t *testing.T) {
+    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+    accessToken.IssueTs = DataMockIssueTs
+    accessToken.Salt = DataMockSalt
+
+    serviceRtm := NewServiceRtm(DataMockUserId)
+    serviceRtm.AddPrivilege(PrivilegeLogin, DataMockExpire)
+    accessToken.AddService(serviceRtm)
+
+    AssertEqual(t, serviceRtm.UserId, DataMockUserId)
+
+    token, err := accessToken.Build()
+    AssertNil(t, err)
+    AssertEqual(t, token, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A")
+}
+
+func Test_AssessToken_Build_ServiceStreaming(t *testing.T) {
+    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+    accessToken.IssueTs = DataMockIssueTs
+    accessToken.Salt = DataMockSalt
+
+    serviceStreaming := NewServiceStreaming(DataMockChannelName, DataMockUidStr)
+    serviceStreaming.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
+    accessToken.AddService(serviceStreaming)
+
+    AssertEqual(t, serviceStreaming.ChannelName, DataMockChannelName)
+    AssertEqual(t, serviceStreaming.Uid, DataMockUidStr)
+
+    token, err := accessToken.Build()
+    AssertNil(t, err)
+    AssertEqual(t, token, "007eJxSYGBj//4jzGnul2n88j7n7tb9njDzn/j5BhulK6yLV5/YlWKnwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEmRkYGRjBfAUG8xRzI2Mz09QkSwtjEwtTY0vzVONU4zTLFBMzg6SUlEQuBiMLCyNjE0Mjc2NAAAAA//8zyyXw")
+}
+
 func Test_AssessToken_Parse_TokenRtc(t *testing.T) {
     accessToken := CreateAccessToken()
     res, err := accessToken.Parse("007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=")
@@ -149,73 +216,6 @@ func Test_AssessToken_Parse_TokenRtm(t *testing.T) {
     AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).UserId, DataMockUserId)
     AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Type, uint16(ServiceTypeRtm))
     AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Privileges[PrivilegeLogin], DataMockExpire)
-}
-
-func Test_AssessToken_ServiceRtc(t *testing.T) {
-    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
-    accessToken.IssueTs = DataMockIssueTs
-    accessToken.Salt = DataMockSalt
-
-    serviceRtc := NewServiceRtc(DataMockChannelName, DataMockUidStr)
-    serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
-    accessToken.AddService(serviceRtc)
-
-    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceRtc.Uid, DataMockUidStr)
-
-    token, err := accessToken.Build()
-    AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=")
-}
-
-func Test_AssessToken_ServiceRtc_Uid0(t *testing.T) {
-    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
-    accessToken.IssueTs = DataMockIssueTs
-    accessToken.Salt = DataMockSalt
-
-    serviceRtc := NewServiceRtc(DataMockChannelName, "")
-    serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
-    accessToken.AddService(serviceRtc)
-
-    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceRtc.Uid, "")
-
-    token, err := accessToken.Build()
-    AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMgAAAAP//Npwiag==")
-}
-
-func Test_AssessToken_ServiceRtm(t *testing.T) {
-    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
-    accessToken.IssueTs = DataMockIssueTs
-    accessToken.Salt = DataMockSalt
-
-    serviceRtm := NewServiceRtm(DataMockUserId)
-    serviceRtm.AddPrivilege(PrivilegeLogin, DataMockExpire)
-    accessToken.AddService(serviceRtm)
-
-    AssertEqual(t, serviceRtm.UserId, DataMockUserId)
-
-    token, err := accessToken.Build()
-    AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A")
-}
-
-func Test_AssessToken_ServiceStreaming(t *testing.T) {
-    accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
-    accessToken.IssueTs = DataMockIssueTs
-    accessToken.Salt = DataMockSalt
-
-    serviceStreaming := NewServiceStreaming(DataMockChannelName, DataMockUidStr)
-    serviceStreaming.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
-    accessToken.AddService(serviceStreaming)
-
-    AssertEqual(t, serviceStreaming.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceStreaming.Uid, DataMockUidStr)
-
-    token, err := accessToken.Build()
-    AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYGBj//4jzGnul2n88j7n7tb9njDzn/j5BhulK6yLV5/YlWKnwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEmRkYGRjBfAUG8xRzI2Mz09QkSwtjEwtTY0vzVONU4zTLFBMzg6SUlEQuBiMLCyNjE0Mjc2NAAAAA//8zyyXw")
 }
 
 func Test_GetUidStr(t *testing.T) {
