@@ -20,8 +20,8 @@ public class RtcTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(channelName, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getChannelName());
-        assertEquals(uid, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getUid());
+        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getChannelName());
+        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getUid());
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue));
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM.intValue));
@@ -37,8 +37,8 @@ public class RtcTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(channelName, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getChannelName());
-        assertEquals(uid, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getUid());
+        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getChannelName());
+        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getUid());
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue));
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM.intValue));
@@ -54,8 +54,8 @@ public class RtcTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(channelName, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getChannelName());
-        assertEquals(uid, accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getUid());
+        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getChannelName());
+        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getUid());
         assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
         assertEquals(0, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
         assertEquals(0, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM.intValue, 0));

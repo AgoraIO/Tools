@@ -167,24 +167,12 @@ public class AccessToken2 {
             this.privileges.put(privilege.intValue, expire);
         }
 
-        public String getChannelName() {
-            return "";
-        }
-
         public TreeMap<Short, Integer> getPrivileges() {
             return this.privileges;
         }
 
         public short getServiceType() {
             return this.type;
-        }
-
-        public String getUid() {
-            return "";
-        }
-
-        public String getUserId() {
-            return "";
         }
 
         public ByteBuf pack(ByteBuf buf) {
@@ -210,12 +198,10 @@ public class AccessToken2 {
             this.uid = uid;
         }
 
-        @Override
         public String getChannelName() {
             return this.channelName;
         }
 
-        @Override
         public String getUid() {
             return this.uid;
         }

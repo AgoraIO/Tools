@@ -20,7 +20,7 @@ public class RtmTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(userId, accessToken.services.get(accessToken.SERVICE_TYPE_RTM).getUserId());
+        assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(accessToken.SERVICE_TYPE_RTM)).getUserId());
         assertEquals(expire, (int)accessToken.services.get(accessToken.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
     }
 }
