@@ -15,7 +15,6 @@ public class RtcTokenBuilder2 {
 
     /**
      * Build the RTC token with uid.
-     * <p>
      *
      * @param appId:          The App ID issued to you by Agora. Apply for a new App ID from
      *                        Agora Dashboard if it is missing from your kit. See Get an App ID.
