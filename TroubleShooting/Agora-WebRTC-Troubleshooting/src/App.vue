@@ -260,7 +260,9 @@
                 </v-stepper-content>
             </v-stepper>
             <!-- test area -->
-            <div id="test-send"></div>
+            <div id="test-send">
+            <video id="sample_video" src="./assets/sample.mp4" style="display:none" controls loop></video>
+            </div>
             <div id="test-recv"></div>
           </v-flex>
           <!-- snackbar -->
@@ -505,30 +507,54 @@ export default {
     },
 
     initSendClient() {
-      return new Promise((resolve, reject) => {
-        this.sendStream = AgoraRtc.createStream({
-          streamID: this.sendId,
-          video: true,
-          audio: true,
-          screen: false
-        });
-        this.sendStream.setVideoProfile("720p_2");
-        this.sendClient.init(
-          APP_ID,
-          () => {
-            this.sendStream.init(
+        let isChrome = navigator.userAgent.indexOf("Chrome") >= 0;
+        if (isChrome){
+            let videoDOM = document.querySelector('#sample_video');
+            videoDOM.play();
+            videoDOM.muted = true;
+        }
+        setTimeout(() => {
+            if(isChrome){
+                let videoDOM = document.querySelector('#sample_video');
+                const videoStream = videoDOM.captureStream(60);
+                this.sendStream = AgoraRtc.createStream({
+                  streamID: this.sendId,
+                  video: true,
+                  audio: true,
+                  screen: false,
+                  videoSource: videoStream.getVideoTracks()[0],
+                  audioSource: videoStream.getAudioTracks()[0]
+                });
+            }
+            else {
+                this.sendStream = AgoraRtc.createStream({
+                  streamID: this.sendId,
+                  video: true,
+                  audio: true,
+                  screen: false
+                });
+            }
+            this.sendClient.init(
+              APP_ID,
               () => {
-                this.sendClient.join(
-                  null,
-                  this.channel,
-                  this.sendId,
+                this.sendStream.init(
                   () => {
-                    this.sendClient.publish(this.sendStream, err => {
-                      reject(err);
-                    });
-                    setTimeout(() => {
-                      resolve();
-                    });
+                    this.sendClient.join(
+                      null,
+                      this.channel,
+                      this.sendId,
+                      () => {
+                        this.sendClient.publish(this.sendStream, err => {
+                          reject(err);
+                        });
+                        setTimeout(() => {
+                          resolve();
+                        });
+                      },
+                      err => {
+                        reject(err);
+                      }
+                    );
                   },
                   err => {
                     reject(err);
@@ -539,12 +565,7 @@ export default {
                 reject(err);
               }
             );
-          },
-          err => {
-            reject(err);
-          }
-        );
-      });
+        }, 500);
     },
 
     initRecvClient() {
