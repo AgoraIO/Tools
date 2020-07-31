@@ -25,7 +25,7 @@ class RtcTokenBuilder2
      */
     public static function buildTokenWithUid($appId, $appCertificate, $channelName, $uid, $role, $expire)
     {
-        return buildTokenWithAccount($appId, $appCertificate, $channelName, $uid, $role, $expire);
+        return self::buildTokenWithAccount($appId, $appCertificate, $channelName, $uid, $role, $expire);
     }
 
     /**
