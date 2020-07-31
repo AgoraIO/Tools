@@ -19,13 +19,16 @@ const (
     ServiceTypeRtm       = 2
     ServiceTypeStreaming = 3
 
+    // Rtc
     PrivilegeJoinChannel        = 1
     PrivilegePublishAudioStream = 2
     PrivilegePublishVideoStream = 3
     PrivilegePublishDataStream  = 4
 
+    // Rtm
     PrivilegeLogin = 1
 
+    // Streaming
     PrivilegePublishMixStream = 1
     PrivilegePublishRawStream = 2
 )
