@@ -25,13 +25,13 @@ func AssertNil(t *testing.T, err error) {
     }
 }
 
-func AssertEqual(t *testing.T, actual, expected interface{}) {
-    if actual != expected {
+func AssertEqual(t *testing.T, expected, actual interface{}) {
+    if expected != actual {
         t.Error("Error, Not equal")
         _, shortFile, _, line, _ := getCallerInfo(2)
         t.Errorf("%s:%d", shortFile, line)
-        t.Errorf("Actual:%+v", actual)
         t.Errorf("Expected:%+v", expected)
+        t.Errorf("Actual:%+v", actual)
     }
 }
 

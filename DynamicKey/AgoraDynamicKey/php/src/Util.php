@@ -2,12 +2,12 @@
 
 class Util
 {
-    public static function assertEqual($expect, $actual)
+    public static function assertEqual($expected, $actual)
     {
         $debug = debug_backtrace();
         $info = "\n- File:" . basename($debug[1]["file"]) . ", Func:" . $debug[1]["function"] . ", Line:" . $debug[1]["line"];
-        if ($expect != $actual) {
-            echo $info . "\n  Assert failed" . "\n    Expected :" . $expect . "\n    Actual   :" . $actual;
+        if ($expected != $actual) {
+            echo $info . "\n  Assert failed" . "\n    Expected :" . $expected . "\n    Actual   :" . $actual;
         } else {
             echo $info . "\n  Assert ok";
         }

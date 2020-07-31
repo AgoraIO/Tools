@@ -21,50 +21,50 @@ func Test_AssessToken_Build(t *testing.T) {
     accessToken.IssueTs = DataMockIssueTs
     accessToken.Salt = DataMockSalt
 
-    AssertEqual(t, accessToken.AppCert, DataMockAppCertificate)
-    AssertEqual(t, accessToken.AppId, DataMockAppId)
-    AssertEqual(t, accessToken.Expire, DataMockExpire)
-    AssertEqual(t, accessToken.IssueTs, DataMockIssueTs)
-    AssertEqual(t, accessToken.Salt, DataMockSalt)
-    AssertEqual(t, len(accessToken.Services), 0)
+    AssertEqual(t, DataMockAppCertificate, accessToken.AppCert)
+    AssertEqual(t, DataMockAppId, accessToken.AppId)
+    AssertEqual(t, DataMockExpire, accessToken.Expire)
+    AssertEqual(t, DataMockIssueTs, accessToken.IssueTs)
+    AssertEqual(t, DataMockSalt, accessToken.Salt)
+    AssertEqual(t, 0, len(accessToken.Services))
 
     token, err := accessToken.Build()
     AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAgAA//+rZxiv")
+    AssertEqual(t, "007eJxSYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAgAA//+rZxiv", token)
 }
 
 func Test_AssessToken_Build_Error_AppId(t *testing.T) {
     accessToken := NewAccessToken("", DataMockAppCertificate, DataMockExpire)
     token, err := accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 
     accessToken = NewAccessToken("abc", DataMockAppCertificate, DataMockExpire)
     token, err = accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 
     accessToken = NewAccessToken("Z70CA35de60c44645bbae8a215061b33", DataMockAppCertificate, DataMockExpire)
     token, err = accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 }
 
 func Test_AssessToken_Build_Error_AppCertificate(t *testing.T) {
     accessToken := NewAccessToken(DataMockAppId, "", DataMockExpire)
     token, err := accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 
     accessToken = NewAccessToken(DataMockAppId, "abc", DataMockExpire)
     token, err = accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 
     accessToken = NewAccessToken(DataMockAppId, "5CFd2fd1755d40ecb72977518be15d3Z", DataMockExpire)
     token, err = accessToken.Build()
-    AssertEqual(t, err.Error(), "check appId or appCertificate")
-    AssertEqual(t, token, "")
+    AssertEqual(t, "check appId or appCertificate", err.Error())
+    AssertEqual(t, "", token)
 }
 
 func Test_AssessToken_Build_ServiceRtc(t *testing.T) {
@@ -76,12 +76,12 @@ func Test_AssessToken_Build_ServiceRtc(t *testing.T) {
     serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
     accessToken.AddService(serviceRtc)
 
-    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceRtc.Uid, DataMockUidStr)
+    AssertEqual(t, DataMockChannelName, serviceRtc.ChannelName)
+    AssertEqual(t, DataMockUidStr, serviceRtc.Uid)
 
     token, err := accessToken.Build()
     AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=")
+    AssertEqual(t, "007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=", token)
 }
 
 func Test_AssessToken_Build_ServiceRtc_Uid0(t *testing.T) {
@@ -93,12 +93,12 @@ func Test_AssessToken_Build_ServiceRtc_Uid0(t *testing.T) {
     serviceRtc.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
     accessToken.AddService(serviceRtc)
 
-    AssertEqual(t, serviceRtc.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceRtc.Uid, "")
+    AssertEqual(t, DataMockChannelName, serviceRtc.ChannelName)
+    AssertEqual(t, "", serviceRtc.Uid)
 
     token, err := accessToken.Build()
     AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMgAAAAP//Npwiag==")
+    AssertEqual(t, "007eJxSYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMgAAAAP//Npwiag==", token)
 }
 
 func Test_AssessToken_Build_ServiceRtm(t *testing.T) {
@@ -110,11 +110,11 @@ func Test_AssessToken_Build_ServiceRtm(t *testing.T) {
     serviceRtm.AddPrivilege(PrivilegeLogin, DataMockExpire)
     accessToken.AddService(serviceRtm)
 
-    AssertEqual(t, serviceRtm.UserId, DataMockUserId)
+    AssertEqual(t, DataMockUserId, serviceRtm.UserId)
 
     token, err := accessToken.Build()
     AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A")
+    AssertEqual(t, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A", token)
 }
 
 func Test_AssessToken_Build_ServiceStreaming(t *testing.T) {
@@ -126,12 +126,12 @@ func Test_AssessToken_Build_ServiceStreaming(t *testing.T) {
     serviceStreaming.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
     accessToken.AddService(serviceStreaming)
 
-    AssertEqual(t, serviceStreaming.ChannelName, DataMockChannelName)
-    AssertEqual(t, serviceStreaming.Uid, DataMockUidStr)
+    AssertEqual(t, DataMockChannelName, serviceStreaming.ChannelName)
+    AssertEqual(t, DataMockUidStr, serviceStreaming.Uid)
 
     token, err := accessToken.Build()
     AssertNil(t, err)
-    AssertEqual(t, token, "007eJxSYGBj//4jzGnul2n88j7n7tb9njDzn/j5BhulK6yLV5/YlWKnwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEmRkYGRjBfAUG8xRzI2Mz09QkSwtjEwtTY0vzVONU4zTLFBMzg6SUlEQuBiMLCyNjE0Mjc2NAAAAA//8zyyXw")
+    AssertEqual(t, "007eJxSYGBj//4jzGnul2n88j7n7tb9njDzn/j5BhulK6yLV5/YlWKnwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEmRkYGRjBfAUG8xRzI2Mz09QkSwtjEwtTY0vzVONU4zTLFBMzg6SUlEQuBiMLCyNjE0Mjc2NAAAAA//8zyyXw", token)
 }
 
 func Test_AssessToken_Parse_TokenRtc(t *testing.T) {
@@ -140,19 +140,19 @@ func Test_AssessToken_Parse_TokenRtc(t *testing.T) {
 
     AssertNil(t, err)
     AssertEqual(t, res, true)
-    AssertEqual(t, accessToken.AppId, DataMockAppId)
-    AssertEqual(t, accessToken.Expire, DataMockExpire)
-    AssertEqual(t, accessToken.IssueTs, DataMockIssueTs)
-    AssertEqual(t, accessToken.Salt, DataMockSalt)
-    AssertEqual(t, len(accessToken.Services), 1)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc] != nil, true)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName, DataMockChannelName)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid, DataMockUidStr)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type, uint16(ServiceTypeRtc))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream], uint32(0))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream], uint32(0))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream], uint32(0))
+    AssertEqual(t, DataMockAppId, accessToken.AppId)
+    AssertEqual(t, DataMockExpire, accessToken.Expire)
+    AssertEqual(t, DataMockIssueTs, accessToken.IssueTs)
+    AssertEqual(t, DataMockSalt, accessToken.Salt)
+    AssertEqual(t, 1, len(accessToken.Services))
+    AssertEqual(t, true, accessToken.Services[ServiceTypeRtc] != nil)
+    AssertEqual(t, DataMockChannelName, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName)
+    AssertEqual(t, DataMockUidStr, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid)
+    AssertEqual(t, uint16(ServiceTypeRtc), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type)
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream])
 }
 
 func Test_AssessToken_Parse_TokenRtc_FromPython(t *testing.T) {
@@ -160,20 +160,20 @@ func Test_AssessToken_Parse_TokenRtc_FromPython(t *testing.T) {
     res, err := accessToken.Parse("007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj")
 
     AssertNil(t, err)
-    AssertEqual(t, res, true)
-    AssertEqual(t, accessToken.AppId, DataMockAppId)
-    AssertEqual(t, accessToken.Expire, DataMockExpire)
-    AssertEqual(t, accessToken.IssueTs, DataMockIssueTs)
-    AssertEqual(t, accessToken.Salt, DataMockSalt)
-    AssertEqual(t, len(accessToken.Services), 1)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc] != nil, true)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName, DataMockChannelName)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid, DataMockUidStr)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type, uint16(ServiceTypeRtc))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream], uint32(0))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream], uint32(0))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream], uint32(0))
+    AssertEqual(t, true, res)
+    AssertEqual(t, DataMockAppId, accessToken.AppId)
+    AssertEqual(t, DataMockExpire, accessToken.Expire)
+    AssertEqual(t, DataMockIssueTs, accessToken.IssueTs)
+    AssertEqual(t, DataMockSalt, accessToken.Salt)
+    AssertEqual(t, 1, len(accessToken.Services))
+    AssertEqual(t, true, accessToken.Services[ServiceTypeRtc] != nil)
+    AssertEqual(t, DataMockChannelName, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName)
+    AssertEqual(t, DataMockUidStr, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid)
+    AssertEqual(t, uint16(ServiceTypeRtc), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type)
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream])
+    AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream])
 }
 
 func Test_AssessToken_Parse_TokenRtc_Rtm_MultiService_FromPython(t *testing.T) {
@@ -181,24 +181,24 @@ func Test_AssessToken_Parse_TokenRtc_Rtm_MultiService_FromPython(t *testing.T) {
     res, err := accessToken.Parse("007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4")
 
     AssertNil(t, err)
-    AssertEqual(t, res, true)
-    AssertEqual(t, accessToken.AppId, DataMockAppId)
-    AssertEqual(t, accessToken.Expire, DataMockExpire)
-    AssertEqual(t, accessToken.IssueTs, DataMockIssueTs)
-    AssertEqual(t, accessToken.Salt, DataMockSalt)
-    AssertEqual(t, len(accessToken.Services), 2)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc] != nil, true)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName, DataMockChannelName)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid, DataMockUidStr)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type, uint16(ServiceTypeRtc))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream], DataMockExpire)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm] != nil, true)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).UserId, DataMockUserId)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Type, uint16(ServiceTypeRtm))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Privileges[PrivilegeLogin], DataMockExpire)
+    AssertEqual(t, true, res)
+    AssertEqual(t, DataMockAppId, accessToken.AppId)
+    AssertEqual(t, DataMockExpire, accessToken.Expire)
+    AssertEqual(t, DataMockIssueTs, accessToken.IssueTs)
+    AssertEqual(t, DataMockSalt, accessToken.Salt)
+    AssertEqual(t, 2, len(accessToken.Services))
+    AssertEqual(t, true, accessToken.Services[ServiceTypeRtc] != nil)
+    AssertEqual(t, DataMockChannelName, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).ChannelName)
+    AssertEqual(t, DataMockUidStr, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Uid)
+    AssertEqual(t, uint16(ServiceTypeRtc), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Type)
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegeJoinChannel])
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishAudioStream])
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishVideoStream])
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream])
+    AssertEqual(t, true, accessToken.Services[ServiceTypeRtm] != nil)
+    AssertEqual(t, DataMockUserId, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).UserId)
+    AssertEqual(t, uint16(ServiceTypeRtm), accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Type)
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Privileges[PrivilegeLogin])
 }
 
 func Test_AssessToken_Parse_TokenRtm(t *testing.T) {
@@ -206,31 +206,31 @@ func Test_AssessToken_Parse_TokenRtm(t *testing.T) {
     res, err := accessToken.Parse("007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A")
 
     AssertNil(t, err)
-    AssertEqual(t, res, true)
-    AssertEqual(t, accessToken.AppId, DataMockAppId)
-    AssertEqual(t, accessToken.Expire, DataMockExpire)
-    AssertEqual(t, accessToken.IssueTs, DataMockIssueTs)
-    AssertEqual(t, accessToken.Salt, DataMockSalt)
-    AssertEqual(t, len(accessToken.Services), 1)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm] != nil, true)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).UserId, DataMockUserId)
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Type, uint16(ServiceTypeRtm))
-    AssertEqual(t, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Privileges[PrivilegeLogin], DataMockExpire)
+    AssertEqual(t, true, res)
+    AssertEqual(t, DataMockAppId, accessToken.AppId)
+    AssertEqual(t, DataMockExpire, accessToken.Expire)
+    AssertEqual(t, DataMockIssueTs, accessToken.IssueTs)
+    AssertEqual(t, DataMockSalt, accessToken.Salt)
+    AssertEqual(t, 1, len(accessToken.Services))
+    AssertEqual(t, true, accessToken.Services[ServiceTypeRtm] != nil)
+    AssertEqual(t, DataMockUserId, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).UserId)
+    AssertEqual(t, uint16(ServiceTypeRtm), accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Type)
+    AssertEqual(t, DataMockExpire, accessToken.Services[ServiceTypeRtm].(*ServiceRtm).Privileges[PrivilegeLogin])
 }
 
 func Test_GetUidStr(t *testing.T) {
-    AssertEqual(t, GetUidStr(0), "")
-    AssertEqual(t, GetUidStr(DataMockUid), DataMockUidStr)
+    AssertEqual(t, "", GetUidStr(0))
+    AssertEqual(t, DataMockUidStr, GetUidStr(DataMockUid))
 }
 
 func Test_getVersion(t *testing.T) {
-    AssertEqual(t, getVersion(), "007")
+    AssertEqual(t, "007", getVersion())
 }
 
 func Test_isUuid(t *testing.T) {
-    AssertEqual(t, isUuid(DataMockAppId), true)
-    AssertEqual(t, isUuid(DataMockAppCertificate), true)
-    AssertEqual(t, isUuid(""), false)
-    AssertEqual(t, isUuid("abc"), false)
-    AssertEqual(t, isUuid("Z70CA35de60c44645bbae8a215061b33"), false)
+    AssertEqual(t, true, isUuid(DataMockAppId))
+    AssertEqual(t, true, isUuid(DataMockAppCertificate))
+    AssertEqual(t, false, isUuid(""))
+    AssertEqual(t, false, isUuid("abc"))
+    AssertEqual(t, false, isUuid("Z70CA35de60c44645bbae8a215061b33"))
 }

@@ -8,55 +8,55 @@ import (
 
 func Test_base64EncodeStr(t *testing.T) {
     encodeStr := base64EncodeStr([]byte("hello"))
-    AssertEqual(t, encodeStr, "aGVsbG8=")
+    AssertEqual(t, "aGVsbG8=", encodeStr)
     decodeStr, _ := base64DecodeStr(encodeStr)
-    AssertEqual(t, string(decodeStr), "hello")
+    AssertEqual(t, "hello", string(decodeStr))
 }
 
 func Test_compressZlib(t *testing.T) {
     compressed := compressZlib([]byte("hello"))
-    AssertEqual(t, fmt.Sprintf("%x", compressed), "789cca48cdc9c907040000ffff062c0215")
-    AssertEqual(t, string(decompressZlib(compressed)), "hello")
+    AssertEqual(t, "789cca48cdc9c907040000ffff062c0215", fmt.Sprintf("%x", compressed))
+    AssertEqual(t, "hello", string(decompressZlib(compressed)))
 }
 
 func Test_packUint16(t *testing.T) {
     buf := new(bytes.Buffer)
     err := packUint16(buf, 600)
     AssertNil(t, err)
-    AssertEqual(t, fmt.Sprintf("%x", buf.Bytes()), "5802")
+    AssertEqual(t, "5802", fmt.Sprintf("%x", buf.Bytes()))
 
     i, _ := unPackUint16(buf)
-    AssertEqual(t, i, uint16(600))
+    AssertEqual(t, uint16(600), i)
 }
 
 func Test_packUint32(t *testing.T) {
     buf := new(bytes.Buffer)
     err := packUint32(buf, 600)
     AssertNil(t, err)
-    AssertEqual(t, fmt.Sprintf("%x", buf.Bytes()), "58020000")
+    AssertEqual(t, "58020000", fmt.Sprintf("%x", buf.Bytes()))
 
     i, _ := unPackUint32(buf)
-    AssertEqual(t, i, uint32(600))
+    AssertEqual(t, uint32(600), i)
 }
 
 func Test_packString(t *testing.T) {
     buf := new(bytes.Buffer)
     err := packString(buf, "hello")
     AssertNil(t, err)
-    AssertEqual(t, fmt.Sprintf("%x", buf.Bytes()), "050068656c6c6f")
+    AssertEqual(t, "050068656c6c6f", fmt.Sprintf("%x", buf.Bytes()))
 
     s, _ := unPackString(buf)
-    AssertEqual(t, s, "hello")
+    AssertEqual(t, "hello", s)
 }
 
 func Test_packMapUint32(t *testing.T) {
     buf := new(bytes.Buffer)
     err := packMapUint32(buf, map[uint16]uint32{uint16(1): uint32(2)})
     AssertNil(t, err)
-    AssertEqual(t, fmt.Sprintf("%x", buf.Bytes()), "0100010002000000")
+    AssertEqual(t, "0100010002000000", fmt.Sprintf("%x", buf.Bytes()))
 
     m, _ := unPackMapUint32(buf)
-    AssertEqual(t, m[1], uint32(2))
-    AssertEqual(t, fmt.Sprintf("%x", m), "map[1:2]")
+    AssertEqual(t, uint32(2), m[1])
+    AssertEqual(t, "map[1:2]", fmt.Sprintf("%x", m))
 }
 

@@ -243,7 +243,6 @@ func (accessToken *AccessToken) Build() (res string, err error) {
         return
     }
     bufContent.Write(buf.Bytes())
-    p("1---%s", getVersion()+base64EncodeStr(compressZlib(bufContent.Bytes())))
 
     res = getVersion() + base64EncodeStr(compressZlib(bufContent.Bytes()))
     return

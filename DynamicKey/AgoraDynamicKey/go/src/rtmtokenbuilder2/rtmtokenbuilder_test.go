@@ -19,10 +19,10 @@ func Test_BuildToken(t *testing.T) {
     accessToken := accesstoken.CreateAccessToken()
     accessToken.Parse(token)
 
-    accesstoken.AssertEqual(t, accessToken.AppId, DataMockAppId)
-    accesstoken.AssertEqual(t, accessToken.Expire, DataMockExpire)
-    accesstoken.AssertEqual(t, accessToken.Services[accesstoken.ServiceTypeRtm] != nil, true)
-    accesstoken.AssertEqual(t, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).UserId, DataMockUserId)
-    accesstoken.AssertEqual(t, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).Type, uint16(accesstoken.ServiceTypeRtm))
-    accesstoken.AssertEqual(t, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).Privileges[accesstoken.PrivilegeLogin], DataMockExpire)
+    accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
+    accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
+    accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeRtm] != nil)
+    accesstoken.AssertEqual(t, DataMockUserId, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).UserId)
+    accesstoken.AssertEqual(t, uint16(accesstoken.ServiceTypeRtm), accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).Type)
+    accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).Privileges[accesstoken.PrivilegeLogin])
 }
