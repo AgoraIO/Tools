@@ -23,8 +23,8 @@ def unpack_uint32(buffer):
 
 
 def pack_string(string):
-    if isinstance(string, str):
-        string = string.encode('utf-8')
+    # if isinstance(string, str):
+    #     string = string.encode('utf-8')
     return pack_uint16(len(string)) + string
 
 

@@ -6,7 +6,6 @@ import hmac
 import zlib
 import random
 import base64
-
 from hashlib import sha256
 from collections import OrderedDict
 
@@ -19,7 +18,7 @@ def get_version():
     return '007'
 
 
-class Service:
+class Service(object):
     def __init__(self, service_type):
         self.__type = service_type
         self.__privileges = {}
@@ -136,7 +135,7 @@ class AccessToken:
             if len(data) != 32:
                 return False
             try:
-                bytes.fromhex(data)
+                bytearray.fromhex(data)
             except:
                 return False
             return True

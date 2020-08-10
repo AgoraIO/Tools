@@ -11,7 +11,7 @@ from src.RtmTokenBuilder2 import *
 
 
 class RtmTokenBuilder2Test(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
         self.__user_id = "test_user"
