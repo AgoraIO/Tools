@@ -14,7 +14,9 @@ local sub = string.sub
 local concat = table.concat
 local tonumber = tonumber
 local math = math
-
+local pairs = pairs
+local tostring = tostring
+local setmetatable = setmetatable
 
 math.randomseed(now())
 local random = math.random

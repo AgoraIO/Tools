@@ -1,4 +1,3 @@
--- local struct = require "resty.struct"
 local require = require
 local struct = require "resty.struct"
 local ffi = require "ffi"
