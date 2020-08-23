@@ -69,23 +69,36 @@ class ReadByteBuffer:
 
     def unPackUint16(self):
         len = struct.calcsize('H')
+        print("uint16 len->", len)
         buff = self.buffer[self.position: self.position + len]
         ret = struct.unpack('<H', buff)[0]
         self.position += len
+        print("uint16 self.position->", self.position)
+        print("uint16 ret->", ret)
         return ret
 
     def unPackUint32(self):
         len = struct.calcsize('I')
         buff = self.buffer[self.position: self.position + len]
+        print("uint32 buff->", buff)
         ret = struct.unpack('<I', buff)[0]
         self.position += len
         return ret
 
     def unPackString(self):
         strlen = self.unPackUint16()
+        print("unPackString strlen:", strlen)
+        print("unPackString self.position->", self.position)
+        print("unPackString self.position+str_len->", self.position+strlen)
         buff = self.buffer[self.position: self.position + strlen]
+        print("< str(strlen) s:", '<' + str(strlen) + 's')
+        print("buffer->", buff)
+        print("buffer length->", len(buff))
         ret = struct.unpack('<' + str(strlen) + 's', buff)[0]
+        print("unPackString ret->", ret)
+        print("unPackString #ret->", len(ret))
         self.position += strlen
+        print("unPackString self.position->", self.position)
         return ret
 
     def unPackMapUint32(self):
@@ -102,9 +115,13 @@ class ReadByteBuffer:
 def unPackContent(buff):
     readbuf = ReadByteBuffer(buff)
     signature = readbuf.unPackString()
+    print("signature:", signature)
     crc_channel_name = readbuf.unPackUint32()
+    print("crc_channel_name:", crc_channel_name)
     crc_uid = readbuf.unPackUint32()
+    print("crc_uid:", crc_uid)
     m = readbuf.unPackString()
+    print("m:", m)
 
     return signature, crc_channel_name, crc_uid, m
 
@@ -127,6 +144,8 @@ class AccessToken:
         self.channelName = channelName
         self.ts = int(time.time()) + 24 * 3600
         self.salt = random.randint(1, 99999999)
+        # self.ts = 1594721225
+        # self.salt = 10000
         self.messages = {}
         if (uid == 0):
             self.uidStr = ""
@@ -139,16 +158,22 @@ class AccessToken:
     def fromString(self, originToken):
         try:
             dk6version = getVersion()
+            print("dk6version: ", dk6version)
             originVersion = originToken[:VERSION_LENGTH]
             if (originVersion != dk6version):
                 return False
-
+            print("originVersion: ", originVersion)
             originAppID = originToken[VERSION_LENGTH:(VERSION_LENGTH + APP_ID_LENGTH)]
+            print("originAppID:", originAppID)
             originContent = originToken[(VERSION_LENGTH + APP_ID_LENGTH):]
+            print("originContent:",originContent)
             originContentDecoded = base64.b64decode(originContent)
-
+            print("originContentDecoded:", originContentDecoded)
+            print("originContentDecoded length:", len(originContentDecoded))
             signature, crc_channel_name, crc_uid, m = unPackContent(originContentDecoded)
             self.salt, self.ts, self.messages = unPackMessages(m)
+            print("self.salt:", self.salt)
+            print()
 
         except Exception as e:
             print("error:", str(e))
