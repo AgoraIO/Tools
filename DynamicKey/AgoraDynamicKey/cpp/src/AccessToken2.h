@@ -174,6 +174,91 @@ class ServiceStreaming : public Service {
   std::string account_;
 };
 
+class ServiceMiniApp : public Service {
+ public:
+  enum {
+    kServiceType = 4,
+
+    kPrivilegeMiniApp = 1,
+  };
+
+ public:
+  ServiceMiniApp(const std::string &channel_name = "", uint32_t uid = 0)
+      : Service(kServiceType), channel_name_(channel_name) {
+    if (uid == 0) {
+      account_ = "";
+    } else {
+      account_ = std::to_string(uid);
+    }
+  }
+
+  ServiceMiniApp(const std::string &channel_name, const std::string &account)
+      : Service(kServiceType), channel_name_(channel_name), account_(account) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
+                                          const ServiceMiniApp *x) {
+    p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
+    return p;
+  }
+
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
+                                            ServiceMiniApp *x) {
+    p >> dynamic_cast<Service *>(x) >> x->channel_name_ >> x->account_;
+    return p;
+  }
+
+ public:
+  std::string channel_name_;
+  std::string account_;
+};
+
+class ServiceTeleChannel : public Service {
+ public:
+  enum {
+    kServiceType = 5,
+
+    kPrivilegeTeleChannel = 1,
+  };
+
+ public:
+  ServiceTeleChannel(const std::string &channel_name = "", uint32_t uid = 0)
+      : Service(kServiceType), channel_name_(channel_name) {
+    if (uid == 0) {
+      account_ = "";
+    } else {
+      account_ = std::to_string(uid);
+    }
+  }
+
+  ServiceTeleChannel(const std::string &channel_name,
+    const std::string &account)
+      : Service(kServiceType), channel_name_(channel_name), account_(account) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
+                                          const ServiceTeleChannel *x) {
+    p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
+    return p;
+  }
+
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
+                                            ServiceTeleChannel *x) {
+    p >> dynamic_cast<Service *>(x) >> x->channel_name_ >> x->account_;
+    return p;
+  }
+
+ public:
+  std::string channel_name_;
+  std::string account_;
+};
+
 template <class T>
 struct ServiceCreator {
   static Service *New() { return (new T()); }
@@ -182,6 +267,8 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},
     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
+    {ServiceMiniApp::kServiceType, ServiceCreator<ServiceMiniApp>::New},
+    {ServiceTeleChannel::kServiceType, ServiceCreator<ServiceTeleChannel>::New},
 };
 
 class AccessToken2 {
