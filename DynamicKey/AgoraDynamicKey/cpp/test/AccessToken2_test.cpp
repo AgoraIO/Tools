@@ -67,6 +67,26 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
+  void VerifyServiceMiniApp(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_rtc = dynamic_cast<ServiceMiniApp *>(l);
+    auto r_rtc = dynamic_cast<ServiceMiniApp *>(r);
+
+    EXPECT_EQ(l_rtc->channel_name_, r_rtc->channel_name_);
+    EXPECT_EQ(l_rtc->account_, r_rtc->account_);
+  }
+
+  void VerifyServiceTeleChannel(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_rtc = dynamic_cast<ServiceTeleChannel *>(l);
+    auto r_rtc = dynamic_cast<ServiceTeleChannel *>(r);
+
+    EXPECT_EQ(l_rtc->channel_name_, r_rtc->channel_name_);
+    EXPECT_EQ(l_rtc->account_, r_rtc->account_);
+  }
+
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
     std::string result = key->Build();
     EXPECT_EQ(expected, result);
@@ -96,6 +116,11 @@ class AccessToken2_test : public testing::Test {
         {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
         {ServiceStreaming::kServiceType,
          &AccessToken2_test::VerifyServiceStreaming},
+        {ServiceMiniApp::kServiceType,
+         &AccessToken2_test::VerifyServiceMiniApp},
+        {ServiceTeleChannel::kServiceType,
+         &AccessToken2_test::VerifyServiceTeleChannel},
+
     };
 
     auto k7_it = k7.services_.begin();

@@ -10,7 +10,7 @@ include_directories(/usr/local/include)
 link_directories(/usr/lib)
 link_directories(/usr/local/lib)
 
-link_libraries(-lgtest -lz -lcrypto)
+link_libraries(-lgtest -lz -lcrypto -lpthread)
 
 add_executable(test.exe
         AccessToken2_test.cpp
