@@ -3,9 +3,6 @@
     <!-- title bar -->
     <v-toolbar dark color="primary">
       <v-toolbar-title>{{text.toolbar_title}}</v-toolbar-title>
-      <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting" class="aperture">
-      <span class="github"></span>
-      </a>
       <v-spacer></v-spacer>
       <v-btn v-on:click="switchLanguage" color="blue" :disabled="languageDisabled">
         {{text.language}}
@@ -20,6 +17,15 @@
         {{text.running}}
       </v-btn>
     </v-toolbar>
+    <div class="github-box">
+      <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting">
+        <span class="github"></span>
+        <div class="github-text">
+          <span class="github-text1">GITHUB</span><br> 
+          <span class="github-text2">点击查看源码</span> 
+        </div>
+      </a>
+    </div>
     <!-- end -->
     <v-content>
       <v-container fill-height>
@@ -331,13 +337,13 @@
 </template>
 
 <script>
-import  VConsole  from  'vconsole'
+// import  VConsole  from  'vconsole'
 import AgoraRtc from "agora-rtc-sdk";
 const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
 
-const log = console.log.bind(console)
+// const log = console.log.bind(console)
 
 // If need mobile phone terminal debugging
 // let vConsole = new VConsole()
@@ -1044,34 +1050,72 @@ export default {
       transform: rotate(360deg)
   }
 }
+.github-box {
+  position: absolute;
+  width: 155px;
+  height: 45px;
+  border-radius: 28px;
+  background: #186bcc;
+  right: 330px;
+  padding: 10px;
+  opacity: 0.65;
+  top: 75px;
+  right: 60px;
+  background-color: #e5e5e5;
+  z-index: 99999;
+}
+
+.github-text {
+  top: -20%;
+  left: 15%;
+  transform: translate(15%, -20%);
+}
+
+.github-text1 {
+  position: absolute;
+  font-size: 14px;
+  color: black;
+  right: 43px;
+}
+
+.github-text2 {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  margin-left: 13px;
+  margin-top: -5px;
+  right: 32px;
+  color: black;
+}
+
 .github { 
   cursor: pointer;
   background-repeat: no-repeat;
   position: absolute;
   background-image: url("./assets/github.png");
-  background-size: 50px;
+  background-size: 36px;
   display: block;
-  width: 50px;
-  height: 50px;
-  margin: 20px;
+  width: 36px;
+  height: 36px;
+  top: 45px;
+  /* left: 5px; */
   border-radius: 28px;
   transform: translateY(-40px);
-  -webkit-box-reflect: below;
+  /* -webkit-box-reflect: below;
   -webkit-box-reflect:below 2px 
-  -webkit-linear-gradient(90deg, rgba(0,0,0,0) 15%,rgba(0,0,0,0.5));
+  -webkit-linear-gradient(90deg, rgba(0,0,0,0) 15%,rgba(0,0,0,0.5)); */
  }
 
 .aperture {
   /* display: inline-block; */
-  width: 58px !important;
-  height: 58px !important;
+  width: 46px !important;
+  height: 46px !important;
   position: absolute;
-  right: 260px;
-  top: 28px;
+  top: 26px;
   z-index: 1999;
 }
 
-.aperture::after {
+/* .aperture::after {
     content: "";
     position: absolute;
     width: 100%;
@@ -1082,7 +1126,7 @@ export default {
     box-shadow: inset 0 0 10px #fff06a, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, 0 0 10px #fff06a, -6px 0 36px #f0f, 6px 0 36px #0ff;
     -webkit-animation: rotate 3s infinite linear;
     animation: rotate 3s infinite linear;
-}
+} */
 
 .v-list__tile {
   min-height: 48px!important;
