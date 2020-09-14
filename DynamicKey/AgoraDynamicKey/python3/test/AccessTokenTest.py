@@ -6,13 +6,13 @@ from random import randint
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.AccessToken import AccessToken,kJoinChannel
 
-appID = "test_app_id"
-appCertificate = "test_app_certificate"
-channelName = "test_channel_name"
-uid = 123456
-expireTimestamp = 1598881347
+appID = "970CA35de60c44645bbae8a215061b33"
+appCertificate = "5CFd2fd1755d40ecb72977518be15d3b"
+channelName = "7d72365eb983485397e3e3f9d460bdda"
+uid = 2882341273
+expireTimestamp = 1446455471
 salt = 1
-ts = 1598181347
+ts = 1111111
 
 
 class AccessTokenTest(unittest.TestCase):
@@ -26,7 +26,6 @@ class AccessTokenTest(unittest.TestCase):
         key.messages[kJoinChannel] = expireTimestamp
 
         result = key.build()
-        print(result)
         self.assertEqual(expected, result)
 
         # test uid = 0

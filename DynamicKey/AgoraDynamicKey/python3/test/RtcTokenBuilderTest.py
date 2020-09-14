@@ -21,6 +21,7 @@ class RtcTokenBuilderTest(unittest.TestCase):
         token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
         parser = AccessToken()
         parser.fromString(token)
+        
         self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
         self.assertNotIn(kPublishVideoStream, parser.messages)
         self.assertNotIn(kPublishAudioStream, parser.messages)
