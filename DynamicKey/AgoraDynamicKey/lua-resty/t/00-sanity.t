@@ -138,3 +138,33 @@ GET /t3
 true
 --- no_error_log
 [error]
+
+
+=== TEST 4: signaling_token test
+
+--- http_config eval: $::HttpConfig
+
+--- config
+location = /t4 {
+    content_by_lua_block {
+        local cjson = require "cjson"
+        local utils = require "utils"
+        local signaling_token = require "resty.agoradynamickey.signaling_token"
+        local app_id = "970CA35de60c44645bbae8a215061b33"
+        local app_certificate = "5CFd2fd1755d40ecb72977518be15d3b"
+        local expire_ts = 1446455471
+        local account = "10000"
+        local expected = "1:970CA35de60c44645bbae8a215061b33:1446455471:92697ea82aa794d40d4940250280022b" 
+
+        local token = signaling_token.generate_signaling_token(account, app_id, app_certificate, expire_ts)
+        ngx.say(token == expected)
+    }
+}
+
+--- request
+GET /t4
+
+--- response_body 
+true
+--- no_error_log
+[error]
