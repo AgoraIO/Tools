@@ -13,7 +13,7 @@ module AgoraDynamicKey
       #        Agora Dashboard if it is missing from your kit. See Get an App ID.
       # :app_certificate app_certificate Certificate of the application that you registered in 
       #        the Agora Dashboard. See Get an App Certificate.
-      # :role role AgoraDynamicKey::RTCTokenBuilder::Role::RTM_USER = 1: RTM USER
+      # :role role AgoraDynamicKey::RTMTokenBuilder::Role::RTM_USER = 1: RTM USER
       # :account  User Account.
       # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970.
       #        If, for example, you want to access the Agora Service within 10 minutes
