@@ -701,8 +701,7 @@ export default {
         this.sendStream.setVideoProfile(profile.resolution);
         this.sendStream.init(
           () => {
-            this.sendStream.play("test-send");
-            setTimeout(() => {
+            this.sendStream.play("test-send", () => {
               let videoElement = document.querySelector("#video" + this.sendId);
               let videoArea = videoElement.videoWidth * videoElement.videoHeight
               let profileArea = profile.width * profile.height
@@ -713,7 +712,7 @@ export default {
                 profile.status = "reject";
                 reject("Resolution mismatched");
               }
-            }, 1000);
+            });
           },
           err => {
             reject(err);

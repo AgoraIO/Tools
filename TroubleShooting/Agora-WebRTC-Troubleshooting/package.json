@@ -13,6 +13,7 @@
     "v-charts": "^1.19.0",
     "vconsole": "^3.3.4",
     "vue": "^2.5.16",
+    "vue-cli": "^2.9.6",
     "vuetify": "^1.0.19"
   },
   "devDependencies": {
