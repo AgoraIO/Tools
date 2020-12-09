@@ -39,17 +39,6 @@
                   <v-btn :value=false @click.native="toggleProxy(false)">{{text.cloudProxy_disable}}</v-btn>
                 </v-btn-toggle>
               </v-card-text>
-              <v-card-text class="proxy" v-if="isEnableCloudProxy">
-                <v-label>{{text.cloudProxy_mode}}</v-label>
-                <v-btn-toggle v-model.lazy="fixProxyPort"rounded>
-                  <v-btn :value=false @click.native="toggleProxyMode(false)">{{text.cloudProxy_default}}</v-btn>
-                  <v-btn :value=true @click.native="toggleProxyMode(true)">{{text.cloudProxy_fix}}</v-btn>
-                </v-btn-toggle>
-                <v-card-text class="tip" v-if="fixProxyPort">
-                  <span class="tip_icon"></span>{{text.cloudProxy_tips}}
-                  <a href="https://docs.agora.io/cn/Audio%20Broadcast/cloud_proxy_web?platform=Web">{{text.cloudProxy_tips_link}}</a>
-                </v-card-text>
-              </v-card-text>
               <v-card-text>
                 <v-list>
                   <v-list-tile v-for="item in testSuites" :key="item.id">
@@ -290,22 +279,21 @@
           <!-- dialog -->
           <v-dialog v-model="dialog" persistent max-width="360">
             <v-card>
-              <v-card-title>
-                <v-tabs>
-                  <v-tab
-                    v-for="(item, index) in ProfileForTry"
-                    @click="retry(index)"
-                    :key="index"
-                  >
-                    {{item.resolution}}
-                  </v-tab>
-                </v-tabs>
-              </v-card-title>
               <v-card-text>
                 <div id="modal-video" v-if="!errMsgForTry">
                   <div v-if="!showVideo">{{text.videoText}}</div>
                 </div>
-                <div v-else>{{errMsgForTry}}</div>
+                <div id="modal-remote-video" v-if="!errMsgForTry">
+                  <div v-if="!showVideo">{{text.videoText}}</div>
+                </div>
+                <div>
+                    <v-card-text>
+                        Channel Name: {{channel}}live local user id: {{sendId}}, remote user id: {{remoteid}}
+                    </v-card-text>
+                </div>
+                <div style="color:blue;clear:both">
+                    <v-card-text>{{url}}</v-card-text>
+                </div>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -350,6 +338,7 @@ export default {
   },
   mounted() {
     document.title = this.text.toolbar_title
+    this.parseUrl();
   },
   data() {
     return {
@@ -368,7 +357,11 @@ export default {
       renderChart: false,
       testing: false,
       isEnableCloudProxy: false,
-      fixProxyPort: false,
+      isRemoteAdded : false,
+      isPreSet : false,
+      remoteid : 0,
+      host : "http://localhost:8080",
+      url : "http://localhost:8080",
       profiles: profileArray.map(item => {
         item.status = "pending";
         return item;
@@ -489,20 +482,21 @@ export default {
 
     initialize() {
       this.ts = new Date().getTime();
-      this.channel =
-        String(this.ts).slice(7) +
-        Math.floor(Math.random() * 1000000).toString(36);
+      console.log("start initialize!");
+      if (null == this.channel) {
+        this.channel =
+          String(this.ts).slice(7) +
+          Math.floor(Math.random() * 1000000).toString(36);
+      }
+      //AgoraRTC.Logger.enableLogUpload();
       this.sendId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 1;
       this.recvId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 2;
       this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
       this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
-      if(this.isEnableCloudProxy && this.fixProxyPort){
-        this.sendClient.startProxyServer(2);
-        this.recvClient.startProxyServer(2);
-      }
-      else if(this.isEnableCloudProxy && !this.fixProxyPort){
-        this.sendClient.startProxyServer();
-        this.recvClient.startProxyServer();
+      console.log("start setup proxy!");
+      if(this.isEnableCloudProxy){
+        this.sendClient.startProxyServer(3);
+        this.recvClient.startProxyServer(3);
       }
     },
 
@@ -546,9 +540,6 @@ export default {
                       () => {
                         this.sendClient.publish(this.sendStream, err => {
                           reject(err);
-                        });
-                        setTimeout(() => {
-                          resolve();
                         });
                       },
                       err => {
@@ -668,15 +659,15 @@ export default {
 
     destructAll() {
       try {
+        //if(this.isEnableCloudProxy){
+        //  this.sendClient.stopProxyServer();
+        //  this.recvClient.stopProxyServer();
+        //}
         this.sendStream && this.sendStream.close();
         this.recvStream && this.recvStream.close();
         this.sendClient.unpublish(this.sendStream);
         this.sendClient.leave();
         this.recvClient.leave();
-        if(this.isEnableCloudProxy){
-          this.sendClient.stopProxyServer();
-          this.recvClient.stopProxyServer();
-        }
         clearInterval(this.detectInterval);
       } catch (err) {
         throw(err);
@@ -730,6 +721,18 @@ export default {
       this.handleCompatibilityCheck();
     },
 
+    parseUrl : function() {
+      console.log("start parse url!");
+      var oldUrl = window.location.href;
+      if (oldUrl.indexOf("?") > 0) {
+        this.host = oldUrl.split("?")[0];
+        var componentsStr = oldUrl.split("?")[1];
+        this.channel = componentsStr.split("channel=")[1].split("&")[0];
+        this.isEnableCloudProxy = 1 == componentsStr.split("proxy=")[1].split("&")[0];
+        this.isPreSet = true;
+      }
+    },
+
     restore() {
       this.testSuites.map(item => {
         item.notError = true;
@@ -770,10 +773,12 @@ export default {
       this.currentTestSuite = "0";
       let testSuite = this.testSuites["0"];
       setTimeout(() => {
+        console.log("start handleCompatibilityCheck");
         testSuite.notError = AgoraRtc.checkSystemRequirements();
         testSuite.notError
           ? (testSuite.extra = this.t("fully_supported"))
           : (testSuite.extra = this.t("some_functions_may_be_limited"));
+        console.log(testSuite.notError)
         this.handleMicrophoneCheck();
       }, 3000);
     },
@@ -849,10 +854,6 @@ export default {
 
     toggleProxy(val) {
       this.isEnableCloudProxy = val;
-    },
-
-    toggleProxyMode(val) {
-      this.fixProxyPort = val;
     },
 
     async handleCameraCheck() {
@@ -946,49 +947,83 @@ export default {
         }, 1500);
       }, 21500);
     },
-
+    fetchAndGetHostUrl : function() {
+      var rest = window.location.href;
+      if (rest.indexOf("?") > 0) {
+        this.host = rest.split("?")[0];
+      } else {
+        this.host = rest;
+      }
+      var r = this.isEnableCloudProxy ? "1" : "0";
+      this.url = this.host + "?channel=" + this.channel + "&proxy=" + r
+      console.log(this.host);
+      console.log(this.url);
+    },
     haveATry() {
-      this.snackbar = false;
+      this.fetchAndGetHostUrl();
+      console.log("start open dialog")
       this.dialog = true;
-      this.ProfileForTry.forEach((item) => {
-        let index = this.profiles.findIndex((profile) => {
-          return profile.resolution === item.resolution
-        })
-        if(index === -1) {
-          return
-        } 
-        item.isSuccess = this.profiles[index].status === 'resolve'
-      })
-      this.retry(0);
+      this.retry();
     },
 
-    retry(currentIndex) {
+    retry() {
+    this.sendClient = AgoraRtc.createClient({
+      mode : "live",
+      codec : "h264"
+    });
+    this.sendClient.init(APP_ID);
+    if (this.isEnableCloudProxy) {
+      this.sendClient.startProxyServer(3);
+    }
       if (this.sendStream && this.sendStream.isPlaying()) {
-        this.sendStream.stop();
-        this.sendStream.close();
+        this.destructAll();
       }
+      console.log("start retry")
       //If the resolution is equal to not supported, 1. Do not play video stream; 2. Give error prompt
-      if (this.ProfileForTry[currentIndex].isSuccess) {
         this.showVideo = true
-      } else {
-        this.showVideo = false
-        return
-      }
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: true,
-        audio: true,
-        screen: false
-      });
-      this.sendStream.setVideoProfile(this.ProfileForTry[currentIndex].resolution);
-      this.sendStream.init(
-        () => {
-          this.sendStream.play("modal-video");
-        },
-        err => {
-          this.errMsgForTry = err.msg;
-        }
-      );
+
+          this.sendStream = AgoraRtc.createStream({
+            streamID: this.sendId,
+            video: true,
+            audio: true,
+            screen: false
+          });
+          this.sendStream.init(
+            () => {
+              this.sendStream.play("modal-video");
+              this.sendClient.join(
+                null,
+                this.channel + "live",
+                this.sendId,
+                () => {
+                  console.log("start publish")
+                  this.sendClient.publish(this.sendStream, err => {
+                    console.log(err);
+                    reject(err);
+                  });
+                },
+                err => {
+                  reject(err);
+                }
+              );
+            },
+            err => {
+              this.errMsgForTry = err.msg;
+            }
+          );
+
+
+        this.sendClient.on("stream-added", evt => {
+            console.log("stream-added");
+            if(!this.isRemoteAdded){
+                this.sendClient.subscribe(evt.stream);
+                this.isRemoteAdded = true;
+            }
+        });
+        this.sendClient.on("stream-subscribed", evt => {
+          console.log("stream-subscribed");
+          evt.stream.play("modal-remote-video");
+        });
     },
 
     endTry() {
@@ -1017,6 +1052,11 @@ export default {
   right: -999999px;
 }
 #modal-video {
+  width: 320px;
+  height: 240px;
+  margin: 0 auto;
+}
+#modal-remote-video {
   width: 320px;
   height: 240px;
   margin: 0 auto;
