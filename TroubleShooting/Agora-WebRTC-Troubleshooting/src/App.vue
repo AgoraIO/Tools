@@ -698,7 +698,7 @@ export default {
                 profile.status = "reject";
                 reject("Resolution mismatched");
               }
-            }, 1000);
+            }, 2500);
           },
           err => {
             reject(err);
@@ -964,6 +964,7 @@ export default {
       console.log("start open dialog")
       this.dialog = true;
       this.retry();
+      this.snackbar = false;
     },
 
     retry() {
