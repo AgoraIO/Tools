@@ -930,7 +930,7 @@ export default {
             let videoPacketLoss = packetInfo.tVideoPacketLoss
             let audioPacketLoss = packetInfo.tAudioPacketLoss
 
-            if(videoBitrate == 0 || audioBitrate == 0) {
+            if(videoBitrate == 0) {
                testSuite.notError = false;
             }
             if(videoPacketLoss !== '-') {
