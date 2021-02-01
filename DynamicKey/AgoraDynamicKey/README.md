@@ -31,6 +31,8 @@ Sample Code for generating AccessToken are available on the following platforms:
 
 > You can use either the following SimpleTokenBuilder or AccessToken sample code to generate an AccessToken. SimpleTokenBuilder encapsulates the underlying AccessToken sample code and is easy to use.
 
+> Note: If you are using windows platform to genenrate access token, you should port c++ code to Visual Stidio to avoid security risk caused by invocation of random_device()
+
 ### C++
 
 + https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/cpp/sample
