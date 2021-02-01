@@ -1,3 +1,0 @@
-#!/usr/bin/env sh
-test_dir=`dirname $0`
-find $test_dir -type f -name '*.t' -exec carton exec -- perl -I$test_dir/../src {} \;
