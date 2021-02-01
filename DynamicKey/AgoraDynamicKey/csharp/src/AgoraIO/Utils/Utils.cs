@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Security.Cryptography;
 
 namespace AgoraIO.Media
 {
@@ -12,7 +13,10 @@ namespace AgoraIO.Media
 
         public static int randomInt()
         {
-            return new Random().Next();
+            RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
+            byte[] bytes = new byte[4];
+            rngCsp.GetBytes(bytes);
+            return BitConverter.ToInt32(bytes, 0);
         }
 
         public static byte[] pack(PrivilegeMessage packableEx)
@@ -21,6 +25,7 @@ namespace AgoraIO.Media
             packableEx.marshal(buffer);
             return buffer.asBytes();
         }
+        
         public static byte[] pack(IPackable packableEx)
         {
             ByteBuf buffer = new ByteBuf();

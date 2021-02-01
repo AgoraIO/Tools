@@ -23,6 +23,6 @@ namespace AgoraIO.Tests
             string result = token.build();
             Assert.Equal(expected, result);
         }
-        
+
     }
 }

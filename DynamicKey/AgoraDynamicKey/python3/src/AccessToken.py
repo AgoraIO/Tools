@@ -1,10 +1,9 @@
 import hmac
 from hashlib import sha256
-import ctypes
 import base64
 import struct
 from zlib import crc32
-import random
+import secrets
 import time
 from collections import OrderedDict
 
@@ -121,12 +120,11 @@ def unPackMessages(buff):
 class AccessToken:
 
     def __init__(self, appID='', appCertificate='', channelName='', uid=''):
-        random.seed(time.time())
         self.appID = appID
         self.appCertificate = appCertificate
         self.channelName = channelName
         self.ts = int(time.time()) + 24 * 3600
-        self.salt = random.randint(1, 99999999)
+        self.salt = secrets.SystemRandom().randint(1, 99999999)
         self.messages = {}
         if (uid == 0):
             self.uidStr = ""

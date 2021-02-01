@@ -6,7 +6,7 @@ use utf8;
 use 5.010;
 
 use Carp;
-use Math::Random::MT::Auto qw/rand/;
+use Math::Random::Secure qw/rand/;
 use MIME::Base64 qw/encode_base64 decode_base64/;
 use Digest::SHA qw/hmac_sha256/;
 use String::CRC32 qw/crc32/;
