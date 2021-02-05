@@ -66,9 +66,8 @@ inline uint32_t GenerateSalt() {
   static size_t thread_local bufferedIndex = RANDOM_NUM_BUFFER_SIZE;
 
   if (bufferedIndex >= RANDOM_NUM_BUFFER_SIZE) {
-    int retVal = RAND_bytes(reinterpret_cast<uint8_t *>(bufferedRandomness),
-        sizeof(bufferedRandomness));
-    assert(retVal == 1);
+    assert(RAND_bytes(reinterpret_cast<uint8_t *>(bufferedRandomness),
+        sizeof(bufferedRandomness)) == 1);
     bufferedIndex = 0;
   }
 
