@@ -28,6 +28,7 @@ Sample Code for generating AccessToken are available on the following platforms:
  + PHP
  + Perl
  + CSharp
+ + Ruby
 
 > You can use either the following SimpleTokenBuilder or AccessToken sample code to generate an AccessToken. SimpleTokenBuilder encapsulates the underlying AccessToken sample code and is easy to use.
 
@@ -65,6 +66,10 @@ Sample Code for generating AccessToken are available on the following platforms:
 ### CSharp
 
 + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/src/AgoraIO/Media/AccessToken.cs
+
+### Ruby
+
++ https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/ruby/sample
 
 ### **YOUR IMPLEMENTATIONS ARE VERY WELCOME.**
 
