@@ -51,6 +51,7 @@ module AgoraDynamicKey
         build_token_with_account @params.merge(:account => @params[:uid])
       end
 
+      # NOT RECOMMENDED
       #
       # Builds an RTC token using a string user_account.
       # @param payload
