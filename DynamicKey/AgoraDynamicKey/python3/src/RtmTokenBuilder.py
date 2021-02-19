@@ -11,6 +11,7 @@ class RtmTokenBuilder:
     # appCertificate:	Certificate of the application that you registered in 
     #                  the Agora Dashboard. See Get an App Certificate.
     # userAccount: The user account. 
+    # channelName:Unique channel name for the AgoraRTM session in the string format
     # role: Role_Rtm_User = 1
     # privilegeExpireTs: represented by the number of seconds elapsed since 
     #                    1/1/1970. If, for example, you want to access the
@@ -18,7 +19,7 @@ class RtmTokenBuilder:
     #                    generated, set expireTimestamp as the current 
     #                    timestamp + 600 (seconds)./
     @staticmethod
-    def buildToken(appId, appCertificate, userAccount, role, privilegeExpiredTs):
-        token = AccessToken(appId, appCertificate, userAccount, "")
+    def buildToken(appId, appCertificate, userAccount, channelName, role, privilegeExpiredTs):
+        token = AccessToken(appId, appCertificate, channelName, userAccount)
         token.addPrivilege(kRtmLogin, privilegeExpiredTs)
         return token.build()
