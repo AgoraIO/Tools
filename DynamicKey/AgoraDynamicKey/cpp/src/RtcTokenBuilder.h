@@ -89,6 +89,27 @@ class RtcTokenBuilder {
       const std::string& userAccount,
       UserRole role,
       uint32_t privilegeExpiredTs = 0);
+
+  static std::string buildTokenWithUid(
+       const std::string& appId,
+       const std::string& appCertificate,
+       const std::string& channelName,
+       uint32_t uid,
+       uint32_t joinChannelPrivilegeExpiredTs = 0,
+       uint32_t pubAudioPrivilegeExpiredTs = 0,
+       uint32_t pubVideoPrivilegeExpiredTs = 0,
+       uint32_t pubDataStreamPrivilegeExpiredTs = 0);
+
+  static std::string buildTokenWithUserAccount(
+       const std::string& appId,
+       const std::string& appCertificate,
+       const std::string& channelName,
+       const std::string& userAccount,
+       uint32_t joinChannelPrivilegeExpiredTs = 0,
+       uint32_t pubAudioPrivilegeExpiredTs = 0,
+       uint32_t pubVideoPrivilegeExpiredTs = 0,
+       uint32_t pubDataStreamPrivilegeExpiredTs = 0);
+
 };
 
 inline std::string RtcTokenBuilder::buildTokenWithUid(
@@ -129,6 +150,50 @@ inline std::string RtcTokenBuilder::buildTokenWithUserAccount(
                            privilegeExpiredTs);
   }
   return generator.Build();
+}
+
+inline std::string RtcTokenBuilder::buildTokenWithUserAccount(
+    const std::string& appId,
+    const std::string& appCertificate,
+    const std::string& channelName,
+    const std::string& userAccount,
+    uint32_t joinChannelPrivilegeExpiredTs,
+    uint32_t pubAudioPrivilegeExpiredTs,
+    uint32_t pubVideoPrivilegeExpiredTs,
+    uint32_t pubDataStreamPrivilegeExpiredTs) {
+  AccessToken generator(appId, appCertificate, channelName, userAccount);
+  generator.AddPrivilege(AccessToken::Privileges::kJoinChannel,
+      joinChannelPrivilegeExpiredTs);
+  generator.AddPrivilege(AccessToken::Privileges::kPublishAudioStream,
+      pubAudioPrivilegeExpiredTs);
+  generator.AddPrivilege(AccessToken::Privileges::kPublishVideoStream,
+      pubVideoPrivilegeExpiredTs);
+  generator.AddPrivilege(AccessToken::Privileges::kPublishDataStream,
+      pubDataStreamPrivilegeExpiredTs);
+  return generator.Build();
+}
+
+inline std::string RtcTokenBuilder::buildTokenWithUid(
+    const std::string& appId,
+    const std::string& appCertificate,
+    const std::string& channelName,
+    uint32_t uid,
+    uint32_t joinChannelPrivilegeExpiredTs,
+    uint32_t pubAudioPrivilegeExpiredTs,
+    uint32_t pubVideoPrivilegeExpiredTs,
+    uint32_t pubDataStreamPrivilegeExpiredTs) {
+  std::string str;
+  if (uid != 0) {
+    str = std::to_string(uid);
+  }
+  return RtcTokenBuilder::buildTokenWithUserAccount(appId,
+                                   appCertificate,
+                                   channelName,
+                                   str,
+                                   joinChannelPrivilegeExpiredTs,
+                                   pubAudioPrivilegeExpiredTs,
+                                   pubVideoPrivilegeExpiredTs,
+                                   pubDataStreamPrivilegeExpiredTs);
 }
 }  // namespace tools
 }  // namespace agora
