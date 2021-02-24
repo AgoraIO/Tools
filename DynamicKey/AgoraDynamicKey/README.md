@@ -64,7 +64,7 @@ Sample Code for generating AccessToken are available on the following platforms:
 
 ### CSharp
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/src/AgoraIO/Media/AccessToken.cs
++ https://github.com/AgoraIO/Tools/blob/deprecated/DynamicKey/AgoraDynamicKey/csharp/src/AgoraIO/Media/AccessToken.cs
 
 ### **YOUR IMPLEMENTATIONS ARE VERY WELCOME.**
 
