@@ -46,12 +46,6 @@ class Service {
  public:
   uint16_t type_;
   std::map<uint16_t, uint32_t> privileges_;
-
- private:
-  Service(const Service &) = delete;
-  Service(Service &&) = delete;
-  Service &operator=(const Service &) = delete;
-  Service &operator=(Service &&) = delete;
 };
 
 class ServiceRtc : public Service {
