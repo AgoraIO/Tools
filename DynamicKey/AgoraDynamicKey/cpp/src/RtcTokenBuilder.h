@@ -90,6 +90,24 @@ class RtcTokenBuilder {
       UserRole role,
       uint32_t privilegeExpiredTs = 0);
 
+   /**
+    Builds an RTC token using an int uid.
+
+    @param appId The App ID issued to you by Agora.
+    @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+    @param channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+    - The 26 lowercase English letters: a to z.
+    - The 26 uppercase English letters: A to Z.
+    - The 10 digits: 0 to 9.
+    - The space.
+    - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    @param uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
+    @param joinChannelPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubAudioPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubVideoPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubDataStreamPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @return The new Token.
+    */
   static std::string buildTokenWithUid(
        const std::string& appId,
        const std::string& appCertificate,
@@ -100,6 +118,24 @@ class RtcTokenBuilder {
        uint32_t pubVideoPrivilegeExpiredTs = 0,
        uint32_t pubDataStreamPrivilegeExpiredTs = 0);
 
+   /**
+    Builds an RTC token using an int uid.
+
+    @param appId The App ID issued to you by Agora.
+    @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+    @param channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+    - The 26 lowercase English letters: a to z.
+    - The 26 uppercase English letters: A to Z.
+    - The 10 digits: 0 to 9.
+    - The space.
+    - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    @param userAccount The user account.
+    @param joinChannelPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubAudioPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubVideoPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @param pubDataStreamPrivilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970.
+    @return The new Token.
+    */
   static std::string buildTokenWithUserAccount(
        const std::string& appId,
        const std::string& appCertificate,
@@ -109,7 +145,6 @@ class RtcTokenBuilder {
        uint32_t pubAudioPrivilegeExpiredTs = 0,
        uint32_t pubVideoPrivilegeExpiredTs = 0,
        uint32_t pubDataStreamPrivilegeExpiredTs = 0);
-
 };
 
 inline std::string RtcTokenBuilder::buildTokenWithUid(
