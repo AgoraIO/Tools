@@ -2,6 +2,7 @@ package rtctokenbuilder
 
 import (
 	"fmt"
+
 	accesstoken "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/AccessToken"
 )
 
@@ -66,4 +67,31 @@ func BuildTokenWithUID(appID string, appCertificate string, channelName string, 
 		uidStr = ""
 	}
 	return BuildTokenWithUserAccount(appID, appCertificate, channelName, uidStr, role, privilegeExpiredTs)
+}
+
+func BuildTokenWithUserAccountAndCustomPrivilege(appID string, appCertificate string,
+																								 channelName string, userAccount string,
+																								 joinChannelPrivilegeExpiredTs uint32,
+																								 pubAudioPrivilegeExpiredTs uint32,
+																								 pubVideoPrivilegeExpiredTs uint32,
+																								 pubDataStreamPrivilegeExpiredTs uint32) (string, error) {
+
+	tokenGenerator := accessToken.CreateAccessToken2(appID, appCertificate, channelName, userAccount)
+	tokenGenerator.AddPrivilege(accessToken.KJoinChannel, joinChannelPrivilegeExpiredTs)
+	tokenGenerator.AddPrivilege(accessToken.KPublishVideoStream, pubVideoPrivilegeExpiredTs)
+	tokenGenerator.AddPrivilege(accessToken.KPublishAudioStream, pubAudioPrivilegeExpiredTs)
+	tokenGenerator.AddPrivilege(accessToken.KPublishDataStream, pubDataStreamPrivilegeExpiredTs)
+	return token.Build()
+}
+
+func BuildTokenWithUIDAndCustomPrivilege(appID string, appCertificate string, channelName string, uid uint32,
+																				 joinChannelPrivilegeExpiredTs uint32, pubAudioPrivilegeExpiredTs uint32,
+																				 pubVideoPrivilegeExpiredTs uint32,
+																				 pubDataStreamPrivilegeExpiredTs uint32) (string, error) {
+	uidStr := fmt.Sprint(uid)
+	if uid == 0 {
+		uidStr = ""
+	}
+	return BuildTokenWithUserAccount(appID, appCertificate, channelName, uidStr, joinChannelPrivilegeExpiredTs,
+																	 pubAudioPrivilegeExpiredTs, pubVideoPrivilegeExpiredTs, pubDataStreamPrivilegeExpiredTs)
 }

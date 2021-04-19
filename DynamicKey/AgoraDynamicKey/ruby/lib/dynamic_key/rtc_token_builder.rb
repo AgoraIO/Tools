@@ -76,6 +76,55 @@ module AgoraDynamicKey
         generate_access_token!
       end
 
+      #
+      # Builds an RTC token using an Integer uid.
+      # @param payload
+      # :app_id The App ID issued to you by Agora.
+      # :app_certificate Certificate of the application that you registered in the Agora Dashboard.
+      # :channel_name The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+      # - The 26 lowercase English letters: a to z.
+      # - The 26 uppercase English letters: A to Z.
+      # - The 10 digits: 0 to 9.
+      # - The space.
+      # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+      # :uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
+      # :role See #userRole.
+      # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
+      # 
+      # @return The new Token.
+      #
+      def build_token_with_uid_user_defined_privilege payload
+        check! payload, %i[app_id app_certificate channel_name uid join_channel_privilege_expired_ts pub_audio_privilege_expired_ts pub_video_privilege_expired_ts pub_data_stream_privilege_expired_ts]
+        build_token_with_account_user_defined_privilege @params.merge(:account => @params[:uid])
+      end
+
+      #
+      # Builds an RTC token using a string user_account.
+      # @param payload
+      # :app_id The App ID issued to you by Agora.
+      # :app_certificate Certificate of the application that you registered in the Agora Dashboard.
+      # :channel_name The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+      # - The 26 lowercase English letters: a to z.
+      # - The 26 uppercase English letters: A to Z.
+      # - The 10 digits: 0 to 9.
+      # - The space.
+      # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+      # :account The user account.
+      # :role See #userRole.
+      # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
+      # 
+      # @return The new Token.
+      #                        
+      def build_token_with_account_user_defined_privilege payload
+        check! payload, %i[app_id app_certificate channel_name account join_channel_privilege_expired_ts pub_audio_privilege_expired_ts pub_video_privilege_expired_ts pub_data_stream_privilege_expired_ts]
+        @params.merge!(:uid => @params[:account])
+        generate_access_token_user_defined!
+      end
+
       private
 
       # generate access token
@@ -90,6 +139,16 @@ module AgoraDynamicKey
             t.grant AgoraDynamicKey::Privilege::PUBLISH_VIDEO_STREAM, t.privilege_expired_ts
             t.grant AgoraDynamicKey::Privilege::PUBLISH_DATA_STREAM, t.privilege_expired_ts
           end
+        end
+      end
+      # generate access token
+      def generate_access_token_user_defined!
+        # Assign appropriate access privileges to each role.
+        AgoraDynamicKey::AccessToken.generate!(@params) do |t|
+          t.grant AgoraDynamicKey::Privilege::JOIN_CHANNEL, t.join_channel_privilege_expired_ts
+          t.grant AgoraDynamicKey::Privilege::PUBLISH_AUDIO_STREAM, t.pub_audio_privilege_expired_ts
+          t.grant AgoraDynamicKey::Privilege::PUBLISH_VIDEO_STREAM, t.pub_video_privilege_expired_ts
+          t.grant AgoraDynamicKey::Privilege::PUBLISH_DATA_STREAM, t.pub_data_stream_privilege_expired_ts
         end
       end
 

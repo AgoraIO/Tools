@@ -7,13 +7,13 @@ using namespace agora::tools;
 class RtcTokenBuilder_test : public testing::Test {
  protected:
   virtual void SetUp() {
-    appID = "972CA35de60c44645bbae8a215061b33";
-    appCertificate = "5CFd2fd1756d40ecb72977518be15d3b";
+    appID = "970CA35de60c44645bbae8a215061b33";
+    appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
     userAccount = "test_user";
     crcUserAccount = crc32(
         0, reinterpret_cast<Bytef*>(const_cast<char*>(userAccount.c_str())),
         userAccount.length());
-    cname = "test_channel";
+    cname = "7d72365eb983485397e3e3f9d460bdda";
     crcCname = crc32(
         0, reinterpret_cast<Bytef*>(const_cast<char*>(cname.c_str())),
         cname.length());
@@ -33,6 +33,7 @@ class RtcTokenBuilder_test : public testing::Test {
 };
 
 void RtcTokenBuilder_test::testRtcTokenBuilder() {
+    uint32_t uid = 2882341273;
     uint32_t joints = 1614049514;
     uint32_t audiots = 1614049515;
     uint32_t videots = 1614049516;
@@ -58,6 +59,9 @@ void RtcTokenBuilder_test::testRtcTokenBuilder() {
           appCertificate, appID, cname, userAccount,
           parser.message_raw_content_),
         parser.signature_);
+    std::string token2 = RtcTokenBuilder::buildTokenWithUid(appID, appCertificate, cname, uid,
+        joints, audiots, videots, datats);
+    std::cout << token2.c_str() << std::endl;
 }
 
 TEST_F(RtcTokenBuilder_test, testRtcTokenBuilder) {

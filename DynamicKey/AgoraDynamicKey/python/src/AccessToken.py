@@ -157,7 +157,7 @@ class AccessToken:
     def build(self):
 
         self.messages = OrderedDict(sorted(self.messages.iteritems(), key=lambda x: int(x[0])))
-
+        print("salt", self.salt)
         m = packUint32(self.salt) + packUint32(self.ts) \
             + packMapUint32(self.messages)
 

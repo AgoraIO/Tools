@@ -26,6 +26,15 @@ def main():
     print("Token with int uid: {}".format(token))
     token = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, userAccount, Role_Attendee, privilegeExpiredTs)
     print("Token with user account: {}".format(token))
+    token = RtcTokenBuilder.buildTokenWithUidUserDefinedPrivilege(appID, appCertificate, channelName, uid, 
+                                              privilegeExpiredTs, privilegeExpiredTs,
+                                              privilegeExpiredTs, privilegeExpiredTs)
+    print("Token with int uid user defined privilege: {}".format(token))
+
+    token = RtcTokenBuilder.buildTokenWithAccountUserDefinedPrivilege(appID, appCertificate, channelName, userAccount,
+                                                  privilegeExpiredTs, privilegeExpiredTs,
+                                                  privilegeExpiredTs, privilegeExpiredTs)
+    print("Token with user account user defined privilege: {}".format(token))
 
 if __name__ == "__main__":
     main()
