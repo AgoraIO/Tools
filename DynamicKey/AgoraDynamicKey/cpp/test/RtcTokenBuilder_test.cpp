@@ -59,9 +59,9 @@ void RtcTokenBuilder_test::testRtcTokenBuilder() {
           appCertificate, appID, cname, userAccount,
           parser.message_raw_content_),
         parser.signature_);
-    std::string token2 = RtcTokenBuilder::buildTokenWithUid(appID, appCertificate, cname, uid,
-        joints, audiots, videots, datats);
-    std::cout << token2.c_str() << std::endl;
+    std::cout <<  crc32(
+        0, reinterpret_cast<Bytef*>(const_cast<char*>("0")), 1);
+
 }
 
 TEST_F(RtcTokenBuilder_test, testRtcTokenBuilder) {
