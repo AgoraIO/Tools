@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"rtctokenbuilder"
+	rtctokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/RtcTokenBuilder"
 	"time"
 )
 
@@ -29,5 +29,21 @@ func main() {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with userAccount: %s\n", result)
+	}
+	result1, err1 := rtctokenbuilder.BuildTokenWithUIDUserDefinedPrivilege(appID, appCertificate, channelName, uid, expireTimestamp,
+																		  expireTimestamp, expireTimestamp, expireTimestamp)
+	if err1 != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with uid user defined privilege: %s\n", result1)
+	}
+
+	result1, err1 = rtctokenbuilder.BuildTokenWithUserAccountUserDefinedPrivilege(appID, appCertificate, channelName,uidStr, expireTimestamp,
+																			      expireTimestamp, expireTimestamp, expireTimestamp)
+
+	if err1 != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with userAccount user defined privilege: %s\n", result1)
 	}
 }

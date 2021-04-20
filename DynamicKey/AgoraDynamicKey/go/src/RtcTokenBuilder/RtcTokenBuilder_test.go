@@ -40,19 +40,18 @@ func Test_RtcTokenBuilderCustomPrivilege(t *testing.T) {
 		videoTs uint32 = 1614049516
 		dataTs  uint32 = 1614049517
 	)
-	result, err := BuildTokenWithUID(appID, appCertificate, channelName,uidZero, joinTs, audioTs, videoTs, dataTs)
+	result, err := BuildTokenWithUIDUserDefinedPrivilege(appID, appCertificate, channelName,uidZero, joinTs, audioTs, videoTs, dataTs)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	token := accessToken.AccessToken{}
+	token := accesstoken.AccessToken{}
 	token.FromString(result)
-	if token.Message[accessToken.KJoinChannel] != joints {
+	if token.Message[accesstoken.KJoinChannel] != joinTs {
 		t.Error("no kJoinChannel ts")
 	}
-
-	if token.Message[accessToken.KPublishVideoStream] == 0 {
+	if token.Message[accesstoken.KPublishAudioStream] != audioTs {
 		t.Error("publish video stream ts nil")
 	}
 }
