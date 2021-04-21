@@ -16,16 +16,10 @@
       <v-btn v-else color="error" disabled>
         {{text.running}}
       </v-btn>
+      <v-btn v-on:click="copyLogs" color="info" >
+        Download Logs
+      </v-btn>
     </v-toolbar>
-    <div class="github-box">
-      <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting">
-        <span class="github"></span>
-        <div class="github-text">
-          <span class="github-text1">GITHUB</span><br> 
-          <span class="github-text2">点击查看源码</span> 
-        </div>
-      </a>
-    </div>
     <!-- end -->
     <v-content>
       <v-container fill-height>
@@ -45,17 +39,6 @@
                   <v-btn :value=false @click.native="toggleProxy(false)">{{text.cloudProxy_disable}}</v-btn>
                 </v-btn-toggle>
               </v-card-text>
-              <v-card-text class="proxy" v-if="isEnableCloudProxy">
-                <v-label>{{text.cloudProxy_mode}}</v-label>
-                <v-btn-toggle v-model.lazy="fixProxyPort"rounded>
-                  <v-btn :value=false @click.native="toggleProxyMode(false)">{{text.cloudProxy_default}}</v-btn>
-                  <v-btn :value=true @click.native="toggleProxyMode(true)">{{text.cloudProxy_fix}}</v-btn>
-                </v-btn-toggle>
-                <v-card-text class="tip" v-if="fixProxyPort">
-                  <span class="tip_icon"></span>{{text.cloudProxy_tips}}
-                  <a href="https://docs.agora.io/cn/Audio%20Broadcast/cloud_proxy_web?platform=Web">{{text.cloudProxy_tips_link}}</a>
-                </v-card-text>
-              </v-card-text>
               <v-card-text>
                 <v-list>
                   <v-list-tile v-for="item in testSuites" :key="item.id">
@@ -73,13 +56,14 @@
             <v-card style="margin-top: 60px">
               <v-toolbar color="info" dark>
                 <v-toolbar-title>
-                  {{text.test_report}}
+                  {{text.test_report}} - {{this.channel}}
                 </v-toolbar-title>
               </v-toolbar>
               <v-list>
                 <v-list-group v-for="item in testSuites" :key="item.id">
                   <v-list-tile slot="activator">
                     <v-icon v-if="item.notError" color="success">done</v-icon>
+                    <v-icon warning v-else-if="item.id === '3'" color="warning">warning</v-icon>
                     <v-icon v-else color="error">close</v-icon>
                     <span>{{t(item.label)}}</span>
                   </v-list-tile>
@@ -296,22 +280,21 @@
           <!-- dialog -->
           <v-dialog v-model="dialog" persistent max-width="360">
             <v-card>
-              <v-card-title>
-                <v-tabs>
-                  <v-tab
-                    v-for="(item, index) in ProfileForTry"
-                    @click="retry(index)"
-                    :key="index"
-                  >
-                    {{item.resolution}}
-                  </v-tab>
-                </v-tabs>
-              </v-card-title>
               <v-card-text>
                 <div id="modal-video" v-if="!errMsgForTry">
                   <div v-if="!showVideo">{{text.videoText}}</div>
                 </div>
-                <div v-else>{{errMsgForTry}}</div>
+                <div id="modal-remote-video" v-if="!errMsgForTry">
+                  <div v-if="!showVideo">{{text.videoText}}</div>
+                </div>
+                <div>
+                    <v-card-text>
+                        Channel Name: {{channel}}live local user id: {{sendId}}, remote user id: {{remoteid}}
+                    </v-card-text>
+                </div>
+                <div style="color:blue;clear:both">
+                    <v-card-text>{{url}}</v-card-text>
+                </div>
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -339,11 +322,14 @@
 <script>
 // import  VConsole  from  'vconsole'
 import AgoraRtc from "agora-rtc-sdk";
+import { Debugout } from 'debugout.js';
 const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
 
 // const log = console.log.bind(console)
+
+const logger = new Debugout()
 
 // If need mobile phone terminal debugging
 // let vConsole = new VConsole()
@@ -356,6 +342,7 @@ export default {
   },
   mounted() {
     document.title = this.text.toolbar_title
+    this.parseUrl();
   },
   data() {
     return {
@@ -374,7 +361,11 @@ export default {
       renderChart: false,
       testing: false,
       isEnableCloudProxy: false,
-      fixProxyPort: false,
+      isRemoteAdded : false,
+      isPreSet : false,
+      remoteid : 0,
+      host : "http://localhost:8080",
+      url : "http://localhost:8080",
       profiles: profileArray.map(item => {
         item.status = "pending";
         return item;
@@ -414,20 +405,20 @@ export default {
       bitrateData: {
           columns: ['index', 'tVideoBitrate', 'tAudioBitrate'],
           rows: [
-            { 
-              index: 0, 
-              'tVideoBitrate': 0, 
-              'tAudioBitrate': 0 
+            {
+              index: 0,
+              'tVideoBitrate': 0,
+              'tAudioBitrate': 0
             },
         ]
       },
       packetsData: {
         columns: ["index", 'tVideoPacketLoss', 'tAudioPacketLoss'],
         rows: [
-          { 
-            index: 0, 
-            'tVideoPacketLoss': 0, 
-            'tAudioPacketLoss': 0 
+          {
+            index: 0,
+            'tVideoPacketLoss': 0,
+            'tAudioPacketLoss': 0
           }
         ]
       },
@@ -492,23 +483,26 @@ export default {
     switchLanguage () {
       this.language = this.language === 0 ? 1 : 0
     },
-
+    copyLogs () {
+      logger.downloadLog()
+    },
     initialize() {
       this.ts = new Date().getTime();
-      this.channel =
-        String(this.ts).slice(7) +
-        Math.floor(Math.random() * 1000000).toString(36);
+      if (null == this.channel) {
+        this.channel =
+          String(this.ts).slice(7) +
+          Math.floor(Math.random() * 1000000).toString(36);
+      }
+      logger.info("start initialize! channel id: ", this.channel);
+      AgoraRtc.Logger.enableLogUpload();
       this.sendId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 1;
       this.recvId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 2;
       this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
       this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
-      if(this.isEnableCloudProxy && this.fixProxyPort){
-        this.sendClient.startProxyServer(2);
-        this.recvClient.startProxyServer(2);
-      }
-      else if(this.isEnableCloudProxy && !this.fixProxyPort){
-        this.sendClient.startProxyServer();
-        this.recvClient.startProxyServer();
+      if(this.isEnableCloudProxy){
+        logger.info("start setup proxy!");
+        this.sendClient.startProxyServer(3);
+        this.recvClient.startProxyServer(3);
       }
     },
 
@@ -516,6 +510,7 @@ export default {
         let isChrome = navigator.userAgent.indexOf("Chrome") >= 0;
         if (isChrome){
             let videoDOM = document.querySelector('#sample_video');
+            logger.info("chrome detected, use local video for network check!", navigator.userAgent)
             videoDOM.play();
             videoDOM.muted = true;
         }
@@ -552,9 +547,6 @@ export default {
                       () => {
                         this.sendClient.publish(this.sendStream, err => {
                           reject(err);
-                        });
-                        setTimeout(() => {
-                          resolve();
                         });
                       },
                       err => {
@@ -679,12 +671,9 @@ export default {
         this.sendClient.unpublish(this.sendStream);
         this.sendClient.leave();
         this.recvClient.leave();
-        if(this.isEnableCloudProxy){
-          this.sendClient.stopProxyServer();
-          this.recvClient.stopProxyServer();
-        }
         clearInterval(this.detectInterval);
       } catch (err) {
+        logger.error(err.msg)
         throw(err);
       }
     },
@@ -713,7 +702,7 @@ export default {
                 profile.status = "reject";
                 reject("Resolution mismatched");
               }
-            }, 1000);
+            }, 2500);
           },
           err => {
             reject(err);
@@ -736,6 +725,18 @@ export default {
       this.handleCompatibilityCheck();
     },
 
+    parseUrl : function() {
+      logger.info("start parse url!");
+      var oldUrl = window.location.href;
+      if (oldUrl.indexOf("?") > 0) {
+        this.host = oldUrl.split("?")[0];
+        var componentsStr = oldUrl.split("?")[1];
+        this.channel = componentsStr.split("channel=")[1].split("&")[0];
+        this.isEnableCloudProxy = 1 == componentsStr.split("proxy=")[1].split("&")[0];
+        this.isPreSet = true;
+      }
+    },
+
     restore() {
       this.testSuites.map(item => {
         item.notError = true;
@@ -753,20 +754,20 @@ export default {
       this.bitrateData = {
         columns: ["index", 'tVideoBitrate', 'tAudioBitrate'],
         rows: [
-          { 
-            index: 0, 
-            'tVideoBitrate': 0, 
-            'tAudioBitrate': 0 
+          {
+            index: 0,
+            'tVideoBitrate': 0,
+            'tAudioBitrate': 0
           }
         ]
       }
       this.packetsData = {
         columns: ["index", 'tVideoPacketLoss', 'tAudioPacketLoss'],
         rows: [
-          { 
-            index: 0, 
-            'tVideoPacketLoss': 0, 
-            'tAudioPacketLoss': 0 
+          {
+            index: 0,
+            'tVideoPacketLoss': 0,
+            'tAudioPacketLoss': 0
           }
         ]
       }
@@ -776,10 +777,12 @@ export default {
       this.currentTestSuite = "0";
       let testSuite = this.testSuites["0"];
       setTimeout(() => {
+        logger.info("start handleCompatibilityCheck");
         testSuite.notError = AgoraRtc.checkSystemRequirements();
         testSuite.notError
           ? (testSuite.extra = this.t("fully_supported"))
           : (testSuite.extra = this.t("some_functions_may_be_limited"));
+        logger.info(testSuite.notError)
         this.handleMicrophoneCheck();
       }, 3000);
     },
@@ -822,6 +825,7 @@ export default {
           try {
             this.sendStream.close();
           } catch (error) {
+            logger.error(error.msg)
             throw(error);
           } finally {
             this.handleSpeakerCheck();
@@ -855,10 +859,6 @@ export default {
 
     toggleProxy(val) {
       this.isEnableCloudProxy = val;
-    },
-
-    toggleProxyMode(val) {
-      this.fixProxyPort = val;
     },
 
     async handleCameraCheck() {
@@ -905,6 +905,7 @@ export default {
       } catch (err) {
         testSuite.extra = err.msg;
         testSuite.notError = false;
+        logger.error(err.msg);
         setTimeout(() => {
           this.testing = false;
           this.currentTestSuite = "5";
@@ -929,13 +930,13 @@ export default {
           if (this.bitrateData && this.packetsData) {
             let bitrateInfo = this.bitrateData.rows.pop();
             let packetInfo = this.packetsData.rows.pop();
-          
+
             let videoBitrate = bitrateInfo.tVideoBitrate
             let audioBitrate = bitrateInfo.tAudioBitrate
             let videoPacketLoss = packetInfo.tVideoPacketLoss
             let audioPacketLoss = packetInfo.tAudioPacketLoss
 
-            if(videoBitrate == 0 || audioBitrate == 0) {
+            if(videoBitrate == 0) {
                testSuite.notError = false;
             }
             if(videoPacketLoss !== '-') {
@@ -952,54 +953,87 @@ export default {
         }, 1500);
       }, 21500);
     },
-
+    fetchAndGetHostUrl : function() {
+      const rest = window.location.href;
+      if (rest.indexOf("?") > 0) {
+        this.host = rest.split("?")[0];
+      } else {
+        this.host = rest;
+      }
+      const r = this.isEnableCloudProxy ? "1" : "0";
+      this.url = this.host + "?channel=" + this.channel + "&proxy=" + r
+      logger.info("fetchAndGetHostUrl: ", this.host, this.url);
+    },
     haveATry() {
-      this.snackbar = false;
+      this.fetchAndGetHostUrl();
+      logger.info("start open dialog")
       this.dialog = true;
-      this.ProfileForTry.forEach((item) => {
-        let index = this.profiles.findIndex((profile) => {
-          return profile.resolution === item.resolution
-        })
-        if(index === -1) {
-          return
-        } 
-        item.isSuccess = this.profiles[index].status === 'resolve'
-      })
-      this.retry(0);
+      this.retry();
+      this.snackbar = false;
     },
 
-    retry(currentIndex) {
+    retry() {
+    this.sendClient = AgoraRtc.createClient({
+      mode : "live",
+      codec : "h264"
+    });
+    this.sendClient.init(APP_ID);
+    if (this.isEnableCloudProxy) {
+      this.sendClient.startProxyServer(3);
+    }
       if (this.sendStream && this.sendStream.isPlaying()) {
-        this.sendStream.stop();
-        this.sendStream.close();
+        this.destructAll();
       }
+      logger.info("start retry")
       //If the resolution is equal to not supported, 1. Do not play video stream; 2. Give error prompt
-      if (this.ProfileForTry[currentIndex].isSuccess) {
         this.showVideo = true
-      } else {
-        this.showVideo = false
-        return
-      }
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: true,
-        audio: true,
-        screen: false
-      });
-      this.sendStream.setVideoProfile(this.ProfileForTry[currentIndex].resolution);
-      this.sendStream.init(
-        () => {
-          this.sendStream.play("modal-video");
-        },
-        err => {
-          this.errMsgForTry = err.msg;
-        }
-      );
+
+          this.sendStream = AgoraRtc.createStream({
+            streamID: this.sendId,
+            video: true,
+            audio: true,
+            screen: false
+          });
+          this.sendStream.init(
+            () => {
+              this.sendStream.play("modal-video");
+              this.sendClient.join(
+                null,
+                this.channel + "live",
+                this.sendId,
+                () => {
+                  logger.info("start publish")
+                  this.sendClient.publish(this.sendStream, err => {
+                    logger.error(err);
+                    reject(err);
+                  });
+                },
+                err => {
+                  reject(err);
+                }
+              );
+            },
+            err => {
+              this.errMsgForTry = err.msg;
+            }
+          );
+
+
+        this.sendClient.on("stream-added", evt => {
+            logger.info("stream-added:",evt.stream);
+            if(!this.isRemoteAdded){
+                this.sendClient.subscribe(evt.stream);
+                this.isRemoteAdded = true;
+            }
+        });
+        this.sendClient.on("stream-subscribed", evt => {
+          logger.info("stream-subscribed", evt.stream);
+          evt.stream.play("modal-remote-video");
+        });
     },
 
     endTry() {
       this.dialog = false;
-      this.sendStream.stop();
       this.sendStream.close();
     }
   }
@@ -1027,6 +1061,11 @@ export default {
   height: 240px;
   margin: 0 auto;
 }
+#modal-remote-video {
+  width: 320px;
+  height: 240px;
+  margin: 0 auto;
+}
 @-webkit-keyframes rotate {
   0% {
       -webkit-transform: rotate(0deg);
@@ -1050,72 +1089,34 @@ export default {
       transform: rotate(360deg)
   }
 }
-.github-box {
-  position: absolute;
-  width: 155px;
-  height: 45px;
-  border-radius: 28px;
-  background: #186bcc;
-  right: 330px;
-  padding: 10px;
-  opacity: 0.65;
-  top: 75px;
-  right: 60px;
-  background-color: #e5e5e5;
-  z-index: 99999;
-}
-
-.github-text {
-  top: -20%;
-  left: 15%;
-  transform: translate(15%, -20%);
-}
-
-.github-text1 {
-  position: absolute;
-  font-size: 14px;
-  color: black;
-  right: 43px;
-}
-
-.github-text2 {
-  position: absolute;
-  font-size: 10px;
-  font-weight: bold;
-  margin-left: 13px;
-  margin-top: -5px;
-  right: 32px;
-  color: black;
-}
-
 .github { 
   cursor: pointer;
   background-repeat: no-repeat;
   position: absolute;
   background-image: url("./assets/github.png");
-  background-size: 36px;
+  background-size: 50px;
   display: block;
-  width: 36px;
-  height: 36px;
-  top: 45px;
-  /* left: 5px; */
+  width: 50px;
+  height: 50px;
+  margin: 20px;
   border-radius: 28px;
   transform: translateY(-40px);
-  /* -webkit-box-reflect: below;
+  -webkit-box-reflect: below;
   -webkit-box-reflect:below 2px 
-  -webkit-linear-gradient(90deg, rgba(0,0,0,0) 15%,rgba(0,0,0,0.5)); */
+  -webkit-linear-gradient(90deg, rgba(0,0,0,0) 15%,rgba(0,0,0,0.5));
  }
 
 .aperture {
   /* display: inline-block; */
-  width: 46px !important;
-  height: 46px !important;
+  width: 58px !important;
+  height: 58px !important;
   position: absolute;
-  top: 26px;
+  right: 260px;
+  top: 28px;
   z-index: 1999;
 }
 
-/* .aperture::after {
+.aperture::after {
     content: "";
     position: absolute;
     width: 100%;
@@ -1126,7 +1127,7 @@ export default {
     box-shadow: inset 0 0 10px #fff06a, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, inset 4px 0 16px #f0f, inset -4px 0 16px #0ff, 0 0 10px #fff06a, -6px 0 36px #f0f, 6px 0 36px #0ff;
     -webkit-animation: rotate 3s infinite linear;
     animation: rotate 3s infinite linear;
-} */
+}
 
 .v-list__tile {
   min-height: 48px!important;
