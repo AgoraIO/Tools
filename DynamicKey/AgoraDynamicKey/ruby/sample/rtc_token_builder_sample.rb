@@ -42,7 +42,7 @@ params_with_uid_user_defined_privilege = {
   pub_data_stream_privilege_expired_ts: current_time_stamps + expiration_time_in_seconds
 }
 
-result = AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid_user_defined_privilege params_with_uid_user_defined_privilege
+result = AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid_and_privilege params_with_uid_user_defined_privilege
 
 puts "Token With Int Uid user defined privilege: #{result}"
 
@@ -57,6 +57,6 @@ params_with_account_user_defined_privilege = {
   pub_data_stream_privilege_expired_ts: current_time_stamps + expiration_time_in_seconds
 }
 
-result = AgoraDynamicKey::RTCTokenBuilder.build_token_with_account_user_defined_privilege params_with_account_user_defined_privilege
+result = AgoraDynamicKey::RTCTokenBuilder.build_token_with_user_account_and_privilege params_with_account_user_defined_privilege
 
 puts "Token With Int Uid user defined privilege: #{result}"
