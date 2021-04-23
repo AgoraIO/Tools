@@ -31,7 +31,7 @@ class RtcTokenBuilderTest(unittest.TestCase):
         # self.assertNotIn(kPublishAudioStream, parser.messages)
         # self.assertNotIn(kPublishDataStream, parser.messages)
 
-        token = RtcTokenBuilder.buildTokenWithUidUserDefinedPrivilege(appID, appCertificate,
+        token = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appID, appCertificate,
                                                   channelName, uid, joinTs,
                                                   audioTs, videoTs, dataTs)
         

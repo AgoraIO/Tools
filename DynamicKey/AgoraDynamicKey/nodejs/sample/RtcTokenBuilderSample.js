@@ -24,12 +24,12 @@ console.log("Token With Integer Number Uid: " + tokenA);
 const tokenB = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
 console.log("Token With UserAccount: " + tokenB);
 
-const tokenC = RtcTokenBuilder.buildTokenWithUidUserDefinedPrivilege(appID, appCertificate, channelName, uid, 
+const tokenC = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid, 
 	privilegeExpiredTs, privilegeExpiredTs,
 	privilegeExpiredTs, privilegeExpiredTs)
 	console.log("Token with user uid user defined privilege:" + tokenC)
 
-const tokenD = RtcTokenBuilder.buildTokenWithAccountUserDefinedPrivilege(appID, appCertificate, channelName, account,
+const tokenD = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(appID, appCertificate, channelName, account,
 			privilegeExpiredTs, privilegeExpiredTs,
 			privilegeExpiredTs, privilegeExpiredTs)
 console.log("Token with user account user defined privilege:" + tokenD)
