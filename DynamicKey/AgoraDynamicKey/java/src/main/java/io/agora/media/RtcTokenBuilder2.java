@@ -50,7 +50,7 @@ public class RtcTokenBuilder2 {
      */
     public String buildTokenWithAccount(String appId, String appCertificate, String channelName, String account, Role role, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
-        AccessToken2.Service serviceRtc = accessToken.new ServiceRtc(channelName, account);
+        AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
         if (role == Role.ROLE_PUBLISHER) {

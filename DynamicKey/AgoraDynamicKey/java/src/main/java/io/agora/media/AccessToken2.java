@@ -43,10 +43,22 @@ public class AccessToken2 {
         }
     }
 
+    public enum PrivilegeChat {
+        PRIVILEGE_CHAT_USER(1),
+        PRIVILEGE_CHAT_APP(2),
+        ;
+
+        public short intValue;
+        PrivilegeChat(int value) {
+            intValue = (short) value;
+        }
+    }
+
     private static final String VERSION = "007";
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
     public static final short SERVICE_TYPE_STREAMING = 3;
+    public static final short SERVICE_TYPE_CHAT = 4;
 
     public String appCert = "";
     public String appId = "";
@@ -103,6 +115,9 @@ public class AccessToken2 {
         if (serviceType == SERVICE_TYPE_STREAMING) {
             return new ServiceStreaming();
         }
+        if (serviceType == SERVICE_TYPE_CHAT) {
+            return new ServiceChat();
+        }
         return null;
     }
 
@@ -147,7 +162,7 @@ public class AccessToken2 {
         return true;
     }
 
-    public class Service {
+    public static class Service {
         public short type;
         public TreeMap<Short, Integer> privileges = new TreeMap<Short, Integer>() {
         };
@@ -164,6 +179,10 @@ public class AccessToken2 {
         }
 
         public void addPrivilegeRtm(PrivilegeRtm privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        public void addPrivilegeChat(PrivilegeChat privilege, int expire) {
             this.privileges.put(privilege.intValue, expire);
         }
 
@@ -184,7 +203,7 @@ public class AccessToken2 {
         }
     }
 
-    public class ServiceRtc extends Service {
+    public static class ServiceRtc extends Service {
         public String channelName;
         public String uid;
 
@@ -217,7 +236,7 @@ public class AccessToken2 {
         }
     }
 
-    public class ServiceRtm extends Service {
+    public static class ServiceRtm extends Service {
         public String userId;
 
         public ServiceRtm() {
@@ -243,7 +262,7 @@ public class AccessToken2 {
         }
     }
 
-    public class ServiceStreaming extends Service {
+    public static class ServiceStreaming extends Service {
         public String channelName;
         public String uid;
 
@@ -265,6 +284,33 @@ public class AccessToken2 {
             super.unpack(byteBuf);
             this.channelName = byteBuf.readString();
             this.uid = byteBuf.readString();
+        }
+    }
+
+    public static class ServiceChat extends Service {
+        public String userId;
+
+        public ServiceChat() {
+            this.type = SERVICE_TYPE_CHAT;
+            this.userId = "";
+        }
+
+        public ServiceChat(String userId) {
+            this.type = SERVICE_TYPE_CHAT;
+            this.userId = userId;
+        }
+
+        public String getUserId() {
+            return this.userId;
+        }
+
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf).put(this.userId);
+        }
+
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+            this.userId = byteBuf.readString();
         }
     }
 }
