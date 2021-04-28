@@ -2,7 +2,8 @@ package io.agora.media;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AccessToken2Test {
     private String appId = "970CA35de60c44645bbae8a215061b33";
@@ -207,8 +208,8 @@ public class AccessToken2Test {
     @Test
     public void parse_TokenChatUser() {
         AccessToken2 accessToken = new AccessToken2();
-        boolean parsedSuccessful = accessToken.parse("007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc=");
-        assertTrue(parsedSuccessful);
+        boolean res = accessToken.parse("007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc=");
+        assertTrue(res);
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
         assertEquals(issueTs, accessToken.issueTs);
@@ -222,8 +223,8 @@ public class AccessToken2Test {
     @Test
     public void parse_TokenChatApp() {
         AccessToken2 accessToken = new AccessToken2();
-        boolean parsedSuccessful = accessToken.parse("007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg");
-        assertTrue(parsedSuccessful);
+        boolean res = accessToken.parse("007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg");
+        assertTrue(res);
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
         assertEquals(issueTs, accessToken.issueTs);
