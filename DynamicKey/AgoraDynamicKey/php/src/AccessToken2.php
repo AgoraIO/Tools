@@ -115,6 +115,31 @@ class ServiceStreaming extends Service
     }
 }
 
+class ServiceChat extends Service
+{
+    const SERVICE_TYPE = 4;
+    const PRIVILEGE_USER = 1;
+    const PRIVILEGE_APP = 2;
+    public $userId;
+
+    public function __construct($userId = "")
+    {
+        parent::__construct(self::SERVICE_TYPE);
+        $this->userId = $userId;
+    }
+
+    public function pack()
+    {
+        return parent::pack() . Util::packString($this->userId);
+    }
+
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+        $this->userId = Util::unpackString($data);
+    }
+}
+
 class AccessToken2
 {
     const VERSION = "007";
@@ -195,7 +220,8 @@ class AccessToken2
         $servicesObj = [
             ServiceRtc::SERVICE_TYPE => new ServiceRtc(),
             ServiceRtm::SERVICE_TYPE => new ServiceRtm(),
-            ServiceStreaming::SERVICE_TYPE => new ServiceStreaming()
+            ServiceStreaming::SERVICE_TYPE => new ServiceStreaming(),
+            ServiceChat::SERVICE_TYPE => new ServiceChat()
         ];
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceTye = Util::unpackUint16($data);
