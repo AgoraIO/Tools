@@ -90,11 +90,33 @@ class ServiceRtm extends Service{
 }
 ServiceRtm.kPrivilegeLogin = 1
 
+const kChatServiceType = 4
+class ServiceChat extends Service{
+    constructor(user_id) {
+        super(kChatServiceType)
+        this.__user_id = user_id || ""
+    }
+
+    pack(){
+        let buffer = new ByteBuf()
+        buffer.putString(this.__user_id)
+        return Buffer.concat([super.pack(),buffer.pack()])
+    }
+
+    unpack(buffer){
+        super.unpack(buffer)
+        this.__user_id = buffer.getString()
+        return buffer
+    }
+}
+ServiceChat.kPrivilegeUser = 1
+ServiceChat.kPrivilegeApp = 2
+
 class AccessToken2{
     constructor(appID, appCertificate, issue_ts, expire) {
         this.appID = appID
         this.appCertificate = appCertificate
-        this.issue_ts = issue_ts || new Date().getTime()
+        this.issue_ts = issue_ts || new Date().getTime()/1000
         this.expire = expire
         // salt ranges in (1, 99999999)
         this.salt = Math.floor(Math.random() * (99999999)) + 1
@@ -346,9 +368,9 @@ var unPackMessages = function(bytes) {
     });
 }
 
-AccessToken2.kServices = {
-    kRtcServiceType: ServiceRtc,
-    kRtmServiceType: ServiceRtm
-}
+AccessToken2.kServices = {}
+AccessToken2.kServices[kRtcServiceType] = ServiceRtc
+AccessToken2.kServices[kRtmServiceType] = ServiceRtm
+AccessToken2.kServices[kChatServiceType] = ServiceChat
 
-module.exports = {AccessToken2, ServiceRtc, ServiceRtm}
+module.exports = {AccessToken2, ServiceRtc, ServiceRtm, ServiceChat}
