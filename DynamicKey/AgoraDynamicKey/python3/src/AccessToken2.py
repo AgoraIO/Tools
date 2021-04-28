@@ -123,12 +123,32 @@ class ServiceRtns(Service):
         return buffer
 
 
+class ServiceChat(Service):
+    kServiceType = 5
+
+    kPrivilegeUser = 1
+    kPrivilegeApp = 2
+    
+    def __init__(self, user_id=''):
+        super(ServiceChat, self).__init__(ServiceChat.kServiceType)
+        self.__user_id = user_id.encode('utf-8')
+
+    def pack(self):
+        return super(ServiceChat, self).pack() + pack_string(self.__user_id)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceChat, self).unpack(buffer)
+        self.__user_id, buffer = unpack_string(buffer)
+        return buffer
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceStreaming.kServiceType: ServiceStreaming,
-        ServiceRtns.kServiceType: ServiceRtns
+        ServiceRtns.kServiceType: ServiceRtns,
+        ServiceChat.kServiceType: ServiceChat
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):

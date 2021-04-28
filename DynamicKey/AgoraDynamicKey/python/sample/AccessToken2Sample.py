@@ -15,6 +15,7 @@ def main():
     channel_name = "7d72365eb983485397e3e3f9d460bdda"
     uid = 2882341273
     account = "2882341273"
+    chat_user_id = "2882341273"
     expiration_in_seconds = 3600
 
     rtc_service = ServiceRtc(channel_name, uid)
@@ -23,11 +24,15 @@ def main():
     rtm_service = ServiceRtm(account)
     rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, expiration_in_seconds)
 
+    chat_service = ServiceChat(chat_user_id)
+    chat_service.add_privilege(ServiceChat.kPrivilegeUser, expiration_in_seconds)
+
     token = AccessToken(app_id=app_id, app_certificate=app_certificate, expire=expiration_in_seconds)
     token.add_service(rtc_service)
     token.add_service(rtm_service)
+    token.add_service(chat_service)
 
-    print("Token for RTC and RTM: {}".format(token.build()))
+    print("Token for RTC, RTM and CHAT: {}".format(token.build()))
 
 
 if __name__ == "__main__":

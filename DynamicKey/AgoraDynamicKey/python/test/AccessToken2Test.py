@@ -17,6 +17,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__channel_name = "7d72365eb983485397e3e3f9d460bdda"
         self.__user_id = 'test_user'
         self.__uid = 2882341273
+        self.__uid_str = "2882341273"
         self.__expire = 600
         self.__salt = 1
         self.__ts = 1111111
@@ -57,6 +58,28 @@ class AccessToken2Test(unittest.TestCase):
                    'Mk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
         self.assertEqual(expected, result)
 
+    def test_service_chat_user(self):
+        service = ServiceChat(self.__uid_str)
+        service.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
+
+        self.__token.add_service(service)
+        result = self.__token.build()
+
+        expected = '007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamB' \
+                   'mmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc='
+        self.assertEqual(expected, result)
+
+    def test_service_chat_app(self):
+        service = ServiceChat()
+        service.add_privilege(ServiceChat.kPrivilegeApp, self.__expire)
+
+        self.__token.add_service(service)
+        result = self.__token.build()
+
+        expected = '007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
+                   'Mk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg'
+        self.assertEqual(expected, result)
+
     def test_multi_service(self):
         rtc = ServiceRtc(self.__channel_name, self.__uid)
         rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
@@ -67,11 +90,15 @@ class AccessToken2Test(unittest.TestCase):
         rtm = ServiceRtm(self.__user_id)
         rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
 
+        chat = ServiceChat(self.__uid_str)
+        chat.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
+
         self.__token.add_service(rtc)
         self.__token.add_service(rtm)
+        self.__token.add_service(chat)
         result = self.__token.build()
 
-        expected = '007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBma' \
-                   'GScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI' \
-                   '2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4'
+        expected = '007eJxTYJC/8fTS2VM8fzpL8u6zXrB0vvfF6Lhahdx9D8eH/Rwv4g4pMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpg' \
+                   'ZJhkbu38RYIhgYmBgZGBgYAaSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsj' \
+                   'IxNDI3MjZmA5kBM4mQoSS0uiS8tTi1igQsiKwUAECouiQ==' 
         self.assertEqual(expected, result)
