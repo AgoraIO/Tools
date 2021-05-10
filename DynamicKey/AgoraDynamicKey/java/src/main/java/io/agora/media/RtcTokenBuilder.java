@@ -92,12 +92,8 @@ public class RtcTokenBuilder {
     	// Assign appropriate access privileges to each role.
     	AccessToken builder = new AccessToken(appId, appCertificate, channelName, account);
     	builder.addPrivilege(AccessToken.Privileges.kJoinChannel, privilegeTs);
-    	if (role == Role.Role_Publisher || role == Role.Role_Subscriber || role == Role.Role_Admin) {
-    		builder.addPrivilege(AccessToke
-
-
-
-    		n.Privileges.kPublishAudioStream, privilegeTs);
+    	if (role == Role.Role_Publisher || role == Role.Role_Attendee || role == Role.Role_Admin) {
+    		builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, privilegeTs);
     		builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);
     		builder.addPrivilege(AccessToken.Privileges.kPublishDataStream, privilegeTs);
     	}
@@ -110,7 +106,7 @@ public class RtcTokenBuilder {
 		}
     }
 
-    /**
+   /**
     * Generates an RTC token with the specified privilege.
     *
     * This method supports generating a token with the following privileges:
@@ -170,7 +166,7 @@ public class RtcTokenBuilder {
                 pubVideoPrivilegeExpiredTs, pubDataStreamPrivilegeExpiredTs);
     }
 
-    /**
+   /**
     * Generates an RTC token with the specified privilege.
     *
     * This method supports generating a token with the following privileges:
