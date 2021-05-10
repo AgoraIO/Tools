@@ -109,11 +109,26 @@ class ServiceStreaming(Service):
         return buffer
 
 
+class ServiceRtns(Service):
+    kServiceType = 4
+
+    def __init__(self):
+        super(ServiceRtns, self).__init__(ServiceRtns.kServiceType)
+
+    def pack(self):
+        return super(ServiceRtns, self).pack()
+
+    def unpack(self, buffer):
+        buffer = super(ServiceRtns, self).unpack(buffer)
+        return buffer
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
-        ServiceStreaming.kServiceType: ServiceStreaming
+        ServiceStreaming.kServiceType: ServiceStreaming,
+        ServiceRtns.kServiceType: ServiceRtns
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):

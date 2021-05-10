@@ -60,11 +60,18 @@ class AccessToken2_test : public testing::Test {
   void VerifyServiceStreaming(Service *l, Service *r) {
     VerifyService(l, r);
 
-    auto l_rtc = dynamic_cast<ServiceRtc *>(l);
-    auto r_rtc = dynamic_cast<ServiceRtc *>(r);
+    auto l_rtc = dynamic_cast<ServiceStreaming *>(l);
+    auto r_rtc = dynamic_cast<ServiceStreaming *>(r);
 
     EXPECT_EQ(l_rtc->channel_name_, r_rtc->channel_name_);
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
+  }
+
+  void VerifyServiceRtns(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    (void)dynamic_cast<ServiceRtns *>(l);
+    (void)dynamic_cast<ServiceRtns *>(r);
   }
 
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
@@ -96,6 +103,7 @@ class AccessToken2_test : public testing::Test {
         {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
         {ServiceStreaming::kServiceType,
          &AccessToken2_test::VerifyServiceStreaming},
+        {ServiceRtns::kServiceType, &AccessToken2_test::VerifyServiceRtns},
     };
 
     auto k7_it = k7.services_.begin();
@@ -176,14 +184,25 @@ class AccessToken2_test : public testing::Test {
     std::unique_ptr<Service> rtm(new ServiceRtm(user_id_));
     rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
 
+    std::unique_ptr<Service> streaming(
+        new ServiceStreaming(channel_name_, uid_));
+    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream,
+                            expire_);
+    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream,
+                            expire_);
+
+    std::unique_ptr<Service> rtns(new ServiceRtns());
+
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
+    key.AddService(std::move(streaming));
+    key.AddService(std::move(rtns));
 
     std::string expected =
-        "007eJxTYOAQsrQ5s3TfH+"
-        "1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoam"
-        "BmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/"
-        "NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4";
+        "007eJxTYFgedFLiTXNWtuzC7DTnrFeCpxKDp+r3eVnVrrEK9M+vm6/"
+        "AYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/"
+        "kWAIYKJgYGRgYGBBUiCMIjPBCaZwSQLmFRgME8xNzI2M01NsrQwNrEwNbY0TzVONU6zTDE"
+        "xM0hKSUnkYjCysDAyNjE0MjdmApoDMYmToSS1uCS+tDi1iJmBCcV40oxkAToRACRUNJQ=";
     VerifyAccessToken2(expected, &key);
   }
 

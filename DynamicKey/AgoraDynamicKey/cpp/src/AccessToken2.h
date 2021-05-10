@@ -31,6 +31,8 @@ class Service {
 
   virtual void UnpackService(Unpacker *unpacker) = 0;
 
+  virtual std::unique_ptr<Service> Clone() const = 0;
+
   friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
                                           const Service *x) {
     p << x->type_ << x->privileges_;
@@ -47,11 +49,11 @@ class Service {
   uint16_t type_;
   std::map<uint16_t, uint32_t> privileges_;
 
- private:
-  Service(const Service &) = delete;
-  Service(Service &&) = delete;
-  Service &operator=(const Service &) = delete;
-  Service &operator=(Service &&) = delete;
+ protected:
+  Service(const Service &) = default;
+  Service(Service &&) = default;
+  Service &operator=(const Service &) = default;
+  Service &operator=(Service &&) = default;
 };
 
 class ServiceRtc : public Service {
@@ -82,6 +84,10 @@ class ServiceRtc : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
+  virtual std::unique_ptr<Service> Clone() const {
+    return std::unique_ptr<Service>(new ServiceRtc(*this));
+  }
+
   friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
                                           const ServiceRtc *x) {
     p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
@@ -97,6 +103,12 @@ class ServiceRtc : public Service {
  public:
   std::string channel_name_;
   std::string account_;
+
+ protected:
+  ServiceRtc(const ServiceRtc &) = default;
+  ServiceRtc(ServiceRtc &&) = default;
+  ServiceRtc &operator=(const ServiceRtc &) = default;
+  ServiceRtc &operator=(ServiceRtc &&) = default;
 };
 
 class ServiceRtm : public Service {
@@ -115,6 +127,10 @@ class ServiceRtm : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
+  virtual std::unique_ptr<Service> Clone() const {
+    return std::unique_ptr<Service>(new ServiceRtm(*this));
+  }
+
   friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
                                           const ServiceRtm *x) {
     p << dynamic_cast<const Service *>(x) << x->user_id_;
@@ -129,6 +145,12 @@ class ServiceRtm : public Service {
 
  public:
   std::string user_id_;
+
+ protected:
+  ServiceRtm(const ServiceRtm &) = default;
+  ServiceRtm(ServiceRtm &&) = default;
+  ServiceRtm &operator=(const ServiceRtm &) = default;
+  ServiceRtm &operator=(ServiceRtm &&) = default;
 };
 
 class ServiceStreaming : public Service {
@@ -157,6 +179,10 @@ class ServiceStreaming : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
+  virtual std::unique_ptr<Service> Clone() const {
+    return std::unique_ptr<Service>(new ServiceStreaming(*this));
+  }
+
   friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
                                           const ServiceStreaming *x) {
     p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
@@ -172,6 +198,43 @@ class ServiceStreaming : public Service {
  public:
   std::string channel_name_;
   std::string account_;
+
+ protected:
+  ServiceStreaming(const ServiceStreaming &) = default;
+  ServiceStreaming(ServiceStreaming &&) = default;
+  ServiceStreaming &operator=(const ServiceStreaming &) = default;
+  ServiceStreaming &operator=(ServiceStreaming &&) = default;
+};
+
+class ServiceRtns : public Service {
+ public:
+  enum {
+    kServiceType = 4,
+  };
+
+  ServiceRtns() : Service(kServiceType) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  virtual std::unique_ptr<Service> Clone() const {
+    return std::unique_ptr<Service>(new ServiceRtns(*this));
+  }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
+                                          const ServiceRtns *x) {
+    return p << dynamic_cast<const Service *>(x);
+  }
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
+                                            ServiceRtns *x) {
+    return p >> dynamic_cast<Service *>(x);
+  }
+
+ protected:
+  ServiceRtns(const ServiceRtns &) = default;
+  ServiceRtns(ServiceRtns &&) = default;
+  ServiceRtns &operator=(const ServiceRtns &) = default;
+  ServiceRtns &operator=(ServiceRtns &&) = default;
 };
 
 template <class T>
@@ -182,6 +245,7 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},
     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
+    {ServiceRtns::kServiceType, ServiceCreator<ServiceRtns>::New},
 };
 
 class AccessToken2 {

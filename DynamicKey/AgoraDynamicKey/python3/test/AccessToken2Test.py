@@ -68,12 +68,20 @@ class AccessToken2Test(unittest.TestCase):
         rtm = ServiceRtm(self.__user_id)
         rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
 
+        streaming = ServiceStreaming(self.__channel_name, self.__uid)
+        streaming.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, self.__expire)
+        streaming.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
+
+        rtns = ServiceRtns()
+
         self.__token.add_service(rtc)
         self.__token.add_service(rtm)
+        self.__token.add_service(streaming)
+        self.__token.add_service(rtns)
         result = self.__token.build()
 
-        expected = '007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBma' \
-                   'GScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI' \
-                   '2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4'
+        expected = '007eJxTYFgedFLiTXNWtuzC7DTnrFeCpxKDp+r3eVnVrrEK9M+vm6/AYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYG' \
+                   'aYZGzs/kWAIYKJgYGRgYGBBUiCMIjPBCaZwSQLmFRgME8xNzI2M01NsrQwNrEwNbY0TzVONU6zTDExM0hKSUnkYjCysDA' \
+                   'yNjE0MjdmApoDMYmToSS1uCS+tDi1iJmBCcV40oxkAToRACRUNJQ='
         self.assertEqual(expected, result)
 
