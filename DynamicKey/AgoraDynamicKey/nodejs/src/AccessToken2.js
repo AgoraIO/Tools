@@ -90,7 +90,7 @@ class ServiceRtm extends Service{
 }
 ServiceRtm.kPrivilegeLogin = 1
 
-const kChatServiceType = 4
+const kChatServiceType = 5
 class ServiceChat extends Service{
     constructor(user_id) {
         super(kChatServiceType)

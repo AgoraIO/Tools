@@ -147,7 +147,7 @@ func Test_AccessToken_Build_ServiceChatUser(t *testing.T) {
 
 	token, err := accessToken.Build()
 	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWRgYGRjBfC4GIwsLI2MTQyNzY0AAAAD//7nNHTc=", token)
+	AssertEqual(t, "007eJxSYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrAyMDIxgPheDkYWFkbGJoZG5MSAAAP//H6UeuA==", token)
 }
 
 func Test_AccessToken_Build_ServiceChatApp(t *testing.T) {
@@ -163,7 +163,7 @@ func Test_AccessToken_Build_ServiceChatApp(t *testing.T) {
 
 	token, err := accessToken.Build()
 	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCwMjAxOYz8AACAAA///45Rlg", token)
+	AssertEqual(t, "007eJxSYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZGRgZmMB8BgZAAAAA//+t8hhr", token)
 }
 
 func Test_AccessToken_Build_MultipleServices(t *testing.T) {
@@ -196,7 +196,7 @@ func Test_AccessToken_Build_MultipleServices(t *testing.T) {
 
 	token, err := accessToken.Build()
 	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYJjAJd6te9Pl9I64rOhJZX5P9kz23jevVcrfUVn1hl+JW4gCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGFgZGMATxFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZng+jgZSlKLS+JLi1OLmMk0jAWuD1kUEAAA//9B1TVa", token)
+	AssertEqual(t, "007eJxSYHh7j83I4Q6X9f94Vt1zS7du+NrqujQ86nSB+NJZn+eYG1kqMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYGFgBEMQX4HBPMXcyNjMNDXJ0sLYxMLU2NI81TjVOM0yxcTMICklJZGLwcjCwsjYxNDI3JgJro+ToSS1uCS+tDi1iJlMw1jh+pBFAQEAAP//oGY29w==", token)
 }
 
 func Test_AccessToken_Parse_TokenRtc(t *testing.T) {
@@ -285,7 +285,7 @@ func Test_AccessToken_Parse_TokenRtm(t *testing.T) {
 
 func Test_AccessToken_Parse_TokenChatUser(t *testing.T) {
 	accessToken := CreateAccessToken()
-	res, err := accessToken.Parse("007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc=")
+	res, err := accessToken.Parse("007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=")
 
 	AssertNil(t, err)
 	AssertEqual(t, true, res)
@@ -302,7 +302,7 @@ func Test_AccessToken_Parse_TokenChatUser(t *testing.T) {
 
 func Test_AccessToken_Parse_TokenChatApp(t *testing.T) {
 	accessToken := CreateAccessToken()
-	res, err := accessToken.Parse("007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg")
+	res, err := accessToken.Parse("007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr")
 
 	AssertNil(t, err)
 	AssertEqual(t, true, res)

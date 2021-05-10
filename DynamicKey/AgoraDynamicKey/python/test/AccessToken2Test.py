@@ -65,8 +65,8 @@ class AccessToken2Test(unittest.TestCase):
         self.__token.add_service(service)
         result = self.__token.build()
 
-        expected = '007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamB' \
-                   'mmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc='
+        expected = '007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTA' \
+                   'zTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg='
         self.assertEqual(expected, result)
 
     def test_service_chat_app(self):
@@ -76,8 +76,8 @@ class AccessToken2Test(unittest.TestCase):
         self.__token.add_service(service)
         result = self.__token.build()
 
-        expected = '007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcw' \
-                   'Mk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg'
+        expected = '007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGa' \
+                   'YZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr'
         self.assertEqual(expected, result)
 
     def test_multi_service(self):
@@ -98,7 +98,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__token.add_service(chat)
         result = self.__token.build()
 
-        expected = '007eJxTYJC/8fTS2VM8fzpL8u6zXrB0vvfF6Lhahdx9D8eH/Rwv4g4pMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpg' \
-                   'ZJhkbu38RYIhgYmBgZGBgYAaSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsj' \
-                   'IxNDI3MjZmA5kBM4mQoSS0uiS8tTi1igQsiKwUAECouiQ==' 
+        expected = '007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTA' \
+                   'zTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYG' \
+                   'BmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q=='
         self.assertEqual(expected, result)

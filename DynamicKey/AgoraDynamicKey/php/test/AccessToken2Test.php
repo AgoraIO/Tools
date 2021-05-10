@@ -82,7 +82,7 @@ class AccessToken2Test
 
         $accessToken->addService($serviceChat);
         $token = $accessToken->build();
-        Util::assertEqual("007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc=", $token);
+        Util::assertEqual("007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=", $token);
     }
 
     public function test_build_ServiceChat_app() {
@@ -95,7 +95,7 @@ class AccessToken2Test
 
         $accessToken->addService($serviceChat);
         $token = $accessToken->build();
-        Util::assertEqual("007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg", $token);
+        Util::assertEqual("007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr", $token);
     }
 
     public function test_build_multi_service()
@@ -120,7 +120,7 @@ class AccessToken2Test
         $accessToken->addService($serviceChat);
 
         $token = $accessToken->build();
-        Util::assertEqual("007eJxTYJC/8fTS2VM8fzpL8u6zXrB0vvfF6Lhahdx9D8eH/Rwv4g4pMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYAaSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kBM4mQoSS0uiS8tTi1igQsiKwUAECouiQ==", $token);
+        Util::assertEqual("007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==", $token);
     }
 
     public function test_parse_TokenRtc()
@@ -145,7 +145,7 @@ class AccessToken2Test
     public function test_parse_TokenRtc_Rtm_Chat_MultiService()
     {
         $accessToken = new AccessToken2();
-        $res = $accessToken->parse("007eJxTYJC/8fTS2VM8fzpL8u6zXrB0vvfF6Lhahdx9D8eH/Rwv4g4pMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYAaSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kBM4mQoSS0uiS8tTi1igQsiKwUAECouiQ==");
+        $res = $accessToken->parse("007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==");
         Util::assertEqual(true, $res);
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
@@ -185,7 +185,7 @@ class AccessToken2Test
     public function test_parse_TokenChat_user()
     {
         $accessToken = new AccessToken2();
-        $res = $accessToken->parse("007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc=");
+        $res = $accessToken->parse("007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=");
         Util::assertEqual(true, $res);
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
@@ -200,7 +200,7 @@ class AccessToken2Test
     public function test_parse_TokenChat_app()
     {
         $accessToken = new AccessToken2();
-        $res = $accessToken->parse("007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg");
+        $res = $accessToken->parse("007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr");
         Util::assertEqual(true, $res);
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);

@@ -58,7 +58,7 @@ public class AccessToken2 {
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
     public static final short SERVICE_TYPE_STREAMING = 3;
-    public static final short SERVICE_TYPE_CHAT = 4;
+    public static final short SERVICE_TYPE_CHAT = 5;
 
     public String appCert = "";
     public String appId = "";
@@ -118,7 +118,7 @@ public class AccessToken2 {
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
         }
-        return null;
+        throw new IllegalArgumentException(String.format("unknown service type: `%d`", serviceType));
     }
 
     public byte[] getSign() throws Exception {

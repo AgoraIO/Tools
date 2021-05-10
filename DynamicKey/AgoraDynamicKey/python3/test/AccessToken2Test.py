@@ -68,7 +68,7 @@ class AccessToken2Test(unittest.TestCase):
 
         expected = '007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTA' \
                    'zTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg='
-                   
+
         self.assertEqual(expected, result)
 
     def test_service_chat_app(self):

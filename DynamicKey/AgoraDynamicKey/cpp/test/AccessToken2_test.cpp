@@ -211,7 +211,7 @@ class AccessToken2_test : public testing::Test {
         "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTU"
         "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDA"
         "B+lHrg=";
-        
+
     VerifyAccessToken2(expected, &key);
   }
 

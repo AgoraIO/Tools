@@ -107,7 +107,7 @@ class ServiceStreaming(Service):
 
 
 class ServiceChat(Service):
-    kServiceType = 4
+    kServiceType = 5
 
     kPrivilegeUser = 1
     kPrivilegeApp = 2

@@ -82,7 +82,7 @@
  };
 
  exports.AccessToken_Test_buildChatUserToken = function (test) {
-  var expected = "007eJxTYFi3mPnI/sqHC8JXrfX5bL/tHAdjz63WEKWMnh8ipxhXzVqiwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEWYCYEcznYjCysDAyNjE0MjcGALnNHTc="
+  var expected = "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg="
 
   var token = new AccessToken2(appID, appCertificate, ts, expire)
   token.salt = salt
@@ -96,7 +96,7 @@
  }
 
  exports.AccessToken_Test_buildChatAppToken = function (test) {
-  var expected = "007eJxTYJgmz2E3p0Bj3s3UF6u4UvfbqlS55NvvmC5erH77zbXpodsVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwCxAzgfkMDAD45Rlg"
+  var expected = "007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr"
 
   var token = new AccessToken2(appID, appCertificate, ts, expire)
   token.salt = salt

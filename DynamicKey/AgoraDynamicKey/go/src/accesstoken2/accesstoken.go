@@ -18,7 +18,7 @@ const (
 	ServiceTypeRtc       = 1
 	ServiceTypeRtm       = 2
 	ServiceTypeStreaming = 3
-	ServiceTypeChat      = 4
+	ServiceTypeChat      = 5
 
 	// Rtc
 	PrivilegeJoinChannel        = 1
@@ -369,6 +369,8 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 		service = NewServiceStreaming("", "")
 	case ServiceTypeChat:
 		service = NewServiceChat("")
+	default:
+		panic(fmt.Sprintf("new service failed: unknown service type `%v`", serviceType))
 	}
 	return
 }

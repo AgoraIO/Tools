@@ -117,7 +117,7 @@ class ServiceStreaming extends Service
 
 class ServiceChat extends Service
 {
-    const SERVICE_TYPE = 4;
+    const SERVICE_TYPE = 5;
     const PRIVILEGE_USER = 1;
     const PRIVILEGE_APP = 2;
     public $userId;
@@ -226,6 +226,9 @@ class AccessToken2
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceTye = Util::unpackUint16($data);
             $service = $servicesObj[$serviceTye];
+            if ($service == null) {
+                return false;
+            }
             $service->unpack($data);
             $this->services[$serviceTye] = $service;
         }
