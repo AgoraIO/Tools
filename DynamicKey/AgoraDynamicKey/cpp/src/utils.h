@@ -12,6 +12,7 @@
 #include <stdexcept>
 #include <string>
 #include <random>
+#include <assert.h>
 
 #include "Packer.h" 
 

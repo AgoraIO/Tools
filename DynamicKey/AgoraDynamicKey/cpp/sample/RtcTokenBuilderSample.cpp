@@ -26,5 +26,15 @@ int main(int argc, char const *argv[]) {
       appID, appCertificate, channelName, userAccount, UserRole::Role_Publisher,
       privilegeExpiredTs);
   std::cout << "Token With UserAccount:" << result << std::endl;
+  result = RtcTokenBuilder::buildTokenWithUid(
+      appID, appCertificate, channelName, uid,
+      privilegeExpiredTs, privilegeExpiredTs,
+      privilegeExpiredTs, privilegeExpiredTs);
+  std::cout << "Token With Int Uid:" << result << std::endl;
+  result = RtcTokenBuilder::buildTokenWithUserAccount(
+      appID, appCertificate, channelName, userAccount,
+      privilegeExpiredTs, privilegeExpiredTs,
+      privilegeExpiredTs, privilegeExpiredTs);
+  std::cout << "Token With UserAccount:" << result << std::endl;
   return 0;
 }
