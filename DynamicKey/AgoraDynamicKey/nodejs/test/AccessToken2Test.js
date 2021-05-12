@@ -3,12 +3,13 @@
  * nodeunit AccessTokenTest.js
  * see https://github.com/caolan/nodeunit
  */
- const {AccessToken2, ServiceRtc, ServiceRtm} = require('../src/AccessToken2')
+ const {AccessToken2, ServiceRtc, ServiceRtm, ServiceChat} = require('../src/AccessToken2')
  
  var appID = "970CA35de60c44645bbae8a215061b33";
  var appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
  var channel = "7d72365eb983485397e3e3f9d460bdda";
  var uid = 2882341273;
+ var uidStr = "2882341273"
  var ts = 1111111;
  var expire = 600;
  var salt = 1;
@@ -79,3 +80,31 @@
   test.equal(expected, actual);
   test.done();
  };
+
+ exports.AccessToken_Test_buildChatUserToken = function (test) {
+  var expected = "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg="
+
+  var token = new AccessToken2(appID, appCertificate, ts, expire)
+  token.salt = salt
+  let chat_service = new ServiceChat(uidStr)
+  chat_service.add_privilege(ServiceChat.kPrivilegeUser, expire)
+  token.add_service(chat_service)
+
+  var actual = token.build()
+  test.equal(expected, actual)
+  test.done()
+ }
+
+ exports.AccessToken_Test_buildChatAppToken = function (test) {
+  var expected = "007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr"
+
+  var token = new AccessToken2(appID, appCertificate, ts, expire)
+  token.salt = salt
+  let chat_service = new ServiceChat()
+  chat_service.add_privilege(ServiceChat.kPrivilegeApp, expire)
+  token.add_service(chat_service)
+
+  var actual = token.build()
+  test.equal(expected, actual)
+  test.done()
+ }

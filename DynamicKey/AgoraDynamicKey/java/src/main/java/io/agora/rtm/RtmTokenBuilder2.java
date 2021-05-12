@@ -18,7 +18,7 @@ public class RtmTokenBuilder2 {
      */
     public String buildToken(String appId, String appCertificate, String userId, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
-        AccessToken2.Service serviceRtm = accessToken.new ServiceRtm(userId);
+        AccessToken2.Service serviceRtm = new AccessToken2.ServiceRtm(userId);
 
         serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN, expire);
         accessToken.addService(serviceRtm);

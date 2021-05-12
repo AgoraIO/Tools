@@ -74,6 +74,15 @@ class AccessToken2_test : public testing::Test {
     (void)dynamic_cast<ServiceRtns *>(r);
   }
 
+  void VerifyServiceChat(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_chat = dynamic_cast<ServiceChat *>(l);
+    auto r_chat = dynamic_cast<ServiceChat *>(r);
+
+    EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
+  }
+
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
     std::string result = key->Build();
     EXPECT_EQ(expected, result);
@@ -104,6 +113,7 @@ class AccessToken2_test : public testing::Test {
         {ServiceStreaming::kServiceType,
          &AccessToken2_test::VerifyServiceStreaming},
         {ServiceRtns::kServiceType, &AccessToken2_test::VerifyServiceRtns},
+        {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
     };
 
     auto k7_it = k7.services_.begin();
@@ -171,6 +181,56 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  void TestAccessToken2Rtm() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceRtm(account_));
+    service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected = 
+        "007eJxTYEhuZrAR/XT+XPihI+6t4t5F9RtUltw9em3Pwi2sr6P/lAspMFiaGzg7GpumpJo"
+        "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPO5GIwsLIyMTQyNzI0Bn"
+        "dAdKg==";
+
+    VerifyAccessToken2(expected, &key);
+  }
+
+  void TestAccessToken2ChatUser() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceChat(account_));
+    service->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected = 
+        "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTU"
+        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDA"
+        "B+lHrg=";
+
+    VerifyAccessToken2(expected, &key);
+  }
+
+  void TestAccessToken2ChatApp() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceChat());
+    service->AddPrivilege(ServiceChat::kPrivilegeApp, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected = 
+        "007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSama"
+        "QbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr";
+
+    VerifyAccessToken2(expected, &key);
+  }
+
   void TestAccessToken2WithMultiService() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -193,16 +253,21 @@ class AccessToken2_test : public testing::Test {
 
     std::unique_ptr<Service> rtns(new ServiceRtns());
 
+    std::unique_ptr<Service> chat(new ServiceChat(account_));
+    chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
+
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
     key.AddService(std::move(streaming));
     key.AddService(std::move(rtns));
+    key.AddService(std::move(chat));
 
     std::string expected =
-        "007eJxTYFgedFLiTXNWtuzC7DTnrFeCpxKDp+r3eVnVrrEK9M+vm6/"
-        "AYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/"
-        "kWAIYKJgYGRgYGBBUiCMIjPBCaZwSQLmFRgME8xNzI2M01NsrQwNrEwNbY0TzVONU6zTDE"
-        "xM0hKSUnkYjCysDAyNjE0MjdmApoDMYmToSS1uCS+tDi1iJmBCcV40oxkAToRACRUNJQ=";
+        "007eJxTYAh5UWu1drfhsnu9etvupS0v/iFs+3PC/Sbl8gdht55xSusqMFiaGzg7GpumpJo"
+        "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYAWSLEAM4jOBSWYwyQImFRjMU"
+        "8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kBM4mQoSS0"
+        "uiS8tTi1iZmBCMZ40I1mgToSYgCwDAGL1OcI=";
+
     VerifyAccessToken2(expected, &key);
   }
 
@@ -226,6 +291,15 @@ TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) {
 }
 TEST_F(AccessToken2_test, testAccessToken2WithStringUid) {
   TestAccessToken2WithStringUid();
+}
+TEST_F(AccessToken2_test, testAccessToken2Rtm) {
+  TestAccessToken2Rtm();
+}
+TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
+  TestAccessToken2ChatUser();
+}
+TEST_F(AccessToken2_test, testAccessToken2ChatApp) {
+  TestAccessToken2ChatApp();
 }
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
   TestAccessToken2WithMultiService();

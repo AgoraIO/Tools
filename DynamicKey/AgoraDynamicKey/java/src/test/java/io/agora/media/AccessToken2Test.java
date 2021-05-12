@@ -2,7 +2,8 @@ package io.agora.media;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class AccessToken2Test {
     private String appId = "970CA35de60c44645bbae8a215061b33";
@@ -36,7 +37,7 @@ public class AccessToken2Test {
         accessToken.issueTs = issueTs;
         accessToken.salt = salt;
 
-        AccessToken2.ServiceRtc serviceRtc = accessToken.new ServiceRtc(channelName, uid);
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
         accessToken.addService(serviceRtc);
 
@@ -53,7 +54,7 @@ public class AccessToken2Test {
         accessToken.issueTs = issueTs;
         accessToken.salt = salt;
 
-        AccessToken2.ServiceRtc serviceRtc = accessToken.new ServiceRtc(channelName, "");
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, "");
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
         accessToken.addService(serviceRtc);
 
@@ -70,7 +71,7 @@ public class AccessToken2Test {
         accessToken.issueTs = issueTs;
         accessToken.salt = salt;
 
-        AccessToken2.ServiceRtc serviceRtc = accessToken.new ServiceRtc(channelName, uid);
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
         accessToken.addService(serviceRtc);
 
@@ -82,28 +83,78 @@ public class AccessToken2Test {
     }
 
     @Test
+    public void build_ServiceRtm() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN, expire);
+
+        accessToken.addService(serviceRtm);
+        String expected = "007eJxTYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPM5GUpSi0viS4tTiwBZVh6A";
+
+        assertEquals(expected, accessToken.build());
+    }
+
+    @Test
+    public void build_ServiceChat_userToken() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uid);
+        serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_USER, expire);
+
+        accessToken.addService(serviceChat);
+        String expected = "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=";
+        
+        assertEquals(expected, accessToken.build());
+    }
+
+    @Test
+    public void build_ServiceChat_appToken() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat();
+        serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_APP, expire);
+
+        accessToken.addService(serviceChat);
+        String expected = "007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr";
+        
+        assertEquals(expected, accessToken.build());
+    }
+
+    @Test
     public void build_multi_service() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
         accessToken.issueTs = issueTs;
         accessToken.salt = salt;
 
-        AccessToken2.ServiceRtc serviceRtc = accessToken.new ServiceRtc(channelName, uid);
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM, expire);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, expire);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, expire);
         accessToken.addService(serviceRtc);
 
-        AccessToken2.ServiceRtm serviceRtm = accessToken.new ServiceRtm(userId);
+        AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
         serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN, expire);
         accessToken.addService(serviceRtm);
+
+        AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uid);
+        serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_USER, expire);
+        accessToken.addService(serviceChat);
 
         assertEquals(channelName, serviceRtc.channelName);
         assertEquals(uid, serviceRtc.uid);
         assertEquals(userId, serviceRtm.userId);
 
+        String expected = "007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==";
         String token = accessToken.build();
-        assertEquals("007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4", token);
+        assertEquals(expected, token);
     }
 
     @Test
@@ -116,10 +167,10 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getChannelName());
-        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getUid());
-        assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
-        assertEquals(0, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
+        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)).getChannelName());
+        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)).getUid());
+        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
+        assertEquals(0, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
     }
 
     @Test
@@ -132,12 +183,12 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(2, accessToken.services.size());
-        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getChannelName());
-        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(accessToken.SERVICE_TYPE_RTC)).getUid());
-        assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(accessToken.SERVICE_TYPE_RTM)).getUserId());
-        assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
-        assertEquals(expire, (int) accessToken.services.get(accessToken.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
-        assertEquals(expire, (int)accessToken.services.get(accessToken.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
+        assertEquals(channelName, ((AccessToken2.ServiceRtc)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)).getChannelName());
+        assertEquals(uid, ((AccessToken2.ServiceRtc)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)).getUid());
+        assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
+        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
+        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
+        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
     }
 
     @Test
@@ -150,8 +201,38 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(accessToken.SERVICE_TYPE_RTM)).getUserId());
-        assertEquals(expire, (int)accessToken.services.get(accessToken.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
+        assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
+        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
+    }
+
+    @Test
+    public void parse_TokenChatUser() {
+        AccessToken2 accessToken = new AccessToken2();
+        boolean res = accessToken.parse("007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=");
+        assertTrue(res);
+        assertEquals(appId, accessToken.appId);
+        assertEquals(expire, accessToken.expire);
+        assertEquals(issueTs, accessToken.issueTs);
+        assertEquals(salt, accessToken.salt);
+        assertEquals(1, accessToken.services.size());
+        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken.services.get(AccessToken2.SERVICE_TYPE_CHAT);
+        assertEquals(uid, serviceChat.getUserId());
+        assertEquals(expire, (int)serviceChat.getPrivileges().get(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_USER.intValue));
+    }
+
+    @Test
+    public void parse_TokenChatApp() {
+        AccessToken2 accessToken = new AccessToken2();
+        boolean res = accessToken.parse("007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr");
+        assertTrue(res);
+        assertEquals(appId, accessToken.appId);
+        assertEquals(expire, accessToken.expire);
+        assertEquals(issueTs, accessToken.issueTs);
+        assertEquals(salt, accessToken.salt);
+        assertEquals(1, accessToken.services.size());
+        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken.services.get(AccessToken2.SERVICE_TYPE_CHAT);
+        assertEquals("", serviceChat.getUserId());
+        assertEquals(expire, (int)serviceChat.getPrivileges().get(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_APP.intValue));
     }
 
     @Test

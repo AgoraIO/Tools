@@ -84,7 +84,7 @@ class ServiceRtc : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const {
+  virtual std::unique_ptr<Service> Clone() const override {
     return std::unique_ptr<Service>(new ServiceRtc(*this));
   }
 
@@ -127,7 +127,7 @@ class ServiceRtm : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const {
+  virtual std::unique_ptr<Service> Clone() const override {
     return std::unique_ptr<Service>(new ServiceRtm(*this));
   }
 
@@ -179,7 +179,7 @@ class ServiceStreaming : public Service {
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const {
+  virtual std::unique_ptr<Service> Clone() const override {
     return std::unique_ptr<Service>(new ServiceStreaming(*this));
   }
 
@@ -217,7 +217,7 @@ class ServiceRtns : public Service {
   virtual std::string PackService() override { return Pack(this); }
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const {
+  virtual std::unique_ptr<Service> Clone() const override {
     return std::unique_ptr<Service>(new ServiceRtns(*this));
   }
 
@@ -237,6 +237,43 @@ class ServiceRtns : public Service {
   ServiceRtns &operator=(ServiceRtns &&) = default;
 };
 
+class ServiceChat : public Service {
+ public:
+  enum {
+    kServiceType = 5,
+
+    kPrivilegeUser = 1,
+    kPrivilegeApp = 2,
+  };
+
+ public:
+  ServiceChat(const std::string &user_id = "")
+      : Service(kServiceType), user_id_(user_id) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  virtual std::unique_ptr<Service> Clone() const override {
+    return std::unique_ptr<Service>(new ServiceChat(*this));
+  }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
+                                          const ServiceChat *x) {
+    p << dynamic_cast<const Service *>(x) << x->user_id_;
+    return p;
+  }
+
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
+                                            ServiceChat *x) {
+    p >> dynamic_cast<Service *>(x) >> x->user_id_;
+    return p;
+  }
+
+ public:
+  std::string user_id_;
+};
+
 template <class T>
 struct ServiceCreator {
   static Service *New() { return (new T()); }
@@ -246,6 +283,7 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
     {ServiceRtns::kServiceType, ServiceCreator<ServiceRtns>::New},
+    {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
 };
 
 class AccessToken2 {

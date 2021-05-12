@@ -17,7 +17,7 @@ class RtmTokenBuilder2Test(unittest.TestCase):
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
         self.__user_id = "test_user"
-        self.__expire = 900
+        self.__expire = 600
 
     def test_token(self):
         token = RtmTokenBuilder.build_token(self.__app_id, self.__app_cert, self.__user_id, self.__expire)
@@ -33,4 +33,4 @@ class RtmTokenBuilder2Test(unittest.TestCase):
         self.assertEqual(parser_service._ServiceRtm__user_id, self.__user_id.encode('utf-8'))
         self.assertIn(ServiceRtm.kPrivilegeLogin, parser_service._Service__privileges)
         self.assertEqual(parser_service._Service__privileges[ServiceRtm.kPrivilegeLogin], self.__expire)
-
+        print("token: ", token)
