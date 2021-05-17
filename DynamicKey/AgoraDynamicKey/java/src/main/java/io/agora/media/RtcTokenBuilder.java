@@ -56,7 +56,7 @@ public class RtcTokenBuilder {
      */
     public String buildTokenWithUid(String appId, String appCertificate, 
     		String channelName, int uid, Role role, int privilegeTs) {
-    	String account = uid == 0 ? "" : String.valueOf(uid);
+    	String account = uid == 0 ? "" : String.valueOf(uid & 0xFFFFFFFFL);
     	return buildTokenWithUserAccount(appId, appCertificate, channelName, 
     			account, role, privilegeTs);
     }
@@ -90,12 +90,12 @@ public class RtcTokenBuilder {
     		String channelName, String account, Role role, int privilegeTs) {
     	
     	// Assign appropriate access privileges to each role.
-    	AccessToken builder = new AccessToken(appId, appCertificate, channelName, account);
-    	builder.addPrivilege(AccessToken.Privileges.kJoinChannel, privilegeTs);
+    	io.agora.media.AccessToken builder = new io.agora.media.AccessToken(appId, appCertificate, channelName, account);
+    	builder.addPrivilege(io.agora.media.AccessToken.Privileges.kJoinChannel, privilegeTs);
     	if (role == Role.Role_Publisher || role == Role.Role_Attendee || role == Role.Role_Admin) {
-    		builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, privilegeTs);
-    		builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, privilegeTs);
-    		builder.addPrivilege(AccessToken.Privileges.kPublishDataStream, privilegeTs);
+    		builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishAudioStream, privilegeTs);
+    		builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishVideoStream, privilegeTs);
+    		builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishDataStream, privilegeTs);
     	}
     	
     	try {
@@ -160,7 +160,7 @@ public class RtcTokenBuilder {
             String channelName, int uid, int joinChannelPrivilegeExpiredTs,
             int pubAudioPrivilegeExpiredTs, int pubVideoPrivilegeExpiredTs,
             int pubDataStreamPrivilegeExpiredTs) {
-        String account = uid == 0 ? "" : String.valueOf(uid);
+        String account = uid == 0 ? "" : String.valueOf(uid & 0xFFFFFFFFL);
         return buildTokenWithUserAccount(appId, appCertificate, channelName, 
                 account, joinChannelPrivilegeExpiredTs, pubAudioPrivilegeExpiredTs,
                 pubVideoPrivilegeExpiredTs, pubDataStreamPrivilegeExpiredTs);
@@ -221,11 +221,11 @@ public class RtcTokenBuilder {
             int pubAudioPrivilegeExpiredTs, int pubVideoPrivilegeExpiredTs,
             int pubDataStreamPrivilegeExpiredTs) {
         // Assign appropriate access privileges to each role.
-        AccessToken builder = new AccessToken(appId, appCertificate, channelName, account);
-        builder.addPrivilege(AccessToken.Privileges.kJoinChannel, joinChannelPrivilegeExpiredTs);
-        builder.addPrivilege(AccessToken.Privileges.kPublishAudioStream, pubAudioPrivilegeExpiredTs);
-        builder.addPrivilege(AccessToken.Privileges.kPublishVideoStream, pubVideoPrivilegeExpiredTs);
-        builder.addPrivilege(AccessToken.Privileges.kPublishDataStream, pubDataStreamPrivilegeExpiredTs);
+        io.agora.media.AccessToken builder = new io.agora.media.AccessToken(appId, appCertificate, channelName, account);
+        builder.addPrivilege(io.agora.media.AccessToken.Privileges.kJoinChannel, joinChannelPrivilegeExpiredTs);
+        builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishAudioStream, pubAudioPrivilegeExpiredTs);
+        builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishVideoStream, pubVideoPrivilegeExpiredTs);
+        builder.addPrivilege(io.agora.media.AccessToken.Privileges.kPublishDataStream, pubDataStreamPrivilegeExpiredTs);
         try {
             return builder.build();
         } catch (Exception e) {
