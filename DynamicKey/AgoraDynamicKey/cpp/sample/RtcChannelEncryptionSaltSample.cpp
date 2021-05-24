@@ -36,4 +36,4 @@ int main(int argc, char* argv[])
         cout << (int)*(d + i) << " ";
     }
     */
-}ji
+}
