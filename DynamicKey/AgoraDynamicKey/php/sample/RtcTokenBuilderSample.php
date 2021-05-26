@@ -16,4 +16,15 @@ echo 'Token with int uid: ' . $token . PHP_EOL;
 
 $token = RtcTokenBuilder::buildTokenWithUserAccount($appID, $appCertificate, $channelName, $uidStr, $role, $privilegeExpiredTs);
 echo 'Token with user account: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder::buildTokenWithUidAndPrivilege($appID, $appCertificate, $channelName, $uid,
+                                                                $privilegeExpiredTs, $privilegeExpiredTs,
+                                                                $privilegeExpiredTs, $privilegeExpiredTs);
+echo 'Token with user uid user defined privilege: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder::buildTokenWithUserAccountAndPrivilege($appID, $appCertificate, $channelName, $uidStr,
+                                                                    $privilegeExpiredTs, $privilegeExpiredTs,
+                                                                    $privilegeExpiredTs, $privilegeExpiredTs);
+echo 'Token with user account user defined privilege: ' . $token . PHP_EOL;
+
 ?>

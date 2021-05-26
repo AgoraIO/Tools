@@ -120,12 +120,11 @@ def unPackMessages(buff):
 
 class AccessToken:
     def __init__(self, appID="", appCertificate="", channelName="", uid=""):
-        random.seed(time.time())
         self.appID = appID
         self.appCertificate = appCertificate
         self.channelName = channelName
         self.ts = int(time.time()) + 24 * 3600
-        self.salt = random.randint(1, 99999999)
+        self.salt = random.SystemRandom().randint(1, 99999999)
         self.messages = {}
         if (uid == 0):
             self.uidStr = ""
@@ -158,7 +157,7 @@ class AccessToken:
     def build(self):
 
         self.messages = OrderedDict(sorted(self.messages.iteritems(), key=lambda x: int(x[0])))
-
+        print("salt", self.salt)
         m = packUint32(self.salt) + packUint32(self.ts) \
             + packMapUint32(self.messages)
 

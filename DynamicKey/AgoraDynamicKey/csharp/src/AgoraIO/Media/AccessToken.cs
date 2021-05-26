@@ -6,16 +6,16 @@ namespace AgoraIO.Media
 {
     public class AccessToken
     {
-        private string _appId;
-        private string _appCertificate;
-        private string _channelName;
-        private string _uid;
-        private uint _ts;
-        private uint _salt;
-        private byte[] _signature;
-        private uint _crcChannelName;
-        private uint _crcUid;
-        private byte[] _messageRawContent;
+        public string _appId;
+        public string _appCertificate;
+        public string _channelName;
+        public string _uid;
+        public uint _ts;
+        public uint _salt;
+        public byte[] _signature;
+        public uint _crcChannelName;
+        public uint _crcUid;
+        public byte[] _messageRawContent;
         public PrivilegeMessage message = new PrivilegeMessage();
 
         public AccessToken(string appId, string appCertificate, string channelName, string uid)
@@ -43,15 +43,15 @@ namespace AgoraIO.Media
 
         public string build()
         {
-            //if (!Utils.isUUID(this.appId))
-            //{
-            //    return "";
-            //}
+            if (!Utils.isUUID(this._appId))
+            {
+                return "";
+            }
 
-            //if (!Utils.isUUID(this.appCertificate))
-            //{
-            //    return "";
-            //}
+            if (!Utils.isUUID(this._appCertificate))
+            {
+                return "";
+            }
 
             this._messageRawContent = Utils.pack(this.message);
             this._signature = generateSignature(_appCertificate
@@ -91,6 +91,23 @@ namespace AgoraIO.Media
                 byte[] sign = DynamicKeyUtil.encodeHMAC(appCertificate, ms.ToArray(), "SHA256");
                 return sign;
             }
+        }
+
+        public bool fromString(string token)
+        {
+            if (!getVersion().Equals(token.Substring(0, Utils.VERSION_LENGTH)))
+            {
+                return false;
+            }
+            this._appId = token.Substring(Utils.VERSION_LENGTH, Utils.APP_ID_LENGTH);
+            PackContent packContent = new PackContent();
+            Utils.unpack(Utils.base64Decode(token.Substring(Utils.VERSION_LENGTH + Utils.APP_ID_LENGTH)), packContent);
+            this._signature = packContent.signature;
+            this._crcChannelName = packContent.crcChannelName;
+            this._crcUid = packContent.crcUid;
+            this._messageRawContent = packContent.rawMessage;
+            Utils.unpack(this._messageRawContent, message);
+            return true;
         }
     }
 }

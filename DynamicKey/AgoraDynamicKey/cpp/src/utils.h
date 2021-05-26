@@ -4,8 +4,11 @@
 #pragma once  // NOLINT(build/header_guard)
 
 #include <openssl/evp.h>
+#include <openssl/rand.h>
 #include <openssl/hmac.h>
+
 #include <zlib.h>
+#include <assert.h>
 
 #include <cctype>
 #include <cstddef>
@@ -22,6 +25,7 @@
 namespace agora {
 namespace tools {
 
+const uint32_t RANDOM_NUM_BUFFER_SIZE = 256;
 const uint32_t HMAC_LENGTH = 20;
 const uint32_t HMAC_SHA256_LENGTH = 32;
 const uint32_t SIGNATURE_LENGTH = 40;
@@ -61,9 +65,20 @@ inline bool IsUUID(const std::string& v) {
   return true;
 }
 
+// prefetch 256 * sizeof(uint32_t) bytes of randomness and consume from buffer.
+// buffered_idx is initialized to 256 so the buffer will be filled with
+// randomness on the first call to this function
 inline uint32_t GenerateSalt() {
-  std::random_device r;
-  return r();
+  static thread_local uint32_t bufferedRandomness[RANDOM_NUM_BUFFER_SIZE];
+  static size_t thread_local bufferedIndex = RANDOM_NUM_BUFFER_SIZE;
+
+  if (bufferedIndex >= RANDOM_NUM_BUFFER_SIZE) {
+    assert(RAND_bytes(reinterpret_cast<uint8_t *>(bufferedRandomness),
+        sizeof(bufferedRandomness)) == 1);
+    bufferedIndex = 0;
+  }
+
+  return bufferedRandomness[bufferedIndex++];
 }
 
 // HMAC
