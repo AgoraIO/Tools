@@ -1,7 +1,7 @@
 package rtmtokenbuilder
 
 import (
-	accesstoken "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/AccessToken"
+    accesstoken "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/AccessToken"
 )
 
 // Role Type
@@ -9,7 +9,7 @@ type Role uint16
 
 // Role consts
 const (
-	RoleRtmUser = 1
+    RoleRtmUser = 1
 )
 
 //RtmTokenBuilder class
@@ -29,7 +29,7 @@ type RtmTokenBuilder struct {
 //                    generated, set expireTimestamp as the current
 //                    timestamp + 600 (seconds)./
 func BuildToken(appID string, appCertificate string, userAccount string, role Role, privilegeExpiredTs uint32) (string, error) {
-	token := accesstoken.CreateAccessToken2(appID, appCertificate, userAccount, "")
-	token.AddPrivilege(accesstoken.KLoginRtm, privilegeExpiredTs)
-	return token.Build()
+    token := accesstoken.CreateAccessToken2(appID, appCertificate, userAccount, "")
+    token.AddPrivilege(accesstoken.KLoginRtm, privilegeExpiredTs)
+    return token.Build()
 }

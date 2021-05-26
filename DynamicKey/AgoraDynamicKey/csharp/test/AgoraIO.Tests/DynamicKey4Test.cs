@@ -46,15 +46,15 @@ namespace AgoraIO.Tests
         [Fact]
         public void testGenerateMediaChannelKey() //throws Exception
         {
-            //String appID = "970ca35de60c44645bbae8a215061b33";
-            //String appCertificate = "5cfd2fd1755d40ecb72977518be15d3b";
+            String appID = "970ca35de60c44645bbae8a215061b33";
+            String appCertificate = "5cfd2fd1755d40ecb72977518be15d3b";
             String channel = "7d72365eb983485397e3e3f9d460bdda";
             int ts = 1446455472;
             int r = 58964981;
             string uid = 2882341273L.ToString();
             int expiredTs = 1446455471;
 
-            String expected = "004d0ec5ee3179c964fe7c0485c045541de6bff332b970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471";
+            String expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
             String result = DynamicKey4.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
             Assert.Equal(expected, result);
         }

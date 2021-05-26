@@ -5,8 +5,8 @@ __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 import time
 import hmac
 import zlib
-import random
 import base64
+import secrets
 
 from hashlib import sha256
 from collections import OrderedDict
@@ -152,14 +152,12 @@ class AccessToken:
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
-        random.seed(time.time())
-
         self.__app_id = app_id
         self.__app_cert = app_certificate
 
         self.__issue_ts = issue_ts if issue_ts != 0 else int(time.time())
         self.__expire = expire
-        self.__salt = random.randint(1, 99999999)
+        self.__salt = secrets.SystemRandom().randint(1, 99999999)
 
         self.__service = {}
 
