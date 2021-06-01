@@ -5,11 +5,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
 import java.util.zip.CRC32;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public class Utils {
     public static final long HMAC_SHA256_LENGTH = 32;
@@ -69,5 +73,51 @@ public class Utils {
         }
 
         return uuid.matches("\\p{XDigit}+");
+    }
+
+    public static byte[] compress(byte[] data) {
+        byte[] output;
+        Deflater deflater = new Deflater();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+
+        try {
+            deflater.reset();
+            deflater.setInput(data);
+            deflater.finish();
+
+            byte[] buf = new byte[data.length];
+            while (!deflater.finished()) {
+                int i = deflater.deflate(buf);
+                bos.write(buf, 0, i);
+            }
+            output = bos.toByteArray();
+        } catch (Exception e) {
+            output = data;
+            e.printStackTrace();
+        } finally {
+            deflater.end();
+        }
+
+        return output;
+    }
+
+    public static byte[] decompress(byte[] data) {
+        Inflater inflater = new Inflater();
+        ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
+
+        try {
+            inflater.setInput(data);
+            byte[] buf = new byte[data.length];
+            while (!inflater.finished()) {
+                int i = inflater.inflate(buf);
+                bos.write(buf, 0, i);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            inflater.end();
+        }
+
+        return bos.toByteArray();
     }
 }

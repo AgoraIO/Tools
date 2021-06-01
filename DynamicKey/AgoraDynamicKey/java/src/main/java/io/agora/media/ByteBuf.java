@@ -95,7 +95,7 @@ public class ByteBuf {
         return new String(bytes);
     }
 
-    public TreeMap readMap() {
+    public TreeMap<Short, String> readMap() {
         TreeMap<Short, String> map = new TreeMap<>();
 
         short length = readShort();
