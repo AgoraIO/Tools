@@ -4,6 +4,10 @@ This page describes the authentication mechanism used by the Agora SDK, as well 
 
 **For users who want a quick deployable sample server to test with, please look at [here](https://github.com/AgoraIO-Community/TokenServer-nodejs)**
 
+> **We have different token versions. The token version is determined by the prefix. When you run the sample code, you may get token value started with prefix either 006 or 007.**
+
+> **Our current SDK version supports only 006 version token. So please skip the sample code which generates 007 prefix token.**
+
 ## AccessToken
 
 AccessToken is more powerful than the legacy Dynamic Key. It encapsulates several privileges in one token to cover various services provided by Agora.
