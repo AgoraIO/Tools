@@ -32,39 +32,10 @@ class RtcTokenBuilder_test : public testing::Test {
   uint32_t crcCname;
 };
 
-void RtcTokenBuilder_test::testRtcTokenBuilder() {
-    uint32_t uid = 2882341273;
-    uint32_t joints = 1614049514;
-    uint32_t audiots = 1614049515;
-    uint32_t videots = 1614049516;
-    uint32_t datats = 1614049517;
-    std::string token = RtcTokenBuilder::buildTokenWithUserAccount(
-        appID, appCertificate, cname, userAccount,
-        joints, audiots, videots, datats);
-    AccessToken parser;
-    parser.FromString(token);
-    EXPECT_EQ(parser.app_id_, appID);
-    EXPECT_EQ(parser.crc_channel_name_ , crcCname);
-    EXPECT_EQ(parser.crc_uid_, crcUserAccount);
-    EXPECT_EQ(parser.message_.messages[AccessToken::kJoinChannel],
-        joints);
-    EXPECT_EQ(parser.message_.messages[AccessToken::kPublishAudioStream],
-        audiots);
-    EXPECT_EQ(parser.message_.messages[AccessToken::kPublishVideoStream],
-        videots);
-    EXPECT_EQ(parser.message_.messages[AccessToken::kPublishDataStream],
-        datats);
-    EXPECT_EQ(
-        AccessToken::GenerateSignature(
-          appCertificate, appID, cname, userAccount,
-          parser.message_raw_content_),
-        parser.signature_);
-    std::cout <<  crc32(
-        0, reinterpret_cast<Bytef*>(const_cast<char*>("0")), 1);
+ private:
+  std::string app_id_;
+  std::string app_cert_;
+  std::string channel_name_;
+  std::string account_;
 
 }
-
-TEST_F(RtcTokenBuilder_test, testRtcTokenBuilder) {
-  testRtcTokenBuilder();
-}
-

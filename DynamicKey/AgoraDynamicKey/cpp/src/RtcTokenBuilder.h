@@ -41,28 +41,40 @@ class RtcTokenBuilder {
    /**
     Builds an RTC token using an int uid.
 
-    @param appId The App ID issued to you by Agora.
-    @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
-    @param channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
-    - The 26 lowercase English letters: a to z.
-    - The 26 uppercase English letters: A to Z.
-    - The 10 digits: 0 to 9.
-    - The space.
-    - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
-    @param uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
-    @param role See #userRole.
-    - Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-    - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-    @param privilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
-    @return The new Token.
-    */
-   static std::string buildTokenWithUid(
-       const std::string& appId,
-       const std::string& appCertificate,
-       const std::string& channelName,
-       uint32_t uid,
-       UserRole role,
-       uint32_t privilegeExpiredTs = 0);
+   @param appId The App ID issued to you by Agora.
+   @param appCertificate Certificate of the application that you registered in
+   the Agora Dashboard.
+   @param channelName The unique channel name for the AgoraRTC session in the
+   string format. The string length must be less than 64 bytes. Supported
+   character scopes are:
+   - The 26 lowercase English letters: a to z.
+   - The 26 uppercase English letters: A to Z.
+   - The 10 digits: 0 to 9.
+   - The space.
+   - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">",
+   "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+   @param uid User ID. A 32-bit unsigned integer with a value ranging from 1 to
+   (2^32-1).
+   @param role See #userRole.
+   - Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a
+   live broadcast.
+   - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario
+   requires authentication for
+   [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in).
+   In order for this role to take effect, please contact our support team to
+   enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
+   still has the same privileges as Role_Publisher.
+   @param privilegeExpiredTs represented by the number of seconds elapsed since
+   1/1/1970. If, for example, you want to access the Agora Service within 10
+   minutes after the token is generated, set expireTimestamp as the current
+   timestamp + 600 (seconds).
+   @return The new Token.
+   */
+  static std::string buildTokenWithUid(const std::string& appId,
+                                       const std::string& appCertificate,
+                                       const std::string& channelName,
+                                       uint32_t uid, UserRole role,
+                                       uint32_t privilegeExpiredTs = 0);
 
   /**
    Builds an RTC token using a string userAccount.
@@ -83,6 +95,7 @@ class RtcTokenBuilder {
    @return The new Token.
    */
   static std::string buildTokenWithUserAccount(
+<<<<<<< HEAD
       const std::string& appId,
       const std::string& appCertificate,
       const std::string& channelName,
@@ -213,6 +226,11 @@ class RtcTokenBuilder {
        uint32_t pubAudioPrivilegeExpiredTs = 0,
        uint32_t pubVideoPrivilegeExpiredTs = 0,
        uint32_t pubDataStreamPrivilegeExpiredTs = 0);
+=======
+      const std::string& appId, const std::string& appCertificate,
+      const std::string& channelName, const std::string& userAccount,
+      UserRole role, uint32_t privilegeExpiredTs = 0);
+>>>>>>> parent of 4408a79... Merge pull request #154 from winking324/dev/accesstoken2
 };
 
 inline std::string RtcTokenBuilder::buildTokenWithUid(
@@ -253,50 +271,6 @@ inline std::string RtcTokenBuilder::buildTokenWithUserAccount(
                            privilegeExpiredTs);
   }
   return generator.Build();
-}
-
-inline std::string RtcTokenBuilder::buildTokenWithUserAccount(
-    const std::string& appId,
-    const std::string& appCertificate,
-    const std::string& channelName,
-    const std::string& userAccount,
-    uint32_t joinChannelPrivilegeExpiredTs,
-    uint32_t pubAudioPrivilegeExpiredTs,
-    uint32_t pubVideoPrivilegeExpiredTs,
-    uint32_t pubDataStreamPrivilegeExpiredTs) {
-  AccessToken generator(appId, appCertificate, channelName, userAccount);
-  generator.AddPrivilege(AccessToken::Privileges::kJoinChannel,
-      joinChannelPrivilegeExpiredTs);
-  generator.AddPrivilege(AccessToken::Privileges::kPublishAudioStream,
-      pubAudioPrivilegeExpiredTs);
-  generator.AddPrivilege(AccessToken::Privileges::kPublishVideoStream,
-      pubVideoPrivilegeExpiredTs);
-  generator.AddPrivilege(AccessToken::Privileges::kPublishDataStream,
-      pubDataStreamPrivilegeExpiredTs);
-  return generator.Build();
-}
-
-inline std::string RtcTokenBuilder::buildTokenWithUid(
-    const std::string& appId,
-    const std::string& appCertificate,
-    const std::string& channelName,
-    uint32_t uid,
-    uint32_t joinChannelPrivilegeExpiredTs,
-    uint32_t pubAudioPrivilegeExpiredTs,
-    uint32_t pubVideoPrivilegeExpiredTs,
-    uint32_t pubDataStreamPrivilegeExpiredTs) {
-  std::string str;
-  if (uid != 0) {
-    str = std::to_string(uid);
-  }
-  return RtcTokenBuilder::buildTokenWithUserAccount(appId,
-                                   appCertificate,
-                                   channelName,
-                                   str,
-                                   joinChannelPrivilegeExpiredTs,
-                                   pubAudioPrivilegeExpiredTs,
-                                   pubVideoPrivilegeExpiredTs,
-                                   pubDataStreamPrivilegeExpiredTs);
 }
 }  // namespace tools
 }  // namespace agora

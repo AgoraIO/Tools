@@ -2,7 +2,7 @@ var crypto = require('crypto');
 var crc32 = require('crc-32');
 var UINT32 = require('cuint').UINT32;
 var version = "006";
-var randomInt = parseInt(crypto.randomBytes(4).toString('hex'), 16);
+var randomInt = Math.floor(Math.random() * 0xFFFFFFFF);
 const VERSION_LENGTH = 3;
 const APP_ID_LENGTH = 32;
 
@@ -28,10 +28,10 @@ var AccessToken = function (appID, appCertificate, channelName, uid) {
         }).pack();
 
         var toSign = Buffer.concat(
-            [Buffer.from(token.appID, 'utf8'),
-                Buffer.from(token.channelName, 'utf8'),
-                Buffer.from(token.uid, 'utf8'),
-                m]);
+            [Buffer.from(token.appID, 'utf8'), 
+            Buffer.from(token.channelName, 'utf8'), 
+            Buffer.from(token.uid, 'utf8'), 
+            m]);
 
         var signature = encodeHMac(token.appCertificate, toSign);
         var crc_channel = UINT32(crc32.str(token.channelName)).and(UINT32(0xffffffff)).toNumber();
@@ -52,7 +52,7 @@ var AccessToken = function (appID, appCertificate, channelName, uid) {
     this.fromString = function (originToken) {
         try {
             originVersion = originToken.substr(0, VERSION_LENGTH);
-            if (originVersion != version) {
+            if(originVersion != version) {
                 return false;
             }
             var originAppID = originToken.substr(VERSION_LENGTH, (VERSION_LENGTH + APP_ID_LENGTH));
@@ -69,12 +69,12 @@ var AccessToken = function (appID, appCertificate, channelName, uid) {
             this.salt = msgs.salt;
             this.ts = msgs.ts;
             this.messages = msgs.messages;
-
+            
         } catch (err) {
             console.log(err);
             return false;
         }
-
+        
         return true;
     };
 };
@@ -168,12 +168,12 @@ var ByteBuf = function () {
 
         return that;
     };
-
+    
     return that;
 }
 
 
-var ReadByteBuf = function (bytes) {
+var ReadByteBuf = function(bytes) {
     var that = {
         buffer: bytes
         , position: 0
@@ -203,7 +203,7 @@ var ReadByteBuf = function (bytes) {
     that.getTreeMapUInt32 = function () {
         var map = {};
         var len = that.getUint16();
-        for (var i = 0; i < len; i++) {
+        for( var i = 0; i < len; i++) {
             var key = that.getUint16();
             var value = that.getUint32();
             map[key] = value;
@@ -238,7 +238,7 @@ var Message = function (options) {
     return options;
 }
 
-var unPackContent = function (bytes) {
+var unPackContent = function(bytes) {
     var readbuf = new ReadByteBuf(bytes);
     return AccessTokenContent({
         signature: readbuf.getString(),
@@ -248,7 +248,7 @@ var unPackContent = function (bytes) {
     });
 }
 
-var unPackMessages = function (bytes) {
+var unPackMessages = function(bytes) {
     var readbuf = new ReadByteBuf(bytes);
     return Message({
         salt: readbuf.getUint32(),
