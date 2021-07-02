@@ -23,12 +23,12 @@ public class RtcTokenBuilderSample {
        		 channelName, uid, Role.Role_Publisher, timestamp);
         System.out.println(result);
         result = token.buildTokenWithUid(appId, appCertificate, channelName, uid,
-                timestamp, timestamp, timestamp,
-                timestamp);
+                expirationTimeInSeconds, expirationTimeInSeconds, expirationTimeInSeconds,
+                expirationTimeInSeconds);
         System.out.println(result);
         result = token.buildTokenWithUserAccount(appId, appCertificate, channelName,
-                userAccount, timestamp, timestamp, timestamp,
-                timestamp);
+                userAccount, expirationTimeInSeconds, expirationTimeInSeconds, expirationTimeInSeconds,
+                expirationTimeInSeconds);
         System.out.println(result);
     }
 }
