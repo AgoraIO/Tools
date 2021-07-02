@@ -3,7 +3,6 @@ import unittest
 import os
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-
 from RtcTokenBuilder import *
 from AccessToken import *
 
@@ -21,20 +20,22 @@ ts = 1111111
 
 
 class RtcTokenBuilderTest(unittest.TestCase):
-    def test_token(self):
-        token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
-        parser = AccessToken()
-        parser.fromString(token)
 
-        self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
-        self.assertNotIn(kPublishVideoStream, parser.messages)
-        self.assertNotIn(kPublishAudioStream, parser.messages)
-        self.assertNotIn(kPublishDataStream, parser.messages)
+    def test_(self):
+        # token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
+        # parser = AccessToken()
+        # parser.fromString(token)
 
-    def test_token2(self):
+        # self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
+        # self.assertNotIn(kPublishVideoStream, parser.messages)
+        # self.assertNotIn(kPublishAudioStream, parser.messages)
+        # self.assertNotIn(kPublishDataStream, parser.messages)
+
         token = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appID, appCertificate,
-                                                              channelName, uid, joinTs,
-                                                              audioTs, videoTs, dataTs)
+                                                  channelName, uid, joinTs,
+                                                  audioTs, videoTs, dataTs)
+        
+        print(token)
         parser = AccessToken()
         parser.fromString(token)
         self.assertEqual(parser.messages[kJoinChannel], joinTs)
@@ -42,3 +43,5 @@ class RtcTokenBuilderTest(unittest.TestCase):
         self.assertEqual(parser.messages[kPublishVideoStream], videoTs)
         self.assertEqual(parser.messages[kPublishDataStream], dataTs)
 
+if __name__ == "__main__":
+    unittest.main()

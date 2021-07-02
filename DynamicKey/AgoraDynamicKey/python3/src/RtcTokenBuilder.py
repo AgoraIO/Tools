@@ -1,17 +1,13 @@
-# -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
-
+import os
+import sys
+from collections import OrderedDict
 
 from .AccessToken import *
 
-
-warnings.warn('The RtcTokenBuilder module is deprecated', DeprecationWarning)
-
-
-Role_Attendee = 0  # depreated, same as publisher
-Role_Publisher = 1  # for live broadcaster
-Role_Subscriber = 2  # default, for live audience
-Role_Admin = 101  # deprecated, same as publisher
+Role_Attendee = 0 # depreated, same as publisher
+Role_Publisher = 1 # for live broadcaster
+Role_Subscriber = 2 # default, for live audience
+Role_Admin = 101 # deprecated, same as publisher
 
 
 class RtcTokenBuilder:

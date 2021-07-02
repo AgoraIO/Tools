@@ -1,16 +1,11 @@
-// Copyright (c) 2014-2017 Agora.io, Inc.
-//
-
-#pragma once  // NOLINT(build/header_guard)
+#pragma once
 
 #include <zlib.h>
-
 #include <cstdlib>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
-
 #include "cpp/src/AccessToken.h"
 
 namespace agora {
@@ -30,12 +25,13 @@ class RtmTokenBuilder {
 };
 
 inline std::string RtmTokenBuilder::buildToken(
-    const std::string& appId, const std::string& appCertificate,
-    const std::string& userAccount, RtmUserRole userRole,
+    const std::string& appId,
+    const std::string& appCertificate,
+    const std::string& userAccount,
+    RtmUserRole userRole,
     uint32_t privilegeExpiredTs) {
   AccessToken generator(appId, appCertificate, userAccount, "");
-  generator.AddPrivilege(AccessToken::Privileges::kRtmLogin,
-                         privilegeExpiredTs);
+  generator.AddPrivilege(AccessToken::Privileges::kRtmLogin, privilegeExpiredTs);
   return generator.Build();
 }
 }  // namespace tools

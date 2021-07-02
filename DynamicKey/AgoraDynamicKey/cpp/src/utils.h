@@ -1,26 +1,20 @@
-// Copyright (c) 2014-2017 Agora.io, Inc.
-//
+#pragma once
 
-#pragma once  // NOLINT(build/header_guard)
-
+#include <openssl/hmac.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <openssl/hmac.h>
-
-#include <zlib.h>
-#include <assert.h>
-
 #include <cctype>
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
 #include <iomanip>
-#include <random>
 #include <sstream>
 #include <stdexcept>
 #include <string>
+#include <random>
+#include <assert.h>
 
-#include "Packer.h"
+#include "Packer.h" 
 
 namespace agora {
 namespace tools {
@@ -83,7 +77,7 @@ inline uint32_t GenerateSalt() {
 
 // HMAC
 inline std::string HmacSign(const std::string& appCertificate,
-                            const std::string& message, uint32_t signSize) {
+                              const std::string& message, uint32_t signSize) {
   if (appCertificate.empty()) {
     return "";
   }
@@ -96,7 +90,7 @@ inline std::string HmacSign(const std::string& appCertificate,
 }
 
 inline std::string HmacSign2(const std::string& appCertificate,
-                             const std::string& message, uint32_t signSize) {
+                              const std::string& message, uint32_t signSize) {
   if (appCertificate.empty()) {
     return "";
   }
@@ -107,6 +101,7 @@ inline std::string HmacSign2(const std::string& appCertificate,
        message.length(), &md[0], &md_len);
   return std::string(reinterpret_cast<char*>(md), signSize);
 }
+
 
 inline std::string toupper(const std::string& in) {
   std::string out;
@@ -274,73 +269,5 @@ inline std::string base64Decode(const std::string& data) {
   delete[] r;
   return s;
 }
-
-inline std::string Compress(const std::string& data,
-                     int compressionlevel = Z_DEFAULT_COMPRESSION) {
-  z_stream zs;
-  memset(&zs, 0, sizeof(zs));
-  if (deflateInit(&zs, compressionlevel) != Z_OK) {
-    return "";
-  }
-
-  zs.next_in = (Bytef*)data.data();
-  zs.avail_in = data.size();
-
-  int ret;
-  char outbuffer[1500];
-  std::string outstring;
-
-  do {
-    zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
-    zs.avail_out = sizeof(outbuffer);
-
-    ret = deflate(&zs, Z_FINISH);
-
-    if (outstring.size() < zs.total_out) {
-      outstring.append(outbuffer, zs.total_out - outstring.size());
-    }
-  } while (ret == Z_OK);
-
-  deflateEnd(&zs);
-  if (ret != Z_STREAM_END) {
-    return "";
-  }
-
-  return outstring;
 }
-
-inline std::string Decompress(const std::string& data) {
-  z_stream zs;
-  memset(&zs, 0, sizeof(zs));
-  if (inflateInit(&zs) != Z_OK) {
-    return "";
-  }
-
-  zs.next_in = (Bytef*)data.data();
-  zs.avail_in = data.size();
-
-  int ret;
-  char outbuffer[3000];
-  std::string outstring;
-  do {
-    zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
-    zs.avail_out = sizeof(outbuffer);
-
-    ret = inflate(&zs, 0);
-
-    if (outstring.size() < zs.total_out) {
-      outstring.append(outbuffer, zs.total_out - outstring.size());
-    }
-
-  } while (ret == Z_OK);
-
-  inflateEnd(&zs);
-  if (ret != Z_STREAM_END) {
-    return "";
-  }
-
-  return outstring;
 }
-
-}  // namespace tools
-}  // namespace agora
