@@ -5,10 +5,9 @@ class Message
     public $salt;
     public $ts;
     public $privileges;
-
     public function __construct()
     {
-        $this->salt = random_int(1, 99999999);
+        $this->salt = rand(0, 100000);
 
         $date = new DateTime("now", new DateTimeZone('UTC'));
         $this->ts = $date->getTimestamp() + 24 * 3600;
