@@ -4,6 +4,8 @@ import base64
 import random
 import warnings
 
+import struct #added line
+
 from zlib import crc32
 import secrets
 import time
