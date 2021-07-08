@@ -19,6 +19,6 @@ class RtmTokenBuilder:
     #                    timestamp + 600 (seconds)./
     @staticmethod
     def buildToken(appId, appCertificate, userAccount, role, privilegeExpiredTs):
-        token = AccessToken(appId, appCertificate, userAccount, "")
+        token = AccessToken(appId, appCertificate, "", userAccount)
         token.addPrivilege(kRtmLogin, privilegeExpiredTs)
         return token.build()
