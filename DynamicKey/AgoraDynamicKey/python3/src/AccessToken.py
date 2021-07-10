@@ -22,17 +22,6 @@ kJoinChannel = 1
 kPublishAudioStream = 2
 kPublishVideoStream = 3
 kPublishDataStream = 4
-
-kPublishAudioCdn = 5  # deprecated, unused
-kPublishVideoCdn = 6  # deprecated, unused
-kRequestPublishAudioStream = 7  # deprecated, unused
-kRequestPublishVideoStream = 8  # deprecated, unused
-kRequestPublishDataStream = 9  # deprecated, unused
-kInvitePublishAudioStream = 10  # deprecated, unused
-kInvitePublishVideoStream = 11  # deprecated, unused
-kInvitePublishDataStream = 12  # deprecated, unused
-kAdministrateChannel = 101  # deprecated, unused
-
 kRtmLogin = 1000
 
 VERSION_LENGTH = 3
