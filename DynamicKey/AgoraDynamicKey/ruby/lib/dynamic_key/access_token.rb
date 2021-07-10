@@ -15,10 +15,7 @@ module AgoraDynamicKey
 
     attr_accessor :app_id, :channel_name, :app_certificate,
                   :uid, :privileges, :privilege_expired_ts,
-                  :salt, :expired_ts, :join_channel_privilege_expired_ts,
-                  :pub_audio_privilege_expired_ts,
-                  :pub_video_privilege_expired_ts,
-                  :pub_data_stream_privilege_expired_ts
+                  :salt, :expired_ts
 
     def initialize args={}
       @app_id = args[:app_id]
@@ -26,14 +23,7 @@ module AgoraDynamicKey
       @app_certificate = args[:app_certificate]
       @uid = "#{args.fetch(:uid, "")}"
       @privileges = {}
-      if args.fetch(:privilege_expired_ts, nil).nil?
-        @join_channel_privilege_expired_ts = args[:join_channel_privilege_expired_ts]
-        @pub_audio_privilege_expired_ts = args[:pub_audio_privilege_expired_ts]
-        @pub_video_privilege_expired_ts = args[:pub_video_privilege_expired_ts]
-        @pub_data_stream_privilege_expired_ts = args[:pub_data_stream_privilege_expired_ts]
-      else
-        @privilege_expired_ts = args[:privilege_expired_ts]
-      end
+      @privilege_expired_ts = args[:privilege_expired_ts]
       @salt = SecureRandom.rand(SEED)
       @expired_ts = Time.now.to_i + ONE_DAY
     end
@@ -57,7 +47,7 @@ module AgoraDynamicKey
     end
 
     def self.generate! payload={}, &block
-      token = AccessToken.new(payload)
+      token = AccessToken.new payload
       block.call token
       token.build!
     end

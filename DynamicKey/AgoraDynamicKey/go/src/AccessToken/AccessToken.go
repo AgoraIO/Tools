@@ -1,19 +1,18 @@
 package accesstoken
 
 import (
-    "bytes"
-    "crypto/hmac"
-    "crypto/rand"
-    "crypto/sha256"
-    "encoding/base64"
-    "encoding/binary"
-    "encoding/hex"
-    "fmt"
-    "hash/crc32"
-    "io"
-    "math/big"
-    "sort"
-    "time"
+	"bytes"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/binary"
+	"encoding/hex"
+	"fmt"
+	"hash/crc32"
+	"io"
+	"math/rand"
+	"sort"
+	"time"
 )
 
 const VERSION_LENGTH = 3
@@ -22,10 +21,10 @@ const APP_ID_LENGTH = 32
 type Privileges uint16
 
 const (
-    KJoinChannel        = 1
-    KPublishAudioStream = 2
-    KPublishVideoStream = 3
-    KPublishDataStream  = 4
+	KJoinChannel        = 1
+	KPublishAudioStream = 2
+	KPublishVideoStream = 3
+	KPublishDataStream  = 4
 
     KPublishAudiocdn           = 5
     KLoginRtm            = 1000
@@ -46,14 +45,14 @@ type AccessToken struct {
 }
 
 func random(min int, max int) int {
-    n, _ := rand.Int(rand.Reader, big.NewInt(int64(max)))
-    return int(n.Int64() + int64(min))
+	rand.Seed(time.Now().UnixNano())
+	return rand.Intn(max-min) + min
 }
 
 func panichandler() {
-    if r := recover(); r != nil {
-        fmt.Println("error: ", r)
-    }
+	if r := recover(); r != nil {
+		fmt.Println("error: ", r)
+	}
 }
 
 func getVersion() string {
