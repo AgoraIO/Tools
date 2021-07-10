@@ -22,16 +22,6 @@ use constant {
     KPublishAudioStream        => 2,
     KPublishVideoStream        => 3,
     KPublishDataStream         => 4,
-    KPublishAudiocdn           => 5,
-    KPublishVideoCdn           => 6,
-    KRequestPublishAudioStream => 7,
-    KRequestPublishVideoStream => 8,
-    KRequestPublishDataStream  => 9,
-    KInvitePublishAudioStream  => 10,
-    KInvitePublishVideoStream  => 11,
-    KInvitePublishDataStream   => 12,
-
-    KAdministrateChannel => 101,
 };
 
 sub get_version {
