@@ -2,6 +2,7 @@ import hmac
 from hashlib import sha256
 import base64
 import random
+import struct
 import warnings
 
 from zlib import crc32
