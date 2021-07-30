@@ -210,6 +210,8 @@ class ServiceRtns : public Service {
  public:
   enum {
     kServiceType = 4,
+
+    kPrivilegeLogin = 1,
   };
 
   ServiceRtns() : Service(kServiceType) {}

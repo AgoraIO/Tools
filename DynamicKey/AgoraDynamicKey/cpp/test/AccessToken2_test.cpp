@@ -252,6 +252,7 @@ class AccessToken2_test : public testing::Test {
                             expire_);
 
     std::unique_ptr<Service> rtns(new ServiceRtns());
+    rtns->AddPrivilege(ServiceRtns::kPrivilegeLogin, expire_);
 
     std::unique_ptr<Service> chat(new ServiceChat(account_));
     chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
