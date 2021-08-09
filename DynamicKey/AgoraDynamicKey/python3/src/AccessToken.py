@@ -7,10 +7,24 @@ import secrets
 import time
 from collections import OrderedDict
 
+Role_Attendee = 0  # depreated, same as publisher
+Role_Publisher = 1  # for live broadcaster
+Role_Subscriber = 2  # default, for live audience
+Role_Admin = 101  # deprecated, same as publisher
+
 kJoinChannel = 1
 kPublishAudioStream = 2
 kPublishVideoStream = 3
 kPublishDataStream = 4
+kPublishAudiocdn = 5
+kPublishVideoCdn = 6
+kRequestPublishAudioStream = 7
+kRequestPublishVideoStream = 8
+kRequestPublishDataStream = 9
+kInvitePublishAudioStream = 10
+kInvitePublishVideoStream = 11
+kInvitePublishDataStream = 12
+kAdministrateChannel = 101
 kRtmLogin = 1000
 
 VERSION_LENGTH = 3
@@ -110,20 +124,18 @@ def unPackMessages(buff):
 
 class AccessToken:
 
-    def __init__(self, appID='', appCertificate='', channelName='', uid=''):
-        self.appID = appID
-        self.appCertificate = appCertificate
-        self.channelName = channelName
+    def __init__(self, app_id='', app_cert='', channel_name='', uid=''):
+        self.appID = app_id
+        self.appCertificate = app_cert
+        self.channelName = channel_name
         self.ts = int(time.time()) + 24 * 3600
         self.salt = secrets.SystemRandom().randint(1, 99999999)
         self.messages = {}
-        if (uid == 0):
-            self.uidStr = ""
-        else:
-            self.uidStr = str(uid)
 
-    def addPrivilege(self, privilege, expireTimestamp):
-        self.messages[privilege] = expireTimestamp
+        self.uidStr = str(uid)
+
+    def add_privilege(self, privilege, expire_timestamp):
+        self.messages[privilege] = expire_timestamp
 
     def fromString(self, originToken):
         try:
@@ -166,3 +178,14 @@ class AccessToken:
         version = getVersion()
         ret = version + self.appID + base64.b64encode(content).decode('utf-8')
         return ret
+
+
+def build_token_with_account(app_id, app_cert, scene_name, inner_user, role, expired_ts):
+    token_obj = AccessToken(app_id, app_cert, scene_name, inner_user)
+    token_obj.add_privilege(kJoinChannel, expired_ts)
+    if role == Role_Attendee or role == Role_Admin or role == Role_Publisher:
+        token_obj.add_privilege(kPublishVideoStream, expired_ts)
+        token_obj.add_privilege(kPublishAudioStream, expired_ts)
+        token_obj.add_privilege(kPublishDataStream, expired_ts)
+    return token_obj.build()
+
