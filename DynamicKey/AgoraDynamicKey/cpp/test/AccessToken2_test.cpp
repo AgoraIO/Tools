@@ -264,10 +264,10 @@ class AccessToken2_test : public testing::Test {
     key.AddService(std::move(chat));
 
     std::string expected =
-        "007eJxTYAh5UWu1drfhsnu9etvupS0v/iFs+3PC/Sbl8gdht55xSusqMFiaGzg7GpumpJo"
-        "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYAWSLEAM4jOBSWYwyQImFRjMU"
-        "8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kBM4mQoSS0"
-        "uiS8tTi1iZmBCMZ40I1mgToSYgCwDAGL1OcI=";
+        "007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYLA0N3B2NDZNSTU"
+        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAokWYAYxGcCk8xgkgVMKjCYp"
+        "5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklp"
+        "cEl9anFrEzMCEYjxpRrLAjWSFs5DlAYHiOdw=";
 
     VerifyAccessToken2(expected, &key);
   }

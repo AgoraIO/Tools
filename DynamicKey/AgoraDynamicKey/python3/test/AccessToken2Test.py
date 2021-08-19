@@ -111,9 +111,11 @@ class AccessToken2Test(unittest.TestCase):
 
         result = self.__token.build()
 
-        expected = '007eJxTYAh5UWu1drfhsnu9etvupS0v/iFs+3PC/Sbl8gdht55xSusqMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpg' \
-                   'ZJhkbu38RYIhgYmBgZGBgYAWSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsj' \
-                   'IxNDI3MjZmA5kBM4mQoSS0uiS8tTi1iZmBCMZ40I1mgToSYgCwDAGL1OcI='
+        expected = '007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYL' \
+                   'A0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMD' \
+                   'AwAokWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mm' \
+                   'mJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEzMCEYjxpR' \
+                   'rLAjWSFs5DlAYHiOdw='
                    
         self.assertEqual(expected, result)
 
