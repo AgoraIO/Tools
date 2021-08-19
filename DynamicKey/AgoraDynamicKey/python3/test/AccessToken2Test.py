@@ -98,6 +98,7 @@ class AccessToken2Test(unittest.TestCase):
         streaming.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
 
         rtns = ServiceRtns()
+        rtns.add_privilege(ServiceRtns.kPrivilegeLogin, self.__expire)
 
         chat = ServiceChat(self.__uid_str)
         chat.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)

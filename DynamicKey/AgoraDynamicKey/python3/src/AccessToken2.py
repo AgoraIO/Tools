@@ -112,6 +112,8 @@ class ServiceStreaming(Service):
 class ServiceRtns(Service):
     kServiceType = 4
 
+    kPrivilegeLogin = 1
+
     def __init__(self):
         super(ServiceRtns, self).__init__(ServiceRtns.kServiceType)
 
