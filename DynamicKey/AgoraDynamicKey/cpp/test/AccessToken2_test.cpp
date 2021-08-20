@@ -83,6 +83,16 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
   }
 
+  void VerifyServiceFCdn(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_fcdn = dynamic_cast<ServiceFCdn *>(l);
+    auto r_fcdn = dynamic_cast<ServiceFCdn *>(r);
+
+    EXPECT_EQ(l_fcdn->channel_name_, r_fcdn->channel_name_);
+    EXPECT_EQ(l_fcdn->account_, r_fcdn->account_);
+  }
+
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
     std::string result = key->Build();
     EXPECT_EQ(expected, result);
@@ -114,6 +124,7 @@ class AccessToken2_test : public testing::Test {
          &AccessToken2_test::VerifyServiceStreaming},
         {ServiceRtns::kServiceType, &AccessToken2_test::VerifyServiceRtns},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
+        {ServiceFCdn::kServiceType, &AccessToken2_test::VerifyServiceFCdn},
     };
 
     auto k7_it = k7.services_.begin();
@@ -231,6 +242,55 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  void TestAccessToken2FCdnWithIntUid() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceFCdn(channel_name_, uid_));
+    service->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected =
+      "007eJxTYCjLT2v/scTt9SaxJB+F9L8T/mbzlNoVKXDPEnO/+zdu0WIFBktzA2dHY9OUVDODZ"
+      "BMTMxPTpKTEVItEI0NTAzPDJGNj9y8CDBFMDAyMDCDMBsSMYL4Cg3mKuZGxmWlqkqWFsYmFq"
+      "bGleapxqnGaZYqJmUFSSkoiF4ORhYWRsYmhkbkxAK3JJMU=";
+    VerifyAccessToken2(expected, &key);
+  }
+
+  void TestAccessToken2FCdnWithIntUidZero() {
+    uint32_t uid_zero = 0;
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceFCdn(channel_name_, uid_zero));
+    service->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected =
+      "007eJxTYDgYE3trdcOmk15Xedl3MCQbaIrfrDioPNfhQk5Pr2OIg5YCg6W5gbOjsWlKqplBs"
+      "omJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBhBmA2JGMF+BwTzF3MjYzDQ1ydLC2MTC1"
+      "NjSPNU41TjNMsXEzCApJSWRgQEAyy8hcA==";
+    VerifyAccessToken2(expected, &key);
+  }
+
+  void TestAccessToken2FCdnWithStringUid() {
+    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
+    key.salt_ = 1;
+
+    std::unique_ptr<Service> service(new ServiceFCdn(channel_name_, account_));
+    service->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+
+    key.AddService(std::move(service));
+
+    std::string expected =
+      "007eJxTYCjLT2v/scTt9SaxJB+F9L8T/mbzlNoVKXDPEnO/+zdu0WIFBktzA2dHY9OUVDODZ"
+      "BMTMxPTpKTEVItEI0NTAzPDJGNj9y8CDBFMDAyMDCDMBsSMYL4Cg3mKuZGxmWlqkqWFsYmFq"
+      "bGleapxqnGaZYqJmUFSSkoiF4ORhYWRsYmhkbkxAK3JJMU=";
+    VerifyAccessToken2(expected, &key);
+  }
+
   void TestAccessToken2WithMultiService() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -257,17 +317,22 @@ class AccessToken2_test : public testing::Test {
     std::unique_ptr<Service> chat(new ServiceChat(account_));
     chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
 
+    std::unique_ptr<Service> fcdn(new ServiceFCdn(channel_name_, account_));
+    fcdn->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+    fcdn->AddPrivilege(ServiceFCdn::kPrivilegePlay, expire_);
+
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
     key.AddService(std::move(streaming));
     key.AddService(std::move(rtns));
     key.AddService(std::move(chat));
+    key.AddService(std::move(fcdn));
 
     std::string expected =
-        "007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYLA0N3B2NDZNSTU"
-        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAokWYAYxGcCk8xgkgVMKjCYp"
-        "5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklp"
-        "cEl9anFrEzMCEYjxpRrLAjWSFs5DlAYHiOdw=";
+      "007eJxTYKh0mlnkw+3LHxCYO3mX2tZVpr5GSU1tJsmvWz0Wq75d4aXAYGlu4OxobJqSamaQb"
+      "GJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRgYGBDUiyADGIzwQmmcEkC5hUYDBPMTcyN"
+      "jNNTbK0MDaxMDW2NE81TjVOs0wxMTNISklJ5GIwsrAwMjYxNDI3ZgKaAzGJk6EktbgkvrQ4t"
+      "YiZgQnFeNKMZIEbyQpnIcuzUWQ6AIDlQjQ=";
 
     VerifyAccessToken2(expected, &key);
   }
@@ -301,6 +366,15 @@ TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
 }
 TEST_F(AccessToken2_test, testAccessToken2ChatApp) {
   TestAccessToken2ChatApp();
+}
+TEST_F(AccessToken2_test, testAccessToken2FCdnWithIntUid) {
+  TestAccessToken2FCdnWithIntUid();
+}
+TEST_F(AccessToken2_test, testAccessToken2FCdnWithIntUidZero) {
+  TestAccessToken2FCdnWithIntUidZero();
+}
+TEST_F(AccessToken2_test, testAccessToken2FCdnWithStringUid) {
+  TestAccessToken2FCdnWithStringUid();
 }
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
   TestAccessToken2WithMultiService();
