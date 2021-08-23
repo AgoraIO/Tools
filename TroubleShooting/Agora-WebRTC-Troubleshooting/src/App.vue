@@ -330,7 +330,7 @@
 
 <script>
 import  VConsole  from  'vconsole'
-import AgoraRtc from "agora-rtc-sdk";
+import AgoraRtc from "agora-rtc-sdk-ng";
 const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
