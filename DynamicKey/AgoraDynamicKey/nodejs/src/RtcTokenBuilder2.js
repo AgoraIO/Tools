@@ -61,8 +61,8 @@ class RtcTokenBuilder {
         let token = new AccessToken(appID, appCertificate, null, privilegeExpiredTs)
 
         let serviceRtc = new ServiceRtc(channelName, account)
+        serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilegeExpiredTs)
         if (role == Role.PUBLISHER) {
-            serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilegeExpiredTs)
             serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilegeExpiredTs)
             serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilegeExpiredTs)
             serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilegeExpiredTs)
