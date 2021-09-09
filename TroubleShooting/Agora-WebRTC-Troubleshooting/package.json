@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "agora-rtc-sdk-ng": "4.6.3",
+    "debugout.js": "^1.0.0",
     "echarts": "^4.7.0",
     "register-service-worker": "^1.0.0",
     "v-charts": "^1.19.0",

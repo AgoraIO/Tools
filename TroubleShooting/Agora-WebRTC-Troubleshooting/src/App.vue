@@ -3,10 +3,11 @@
     <!-- title bar -->
     <v-toolbar dark color="primary">
       <v-toolbar-title>{{text.toolbar_title}}</v-toolbar-title>
-      <a href="https://github.com/AgoraIO/Tools/tree/master/TroubleShooting/Agora-WebRTC-Troubleshooting" class="aperture">
-      <span class="github"></span>
-      </a>
+     
       <v-spacer></v-spacer>
+      <v-btn v-on:click="copyLogs" color="info" >
+        Download Logs
+      </v-btn>
       <v-btn v-on:click="switchLanguage" color="blue" :disabled="languageDisabled">
         {{text.language}}
       </v-btn>
@@ -19,6 +20,7 @@
       <v-btn v-else color="error" disabled>
         {{text.running}}
       </v-btn>
+
     </v-toolbar>
     <!-- end -->
     <v-content>
@@ -286,6 +288,38 @@
             </v-btn>
           </v-snackbar>
           <!-- dialog -->
+
+          <v-dialog v-model="dialog" persistent max-width="360">
+            <v-card>
+              <v-card-text>
+                <div id="modal-video" v-if="!errMsgForTry">
+                  <div v-if="!showVideo">{{text.videoText}}</div>
+                </div>
+                <div id="modal-remote-video" v-if="!errMsgForTry">
+                  <div v-if="!showVideo">{{text.videoText}}</div>
+                </div>
+                <div>
+                    <v-card-text>
+                        <b>Channel</b> {{channel}} </br>
+                        <b>UID</b> {{sendId}} <br>
+                        <b>RUID</b> {{remoteid}}
+                    </v-card-text>
+                </div>
+                <div style='margin-top: -20px;'>
+                    <v-card-text class='url_link'>{{url}}</v-card-text>                                      
+                    <span class="btn copy-btn " @click.stop.prevent="copyURL">
+                     COPY URL TO CLIPBOARD
+                     </span>
+                    <input type="hidden" id="url-code" :value="url">
+                </div>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="green darken-1" flat @click.native="endTry">{{text.close}}</v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+<!--
           <v-dialog v-model="dialog" persistent max-width="360">
             <v-card>
               <v-card-title>
@@ -311,6 +345,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+-->          
         </v-layout>
       </v-container>
     </v-content>
@@ -331,11 +366,13 @@
 <script>
 import  VConsole  from  'vconsole'
 import AgoraRtc from "agora-rtc-sdk-ng";
+import { Debugout } from 'debugout.js';
 const langs = ['zh', 'en'];
 import { profileArray, APP_ID } from "./utils/settings";
 import * as i18n from './utils/i18n'
 
-const log = console.log.bind(console)
+//const log = console.log.bind(console)
+const logger = new Debugout()
 
 // If need mobile phone terminal debugging
 // let vConsole = new VConsole()
@@ -348,6 +385,7 @@ export default {
   },
   mounted() {
     document.title = this.text.toolbar_title
+    this.parseUrl();
   },
   data() {
     return {
@@ -366,6 +404,14 @@ export default {
       renderChart: false,
       testing: false,
       isEnableCloudProxy: false,
+      isEnableCloudProxy: false,
+      isRemoteAdded : false,
+      isPreSet : false,
+      channel : null,
+      sendId : 0,
+      remoteid : 0,
+      host : "http://localhost:8080",
+      url : "http://localhost:8080",
       fixProxyPort: false,
       profiles: profileArray.map(item => {
         item.status = "pending";
@@ -433,10 +479,6 @@ export default {
           resolution: "720p_1",
           isSuccess: false
         },
-        {
-          resolution: "1080p_1",
-          isSuccess: false
-        },
       ],
       currentProfile: 0
     };
@@ -481,144 +523,123 @@ export default {
       const property = i18n[lang]['default']
       return property[key]
     },
+
     switchLanguage () {
       this.language = this.language === 0 ? 1 : 0
     },
 
+    copyLogs () {
+      logger.downloadLog()
+    },
+
     initialize() {
       this.ts = new Date().getTime();
-      this.channel =
-        String(this.ts).slice(7) +
-        Math.floor(Math.random() * 1000000).toString(36);
+      if (null == this.channel) {
+        this.channel =
+          String(this.ts).slice(7) +
+          Math.floor(Math.random() * 1000000).toString(36);
+      }
+
+      logger.info("start initialize! channel id: ", this.channel);
+      AgoraRtc.enableLogUpload();
       this.sendId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 1;
       this.recvId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 2;
-      this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
-      this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
+      this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'vp8' });
+      this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'vp8' });
       if(this.isEnableCloudProxy && this.fixProxyPort){
-        this.sendClient.startProxyServer(2);
-        this.recvClient.startProxyServer(2);
+         logger.info("start setup proxy 4");
+        this.sendClient.startProxyServer(4);
+        this.recvClient.startProxyServer(4);
       }
       else if(this.isEnableCloudProxy && !this.fixProxyPort){
-        this.sendClient.startProxyServer();
-        this.recvClient.startProxyServer();
+         logger.info("start setup proxy 3");
+        this.sendClient.startProxyServer(3);
+        this.recvClient.startProxyServer(3);
       }
     },
 
     initSendClient() {
-      return new Promise((resolve, reject) => {
-        this.sendStream = AgoraRtc.createStream({
-          streamID: this.sendId,
-          video: true,
-          audio: true,
-          screen: false
+
+      return new Promise(async (resolve, reject) => {
+      
+       this.audioTrack && this.audioTrack.stop() && this.audioTrack.close();
+       this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
+
+       [this.audioTrack, this.videoTrack] = await AgoraRtc.createMicrophoneAndCameraTracks(
+        {}, { encoderConfig: "720p_2" });
+
+        // join 
+        await this.sendClient.join(APP_ID, this.channel, null, this.sendId).catch(e => {
+          console.error(" send join failed");
+          logger.error(e);
+          reject(e);
         });
-        this.sendStream.setVideoProfile("720p_2");
-        this.sendClient.init(
-          APP_ID,
-          () => {
-            this.sendStream.init(
-              () => {
-                this.sendClient.join(
-                  null,
-                  this.channel,
-                  this.sendId,
-                  () => {
-                    this.sendClient.publish(this.sendStream, err => {
-                      reject(err);
-                    });
-                    setTimeout(() => {
-                      resolve();
-                    });
-                  },
-                  err => {
-                    reject(err);
-                  }
-                );
-              },
-              err => {
-                reject(err);
-              }
-            );
-          },
-          err => {
-            reject(err);
-          }
-        );
+
+        // publish
+        await this.sendClient.setClientRole("host");
+        await this.sendClient.publish([this.audioTrack, this.videoTrack]).catch(e => {
+          console.error(" send publish failed");
+          logger.error(e);
+          reject(e);
+        });
+
+        resolve();
       });
     },
 
     initRecvClient() {
-      return new Promise((resolve, reject) => {
-        this.recvClient.init(
-          APP_ID,
-          () => {
-            this.recvClient.join(
-              null,
-              this.channel,
-              this.recvId,
-              () => {
-                this.recvClient.on("stream-added", evt => {
-                  this.recvClient.subscribe(evt.stream, err => {
-                    clearInterval(this.detectInterval);
-                    this.bitrateData = {};
-                    this.packetsData = {};
-                    this.testSuites["4"].notError = false;
-                    this.testSuites["4"].extra = err.msg;
-                    this.destructAll();
-                    this.currentTestSuite = "5";
+
+      return new Promise(async (resolve, reject) => {
+      // join 
+      await this.recvClient.join(APP_ID, this.channel, null, this.recvId);
+
+      this.recvClient.on("user-published",  async (user, mediaType) => {
+
+        this.recvClient.subscribe(user, mediaType).then(response => {
+          if (mediaType === 'video') {
+            user.videoTrack.play("test-recv");
+            let i = 1;
+            this.detectInterval = setInterval(() => {
+
+               const remoteTracksStats = {
+                  video: this.recvClient.getRemoteVideoStats()[user.uid],
+                  audio: this.recvClient.getRemoteAudioStats()[user.uid]
+                };
+
+                  this.bitrateData.rows.push({
+                    index: i,
+                    tVideoBitrate: this._calcBitrate(
+                       remoteTracksStats.video.receiveBytes , i
+                    ),
+                    tAudioBitrate: this._calcBitrate(
+                       remoteTracksStats.audio.receiveBytes , i
+                    )
                   });
-                });
-                this.recvClient.on("stream-removed", () => {
-                  clearInterval(this.detectInterval);
-                  this.bitrateData = {};
-                  this.packetsData = {};
-                  this.testSuites["4"].notError = false;
-                  this.testSuites["4"].extra = "Disconnected";
-                  this.destructAll();
-                  this.currentTestSuite = "5";
-                });
-                this.recvClient.on("stream-subscribed", evt => {
-                  this.recvStream = evt.stream;
-                  this.recvStream.disableAudio();
-                  this.recvStream.play("test-recv");
-                  let i = 1;
-                  this.detectInterval = setInterval(() => {
-                    this.recvStream.getStats(e => {
-                      this.bitrateData.rows.push({
-                        index: i,
-                        tVideoBitrate: this._calcBitrate(
-                          e.videoReceiveBytes, i
-                        ),
-                        tAudioBitrate: this._calcBitrate(
-                          e.audioReceiveBytes, i
-                        )
-                      });
-                      this.packetsData.rows.push({
-                        index: i,
-                        tVideoPacketLoss: this._calcPacketLoss(
-                          e.videoReceivePackets,
-                          e.videoReceivePacketsLost
-                        ),
-                        tAudioPacketLoss: this._calcPacketLoss(
-                          e.audioReceivePackets,
-                          e.audioReceivePacketsLost
-                        ),
-                      });
-                      i++;
-                    });
-                  }, 1000);
-                });
-                resolve();
-              },
-              err => {
-                reject(err);
-              }
-            );
-          },
-          err => {
-            reject(err);
+
+                  this.packetsData.rows.push({
+                    index: i,
+                    tVideoPacketLoss: this._calcPacketLoss(
+                     remoteTracksStats.video.receivePackets,
+                     remoteTracksStats.video.receivePacketsLost                     
+                    ),
+                    tAudioPacketLoss: this._calcPacketLoss(
+                     remoteTracksStats.audio.receivePackets,
+                     remoteTracksStats.audio.receivePacketsLost
+                    ),
+                  });
+                  i++;
+            }, 1000);
           }
-        );
+          if (mediaType === 'audio') {
+            //user.audioTrack.play();
+          } 
+        }).catch(e => {
+          console.error(9);
+          logger.error(e);
+        });
+       });
+
+            resolve();
       });
     },
 
@@ -647,9 +668,10 @@ export default {
 
     destructAll() {
       try {
-        this.sendStream && this.sendStream.close();
-        this.recvStream && this.recvStream.close();
-        this.sendClient.unpublish(this.sendStream);
+        this.sendClient.unpublish(this.audioTrack);    
+        this.sendClient.unpublish(this.videoTrack);
+        this.audioTrack && this.audioTrack.stop() && this.audioTrack.close();
+        this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
         this.sendClient.leave();
         this.recvClient.leave();
         if(this.isEnableCloudProxy){
@@ -658,40 +680,35 @@ export default {
         }
         clearInterval(this.detectInterval);
       } catch (err) {
+        logger.error(err);
         throw(err);
       }
     },
 
-    checkProfile(profile) {
-      return new Promise((resolve, reject) => {
-        this.sendStream && this.sendStream.stop();
-        this.sendStream = AgoraRtc.createStream({
-          streamID: this.sendId,
-          video: true,
-          audio: true,
-          screen: false
-        });
-        this.sendStream.setVideoProfile(profile.resolution);
-        this.sendStream.init(
-          () => {
-            this.sendStream.play("test-send");
-            setTimeout(() => {
-              let videoElement = document.querySelector("#video" + this.sendId);
-              let videoArea = videoElement.videoWidth * videoElement.videoHeight
-              let profileArea = profile.width * profile.height
-              if (videoArea === profileArea) {
-                profile.status = "resolve";
-                resolve();
-              } else {
-                profile.status = "reject";
-                reject("Resolution mismatched");
-              }
-            }, 1000);
-          },
-          err => {
-            reject(err);
+  async  checkProfile(profile) {
+
+      return new Promise(async (resolve, reject) => {
+
+        this.audioTrack && this.audioTrack.stop() && this.audioTrack.close();
+        this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
+
+       [this.audioTrack, this.videoTrack] = await AgoraRtc.createMicrophoneAndCameraTracks(
+        {}, { encoderConfig: profile.resolution });
+
+        this.videoTrack.play("test-send");
+
+        setTimeout(() => {
+          let videoElement = document.querySelector(".agora_video_player");
+          let videoArea = videoElement.videoWidth * videoElement.videoHeight
+          let profileArea = profile.width * profile.height
+          if (videoArea === profileArea) {
+            profile.status = "resolve";
+            resolve();
+          } else {
+            profile.status = "reject";
+            reject("Resolution mismatched");
           }
-        );
+        }, 2500);                  
       });
     },
 
@@ -707,6 +724,17 @@ export default {
       this.dialog = false;
       this.languageDisabled = true;
       this.handleCompatibilityCheck();
+    },
+
+    parseUrl : function() {
+      var oldUrl = window.location.href;
+      if (oldUrl.indexOf("?") > 0) {
+        this.host = oldUrl.split("?")[0];
+        var componentsStr = oldUrl.split("?")[1];
+        this.channel = componentsStr.split("channel=")[1].split("&")[0];
+        this.isEnableCloudProxy = 1 == componentsStr.split("proxy=")[1].split("&")[0];
+        this.isPreSet = true;
+      }
     },
 
     restore() {
@@ -748,59 +776,46 @@ export default {
     handleCompatibilityCheck() {
       this.currentTestSuite = "0";
       let testSuite = this.testSuites["0"];
+       this.bollok=22;
       setTimeout(() => {
         testSuite.notError = AgoraRtc.checkSystemRequirements();
         testSuite.notError
           ? (testSuite.extra = this.t("fully_supported"))
           : (testSuite.extra = this.t("some_functions_may_be_limited"));
         this.handleMicrophoneCheck();
-      }, 3000);
+      }, 6000);
     },
 
-    handleMicrophoneCheck() {
-      this.currentTestSuite = "1";
-      let testSuite = this.testSuites["1"];
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: false,
-        audio: true,
-        screen: false
-      });
-      this.sendStream.init(
-        () => {
-          this.sendStream.play("test-send");
-          let totalVolume = 0;
-          this.microphoneCheckTimer = setInterval(() => {
-            this.inputVolume = Math.floor(
-              this.sendStream.getAudioLevel() * 100
-            );
-            totalVolume += this.inputVolume;
-          }, 100);
-          setTimeout(() => {
-            clearInterval(this.microphoneCheckTimer);
-            this.sendStream.close();
-            if (totalVolume < 60) {
-              testSuite.notError = false;
-              testSuite.extra = this.t("can_barely_hear_you");
-            } else {
-              testSuite.extra = this.t("microphone_works_well");
-            }
-            this.handleSpeakerCheck();
-          }, 7000);
-        },
-        err => {
-          // do next test
+    async handleMicrophoneCheck() {
+
+     this.currentTestSuite = "1";
+     let testSuite = this.testSuites["1"];
+
+     this.localAudioTrack = await AgoraRtc.createMicrophoneAudioTrack();
+     //this.localAudioTrack.play("test-send");
+
+     let totalVolume = 0;
+
+      this.microphoneCheckTimer = setInterval(() => {
+        this.inputVolume = Math.floor(
+          this.localAudioTrack.getVolumeLevel() * 100
+        );
+        totalVolume += this.inputVolume;
+      }, 100);
+
+      setTimeout(() => {
+        clearInterval(this.microphoneCheckTimer);
+        this.localAudioTrack.close();
+        if (totalVolume < 60) {
           testSuite.notError = false;
-          testSuite.extra = err.msg;
-          try {
-            this.sendStream.close();
-          } catch (error) {
-            throw(error);
-          } finally {
-            this.handleSpeakerCheck();
-          }
+          testSuite.extra = this.t("can_barely_hear_you");
+        } else {
+          testSuite.extra = this.t("microphone_works_well");
         }
-      );
+        this.handleSpeakerCheck();
+      }, 7000);
+
+
     },
 
     handleSpeakerCheck() {
@@ -843,6 +858,7 @@ export default {
             this.sendStream && this.sendStream.close();
           })
           .catch(err => {
+            logger.error(err);
             if (err === "Resolution mismatched") {
               testSuite.notError = false;
               testSuite.extra = err.msg;
@@ -876,9 +892,11 @@ export default {
         await this.initSendClient();
         this.renderChart = true;
       } catch (err) {
+        console.error(4);
         testSuite.extra = err.msg;
         testSuite.notError = false;
         setTimeout(() => {
+          console.error(6);
           this.testing = false;
           this.currentTestSuite = "5";
           this.snackbar = true;
@@ -923,10 +941,20 @@ export default {
             ${ this.t('Audio_Packet_Loss')}: ${ audioPacketLoss } % </br>`;
           }
         }, 1500);
-      }, 21500);
+      }, 3500);
     },
-
+    fetchAndGetHostUrl : function() {
+      const rest = window.location.href;
+      if (rest.indexOf("?") > 0) {
+        this.host = rest.split("?")[0];
+      } else {
+        this.host = rest;
+      }
+      const r = this.isEnableCloudProxy ? "1" : "0";
+      this.url = this.host + "?channel=" + this.channel + "&proxy=" + r
+    },
     haveATry() {
+      this.fetchAndGetHostUrl();
       this.snackbar = false;
       this.dialog = true;
       this.ProfileForTry.forEach((item) => {
@@ -938,42 +966,72 @@ export default {
         } 
         item.isSuccess = this.profiles[index].status === 'resolve'
       })
-      this.retry(0);
+      this.retry();
     },
 
-    retry(currentIndex) {
-      if (this.sendStream && this.sendStream.isPlaying()) {
-        this.sendStream.stop();
-        this.sendStream.close();
-      }
-      //If the resolution is equal to not supported, 1. Do not play video stream; 2. Give error prompt
-      if (this.ProfileForTry[currentIndex].isSuccess) {
-        this.showVideo = true
-      } else {
-        this.showVideo = false
-        return
-      }
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: true,
-        audio: true,
-        screen: false
+   async retry() {
+
+      this.showVideo = true;
+      this.audioTrack && this.audioTrack.stop() && this.audioTrack.close();
+      this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
+
+      [this.audioTrack, this.videoTrack] = await AgoraRtc.createMicrophoneAndCameraTracks(
+        {}, { encoderConfig: "720p_1" });
+
+      this.videoTrack.play("modal-video");
+
+      // join 
+      await this.sendClient.join(APP_ID, this.channel, null, this.sendId).catch(e => {
+        console.error(" send join failed");
+        return;
       });
-      this.sendStream.setVideoProfile(this.ProfileForTry[currentIndex].resolution);
-      this.sendStream.init(
-        () => {
-          this.sendStream.play("modal-video");
-        },
-        err => {
-          this.errMsgForTry = err.msg;
-        }
-      );
+
+      // subscribe 
+      await this.sendClient.on("user-published",  async (user, mediaType) => {
+        this.sendClient.subscribe(user, mediaType).then(response => {
+          if (mediaType === 'video') {
+            user.videoTrack.play("modal-remote-video");
+          }
+          if (mediaType === 'audio') {
+            user.audioTrack.play();
+          } 
+        }).catch(e => {
+          console.error("retry subscribe fail");
+          logger.error(e);
+        });
+      });
+
+      // publish
+      await this.sendClient.setClientRole("host");
+      await this.sendClient.publish([this.audioTrack, this.videoTrack]).catch(e => {
+        console.error(" send publish failed");
+        logger.error(e);
+        reject(e);
+      });
     },
+    copyURL () {
+        let testingCodeToCopy = document.querySelector('#url-code')
+        testingCodeToCopy.setAttribute('type', 'text')    // 不是 hidden 才能複製
+        testingCodeToCopy.select()
+
+        try {
+          var successful = document.execCommand('copy');
+          var msg = successful ? 'successful' : 'unsuccessful';
+          alert('URL was copied ' + msg);
+        } catch (err) {
+          alert('Oops, unable to copy');
+          logger.error(err);
+        }
+
+        /* unselect the range */
+        testingCodeToCopy.setAttribute('type', 'hidden')
+        window.getSelection().removeAllRanges()
+      },
 
     endTry() {
       this.dialog = false;
-      this.sendStream.stop();
-      this.sendStream.close();
+      this.audioTrack && this.audioTrack.stop() && this.audioTrack.close();
+      this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
     }
   }
 };
@@ -997,8 +1055,14 @@ export default {
 }
 #modal-video {
   width: 320px;
-  height: 240px;
-  margin: 0 auto;
+  height: 180px;
+  margin: 10px;
+}
+#modal-remote-video {
+  width: 320px;
+  height: 180px;
+  margin:  10px;
+  background-color: #eee;
 }
 @-webkit-keyframes rotate {
   0% {
@@ -1067,6 +1131,21 @@ export default {
   min-height: 48px!important;
   height: auto!important;
 }
+.copy-btn{
+  margin-left: 74px;
+    /* font-weight: bold; */
+    color: green;
+    font-size: 16px;
+    cursor: pointer;
+}
+.url_link{
+    color: black;
+    width: 338px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: -20px;
+}
 
   .proxy {
     font-size: 12px;
@@ -1110,7 +1189,7 @@ export default {
     margin-left: -24px;
   }
   .v-card__text {
-    padding: 0 16px;
+    padding: 10px;
     width: 100%;
   }
   .v-card {
