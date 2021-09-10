@@ -36,20 +36,20 @@
               </v-card-title>
               <v-card-text class="proxy">
                 <v-label>{{text.cloudProxy}}</v-label>
-                <v-btn-toggle v-model.lazy="isEnableCloudProxy" rounded>
+                <v-btn-toggle mandatory v-model.lazy="isEnableCloudProxy" rounded>
                   <v-btn :value=true @click.native="toggleProxy(true)">{{text.cloudProxy_enable}}</v-btn>
                   <v-btn :value=false @click.native="toggleProxy(false)">{{text.cloudProxy_disable}}</v-btn>
                 </v-btn-toggle>
               </v-card-text>
               <v-card-text class="proxy" v-if="isEnableCloudProxy">
                 <v-label>{{text.cloudProxy_mode}}</v-label>
-                <v-btn-toggle v-model.lazy="fixProxyPort"rounded>
-                  <v-btn :value=false @click.native="toggleProxyMode(false)">{{text.cloudProxy_default}}</v-btn>
-                  <v-btn :value=true @click.native="toggleProxyMode(true)">{{text.cloudProxy_fix}}</v-btn>
+                <v-btn-toggle mandatory v-model.lazy="fixProxyMode" rounded>
+                  <v-btn  :value=3 @click.native="setProxyMode(3)">{{text.cloudProxy_mode_3}}</v-btn>
+                  <v-btn :value=4 @click.native="setProxyMode(4)">{{text.cloudProxy_mode_4}}</v-btn>
+                  <v-btn :value=5 @click.native="setProxyMode(5)">{{text.cloudProxy_mode_5}}</v-btn>
                 </v-btn-toggle>
-                <v-card-text class="tip" v-if="fixProxyPort">
+                <v-card-text class="tip" v-if="fixProxyMode">
                   <span class="tip_icon"></span>{{text.cloudProxy_tips}}
-                  <a href="https://docs.agora.io/cn/Audio%20Broadcast/cloud_proxy_web?platform=Web">{{text.cloudProxy_tips_link}}</a>
                 </v-card-text>
               </v-card-text>
               <v-card-text>
@@ -90,7 +90,7 @@
           <v-flex v-else>
             <v-stepper v-model="currentTestSuite">
               <v-stepper-header>
-                <v-stepper-step
+                <v-stepper-step class='bok' 
                   v-for="item in testSuites"
                   :key="item.id" :step="item.id"
                   :complete="item.complete || (currentTestSuite > item.id)"
@@ -404,15 +404,14 @@ export default {
       renderChart: false,
       testing: false,
       isEnableCloudProxy: false,
-      isEnableCloudProxy: false,
+      fixProxyMode: 3,
       isRemoteAdded : false,
-      isPreSet : false,
       channel : null,
       sendId : 0,
       remoteid : 0,
       host : "http://localhost:8080",
       url : "http://localhost:8080",
-      fixProxyPort: false,
+
       profiles: profileArray.map(item => {
         item.status = "pending";
         return item;
@@ -542,20 +541,18 @@ export default {
 
       logger.info("start initialize! channel id: ", this.channel);
       AgoraRtc.enableLogUpload();
+
       this.sendId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 1;
       this.recvId = Number.parseInt(String(this.ts).slice(7), 10) * 10 + 2;
       this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'vp8' });
       this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'vp8' });
-      if(this.isEnableCloudProxy && this.fixProxyPort){
-         logger.info("start setup proxy 4");
-        this.sendClient.startProxyServer(4);
-        this.recvClient.startProxyServer(4);
+
+      if(this.isEnableCloudProxy && this.fixProxyMode){
+         logger.info("start setup proxy "+this.fixProxyMode);
+        this.sendClient.startProxyServer(this.fixProxyMode);
+        this.recvClient.startProxyServer(this.fixProxyMode);
       }
-      else if(this.isEnableCloudProxy && !this.fixProxyPort){
-         logger.info("start setup proxy 3");
-        this.sendClient.startProxyServer(3);
-        this.recvClient.startProxyServer(3);
-      }
+
     },
 
     initSendClient() {
@@ -674,10 +671,6 @@ export default {
         this.videoTrack && this.videoTrack.stop() && this.videoTrack.close();
         this.sendClient.leave();
         this.recvClient.leave();
-        if(this.isEnableCloudProxy){
-          this.sendClient.stopProxyServer();
-          this.recvClient.stopProxyServer();
-        }
         clearInterval(this.detectInterval);
       } catch (err) {
         logger.error(err);
@@ -732,8 +725,10 @@ export default {
         this.host = oldUrl.split("?")[0];
         var componentsStr = oldUrl.split("?")[1];
         this.channel = componentsStr.split("channel=")[1].split("&")[0];
-        this.isEnableCloudProxy = 1 == componentsStr.split("proxy=")[1].split("&")[0];
-        this.isPreSet = true;
+        this.fixProxyMode=   parseInt(componentsStr.split("proxy=")[1].split("&")[0]);
+        if (this.fixProxyMode>0) {
+          this.isEnableCloudProxy = 1;
+        }
       }
     },
 
@@ -845,8 +840,8 @@ export default {
       this.isEnableCloudProxy = val;
     },
 
-    toggleProxyMode(val) {
-      this.fixProxyPort = val;
+    setProxyMode(val) {
+      this.fixProxyMode = val;
     },
 
     async handleCameraCheck() {
@@ -950,7 +945,7 @@ export default {
       } else {
         this.host = rest;
       }
-      const r = this.isEnableCloudProxy ? "1" : "0";
+      const r = this.fixProxyMode;
       this.url = this.host + "?channel=" + this.channel + "&proxy=" + r
     },
     haveATry() {
@@ -1131,13 +1126,21 @@ export default {
   min-height: 48px!important;
   height: auto!important;
 }
+
 .copy-btn{
   margin-left: 74px;
     /* font-weight: bold; */
-    color: green;
-    font-size: 16px;
+    color: white;
+    background-color: rgb(33, 150, 243);
+    padding: 6px;
+    font-family: Roboto, sans-serif;
+    font-size: 14px;
+    font-stretch: 100%;
+    font-style: normal;
+    font-weight: 700;
     cursor: pointer;
 }
+
 .url_link{
     color: black;
     width: 338px;
@@ -1194,5 +1197,12 @@ export default {
   }
   .v-card {
     min-width: 280px;
+  }
+   .error--text .material-icons {
+  color: orange !important;
+  }
+
+   .error--text .v-stepper__label{
+    color: black !important;
   }
 </style>

@@ -55,7 +55,10 @@ export default {
   'cloudProxy_disable': '禁用',
   'cloudProxy_mode': '设置代理模式',
   'cloudProxy_default': '默认',
+  'cloudProxy_mode_3': '模式3',
+  'cloudProxy_mode_4': '模式4',
+  'cloudProxy_mode_5': '模式5',
   'cloudProxy_fix': '固定TCP443',
-  'cloudProxy_tips': '若使用固定端口，调用云代理API时，请使用startProxyServer(2)，详见：',
+  'cloudProxy_tips': '模式三：UDP 443，无TCP回退；模式 4：UDP 443 带 TCP 回退；模式 5：TCP TLS',
   'cloudProxy_tips_link': '文档'
 }
