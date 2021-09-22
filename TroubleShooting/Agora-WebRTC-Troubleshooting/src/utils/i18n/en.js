@@ -1,5 +1,5 @@
 export default {
-  'toolbar_title': 'Agora WebRTC Precall Test',
+  'toolbar_title': 'Agora WebRTC Precall Test 4',
   'language': 'English',
   'lang': 'en',
   'build': 'build',
