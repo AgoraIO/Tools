@@ -404,7 +404,7 @@ export default {
       renderChart: false,
       testing: false,
       isEnableCloudProxy: false,
-      fixProxyMode: 3,
+      fixProxyMode: 0,
       isRemoteAdded : false,
       channel : null,
       sendId : 0,
@@ -572,6 +572,7 @@ export default {
           reject(e);
         });
 
+
         // publish
         await this.sendClient.setClientRole("host");
         await this.sendClient.publish([this.audioTrack, this.videoTrack]).catch(e => {
@@ -588,7 +589,11 @@ export default {
 
       return new Promise(async (resolve, reject) => {
       // join 
-      await this.recvClient.join(APP_ID, this.channel, null, this.recvId);
+      await this.recvClient.join(APP_ID, this.channel, null, this.recvId).catch(e => {
+          console.error(" recv join failed "+e.message);
+          logger.error(e);
+          reject(e);
+        });
 
       this.recvClient.on("user-published",  async (user, mediaType) => {
 
@@ -887,15 +892,15 @@ export default {
         await this.initSendClient();
         this.renderChart = true;
       } catch (err) {
-        console.error(4);
-        testSuite.extra = err.msg;
+        //console.error("ERR "+ err);
+        testSuite.extra = err; //"Connection Failed"
         testSuite.notError = false;
+
         setTimeout(() => {
-          console.error(6);
           this.testing = false;
           this.currentTestSuite = "5";
-          this.snackbar = true;
-        }, 1500);
+          //this.snackbar = true;
+        }, 1500); 
         return false;
       }
       // go on
@@ -945,7 +950,10 @@ export default {
       } else {
         this.host = rest;
       }
-      const r = this.fixProxyMode;
+      let r = 0;
+      if (this.isEnableCloudProxy>0) {
+        r = this.fixProxyMode;
+      }
       this.url = this.host + "?channel=" + this.channel + "&proxy=" + r
     },
     haveATry() {
