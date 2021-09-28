@@ -16,4 +16,12 @@ echo 'Token with int uid: ' . $token . PHP_EOL;
 
 $token = RtcTokenBuilder::buildTokenWithUserAccount($appID, $appCertificate, $channelName, $uidStr, $role, $privilegeExpiredTs);
 echo 'Token with user account: ' . $token . PHP_EOL;
+
+/**
+ * Whether to connect the microphone
+ * isConnectMicrophone 1=yes 0=no
+ */
+$token = RtcTokenBuilder::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $privilegeExpiredTs,1);
+echo 'Token with int uid: ' . $token . PHP_EOL;
+
 ?>
