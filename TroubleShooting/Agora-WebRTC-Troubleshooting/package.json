@@ -1,6 +1,6 @@
 {
   "name": "agora-webrtc-precall-test",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
