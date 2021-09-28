@@ -23,7 +23,7 @@ class RtcTokenBuilder
     #                    Agora Service within 10 minutes after the token is 
     #                    generated, set expireTimestamp as the current 
     #                    timestamp + 600 (seconds)./
-    # isConnectMicrophone Whether to connect the microphone 1=yes 0=no
+    # Whether to connect the microphone authentication 1=yes 0=no
     public static function buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $privilegeExpireTs, $isConnectMicrophone = 0)
     {
         return RtcTokenBuilder::buildTokenWithUserAccount($appID, $appCertificate, $channelName, $uid, $role, $privilegeExpireTs, $isConnectMicrophone);

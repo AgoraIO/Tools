@@ -18,7 +18,7 @@ $token = RtcTokenBuilder::buildTokenWithUserAccount($appID, $appCertificate, $ch
 echo 'Token with user account: ' . $token . PHP_EOL;
 
 /**
- * Whether to connect the microphone
+ * Whether to connect the microphone authentication
  * isConnectMicrophone 1=yes 0=no
  */
 $token = RtcTokenBuilder::buildTokenWithUid($appID, $appCertificate, $channelName, $uid, $role, $privilegeExpiredTs,1);
