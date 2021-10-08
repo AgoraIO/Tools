@@ -132,7 +132,6 @@ class AccessToken:
             if (originVersion != dk6version):
                 return False
 
-            originAppID = originToken[VERSION_LENGTH:(VERSION_LENGTH + APP_ID_LENGTH)]
             originContent = originToken[(VERSION_LENGTH + APP_ID_LENGTH):]
             originContentDecoded = base64.b64decode(originContent)
 
@@ -158,10 +157,7 @@ class AccessToken:
         crc_channel_name = crc32(self.channelName.encode('utf-8')) & 0xffffffff
         crc_uid = crc32(self.uidStr.encode('utf-8')) & 0xffffffff
 
-        content = packString(signature) \
-                  + packUint32(crc_channel_name) \
-                  + packUint32(crc_uid) \
-                  + packString(m)
+        content = packString(signature) + packUint32(crc_channel_name) + packUint32(crc_uid) + packString(m)
 
         version = getVersion()
         ret = version + self.appID + base64.b64encode(content).decode('utf-8')
