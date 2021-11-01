@@ -97,8 +97,8 @@ class AccessToken2Test(unittest.TestCase):
         streaming.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, self.__expire)
         streaming.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
 
-        rtns = ServiceRtns()
-        rtns.add_privilege(ServiceRtns.kPrivilegeLogin, self.__expire)
+        fpa = ServiceFpa()
+        fpa.add_privilege(ServiceFpa.kPrivilegeLogin, self.__expire)
 
         chat = ServiceChat(self.__uid_str)
         chat.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
@@ -106,7 +106,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__token.add_service(rtc)
         self.__token.add_service(rtm)
         self.__token.add_service(streaming)
-        self.__token.add_service(rtns)
+        self.__token.add_service(fpa)
         self.__token.add_service(chat)
 
         result = self.__token.build()

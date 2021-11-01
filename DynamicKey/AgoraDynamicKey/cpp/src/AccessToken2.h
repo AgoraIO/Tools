@@ -206,7 +206,7 @@ class ServiceStreaming : public Service {
   ServiceStreaming &operator=(ServiceStreaming &&) = default;
 };
 
-class ServiceRtns : public Service {
+class ServiceFpa : public Service {
  public:
   enum {
     kServiceType = 4,
@@ -214,29 +214,29 @@ class ServiceRtns : public Service {
     kPrivilegeLogin = 1,
   };
 
-  ServiceRtns() : Service(kServiceType) {}
+  ServiceFpa() : Service(kServiceType) {}
 
   virtual std::string PackService() override { return Pack(this); }
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
   virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceRtns(*this));
+    return std::unique_ptr<Service>(new ServiceFpa(*this));
   }
 
   friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceRtns *x) {
+                                          const ServiceFpa *x) {
     return p << dynamic_cast<const Service *>(x);
   }
   friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceRtns *x) {
+                                            ServiceFpa *x) {
     return p >> dynamic_cast<Service *>(x);
   }
 
  protected:
-  ServiceRtns(const ServiceRtns &) = default;
-  ServiceRtns(ServiceRtns &&) = default;
-  ServiceRtns &operator=(const ServiceRtns &) = default;
-  ServiceRtns &operator=(ServiceRtns &&) = default;
+  ServiceFpa(const ServiceFpa &) = default;
+  ServiceFpa(ServiceFpa &&) = default;
+  ServiceFpa &operator=(const ServiceFpa &) = default;
+  ServiceFpa &operator=(ServiceFpa &&) = default;
 };
 
 class ServiceChat : public Service {
@@ -284,7 +284,7 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},
     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
-    {ServiceRtns::kServiceType, ServiceCreator<ServiceRtns>::New},
+    {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},
     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
 };
 

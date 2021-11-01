@@ -67,11 +67,11 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
-  void VerifyServiceRtns(Service *l, Service *r) {
+  void VerifyServiceFpa(Service *l, Service *r) {
     VerifyService(l, r);
 
-    (void)dynamic_cast<ServiceRtns *>(l);
-    (void)dynamic_cast<ServiceRtns *>(r);
+    (void)dynamic_cast<ServiceFpa *>(l);
+    (void)dynamic_cast<ServiceFpa *>(r);
   }
 
   void VerifyServiceChat(Service *l, Service *r) {
@@ -112,7 +112,7 @@ class AccessToken2_test : public testing::Test {
         {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
         {ServiceStreaming::kServiceType,
          &AccessToken2_test::VerifyServiceStreaming},
-        {ServiceRtns::kServiceType, &AccessToken2_test::VerifyServiceRtns},
+        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
     };
 
@@ -251,8 +251,8 @@ class AccessToken2_test : public testing::Test {
     streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream,
                             expire_);
 
-    std::unique_ptr<Service> rtns(new ServiceRtns());
-    rtns->AddPrivilege(ServiceRtns::kPrivilegeLogin, expire_);
+    std::unique_ptr<Service> fpa(new ServiceFpa());
+    fpa->AddPrivilege(ServiceFpa::kPrivilegeLogin, expire_);
 
     std::unique_ptr<Service> chat(new ServiceChat(account_));
     chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
@@ -260,7 +260,7 @@ class AccessToken2_test : public testing::Test {
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
     key.AddService(std::move(streaming));
-    key.AddService(std::move(rtns));
+    key.AddService(std::move(fpa));
     key.AddService(std::move(chat));
 
     std::string expected =
