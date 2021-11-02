@@ -109,17 +109,19 @@ class ServiceStreaming(Service):
         return buffer
 
 
-class ServiceRtns(Service):
+class ServiceFpa(Service):
     kServiceType = 4
 
+    kPrivilegeLogin = 1
+
     def __init__(self):
-        super(ServiceRtns, self).__init__(ServiceRtns.kServiceType)
+        super(ServiceFpa, self).__init__(ServiceFpa.kServiceType)
 
     def pack(self):
-        return super(ServiceRtns, self).pack()
+        return super(ServiceFpa, self).pack()
 
     def unpack(self, buffer):
-        buffer = super(ServiceRtns, self).unpack(buffer)
+        buffer = super(ServiceFpa, self).unpack(buffer)
         return buffer
 
 
@@ -147,7 +149,7 @@ class AccessToken:
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceStreaming.kServiceType: ServiceStreaming,
-        ServiceRtns.kServiceType: ServiceRtns,
+        ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat
     }
 

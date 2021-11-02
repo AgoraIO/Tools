@@ -67,11 +67,11 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
-  void VerifyServiceRtns(Service *l, Service *r) {
+  void VerifyServiceFpa(Service *l, Service *r) {
     VerifyService(l, r);
 
-    (void)dynamic_cast<ServiceRtns *>(l);
-    (void)dynamic_cast<ServiceRtns *>(r);
+    (void)dynamic_cast<ServiceFpa *>(l);
+    (void)dynamic_cast<ServiceFpa *>(r);
   }
 
   void VerifyServiceChat(Service *l, Service *r) {
@@ -112,7 +112,7 @@ class AccessToken2_test : public testing::Test {
         {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
         {ServiceStreaming::kServiceType,
          &AccessToken2_test::VerifyServiceStreaming},
-        {ServiceRtns::kServiceType, &AccessToken2_test::VerifyServiceRtns},
+        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
     };
 
@@ -251,7 +251,8 @@ class AccessToken2_test : public testing::Test {
     streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream,
                             expire_);
 
-    std::unique_ptr<Service> rtns(new ServiceRtns());
+    std::unique_ptr<Service> fpa(new ServiceFpa());
+    fpa->AddPrivilege(ServiceFpa::kPrivilegeLogin, expire_);
 
     std::unique_ptr<Service> chat(new ServiceChat(account_));
     chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
@@ -259,14 +260,14 @@ class AccessToken2_test : public testing::Test {
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
     key.AddService(std::move(streaming));
-    key.AddService(std::move(rtns));
+    key.AddService(std::move(fpa));
     key.AddService(std::move(chat));
 
     std::string expected =
-        "007eJxTYAh5UWu1drfhsnu9etvupS0v/iFs+3PC/Sbl8gdht55xSusqMFiaGzg7GpumpJo"
-        "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYAWSLEAM4jOBSWYwyQImFRjMU"
-        "8yNjM1MU5MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kBM4mQoSS0"
-        "uiS8tTi1iZmBCMZ40I1mgToSYgCwDAGL1OcI=";
+        "007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYLA0N3B2NDZNSTU"
+        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAokWYAYxGcCk8xgkgVMKjCYp"
+        "5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklp"
+        "cEl9anFrEzMCEYjxpRrLAjWSFs5DlAYHiOdw=";
 
     VerifyAccessToken2(expected, &key);
   }
