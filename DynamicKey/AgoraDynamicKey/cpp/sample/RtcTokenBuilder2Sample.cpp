@@ -30,5 +30,18 @@ int main(int argc, char const *argv[]) {
       app_id, app_certificate, channel_name, account, UserRole::kRolePublisher,
       expiration_in_seconds);
   std::cout << "Token With UserAccount:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithUid(
+      app_id, app_certificate, channel_name, uid,
+      expiration_in_seconds, expiration_in_seconds,
+      expiration_in_seconds, expiration_in_seconds);
+  std::cout << "Token With Int Uid:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithUserAccount(
+      app_id, app_certificate, channel_name, account,
+      expiration_in_seconds, expiration_in_seconds,
+      expiration_in_seconds, expiration_in_seconds);
+  std::cout << "Token With UserAccount:" << result << std::endl;
+
   return 0;
 }
