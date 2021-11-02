@@ -24,30 +24,22 @@ class FpaTokenBuilder {
    @param app_id The App ID issued to you by Agora.
    @param app_certificate Certificate of the application that you registered in
    the Agora Dashboard.
-   @param token_expire represented by the number of seconds elapsed since now. If, for
-   example, you want to access the Agora FPA Service within 10 minutes after the
-   token is generated, set expireTimestamp as 600(seconds).
-   @param privilege_expire Reserved Field. 
-   @return The new Token.
+   @return The new Token. Token is available for 24 hours after generation
    */
    static std::string BuildToken(
        const std::string& app_id,
-       const std::string& app_certificate,
-       uint32_t token_expire = 3600,
-       uint32_t privilege_expire = 0);
+       const std::string& app_certificate);
 };
 
 inline std::string FpaTokenBuilder::BuildToken(
-    const std::string& app_id, const std::string& app_certificate,
-    uint32_t token_expire, uint32_t privilege_expire) {
+    const std::string& app_id, const std::string& app_certificate) {
   std::unique_ptr<Service> service(new ServiceFpa());
-  service->AddPrivilege(ServiceFpa::kPrivilegeLogin, privilege_expire);
+  service->AddPrivilege(ServiceFpa::kPrivilegeLogin, 0);
 
-  AccessToken2 generator(app_id, app_certificate, 0, token_expire);
+  AccessToken2 generator(app_id, app_certificate, 0, 24 * 3600);
   generator.AddService(std::move(service));
 
   return generator.Build();
-
 }
 
 }  // namespace tools
