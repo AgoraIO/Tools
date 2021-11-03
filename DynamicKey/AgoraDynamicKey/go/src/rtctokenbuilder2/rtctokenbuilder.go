@@ -27,7 +27,7 @@ const (
 //                  Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
 // return The RTC token.
 func BuildTokenWithUid(appId string, appCertificate string, channelName string, uid uint32, role Role, expire uint32) (string, error) {
-    return BuildTokenWithAccount(appId, appCertificate, channelName, accesstoken.GetUidStr(uid), role, expire)
+    return BuildTokenWithUserAccount(appId, appCertificate, channelName, accesstoken.GetUidStr(uid), role, expire)
 }
 
 // Build the RTC token with account.
@@ -43,7 +43,7 @@ func BuildTokenWithUid(appId string, appCertificate string, channelName string, 
 // expire:          represented by the number of seconds elapsed since now. If, for example, you want to access the
 //                  Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
 // return The RTC token.
-func BuildTokenWithAccount(appId string, appCertificate string, channelName string, account string, role Role, expire uint32) (string, error) {
+func BuildTokenWithUserAccount(appId string, appCertificate string, channelName string, account string, role Role, expire uint32) (string, error) {
     token := accesstoken.NewAccessToken(appId, appCertificate, expire)
 
     serviceRtc := accesstoken.NewServiceRtc(channelName, account)
@@ -53,6 +53,136 @@ func BuildTokenWithAccount(appId string, appCertificate string, channelName stri
         serviceRtc.AddPrivilege(accesstoken.PrivilegePublishVideoStream, expire)
         serviceRtc.AddPrivilege(accesstoken.PrivilegePublishDataStream, expire)
     }
+    token.AddService(serviceRtc)
+
+    return token.Build()
+}
+
+// Generates an RTC token with the specified privilege.
+//
+// This method supports generating a token with the following privileges:
+// - Joining an RTC channel.
+// - Publishing audio in an RTC channel.
+// - Publishing video in an RTC channel.
+// - Publishing data streams in an RTC channel.
+//
+// The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
+// enabled co-host authentication.
+//
+// A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
+// The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
+// or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
+// the respective timestamp for each privilege in your app logic. After receiving the callback, you need
+// to generate a new token, and then call renewToken to pass the new token to the SDK, or call joinChannel to re-join
+// the channel.
+//
+// @note
+// Agora recommends setting a reasonable timestamp for each privilege according to your scenario.
+// Suppose the expiration timestamp for joining the channel is set earlier than that for publishing audio.
+// When the token for joining the channel expires, the user is immediately kicked off the RTC channel
+// and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
+//
+// @param appId The App ID of your Agora project.
+// @param appCertificate The App Certificate of your Agora project.
+// @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+// - All lowercase English letters: a to z.
+// - All uppercase English letters: A to Z.
+// - All numeric characters: 0 to 9.
+// - The space character.
+// - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+// @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (232 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
+// @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
+// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes.
+// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubAudioPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubAudioPrivilegeExpire as the current Unix timestamp.
+// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubVideoPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubVideoPrivilegeExpire as the current Unix timestamp.
+// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubDataStreamPrivilegeExpire as the current Unix timestamp.
+func BuildTokenWithUidAndPrivilege(appId string, appCertificate string,
+    channelName string, uid uint32,
+    tokenExpire uint32,
+    joinChannelPrivilegeExpire uint32,
+    pubAudioPrivilegeExpire uint32,
+    pubVideoPrivilegeExpire uint32,
+    pubDataStreamPrivilegeExpire uint32) (string, error) {
+    return BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, accesstoken.GetUidStr(uid), tokenExpire,
+        joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire)
+}
+
+// Generates an RTC token with the specified privilege.
+//
+// This method supports generating a token with the following privileges:
+// - Joining an RTC channel.
+// - Publishing audio in an RTC channel.
+// - Publishing video in an RTC channel.
+// - Publishing data streams in an RTC channel.
+//
+// The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
+// enabled co-host authentication.
+//
+// A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
+// The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
+// or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
+// the respective timestamp for each privilege in your app logic. After receiving the callback, you need
+// to generate a new token, and then call renewToken to pass the new token to the SDK, or call joinChannel to re-join
+// the channel.
+//
+// @note
+// Agora recommends setting a reasonable timestamp for each privilege according to your scenario.
+// Suppose the expiration timestamp for joining the channel is set earlier than that for publishing audio.
+// When the token for joining the channel expires, the user is immediately kicked off the RTC channel
+// and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
+//
+// @param appId The App ID of your Agora project.
+// @param appCertificate The App Certificate of your Agora project.
+// @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+// - All lowercase English letters: a to z.
+// - All uppercase English letters: A to Z.
+// - All numeric characters: 0 to 9.
+// - The space character.
+// - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+// @param account The user account.
+// @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
+// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes.
+// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubAudioPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubAudioPrivilegeExpire as the current Unix timestamp.
+// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubVideoPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubVideoPrivilegeExpire as the current Unix timestamp.
+// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires, represented
+// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
+// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
+// set pubDataStreamPrivilegeExpire as the current Unix timestamp.
+func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string,
+    channelName string, account string,
+    tokenExpire uint32,
+    joinChannelPrivilegeExpire uint32,
+    pubAudioPrivilegeExpire uint32,
+    pubVideoPrivilegeExpire uint32,
+    pubDataStreamPrivilegeExpire uint32) (string, error) {
+    token := accesstoken.NewAccessToken(appId, appCertificate, tokenExpire)
+
+    serviceRtc := accesstoken.NewServiceRtc(channelName, account)
+    serviceRtc.AddPrivilege(accesstoken.PrivilegeJoinChannel, joinChannelPrivilegeExpire)
+    serviceRtc.AddPrivilege(accesstoken.PrivilegePublishAudioStream, pubAudioPrivilegeExpire)
+    serviceRtc.AddPrivilege(accesstoken.PrivilegePublishVideoStream, pubVideoPrivilegeExpire)
+    serviceRtc.AddPrivilege(accesstoken.PrivilegePublishDataStream, pubDataStreamPrivilegeExpire)
     token.AddService(serviceRtc)
 
     return token.Build()
