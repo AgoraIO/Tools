@@ -89,7 +89,7 @@ public class AccessToken2Test {
         accessToken.salt = salt;
 
         AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
-        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN, expire);
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN, expire);
 
         accessToken.addService(serviceRtm);
         String expected = "007eJxTYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPM5GUpSi0viS4tTiwBZVh6A";
@@ -141,7 +141,7 @@ public class AccessToken2Test {
         accessToken.addService(serviceRtc);
 
         AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
-        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN, expire);
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN, expire);
         accessToken.addService(serviceRtm);
 
         AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uid);
@@ -188,7 +188,7 @@ public class AccessToken2Test {
         assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
         assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
         assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC).getPrivileges().getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
-        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
+        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue));
     }
 
     @Test
@@ -202,7 +202,7 @@ public class AccessToken2Test {
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
         assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
-        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue));
+        assertEquals(expire, (int)accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue));
     }
 
     @Test

@@ -21,7 +21,7 @@ public class AccessToken2 {
     }
 
     public enum PrivilegeRtm {
-        PRIVILEGE_JOIN_LOGIN(1),
+        PRIVILEGE_LOGIN(1),
         ;
 
         public short intValue;

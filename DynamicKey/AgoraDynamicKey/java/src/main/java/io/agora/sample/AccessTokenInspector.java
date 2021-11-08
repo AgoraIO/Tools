@@ -73,9 +73,9 @@ public class AccessTokenInspector {
 
     private String toRtmPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
-        if (privileges.containsKey(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue)) {
+        if (privileges.containsKey(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue)) {
             privilegeStrList.add(String.format("JOIN_LOGIN(%d)",
-                    privileges.get(AccessToken2.PrivilegeRtm.PRIVILEGE_JOIN_LOGIN.intValue)));
+                    privileges.get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue)));
         }
         return String.join(",", privilegeStrList);
     }
