@@ -14,7 +14,7 @@ public class RtcTokenBuilder2Test {
     @Test
     public void buildTokenWithUid_ROLE_PUBLISHER() {
         RtcTokenBuilder2 rtcTokenBuilder = new RtcTokenBuilder2();
-        String token = rtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_PUBLISHER, expire);
+        String token = rtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_PUBLISHER, expire);
         AccessToken2 accessToken = new AccessToken2();
         accessToken.parse(token);
 
@@ -29,9 +29,9 @@ public class RtcTokenBuilder2Test {
     }
 
     @Test
-    public void buildTokenWithAccount_ROLE_PUBLISHER() {
+    public void buildTokenWithUserAccount_ROLE_PUBLISHER() {
         RtcTokenBuilder2 rtcTokenBuilder = new RtcTokenBuilder2();
-        String token = rtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_PUBLISHER, expire);
+        String token = rtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_PUBLISHER, expire);
         AccessToken2 accessToken = new AccessToken2();
         accessToken.parse(token);
 
@@ -46,9 +46,9 @@ public class RtcTokenBuilder2Test {
     }
 
     @Test
-    public void buildTokenWithAccount_ROLE_SUBSCRIBER() {
+    public void buildTokenWithUserAccount_ROLE_SUBSCRIBER() {
         RtcTokenBuilder2 rtcTokenBuilder = new RtcTokenBuilder2();
-        String token = rtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_SUBSCRIBER, expire);
+        String token = rtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_SUBSCRIBER, expire);
         AccessToken2 accessToken = new AccessToken2();
         accessToken.parse(token);
 

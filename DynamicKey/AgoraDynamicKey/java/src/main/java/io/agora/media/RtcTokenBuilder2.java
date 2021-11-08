@@ -30,7 +30,7 @@ public class RtcTokenBuilder2 {
      * @return The RTC token.
      */
     public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid, Role role, int expire) {
-        return buildTokenWithAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid), role, expire);
+        return buildTokenWithUserAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid), role, expire);
     }
 
     /**
@@ -48,7 +48,7 @@ public class RtcTokenBuilder2 {
      *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The RTC token.
      */
-    public String buildTokenWithAccount(String appId, String appCertificate, String channelName, String account, Role role, int expire) {
+    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, Role role, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
