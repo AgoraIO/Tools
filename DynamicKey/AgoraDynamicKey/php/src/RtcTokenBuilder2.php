@@ -45,7 +45,7 @@ class RtcTokenBuilder2
      */
     public static function buildTokenWithUserAccount($appId, $appCertificate, $channelName, $account, $role, $expire)
     {
-        $accessToken = new AccessToken2($appId, $appCertificate, $expire);
+        $token = new AccessToken2($appId, $appCertificate, $expire);
         $serviceRtc = new ServiceRtc($channelName, $account);
 
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $expire);
@@ -54,9 +54,9 @@ class RtcTokenBuilder2
             $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $expire);
             $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $expire);
         }
-        $accessToken->addService($serviceRtc);
+        $token->addService($serviceRtc);
 
-        return $accessToken->build();
+        return $token->build();
     }
 
     /**
@@ -177,15 +177,15 @@ class RtcTokenBuilder2
                                                                  $tokenExpire, $joinChannelPrivilegeExpire, $pubAudioPrivilegeExpire,
                                                                  $pubVideoPrivilegeExpire, $pubDataStreamPrivilegeExpire)
     {
-        $accessToken = new AccessToken2($appId, $appCertificate, $tokenExpire);
+        $token = new AccessToken2($appId, $appCertificate, $tokenExpire);
         $serviceRtc = new ServiceRtc($channelName, $account);
 
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $joinChannelPrivilegeExpire);
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, $pubAudioPrivilegeExpire);
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $pubVideoPrivilegeExpire);
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $pubDataStreamPrivilegeExpire);
-        $accessToken->addService($serviceRtc);
+        $token->addService($serviceRtc);
 
-        return $accessToken->build();
+        return $token->build();
     }
 }

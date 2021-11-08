@@ -115,6 +115,27 @@ class ServiceStreaming extends Service
     }
 }
 
+class ServiceFpa extends Service
+{
+    const SERVICE_TYPE = 4;
+    const PRIVILEGE_LOGIN = 1;
+
+    public function __construct()
+    {
+        parent::__construct(self::SERVICE_TYPE);
+    }
+
+    public function pack()
+    {
+        return parent::pack();
+    }
+
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+    }
+}
+
 class ServiceChat extends Service
 {
     const SERVICE_TYPE = 5;
@@ -221,6 +242,7 @@ class AccessToken2
             ServiceRtc::SERVICE_TYPE => new ServiceRtc(),
             ServiceRtm::SERVICE_TYPE => new ServiceRtm(),
             ServiceStreaming::SERVICE_TYPE => new ServiceStreaming(),
+            ServiceFpa::SERVICE_TYPE => new ServiceFpa(),
             ServiceChat::SERVICE_TYPE => new ServiceChat()
         ];
         for ($i = 0; $i < $serviceNum; $i++) {
