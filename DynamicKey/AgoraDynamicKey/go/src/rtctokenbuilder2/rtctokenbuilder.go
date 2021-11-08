@@ -108,13 +108,8 @@ func BuildTokenWithUserAccount(appId string, appCertificate string, channelName 
 // by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
 // current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
 // set pubDataStreamPrivilegeExpire as the current Unix timestamp.
-func BuildTokenWithUidAndPrivilege(appId string, appCertificate string,
-    channelName string, uid uint32,
-    tokenExpire uint32,
-    joinChannelPrivilegeExpire uint32,
-    pubAudioPrivilegeExpire uint32,
-    pubVideoPrivilegeExpire uint32,
-    pubDataStreamPrivilegeExpire uint32) (string, error) {
+func BuildTokenWithUidAndPrivilege(appId string, appCertificate string, channelName string, uid uint32,
+    tokenExpire uint32, joinChannelPrivilegeExpire uint32, pubAudioPrivilegeExpire uint32, pubVideoPrivilegeExpire uint32, pubDataStreamPrivilegeExpire uint32) (string, error) {
     return BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, accesstoken.GetUidStr(uid), tokenExpire,
         joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire)
 }
@@ -169,13 +164,8 @@ func BuildTokenWithUidAndPrivilege(appId string, appCertificate string,
 // by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
 // current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
 // set pubDataStreamPrivilegeExpire as the current Unix timestamp.
-func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string,
-    channelName string, account string,
-    tokenExpire uint32,
-    joinChannelPrivilegeExpire uint32,
-    pubAudioPrivilegeExpire uint32,
-    pubVideoPrivilegeExpire uint32,
-    pubDataStreamPrivilegeExpire uint32) (string, error) {
+func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, channelName string, account string,
+    tokenExpire uint32, joinChannelPrivilegeExpire uint32, pubAudioPrivilegeExpire uint32, pubVideoPrivilegeExpire uint32, pubDataStreamPrivilegeExpire uint32) (string, error) {
     token := accesstoken.NewAccessToken(appId, appCertificate, tokenExpire)
 
     serviceRtc := accesstoken.NewServiceRtc(channelName, account)
