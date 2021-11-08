@@ -133,7 +133,7 @@ public class AccessToken2 {
         if (uid == 0) {
             return "";
         }
-        return String.valueOf(uid);
+        return String.valueOf(uid & 0xFFFFFFFFL);
     }
 
     public static String getVersion() {
