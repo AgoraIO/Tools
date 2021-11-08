@@ -17,6 +17,10 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.__uid = 2882341273
         self.__account = '2882341273'
         self.__expire = 600
+        self.__join_channel_privilege_expire = 600
+        self.__pub_audio_privilege_expire = 600
+        self.__pub_video_privilege_expire = 600
+        self.__pub_data_stream_privilege_expire = 600
 
     def test_build_token_with_uid(self):
         token = RtcTokenBuilder.build_token_with_uid(self.__app_id, self.__app_cert, self.__channel_name, self.__uid,
@@ -57,3 +61,63 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.assertNotIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
         self.assertNotIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
         self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
+
+    def test_build_token_with_uid_and_privilege(self):
+        token = RtcTokenBuilder.build_token_with_uid_and_privilege(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__uid, self.__expire,
+            self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
+            self.__pub_video_privilege_expire, self.__pub_data_stream_privilege_expire)
+
+        parser = AccessToken()
+        parser.from_string(token)
+
+        self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
+        self.assertEqual(parser._AccessToken__expire, self.__expire)
+        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
+
+        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+
+        self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceRtc__uid, str(self.__uid).encode('utf-8'))
+        self.assertIn(ServiceRtc.kPrivilegeJoinChannel, parser_service._Service__privileges)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegeJoinChannel],
+                         self.__join_channel_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishAudioStream],
+                         self.__pub_audio_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishVideoStream],
+                         self.__pub_video_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishDataStream],
+                         self.__pub_data_stream_privilege_expire)
+        self.assertIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
+        self.assertIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
+        self.assertIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
+
+    def test_build_token_with_user_account_and_privilege(self):
+        token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__account, self.__expire,
+            self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
+            self.__pub_video_privilege_expire, self.__pub_data_stream_privilege_expire)
+
+        parser = AccessToken()
+        parser.from_string(token)
+
+        self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
+        self.assertEqual(parser._AccessToken__expire, self.__expire)
+        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
+
+        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+
+        self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceRtc__uid, self.__account.encode('utf-8'))
+        self.assertIn(ServiceRtc.kPrivilegeJoinChannel, parser_service._Service__privileges)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegeJoinChannel],
+                         self.__join_channel_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishAudioStream],
+                         self.__pub_audio_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishVideoStream],
+                         self.__pub_video_privilege_expire)
+        self.assertEqual(parser_service._Service__privileges[ServiceRtc.kPrivilegePublishDataStream],
+                         self.__pub_data_stream_privilege_expire)
+        self.assertIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
+        self.assertIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
+        self.assertIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
