@@ -22,7 +22,7 @@ class RtcTokenBuilder2Test(unittest.TestCase):
         self.__pub_video_privilege_expire = 600
         self.__pub_data_stream_privilege_expire = 600
 
-    def test_token_with_uid(self):
+    def test_build_token_with_uid(self):
         token = RtcTokenBuilder.build_token_with_uid(self.__app_id, self.__app_cert, self.__channel_name, self.__uid,
                                                      Role_Subscriber, self.__expire)
         parser = AccessToken()
@@ -42,8 +42,8 @@ class RtcTokenBuilder2Test(unittest.TestCase):
         self.assertNotIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
         self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
 
-    def test_token_with_account(self):
-        token = RtcTokenBuilder.build_token_with_account(self.__app_id, self.__app_cert, self.__channel_name,
+    def test_build_token_with_user_account(self):
+        token = RtcTokenBuilder.build_token_with_user_account(self.__app_id, self.__app_cert, self.__channel_name,
                                                          self.__account, Role_Subscriber, self.__expire)
         parser = AccessToken()
         parser.from_string(token)

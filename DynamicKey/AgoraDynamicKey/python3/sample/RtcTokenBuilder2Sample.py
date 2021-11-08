@@ -21,7 +21,7 @@ def main():
                                                  expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
-    token = RtcTokenBuilder.build_token_with_account(app_id, app_certificate, channel_name, account, Role_Subscriber,
+    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account, Role_Subscriber,
                                                      expiration_in_seconds)
     print("Token with user account: {}".format(token))
 

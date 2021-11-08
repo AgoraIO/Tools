@@ -26,10 +26,10 @@ class RtcTokenBuilder:
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
         :return: The RTC token.
         """
-        return RtcTokenBuilder.build_token_with_account(app_id, app_certificate, channel_name, uid, role, expire)
+        return RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid, role, expire)
 
     @staticmethod
-    def build_token_with_account(app_id, app_certificate, channel_name, account, role, expire):
+    def build_token_with_user_account(app_id, app_certificate, channel_name, account, role, expire):
         """
         Build the RTC token with account.
         :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
