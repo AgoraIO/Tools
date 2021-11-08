@@ -47,14 +47,14 @@ class RtcTokenBuilder:
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
 
-        rtc_service = ServiceRtc(channel_name, account)
-        rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expire)
+        service_rtc = ServiceRtc(channel_name, account)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expire)
         if role == Role_Publisher:
-            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, expire)
-            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, expire)
-            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishDataStream, expire)
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, expire)
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, expire)
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, expire)
+        token.add_service(service_rtc)
 
-        token.add_service(rtc_service)
         return token.build()
 
     @staticmethod
@@ -172,11 +172,11 @@ class RtcTokenBuilder:
         """
         token = AccessToken(app_id, app_certificate, expire=token_expire)
 
-        rtc_service = ServiceRtc(channel_name, account)
-        rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, join_channel_privilege_expire)
-        rtc_service.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, pub_audio_privilege_expire)
-        rtc_service.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, pub_video_privilege_expire)
-        rtc_service.add_privilege(ServiceRtc.kPrivilegePublishDataStream, pub_data_stream_privilege_expire)
+        service_rtc = ServiceRtc(channel_name, account)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, join_channel_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, pub_audio_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, pub_video_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, pub_data_stream_privilege_expire)
+        token.add_service(service_rtc)
 
-        token.add_service(rtc_service)
         return token.build()
