@@ -11,6 +11,6 @@ $expireTimeInSeconds = 600;
 $token = RtcTokenBuilder2::buildTokenWithUid($appId, $appCertificate, $channelName, $uid, RtcTokenBuilder2::ROLE_PUBLISHER, $expireTimeInSeconds);
 echo 'Token with int uid: ' . $token . PHP_EOL;
 
-$token = RtcTokenBuilder2::buildTokenWithAccount($appId, $appCertificate, $channelName, $uidStr, RtcTokenBuilder2::ROLE_PUBLISHER, $expireTimeInSeconds);
+$token = RtcTokenBuilder2::buildTokenWithUserAccount($appId, $appCertificate, $channelName, $uidStr, RtcTokenBuilder2::ROLE_PUBLISHER, $expireTimeInSeconds);
 echo 'Token with account: ' . $token . PHP_EOL;
 ?>
