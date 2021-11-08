@@ -112,7 +112,7 @@ class AccessToken2Test
         $accessToken->addService($serviceRtc);
 
         $serviceRtm = new ServiceRtm($this->userId);
-        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_JOIN_LOGIN, $this->expire);
+        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $this->expire);
         $accessToken->addService($serviceRtm);
 
         $serviceChat = new ServiceChat($this->chatUserId);
@@ -160,7 +160,7 @@ class AccessToken2Test
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_JOIN_LOGIN]);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
         // CHAT
         Util::assertEqual(ServiceChat::SERVICE_TYPE, $accessToken->services[ServiceChat::SERVICE_TYPE]->type);
         Util::assertEqual($this->chatUserId, $accessToken->services[ServiceChat::SERVICE_TYPE]->userId);
@@ -179,7 +179,7 @@ class AccessToken2Test
         Util::assertEqual($this->salt, $accessToken->salt);
         Util::assertEqual(1, count($accessToken->services));
         Util::assertEqual(ServiceRtm::SERVICE_TYPE, $accessToken->services[ServiceRtm::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_JOIN_LOGIN]);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
     }
 
     public function test_parse_TokenChat_user()

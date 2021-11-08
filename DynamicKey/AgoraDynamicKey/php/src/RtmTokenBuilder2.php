@@ -21,7 +21,7 @@ class RtmTokenBuilder2
         $accessToken = new AccessToken2($appId, $appCertificate, $expire);
         $serviceRtm = new ServiceRtm($userId);
 
-        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_JOIN_LOGIN, $expire);
+        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $expire);
         $accessToken->addService($serviceRtm);
 
         return $accessToken->build();

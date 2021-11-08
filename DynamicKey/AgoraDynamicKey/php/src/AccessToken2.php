@@ -66,7 +66,7 @@ class ServiceRtc extends Service
 class ServiceRtm extends Service
 {
     const SERVICE_TYPE = 2;
-    const PRIVILEGE_JOIN_LOGIN = 1;
+    const PRIVILEGE_LOGIN = 1;
     public $userId;
 
     public function __construct($userId = "")

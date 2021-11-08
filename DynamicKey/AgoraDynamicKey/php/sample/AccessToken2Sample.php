@@ -18,7 +18,7 @@ $accessToken->addService($serviceRtc);
 
 // grant rtm privileges
 $serviceRtm = new ServiceRtm($uidStr);
-$serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_JOIN_LOGIN, $expireTimeInSeconds);
+$serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $expireTimeInSeconds);
 $accessToken->addService($serviceRtm);
 
 // grant chat privileges

@@ -25,7 +25,7 @@ class RtmTokenBuilder2Test
         Util::assertEqual($this->expire, $accessToken->expire);
         Util::assertEqual($this->userId, $accessToken->services[ServiceRtm::SERVICE_TYPE]->userId);
         Util::assertEqual(ServiceRtm::SERVICE_TYPE, $accessToken->services[ServiceRtm::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_JOIN_LOGIN]);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
     }
 }
 
