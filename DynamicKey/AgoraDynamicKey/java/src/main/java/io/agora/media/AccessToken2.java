@@ -43,12 +43,24 @@ public class AccessToken2 {
         }
     }
 
+    public enum PrivilegeFpa {
+        PRIVILEGE_LOGIN(1),
+        ;
+
+        public short intValue;
+
+        PrivilegeFpa(int value) {
+            intValue = (short) value;
+        }
+    }
+
     public enum PrivilegeChat {
         PRIVILEGE_CHAT_USER(1),
         PRIVILEGE_CHAT_APP(2),
         ;
 
         public short intValue;
+
         PrivilegeChat(int value) {
             intValue = (short) value;
         }
@@ -58,6 +70,7 @@ public class AccessToken2 {
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
     public static final short SERVICE_TYPE_STREAMING = 3;
+    public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
 
     public String appCert = "";
@@ -114,6 +127,9 @@ public class AccessToken2 {
         }
         if (serviceType == SERVICE_TYPE_STREAMING) {
             return new ServiceStreaming();
+        }
+        if (serviceType == SERVICE_TYPE_FPA) {
+            return new ServiceFpa();
         }
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
@@ -179,6 +195,10 @@ public class AccessToken2 {
         }
 
         public void addPrivilegeRtm(PrivilegeRtm privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        public void addPrivilegeFpa(PrivilegeFpa privilege, int expire) {
             this.privileges.put(privilege.intValue, expire);
         }
 
@@ -284,6 +304,20 @@ public class AccessToken2 {
             super.unpack(byteBuf);
             this.channelName = byteBuf.readString();
             this.uid = byteBuf.readString();
+        }
+    }
+
+    public static class ServiceFpa extends Service {
+        public ServiceFpa() {
+            this.type = SERVICE_TYPE_FPA;
+        }
+
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf);
+        }
+
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
         }
     }
 
