@@ -71,3 +71,35 @@ exports.buildTokenWithUserAccount_PUBLISHER_Test = function (test) {
     test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream])
     test.done()
 }
+
+exports.buildTokenWithUidAndPrivilege_Test = function (test) {
+    let token = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appId, appCertificate, channelName, uid, expire, expire, expire, expire, expire)
+    let accessToken = new AccessToken2('', '', 0, 0)
+    accessToken.from_string(token)
+
+    test.equal(appId, accessToken.appId)
+    test.equal(expire, accessToken.expire)
+    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name)
+    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid)
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream])
+    test.done()
+}
+
+exports.BuildTokenWithUserAccountAndPrivilege_Test = function (test) {
+    let token = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, uidStr, expire, expire, expire, expire, expire)
+    let accessToken = new AccessToken2('', '', 0, 0)
+    accessToken.from_string(token)
+
+    test.equal(appId, accessToken.appId)
+    test.equal(expire, accessToken.expire)
+    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name)
+    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid)
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream])
+    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream])
+    test.done()
+}
