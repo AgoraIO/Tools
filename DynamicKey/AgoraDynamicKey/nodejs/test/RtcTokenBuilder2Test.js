@@ -43,8 +43,8 @@ exports.buildTokenWithUid_PUBLISHER_Test = function (test) {
     test.done()
 }
 
-exports.buildTokenWithAccount_SUBSCRIBER_Test = function (test) {
-    let token = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, uidStr, Role.SUBSCRIBER, expire)
+exports.buildTokenWithUserAccount_SUBSCRIBER_Test = function (test) {
+    let token = RtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, Role.SUBSCRIBER, expire)
     let accessToken = new AccessToken2('', '', 0, 0)
     accessToken.from_string(token)
 
@@ -56,8 +56,8 @@ exports.buildTokenWithAccount_SUBSCRIBER_Test = function (test) {
     test.done()
 }
 
-exports.buildTokenWithAccount_PUBLISHER_Test = function (test) {
-    let token = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, uid, Role.PUBLISHER, expire)
+exports.buildTokenWithUserAccount_PUBLISHER_Test = function (test) {
+    let token = RtcTokenBuilder.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, Role.PUBLISHER, expire)
     let accessToken = new AccessToken2('', '', 0, 0)
     accessToken.from_string(token)
 

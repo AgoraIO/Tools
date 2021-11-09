@@ -28,7 +28,7 @@ class RtcTokenBuilder {
      * @return The new Token.
      */
     static buildTokenWithUid(appId, appCertificate, channelName, uid, role, expire) {
-        return this.buildTokenWithAccount(appId, appCertificate, channelName, uid, role, expire)
+        return this.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, role, expire)
     }
 
     /**
@@ -48,7 +48,7 @@ class RtcTokenBuilder {
      * @param {*} expire represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
      * @return The new Token.
      */
-    static buildTokenWithAccount(appId, appCertificate, channelName, account, role, expire) {
+    static buildTokenWithUserAccount(appId, appCertificate, channelName, account, role, expire) {
         let token = new AccessToken(appId, appCertificate, null, expire)
 
         let serviceRtc = new ServiceRtc(channelName, account)
