@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "crc-32": "^1.2.0",
-    "cuint": "0.2.2"
+    "cuint": "0.2.2",
+    "nodeunit": "^0.11.3"
   }
 }
