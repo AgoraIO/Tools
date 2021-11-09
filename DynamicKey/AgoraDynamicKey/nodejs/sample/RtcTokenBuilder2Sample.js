@@ -11,7 +11,7 @@ const expirationInSeconds = 3600
 
 // Build token with uid
 const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, expirationInSeconds)
-console.log("Token with uid: " + tokenA)
+console.log("Token with int uid: " + tokenA)
 
 // Build token with user account
 const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(appID, appCertificate, channelName, account, role, expirationInSeconds)
@@ -19,7 +19,7 @@ console.log("Token with user account: " + tokenB)
 
 const tokenC = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid,
     expirationInSeconds, expirationInSeconds, expirationInSeconds, expirationInSeconds, expirationInSeconds)
-console.log("Token with uid and privilege:" + tokenC)
+console.log("Token with int uid and privilege:" + tokenC)
 
 const tokenD = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(appID, appCertificate, channelName, account,
     expirationInSeconds, expirationInSeconds, expirationInSeconds, expirationInSeconds, expirationInSeconds)

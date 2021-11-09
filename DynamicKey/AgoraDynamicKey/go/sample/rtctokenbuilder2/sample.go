@@ -17,14 +17,14 @@ func main() {
     if err != nil {
         fmt.Println(err)
     } else {
-        fmt.Printf("Token with uid: %s\n", result)
+        fmt.Printf("Token with int uid: %s\n", result)
     }
 
     result, err = rtctokenbuilder.BuildTokenWithUserAccount(appID, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, expirationInSeconds)
     if err != nil {
         fmt.Println(err)
     } else {
-        fmt.Printf("Token with userAccount: %s\n", result)
+        fmt.Printf("Token with user account: %s\n", result)
     }
 
     result, err1 := rtctokenbuilder.BuildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid,
@@ -32,7 +32,7 @@ func main() {
     if err1 != nil {
         fmt.Println(err)
     } else {
-        fmt.Printf("Token with uid and privilege: %s\n", result)
+        fmt.Printf("Token with int uid and privilege: %s\n", result)
     }
 
     result, err1 = rtctokenbuilder.BuildTokenWithUserAccountAndPrivilege(appID, appCertificate, channelName, uidStr,
@@ -41,6 +41,6 @@ func main() {
     if err1 != nil {
         fmt.Println(err)
     } else {
-        fmt.Printf("Token with userAccount and privilege: %s\n", result)
+        fmt.Printf("Token with user account and privilege: %s\n", result)
     }
 }

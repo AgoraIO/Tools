@@ -21,9 +21,19 @@ def main():
                                                  expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
-    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account, Role_Subscriber,
-                                                     expiration_in_seconds)
+    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
+                                                          Role_Subscriber, expiration_in_seconds)
     print("Token with user account: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_uid_and_privilege(
+        app_id, app_certificate, channel_name, uid, expiration_in_seconds, expiration_in_seconds,
+        expiration_in_seconds, expiration_in_seconds, expiration_in_seconds)
+    print("Token with int uid and privilege: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
+        app_id, app_certificate, channel_name, account, expiration_in_seconds, expiration_in_seconds,
+        expiration_in_seconds, expiration_in_seconds, expiration_in_seconds)
+    print("Token with user account and privilege: {}".format(token))
 
 
 if __name__ == "__main__":
