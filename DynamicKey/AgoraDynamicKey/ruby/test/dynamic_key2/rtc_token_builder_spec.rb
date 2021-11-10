@@ -27,8 +27,8 @@ describe 'AgoraDynamicKey2::RtcTokenBuilder' do
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(expire)
   end
 
-  it 'test_build_token_with_account_ROLE_PUBLISHER' do
-    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire)
+  it 'test_build_token_with_user_account_ROLE_PUBLISHER' do
+    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
@@ -45,8 +45,8 @@ describe 'AgoraDynamicKey2::RtcTokenBuilder' do
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(expire)
   end
 
-  it 'test_build_token_with_account_ROLE_SUBSCRIBER' do
-    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, expire)
+  it 'test_build_token_with_user_account_ROLE_SUBSCRIBER' do
+    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
