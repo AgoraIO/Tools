@@ -95,6 +95,27 @@ class ServiceRtm extends Service {
 
 ServiceRtm.kPrivilegeLogin = 1
 
+
+const kFpaServiceType = 4
+
+class ServiceFpa extends Service {
+    constructor() {
+        super(kFpaServiceType)
+    }
+
+    pack() {
+        return super.pack()
+    }
+
+    unpack(buffer) {
+        let bufReader = super.unpack(buffer)
+        return bufReader
+    }
+}
+
+ServiceFpa.kPrivilegeLogin = 1
+
+
 const kChatServiceType = 5
 
 class ServiceChat extends Service {
@@ -334,9 +355,10 @@ var ReadByteBuf = function (bytes) {
 AccessToken2.kServices = {}
 AccessToken2.kServices[kRtcServiceType] = ServiceRtc
 AccessToken2.kServices[kRtmServiceType] = ServiceRtm
+AccessToken2.kServices[kFpaServiceType] = ServiceFpa
 AccessToken2.kServices[kChatServiceType] = ServiceChat
 
 module.exports = {
-    AccessToken2, ServiceRtc, ServiceRtm, ServiceChat,
-    kRtcServiceType, kRtmServiceType, kChatServiceType
+    AccessToken2, ServiceRtc, ServiceRtm, ServiceFpa, ServiceChat,
+    kRtcServiceType, kRtmServiceType, kFpaServiceType, kChatServiceType
 }
