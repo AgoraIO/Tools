@@ -101,6 +101,23 @@ module AgoraDynamicKey2
     end
   end
 
+  class ServiceFpa < Service
+    SERVICE_TYPE = 4
+    PRIVILEGE_LOGIN = 1
+
+    def initialize()
+      super(SERVICE_TYPE)
+    end
+
+    def pack
+      super()
+    end
+
+    def unpack(data)
+      _, data = super(data)
+    end
+  end
+
   class AccessToken
     attr_accessor :app_cert, :app_id, :expire, :issue_ts, :salt, :services
 
@@ -108,7 +125,8 @@ module AgoraDynamicKey2
     VERSION_LENGTH = 3
     SERVICES = {ServiceRtc::SERVICE_TYPE => ServiceRtc,
                 ServiceRtm::SERVICE_TYPE => ServiceRtm,
-                ServiceStreaming::SERVICE_TYPE => ServiceStreaming}.freeze
+                ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
+                ServiceFpa::SERVICE_TYPE => ServiceFpa}.freeze
 
     def initialize(app_id = '', app_cert = '', expire = 900)
       @app_id = app_id
@@ -130,7 +148,7 @@ module AgoraDynamicKey2
 
       signing = fetch_sign
       data = Util.pack_string(@app_id) + Util.pack_uint32(@issue_ts) + Util.pack_uint32(@expire) \
-                 + Util.pack_uint32(@salt) + Util.pack_uint16(@services.size)
+                   + Util.pack_uint32(@salt) + Util.pack_uint16(@services.size)
 
       @services.each do |_, service|
         data += service.pack
