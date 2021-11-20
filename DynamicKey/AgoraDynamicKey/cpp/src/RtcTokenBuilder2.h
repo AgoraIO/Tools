@@ -59,7 +59,8 @@ class RtcTokenBuilder2 {
    still has the same privileges as Role_Publisher.
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
-   token is generated, set expireTimestamp as 600(seconds).
+   token is generated (both for token life cycle and privilege life cycle),
+   set expireTimestamp as 600(seconds).
    @return The new Token.
    */
   static std::string BuildTokenWithUid(const std::string& app_id,
@@ -95,7 +96,8 @@ class RtcTokenBuilder2 {
    still has the same privileges as Role_Publisher.
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
-   token is generated, set expireTimestamp as 600(seconds).
+   token is generated, (both for token life cycle and privilege life cycle),
+   set expireTimestamp as 600(seconds).
    @return The new Token.
    */
   static std::string BuildTokenWithUserAccount(
@@ -137,21 +139,11 @@ class RtcTokenBuilder2 {
   * - The space character.
   * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
   * @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (232 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
-  * @param join_channel_privilege_expire The Unix timestamp when the privilege for joining the channel expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set join_channel_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes.
-  * @param pub_audio_privilege_expire The Unix timestamp when the privilege for publishing audio expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_audio_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_audio_privilege_expire as the current Unix timestamp.
-  * @param pub_video_privilege_expire The Unix timestamp when the privilege for publishing video expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_video_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_video_privilege_expire as the current Unix timestamp.
-  * @param pub_data_stream_privilege_expire The Unix timestamp when the privilege for publishing data streams expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_data_stream_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_data_stream_privilege_expire as the current Unix timestamp.
+  * @param token_expire represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
+  * @param join_channel_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+  * @param pub_audio_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+  * @param pub_video_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+  * @param pub_data_stream_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
   * @return The new Token
   */
   static std::string BuildTokenWithUid(
@@ -159,6 +151,7 @@ class RtcTokenBuilder2 {
        const std::string& app_certificate,
        const std::string& channel_name,
        uint32_t uid,
+       uint32_t token_expire,
        uint32_t join_channel_privilege_expire = 0,
        uint32_t pub_audio_privilege_expire = 0,
        uint32_t pub_video_privilege_expire = 0,
@@ -198,21 +191,11 @@ class RtcTokenBuilder2 {
   * - The space character.
   * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
   * @param user_account The user account.
-  * @param join_channel_privilege_expire The Unix timestamp when the privilege for joining the channel expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set join_channel_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes.
-  * @param pub_audio_privilege_expire The Unix timestamp when the privilege for publishing audio expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_audio_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_audio_privilege_expire as the current Unix timestamp.
-  * @param pub_video_privilege_expire The Unix timestamp when the privilege for publishing video expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_video_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_video_privilege_expire as the current Unix timestamp.
-  * @param pub_data_stream_privilege_expire The Unix timestamp when the privilege for publishing data streams expires, represented
-  * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pub_data_stream_privilege_expire as the
-  * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-  * set pub_data_stream_privilege_expire as the current Unix timestamp.
+  * @param token_expire represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
+  * @param join_channel_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+  * @param pub_audio_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+  * @param pub_video_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+  * @param pub_data_stream_privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
   * @return The new Token
   */
   static std::string BuildTokenWithUserAccount(
@@ -220,6 +203,7 @@ class RtcTokenBuilder2 {
        const std::string& app_certificate,
        const std::string& channel_name,
        const std::string& user_account,
+       uint32_t token_expire,
        uint32_t join_channel_privilege_expire = 0,
        uint32_t pub_audio_privilege_expire = 0,
        uint32_t pub_video_privilege_expire = 0,
@@ -263,6 +247,7 @@ inline std::string RtcTokenBuilder2::BuildTokenWithUid(
     const std::string& app_certificate,
     const std::string& channel_name,
     uint32_t uid,
+    uint32_t token_expire,
     uint32_t join_channel_privilege_expire,
     uint32_t pub_audio_privilege_expire,
     uint32_t pub_video_privilege_expire,
@@ -275,6 +260,7 @@ inline std::string RtcTokenBuilder2::BuildTokenWithUid(
                                    app_certificate,
                                    channel_name,
                                    account,
+                                   token_expire,
                                    join_channel_privilege_expire,
                                    pub_audio_privilege_expire,
                                    pub_video_privilege_expire,
@@ -286,6 +272,7 @@ inline std::string RtcTokenBuilder2::BuildTokenWithUserAccount(
     const std::string& app_certificate,
     const std::string& channel_name,
     const std::string& user_account,
+    uint32_t token_expire,
     uint32_t join_channel_privilege_expire,
     uint32_t pub_audio_privilege_expire,
     uint32_t pub_video_privilege_expire,
@@ -301,7 +288,7 @@ inline std::string RtcTokenBuilder2::BuildTokenWithUserAccount(
   service->AddPrivilege(
       ServiceRtc::kPrivilegePublishDataStream, pub_data_stream_privilege_expire);
 
-  AccessToken2 generator(app_id, app_certificate, 0);
+  AccessToken2 generator(app_id, app_certificate, 0, token_expire);
   generator.AddService(std::move(service));
 
   return generator.Build();
