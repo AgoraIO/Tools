@@ -15,7 +15,7 @@ public class ChatTokenBuilder2 {
      *                        optionalUid must be unique.
      * @param expire:         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The RTC token.
+     * @return The USER token.
      */
     public String buildUserToken(String appId, String appCertificate, String userId, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -41,7 +41,7 @@ public class ChatTokenBuilder2 {
      *                        the Agora Dashboard. See Get an App Certificate.
      * @param expire:         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The RTC token.
+     * @return The APP token.
      */
     public String buildAppToken(String appId, String appCertificate, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
