@@ -322,29 +322,29 @@ public class AccessToken2 {
     }
 
     public static class ServiceChat extends Service {
-        public String userId;
+        public String uuid;
 
         public ServiceChat() {
             this.type = SERVICE_TYPE_CHAT;
-            this.userId = "";
+            this.uuid = "";
         }
 
-        public ServiceChat(String userId) {
+        public ServiceChat(String uuid) {
             this.type = SERVICE_TYPE_CHAT;
-            this.userId = userId;
+            this.uuid = uuid;
         }
 
         public String getUserId() {
-            return this.userId;
+            return this.uuid;
         }
 
         public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf).put(this.userId);
+            return super.pack(buf).put(this.uuid);
         }
 
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
-            this.userId = byteBuf.readString();
+            this.uuid = byteBuf.readString();
         }
     }
 }
