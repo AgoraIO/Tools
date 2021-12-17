@@ -48,32 +48,6 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
-  void VerifyServiceRtm(Service *l, Service *r) {
-    VerifyService(l, r);
-
-    auto l_rtc = dynamic_cast<ServiceRtm *>(l);
-    auto r_rtc = dynamic_cast<ServiceRtm *>(r);
-
-    EXPECT_EQ(l_rtc->user_id_, r_rtc->user_id_);
-  }
-
-  void VerifyServiceStreaming(Service *l, Service *r) {
-    VerifyService(l, r);
-
-    auto l_rtc = dynamic_cast<ServiceStreaming *>(l);
-    auto r_rtc = dynamic_cast<ServiceStreaming *>(r);
-
-    EXPECT_EQ(l_rtc->channel_name_, r_rtc->channel_name_);
-    EXPECT_EQ(l_rtc->account_, r_rtc->account_);
-  }
-
-  void VerifyServiceFpa(Service *l, Service *r) {
-    VerifyService(l, r);
-
-    (void)dynamic_cast<ServiceFpa *>(l);
-    (void)dynamic_cast<ServiceFpa *>(r);
-  }
-
   void VerifyServiceChat(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -109,10 +83,6 @@ class AccessToken2_test : public testing::Test {
         void (AccessToken2_test::*)(Service *, Service *);
     static const std::map<uint16_t, VerifyServiceHandler> kVerifyServices = {
         {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},
-        {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
-        {ServiceStreaming::kServiceType,
-         &AccessToken2_test::VerifyServiceStreaming},
-        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
     };
 
@@ -181,23 +151,6 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
-  void TestAccessToken2Rtm() {
-    AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
-    key.salt_ = 1;
-
-    std::unique_ptr<Service> service(new ServiceRtm(account_));
-    service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
-
-    key.AddService(std::move(service));
-
-    std::string expected = 
-        "007eJxTYEhuZrAR/XT+XPihI+6t4t5F9RtUltw9em3Pwi2sr6P/lAspMFiaGzg7GpumpJo"
-        "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPO5GIwsLIyMTQyNzI0Bn"
-        "dAdKg==";
-
-    VerifyAccessToken2(expected, &key);
-  }
-
   void TestAccessToken2ChatUser() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -241,33 +194,17 @@ class AccessToken2_test : public testing::Test {
     rtc->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, expire_);
     rtc->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, expire_);
 
-    std::unique_ptr<Service> rtm(new ServiceRtm(user_id_));
-    rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
-
-    std::unique_ptr<Service> streaming(
-        new ServiceStreaming(channel_name_, uid_));
-    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream,
-                            expire_);
-    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream,
-                            expire_);
-
-    std::unique_ptr<Service> fpa(new ServiceFpa());
-    fpa->AddPrivilege(ServiceFpa::kPrivilegeLogin, expire_);
-
     std::unique_ptr<Service> chat(new ServiceChat(account_));
     chat->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
 
     key.AddService(std::move(rtc));
-    key.AddService(std::move(rtm));
-    key.AddService(std::move(streaming));
-    key.AddService(std::move(fpa));
     key.AddService(std::move(chat));
 
     std::string expected =
-        "007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYLA0N3B2NDZNSTU"
-        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAokWYAYxGcCk8xgkgVMKjCYp"
-        "5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklp"
-        "cEl9anFrEzMCEYjxpRrLAjWSFs5DlAYHiOdw=";
+        "007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqpl"
+        "BsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8x"
+        "dzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCc"
+        "pOg==";
 
     VerifyAccessToken2(expected, &key);
   }
@@ -292,9 +229,6 @@ TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) {
 }
 TEST_F(AccessToken2_test, testAccessToken2WithStringUid) {
   TestAccessToken2WithStringUid();
-}
-TEST_F(AccessToken2_test, testAccessToken2Rtm) {
-  TestAccessToken2Rtm();
 }
 TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
   TestAccessToken2ChatUser();
