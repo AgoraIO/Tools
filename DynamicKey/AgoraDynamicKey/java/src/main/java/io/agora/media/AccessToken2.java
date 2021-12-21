@@ -20,40 +20,6 @@ public class AccessToken2 {
         }
     }
 
-    public enum PrivilegeRtm {
-        PRIVILEGE_LOGIN(1),
-        ;
-
-        public short intValue;
-
-        PrivilegeRtm(int value) {
-            intValue = (short) value;
-        }
-    }
-
-    public enum PrivilegeStreaming {
-        PRIVILEGE_PUBLISH_MIX_STREAM(1),
-        PRIVILEGE_PUBLISH_RAW_STREAM(2),
-        ;
-
-        public short intValue;
-
-        PrivilegeStreaming(int value) {
-            intValue = (short) value;
-        }
-    }
-
-    public enum PrivilegeFpa {
-        PRIVILEGE_LOGIN(1),
-        ;
-
-        public short intValue;
-
-        PrivilegeFpa(int value) {
-            intValue = (short) value;
-        }
-    }
-
     public enum PrivilegeChat {
         PRIVILEGE_CHAT_USER(1),
         PRIVILEGE_CHAT_APP(2),
@@ -68,9 +34,6 @@ public class AccessToken2 {
 
     private static final String VERSION = "007";
     public static final short SERVICE_TYPE_RTC = 1;
-    public static final short SERVICE_TYPE_RTM = 2;
-    public static final short SERVICE_TYPE_STREAMING = 3;
-    public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
 
     public String appCert = "";
@@ -121,15 +84,6 @@ public class AccessToken2 {
     public Service getService(short serviceType) {
         if (serviceType == SERVICE_TYPE_RTC) {
             return new ServiceRtc();
-        }
-        if (serviceType == SERVICE_TYPE_RTM) {
-            return new ServiceRtm();
-        }
-        if (serviceType == SERVICE_TYPE_STREAMING) {
-            return new ServiceStreaming();
-        }
-        if (serviceType == SERVICE_TYPE_FPA) {
-            return new ServiceFpa();
         }
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
@@ -194,14 +148,6 @@ public class AccessToken2 {
             this.privileges.put(privilege.intValue, expire);
         }
 
-        public void addPrivilegeRtm(PrivilegeRtm privilege, int expire) {
-            this.privileges.put(privilege.intValue, expire);
-        }
-
-        public void addPrivilegeFpa(PrivilegeFpa privilege, int expire) {
-            this.privileges.put(privilege.intValue, expire);
-        }
-
         public void addPrivilegeChat(PrivilegeChat privilege, int expire) {
             this.privileges.put(privilege.intValue, expire);
         }
@@ -253,71 +199,6 @@ public class AccessToken2 {
             super.unpack(byteBuf);
             this.channelName = byteBuf.readString();
             this.uid = byteBuf.readString();
-        }
-    }
-
-    public static class ServiceRtm extends Service {
-        public String userId;
-
-        public ServiceRtm() {
-            this.type = SERVICE_TYPE_RTM;
-        }
-
-        public ServiceRtm(String userId) {
-            this.type = SERVICE_TYPE_RTM;
-            this.userId = userId;
-        }
-
-        public String getUserId() {
-            return this.userId;
-        }
-
-        public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf).put(this.userId);
-        }
-
-        public void unpack(ByteBuf byteBuf) {
-            super.unpack(byteBuf);
-            this.userId = byteBuf.readString();
-        }
-    }
-
-    public static class ServiceStreaming extends Service {
-        public String channelName;
-        public String uid;
-
-        public ServiceStreaming() {
-            this.type = SERVICE_TYPE_STREAMING;
-        }
-
-        public ServiceStreaming(String channelName, String uid) {
-            this.type = SERVICE_TYPE_STREAMING;
-            this.channelName = channelName;
-            this.uid = uid;
-        }
-
-        public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf).put(this.channelName).put(this.uid);
-        }
-
-        public void unpack(ByteBuf byteBuf) {
-            super.unpack(byteBuf);
-            this.channelName = byteBuf.readString();
-            this.uid = byteBuf.readString();
-        }
-    }
-
-    public static class ServiceFpa extends Service {
-        public ServiceFpa() {
-            this.type = SERVICE_TYPE_FPA;
-        }
-
-        public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf);
-        }
-
-        public void unpack(ByteBuf byteBuf) {
-            super.unpack(byteBuf);
         }
     }
 

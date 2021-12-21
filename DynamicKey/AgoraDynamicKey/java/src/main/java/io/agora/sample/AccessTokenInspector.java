@@ -33,13 +33,6 @@ public class AccessTokenInspector {
             AccessToken2.ServiceRtc serviceRtc = (AccessToken2.ServiceRtc) service;
             return String.format("type:rtc, channel:%s, uid: %s, privileges: [%s]}", serviceRtc.getChannelName(),
                     serviceRtc.getUid(), toRtcPrivileges(serviceRtc.getPrivileges()));
-        } else if (service.getServiceType() == AccessToken2.SERVICE_TYPE_RTM) {
-            AccessToken2.ServiceRtm serviceRtm = (AccessToken2.ServiceRtm) service;
-            return String.format("type:rtm, user_id:%s, privileges:[%s]", serviceRtm.getUserId(),
-                    toRtmPrivileges(serviceRtm.getPrivileges()));
-        } else if (service.getServiceType() == AccessToken2.SERVICE_TYPE_STREAMING) {
-            AccessToken2.ServiceStreaming serviceStreaming = (AccessToken2.ServiceStreaming) service;
-            return String.format("type:streaming, privileges:[%s]", toStreamingPrivileges(serviceStreaming.getPrivileges()));
         } else if (service.getServiceType() == AccessToken2.SERVICE_TYPE_CHAT) {
             AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) service;
             return String.format("type:chat, user_id:%s, privileges:[%s]", serviceChat.getUserId(),
@@ -47,8 +40,6 @@ public class AccessTokenInspector {
         }
         return "unknown";
     }
-
-
 
     private String toRtcPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
@@ -67,28 +58,6 @@ public class AccessTokenInspector {
         if (privileges.containsKey(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM.intValue)) {
             privilegeStrList.add(String.format("PUBLISH_DATA_STREAM(%d)",
                     privileges.get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM.intValue)));
-        }
-        return String.join(",", privilegeStrList);
-    }
-
-    private String toRtmPrivileges(TreeMap<Short, Integer> privileges) {
-        List<String> privilegeStrList = new ArrayList<>(privileges.size());
-        if (privileges.containsKey(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue)) {
-            privilegeStrList.add(String.format("JOIN_LOGIN(%d)",
-                    privileges.get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue)));
-        }
-        return String.join(",", privilegeStrList);
-    }
-
-    private String toStreamingPrivileges(TreeMap<Short, Integer> privileges) {
-        List<String> privilegeStrList = new ArrayList<>(privileges.size());
-        if (privileges.containsKey(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_MIX_STREAM.intValue)) {
-            privilegeStrList.add(String.format("PUBLISH_MIX_STREAM(%d)",
-                    privileges.get(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_MIX_STREAM.intValue)));
-        }
-        if (privileges.containsKey(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_RAW_STREAM.intValue)) {
-            privilegeStrList.add(String.format("PUBLISH_RAW_STREAM(%d)",
-                    privileges.get(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_RAW_STREAM.intValue)));
         }
         return String.join(",", privilegeStrList);
     }
