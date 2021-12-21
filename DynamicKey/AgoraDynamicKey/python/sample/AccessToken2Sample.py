@@ -21,18 +21,14 @@ def main():
     rtc_service = ServiceRtc(channel_name, uid)
     rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expiration_in_seconds)
 
-    rtm_service = ServiceRtm(account)
-    rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, expiration_in_seconds)
-
     chat_service = ServiceChat(chat_user_id)
     chat_service.add_privilege(ServiceChat.kPrivilegeUser, expiration_in_seconds)
 
     token = AccessToken(app_id=app_id, app_certificate=app_certificate, expire=expiration_in_seconds)
     token.add_service(rtc_service)
-    token.add_service(rtm_service)
     token.add_service(chat_service)
 
-    print("Token for RTC, RTM and CHAT: {}".format(token.build()))
+    print("Token for RTC and CHAT: {}".format(token.build()))
 
 
 if __name__ == "__main__":

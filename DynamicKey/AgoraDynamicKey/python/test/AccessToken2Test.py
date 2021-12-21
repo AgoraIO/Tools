@@ -87,18 +87,12 @@ class AccessToken2Test(unittest.TestCase):
         rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, self.__expire)
         rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, self.__expire)
 
-        rtm = ServiceRtm(self.__user_id)
-        rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
-
         chat = ServiceChat(self.__uid_str)
         chat.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
 
         self.__token.add_service(rtc)
-        self.__token.add_service(rtm)
         self.__token.add_service(chat)
         result = self.__token.build()
 
-        expected = '007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTA' \
-                   'zTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYG' \
-                   'BmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q=='
+        expected = '007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg=='
         self.assertEqual(expected, result)

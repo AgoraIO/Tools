@@ -67,61 +67,6 @@ class ServiceRtc(Service):
         return buffer
 
 
-class ServiceRtm(Service):
-    kServiceType = 2
-
-    kPrivilegeLogin = 1
-
-    def __init__(self, user_id=''):
-        super(ServiceRtm, self).__init__(ServiceRtm.kServiceType)
-        self.__user_id = user_id.encode('utf-8')
-
-    def pack(self):
-        return super(ServiceRtm, self).pack() + pack_string(self.__user_id)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceRtm, self).unpack(buffer)
-        self.__user_id, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceStreaming(Service):
-    kServiceType = 3
-
-    kPrivilegePublishMixStream = 1
-    kPrivilegePublishRawStream = 2
-
-    def __init__(self, channel_name='', uid=0):
-        super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
-        self.__channel_name = channel_name.encode('utf-8')
-        self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
-
-    def pack(self):
-        return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceStreaming, self).unpack(buffer)
-        self.__channel_name, buffer = unpack_string(buffer)
-        self.__uid, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceFpa(Service):
-    kServiceType = 4
-
-    kPrivilegeLogin = 1
-
-    def __init__(self):
-        super(ServiceFpa, self).__init__(ServiceFpa.kServiceType)
-
-    def pack(self):
-        return super(ServiceFpa, self).pack()
-
-    def unpack(self, buffer):
-        buffer = super(ServiceFpa, self).unpack(buffer)
-        return buffer
-
-
 class ServiceChat(Service):
     kServiceType = 5
 
@@ -144,9 +89,6 @@ class ServiceChat(Service):
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
-        ServiceRtm.kServiceType: ServiceRtm,
-        ServiceStreaming.kServiceType: ServiceStreaming,
-        ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat
     }
 
