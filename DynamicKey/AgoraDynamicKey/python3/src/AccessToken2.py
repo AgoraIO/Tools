@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
-
 import time
 import hmac
 import zlib
@@ -12,7 +11,6 @@ from hashlib import sha256
 from collections import OrderedDict
 
 from .Packer import *
-
 
 VERSION_LENGTH = 3
 
@@ -70,67 +68,12 @@ class ServiceRtc(Service):
         return buffer
 
 
-class ServiceRtm(Service):
-    kServiceType = 2
-
-    kPrivilegeLogin = 1
-
-    def __init__(self, user_id=''):
-        super(ServiceRtm, self).__init__(ServiceRtm.kServiceType)
-        self.__user_id = user_id.encode('utf-8')
-
-    def pack(self):
-        return super(ServiceRtm, self).pack() + pack_string(self.__user_id)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceRtm, self).unpack(buffer)
-        self.__user_id, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceStreaming(Service):
-    kServiceType = 3
-
-    kPrivilegePublishMixStream = 1
-    kPrivilegePublishRawStream = 2
-
-    def __init__(self, channel_name='', uid=0):
-        super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
-        self.__channel_name = channel_name.encode('utf-8')
-        self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
-
-    def pack(self):
-        return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
-
-    def unpack(self, buffer):
-        buffer = super(ServiceStreaming, self).unpack(buffer)
-        self.__channel_name, buffer = unpack_string(buffer)
-        self.__uid, buffer = unpack_string(buffer)
-        return buffer
-
-
-class ServiceFpa(Service):
-    kServiceType = 4
-
-    kPrivilegeLogin = 1
-
-    def __init__(self):
-        super(ServiceFpa, self).__init__(ServiceFpa.kServiceType)
-
-    def pack(self):
-        return super(ServiceFpa, self).pack()
-
-    def unpack(self, buffer):
-        buffer = super(ServiceFpa, self).unpack(buffer)
-        return buffer
-
-
 class ServiceChat(Service):
     kServiceType = 5
 
     kPrivilegeUser = 1
     kPrivilegeApp = 2
-    
+
     def __init__(self, user_id=''):
         super(ServiceChat, self).__init__(ServiceChat.kServiceType)
         self.__user_id = user_id.encode('utf-8')
@@ -147,9 +90,6 @@ class ServiceChat(Service):
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
-        ServiceRtm.kServiceType: ServiceRtm,
-        ServiceStreaming.kServiceType: ServiceStreaming,
-        ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat
     }
 
@@ -177,6 +117,7 @@ class AccessToken:
             except:
                 return False
             return True
+
         if not is_uuid(self.__app_id) or not is_uuid(self.__app_cert):
             return False
         if not self.__service:
@@ -194,7 +135,7 @@ class AccessToken:
         self.__app_cert = self.__app_cert.encode('utf-8')
         signing = self.__signing()
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
+                       pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
         for _, service in self.__service.items():
             signing_info += service.pack()
@@ -226,4 +167,3 @@ class AccessToken:
             print('Error: {}'.format(repr(e)))
             raise ValueError('Error: parse origin token failed')
         return True
-
