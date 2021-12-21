@@ -201,7 +201,7 @@ func Test_AccessToken_Parse_TokenRtc_FromPython(t *testing.T) {
 	AssertEqual(t, uint32(0), accessToken.Services[ServiceTypeRtc].(*ServiceRtc).Privileges[PrivilegePublishDataStream])
 }
 
-func Test_AccessToken_Parse_TokenRtc_Rtm_MultiService_FromPython(t *testing.T) {
+func Test_AccessToken_Parse_Token_MultiService_FromPython(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg==")
 

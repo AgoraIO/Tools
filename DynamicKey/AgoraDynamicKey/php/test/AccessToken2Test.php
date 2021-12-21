@@ -24,8 +24,7 @@ class AccessToken2Test
         $this->test_build_ServiceChat_app();
         $this->test_build_multi_service();
         $this->test_parse_TokenRtc();
-        $this->test_parse_TokenRtc_Rtm_Chat_MultiService();
-        $this->test_parse_TokenRtm();
+        $this->test_parse_Token_MultiService();
         $this->test_parse_TokenChat_user();
         $this->test_parse_TokenChat_app();
     }
@@ -111,16 +110,12 @@ class AccessToken2Test
         $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $this->expire);
         $accessToken->addService($serviceRtc);
 
-        $serviceRtm = new ServiceRtm($this->userId);
-        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $this->expire);
-        $accessToken->addService($serviceRtm);
-
         $serviceChat = new ServiceChat($this->chatUserId);
         $serviceChat->addPrivilege($serviceChat::PRIVILEGE_USER, $this->expire);
         $accessToken->addService($serviceChat);
 
         $token = $accessToken->build();
-        Util::assertEqual("007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==", $token);
+        Util::assertEqual("007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg==", $token);
     }
 
     public function test_parse_TokenRtc()
@@ -142,44 +137,28 @@ class AccessToken2Test
         Util::assertEqual(0, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
     }
 
-    public function test_parse_TokenRtc_Rtm_Chat_MultiService()
+    public function test_parse_Token_MultiService()
     {
         $accessToken = new AccessToken2();
-        $res = $accessToken->parse("007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==");
+        $res = $accessToken->parse("007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg==");
         Util::assertEqual(true, $res);
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
         Util::assertEqual($this->issueTs, $accessToken->issueTs);
         Util::assertEqual($this->salt, $accessToken->salt);
-        Util::assertEqual(3, count($accessToken->services));
+        Util::assertEqual(2, count($accessToken->services));
         Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
         Util::assertEqual($this->uidStr, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
         Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->userId, $accessToken->services[ServiceRtm::SERVICE_TYPE]->userId);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
         Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
         // CHAT
         Util::assertEqual(ServiceChat::SERVICE_TYPE, $accessToken->services[ServiceChat::SERVICE_TYPE]->type);
         Util::assertEqual($this->chatUserId, $accessToken->services[ServiceChat::SERVICE_TYPE]->userId);
         Util::assertEqual($this->expire, $accessToken->services[ServiceChat::SERVICE_TYPE]->privileges[ServiceChat::PRIVILEGE_USER]);
         
-    }
-
-    public function test_parse_TokenRtm()
-    {
-        $accessToken = new AccessToken2();
-        $res = $accessToken->parse("007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A");
-        Util::assertEqual(true, $res);
-        Util::assertEqual($this->appId, $accessToken->appId);
-        Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->issueTs, $accessToken->issueTs);
-        Util::assertEqual($this->salt, $accessToken->salt);
-        Util::assertEqual(1, count($accessToken->services));
-        Util::assertEqual(ServiceRtm::SERVICE_TYPE, $accessToken->services[ServiceRtm::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
     }
 
     public function test_parse_TokenChat_user()
