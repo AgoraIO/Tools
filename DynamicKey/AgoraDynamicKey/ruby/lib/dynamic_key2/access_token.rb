@@ -118,15 +118,38 @@ module AgoraDynamicKey2
     end
   end
 
+  class ServiceChat < Service
+    attr_accessor :uid
+
+    SERVICE_TYPE = 5
+    PRIVILEGE_USER = 1
+    PRIVILEGE_APP = 2
+
+    def initialize(uid = '')
+      super(SERVICE_TYPE)
+      @uid = fetch_uid(uid)
+    end
+
+    def pack
+      super() + Util.pack_string(@uid)
+    end
+
+    def unpack(data)
+      _, data = super(data)
+      @uid, data = Util.unpack_string(data)
+    end
+  end
+
   class AccessToken
     attr_accessor :app_cert, :app_id, :expire, :issue_ts, :salt, :services
 
     VERSION = '007'.freeze
     VERSION_LENGTH = 3
-    SERVICES = {ServiceRtc::SERVICE_TYPE => ServiceRtc,
-                ServiceRtm::SERVICE_TYPE => ServiceRtm,
-                ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
-                ServiceFpa::SERVICE_TYPE => ServiceFpa}.freeze
+    SERVICES = { ServiceRtc::SERVICE_TYPE => ServiceRtc,
+                 ServiceRtm::SERVICE_TYPE => ServiceRtm,
+                 ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
+                 ServiceFpa::SERVICE_TYPE => ServiceFpa,
+                 ServiceChat::SERVICE_TYPE => ServiceChat }.freeze
 
     def initialize(app_id = '', app_cert = '', expire = 900)
       @app_id = app_id

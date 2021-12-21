@@ -90,7 +90,7 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(nil)
   end
 
-  it 'test_parse_TokenRtc_Rtm_MultiService' do
+  it 'test_parse_Token_MultiService' do
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse('007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4')
 
