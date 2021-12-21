@@ -56,65 +56,25 @@ module AgoraDynamicKey2
     end
   end
 
-  class ServiceRtm < Service
-    attr_accessor :user_id
+  class ServiceChat < Service
+    attr_accessor :uid
 
-    SERVICE_TYPE = 2
-    PRIVILEGE_JOIN_LOGIN = 1
+    SERVICE_TYPE = 5
+    PRIVILEGE_USER = 1
+    PRIVILEGE_APP = 2
 
-    def initialize(user_id = '')
+    def initialize(uid = '')
       super(SERVICE_TYPE)
-      @user_id = user_id
-    end
-
-    def pack
-      super() + Util.pack_string(@user_id)
-    end
-
-    def unpack(data)
-      _, data = super(data)
-      @user_id, data = Util.unpack_string(data)
-    end
-  end
-
-  class ServiceStreaming < Service
-    attr_accessor :channel_name, :uid
-
-    SERVICE_TYPE = 3
-    PRIVILEGE_PUBLISH_MIX_STREAM = 1
-    PRIVILEGE_PUBLISH_RAW_STREAM = 2
-
-    def initialize(channel_name = '', uid = '')
-      super(SERVICE_TYPE)
-      @channel_name = channel_name
       @uid = fetch_uid(uid)
     end
 
     def pack
-      super() + Util.pack_string(@channel_name) + Util.pack_string(@uid)
+      super() + Util.pack_string(@uid)
     end
 
     def unpack(data)
       _, data = super(data)
-      @channel_name, data = Util.unpack_string(data)
       @uid, data = Util.unpack_string(data)
-    end
-  end
-
-  class ServiceFpa < Service
-    SERVICE_TYPE = 4
-    PRIVILEGE_LOGIN = 1
-
-    def initialize()
-      super(SERVICE_TYPE)
-    end
-
-    def pack
-      super()
-    end
-
-    def unpack(data)
-      _, data = super(data)
     end
   end
 
@@ -123,10 +83,8 @@ module AgoraDynamicKey2
 
     VERSION = '007'.freeze
     VERSION_LENGTH = 3
-    SERVICES = {ServiceRtc::SERVICE_TYPE => ServiceRtc,
-                ServiceRtm::SERVICE_TYPE => ServiceRtm,
-                ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
-                ServiceFpa::SERVICE_TYPE => ServiceFpa}.freeze
+    SERVICES = { ServiceRtc::SERVICE_TYPE => ServiceRtc,
+                 ServiceChat::SERVICE_TYPE => ServiceChat }.freeze
 
     def initialize(app_id = '', app_cert = '', expire = 900)
       @app_id = app_id

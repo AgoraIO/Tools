@@ -63,12 +63,12 @@ describe 'AgoraDynamicKey2::AccessToken' do
     service_rtc.add_privilege(AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, expire)
     access_token.add_service(service_rtc)
 
-    service_rtm = AgoraDynamicKey2::ServiceRtm.new(user_id)
-    service_rtm.add_privilege(AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN, expire)
-    access_token.add_service(service_rtm)
+    service_chat = AgoraDynamicKey2::ServiceChat.new(uid_s)
+    service_chat.add_privilege(AgoraDynamicKey2::ServiceChat::PRIVILEGE_USER, expire)
+    access_token.add_service(service_chat)
 
     token = access_token.build
-    expect(token).to eq('007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4')
+    expect(token).to eq('007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg==')
   end
 
   it 'test_parse_TokenRtc' do
@@ -90,9 +90,9 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(nil)
   end
 
-  it 'test_parse_TokenRtc_Rtm_MultiService' do
+  it 'test_parse_Token_MultiService' do
     access_token = AgoraDynamicKey2::AccessToken.new
-    res = access_token.parse('007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4')
+    res = access_token.parse('007eJxTYLh59YaCUHZeRLXJsRSTDvfv2SV2uddsV+m05Vx5HaP59bMCg6W5gbOjsWlKqplBsomJmYlpUlJiqkWikaGpgZlhkrGx+xcBhggmBgZGBgYGJiDJAsQgPhOYZAaTLGBSgcE8xdzI2Mw0NcnSwtjEwtTY0jzVONU4zTLFxMwgKSUlkYvByMLCyNjE0MjcmBVoDsQkZFEAlCcpOg==')
 
     expect(res).to eq(true)
     expect(access_token.app_id).to eq(app_id)
@@ -103,26 +103,10 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].channel_name).to eq(channel_name)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].uid).to eq(uid_s)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].user_id).to eq(user_id)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_JOIN_CHANNEL]).to eq(expire)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]).to eq(expire)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]).to eq(expire)
     expect(access_token.services[AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(expire)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
-  end
-
-  it 'test_parse_TokenRtm' do
-    access_token = AgoraDynamicKey2::AccessToken.new
-    res = access_token.parse('007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A')
-
-    expect(res).to eq(true)
-    expect(access_token.app_id).to eq(app_id)
-    expect(access_token.expire).to eq(expire)
-    expect(access_token.issue_ts).to eq(issue_ts)
-    expect(access_token.salt).to eq(salt)
-    expect(access_token.services.size).to eq(1)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
   end
 
   it 'test_Service_fetch_uid' do
