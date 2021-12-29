@@ -10,7 +10,7 @@ describe 'AgoraDynamicKey2::RtcTokenBuilder' do
   let(:uid_s) { '2882341273' }
 
   it 'test_build_token_with_uid_ROLE_PUBLISHER' do
-    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire)
+    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
@@ -28,7 +28,7 @@ describe 'AgoraDynamicKey2::RtcTokenBuilder' do
   end
 
   it 'test_build_token_with_user_account_ROLE_PUBLISHER' do
-    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire)
+    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, expire, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
@@ -46,7 +46,7 @@ describe 'AgoraDynamicKey2::RtcTokenBuilder' do
   end
 
   it 'test_build_token_with_user_account_ROLE_SUBSCRIBER' do
-    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, expire)
+    token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid_s, AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, expire, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
