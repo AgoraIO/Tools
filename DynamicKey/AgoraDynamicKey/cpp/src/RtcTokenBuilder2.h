@@ -57,17 +57,21 @@ class RtcTokenBuilder2 {
    In order for this role to take effect, please contact our support team to
    enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
    still has the same privileges as Role_Publisher.
-   @param expire represented by the number of seconds elapsed since now. If, for
-   example, you want to access the Agora Service within 10 minutes after the
-   token is generated (both for token life cycle and privilege life cycle),
-   set expireTimestamp as 600(seconds).
+   @param token_expire represented by the number of seconds elapsed since now. If,
+   for example, you want to access the Agora Service within 10 minutes after the
+   token is generated, set token_expire as 600(seconds).
+   @param privilege_expire represented by the number of seconds elapsed since now. If, for
+   example, you want to enable your privilege for 10 minutes, set privilege_expire
+   as 600(seconds).
    @return The new Token.
    */
+
   static std::string BuildTokenWithUid(const std::string& app_id,
                                        const std::string& app_certificate,
                                        const std::string& channel_name,
                                        uint32_t uid, UserRole role,
-                                       uint32_t expire = 0);
+                                       uint32_t token_expire,
+                                       uint32_t privilege_expire = 0);
 
   /**
    Builds an RTC token using a string userAccount.
@@ -94,16 +98,18 @@ class RtcTokenBuilder2 {
    In order for this role to take effect, please contact our support team to
    enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
    still has the same privileges as Role_Publisher.
-   @param expire represented by the number of seconds elapsed since now. If, for
-   example, you want to access the Agora Service within 10 minutes after the
-   token is generated, (both for token life cycle and privilege life cycle),
-   set expireTimestamp as 600(seconds).
+   @param token_expire represented by the number of seconds elapsed since now. If,
+   for example, you want to access the Agora Service within 10 minutes after the
+   token is generated, set token_expire as 600(seconds).
+   @param privilege_expire represented by the number of seconds elapsed since now. If, for
+   example, you want to enable your privilege for 10 minutes, set privilege_expire
+   as 600(seconds).
    @return The new Token.
    */
   static std::string BuildTokenWithUserAccount(
       const std::string& app_id, const std::string& app_certificate,
       const std::string& channel_name, const std::string& user_account,
-      UserRole role, uint32_t expire = 0);
+      UserRole role, uint32_t token_expire, uint32_t privilege_expire = 0);
 
   /**
   * Generates a RTC token with specified privileges.
@@ -214,29 +220,29 @@ class RtcTokenBuilder2 {
 inline std::string RtcTokenBuilder2::BuildTokenWithUid(
     const std::string& app_id, const std::string& app_certificate,
     const std::string& channel_name, uint32_t uid, UserRole role,
-    uint32_t expire) {
+    uint32_t token_expire, uint32_t privilege_expire) {
   std::string account;
   if (uid != 0) {
     account = std::to_string(uid);
   }
   return RtcTokenBuilder2::BuildTokenWithUserAccount(
-      app_id, app_certificate, channel_name, account, role, expire);
+      app_id, app_certificate, channel_name, account, role, token_expire, privilege_expire);
 }
 
 inline std::string RtcTokenBuilder2::BuildTokenWithUserAccount(
     const std::string& app_id, const std::string& app_certificate,
     const std::string& channel_name, const std::string& user_account,
-    UserRole role, uint32_t expire) {
+    UserRole role, uint32_t token_expire, uint32_t privilege_expire) {
   std::unique_ptr<Service> service(
       new ServiceRtc(channel_name, user_account));
-  service->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expire);
+  service->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, privilege_expire);
   if (role == UserRole::kRolePublisher) {
-    service->AddPrivilege(ServiceRtc::kPrivilegePublishAudioStream, expire);
-    service->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, expire);
-    service->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, expire);
+    service->AddPrivilege(ServiceRtc::kPrivilegePublishAudioStream, privilege_expire);
+    service->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, privilege_expire);
+    service->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, privilege_expire);
   }
 
-  AccessToken2 generator(app_id, app_certificate, 0, expire);
+  AccessToken2 generator(app_id, app_certificate, 0, token_expire);
   generator.AddService(std::move(service));
 
   return generator.Build();
