@@ -24,7 +24,7 @@ class RtcTokenBuilder2Test(unittest.TestCase):
 
     def test_build_token_with_uid(self):
         token = RtcTokenBuilder.build_token_with_uid(self.__app_id, self.__app_cert, self.__channel_name, self.__uid,
-                                                     Role_Subscriber, self.__expire)
+                                                     Role_Subscriber, self.__expire, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
 
@@ -44,7 +44,7 @@ class RtcTokenBuilder2Test(unittest.TestCase):
 
     def test_build_token_with_user_account(self):
         token = RtcTokenBuilder.build_token_with_user_account(self.__app_id, self.__app_cert, self.__channel_name,
-                                                         self.__account, Role_Subscriber, self.__expire)
+                                                         self.__account, Role_Subscriber, self.__expire, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
 

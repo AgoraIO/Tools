@@ -15,24 +15,27 @@ def main():
     channel_name = "7d72365eb983485397e3e3f9d460bdda"
     uid = 2882341273
     account = "2882341273"
-    expiration_in_seconds = 3600
+    token_expiration_in_seconds = 3600
+    privilege_expiration_in_seconds = 3600
 
     token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
-                                                 expiration_in_seconds)
+                                                 token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
-                                                          Role_Subscriber, expiration_in_seconds)
+                                                          Role_Subscriber, token_expiration_in_seconds,
+                                                          privilege_expiration_in_seconds)
     print("Token with user account: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_uid_and_privilege(
-        app_id, app_certificate, channel_name, uid, expiration_in_seconds, expiration_in_seconds,
-        expiration_in_seconds, expiration_in_seconds, expiration_in_seconds)
+        app_id, app_certificate, channel_name, uid, privilege_expiration_in_seconds, privilege_expiration_in_seconds,
+        privilege_expiration_in_seconds, privilege_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid and privilege: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
-        app_id, app_certificate, channel_name, account, expiration_in_seconds, expiration_in_seconds,
-        expiration_in_seconds, expiration_in_seconds, expiration_in_seconds)
+        app_id, app_certificate, channel_name, account, privilege_expiration_in_seconds,
+        privilege_expiration_in_seconds,
+        privilege_expiration_in_seconds, privilege_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with user account and privilege: {}".format(token))
 
 
