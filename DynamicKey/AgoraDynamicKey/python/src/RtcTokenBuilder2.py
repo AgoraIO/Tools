@@ -19,15 +19,12 @@ class RtcTokenBuilder:
         :param channel_name: Unique channel name for the AgoraRTC session in the string format.
         :param uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (232-1).
             optionalUid must be unique.
-        :param role:
-            Role_Publisher: A broadcaster/host in a live-broadcast profile.
+        :param role: Role_Publisher: A broadcaster/host in a live-broadcast profile.
             Role_Subscriber: An audience(default) in a live-broadcast profile.
-        :param token_expire:
-            represented by the number of seconds elapsed since now. If, for example,
+        :param token_expire: represented by the number of seconds elapsed since now. If, for example,
             you want to access the Agora Service within 10 minutes after the token is generated,
             set token_expire as 600(seconds).
-        :param privilege_expire:
-            represented by the number of seconds elapsed since now. If, for example,
+        :param privilege_expire: represented by the number of seconds elapsed since now. If, for example,
             you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
         :return: The RTC token.
         """
@@ -45,15 +42,12 @@ class RtcTokenBuilder:
             See Get an App Certificate.
         :param channel_name: Unique channel name for the AgoraRTC session in the string format.
         :param account: The user's account, max length is 255 Bytes.
-        :param role:
-            Role_Publisher: A broadcaster/host in a live-broadcast profile.
+        :param role: Role_Publisher: A broadcaster/host in a live-broadcast profile.
             Role_Subscriber: An audience(default) in a live-broadcast profile.
-        :param token_expire:
-            represented by the number of seconds elapsed since now. If, for example,
+        :param token_expire: represented by the number of seconds elapsed since now. If, for example,
             you want to access the Agora Service within 10 minutes after the token is generated,
             set token_expire as 600(seconds).
-        :param privilege_expire:
-            represented by the number of seconds elapsed since now. If, for example,
+        :param privilege_expire: represented by the number of seconds elapsed since now. If, for example,
             you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
         :return: The RTC token.
         """
