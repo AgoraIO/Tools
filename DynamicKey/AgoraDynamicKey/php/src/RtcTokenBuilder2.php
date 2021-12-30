@@ -19,13 +19,13 @@ class RtcTokenBuilder2
      *                          optionalUid must be unique.
      * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $expire :         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
      * @return The RTC token.
      */
-    public static function buildTokenWithUid($appId, $appCertificate, $channelName, $uid, $role, $expire)
+    public static function buildTokenWithUid($appId, $appCertificate, $channelName, $uid, $role, $tokenExpire, $privilegeExpire = 0)
     {
-        return self::buildTokenWithUserAccount($appId, $appCertificate, $channelName, $uid, $role, $expire);
+        return self::buildTokenWithUserAccount($appId, $appCertificate, $channelName, $uid, $role, $tokenExpire, $privilegeExpire);
     }
 
     /**
@@ -39,20 +39,20 @@ class RtcTokenBuilder2
      * @param $account :        The user's account, max length is 255 Bytes.
      * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $expire :         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
      * @return The RTC token.
      */
-    public static function buildTokenWithUserAccount($appId, $appCertificate, $channelName, $account, $role, $expire)
+    public static function buildTokenWithUserAccount($appId, $appCertificate, $channelName, $account, $role, $tokenExpire, $privilegeExpire = 0)
     {
-        $token = new AccessToken2($appId, $appCertificate, $expire);
+        $token = new AccessToken2($appId, $appCertificate, $tokenExpire);
         $serviceRtc = new ServiceRtc($channelName, $account);
 
-        $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $expire);
+        $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $privilegeExpire);
         if ($role == self::ROLE_PUBLISHER) {
-            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, $expire);
-            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $expire);
-            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $expire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, $privilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $privilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $privilegeExpire);
         }
         $token->addService($serviceRtc);
 
