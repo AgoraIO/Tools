@@ -9,12 +9,14 @@ const account = "2882341273"
 const role = RtcRole.PUBLISHER
 const expirationInSeconds = 3600
 
+const tokenExpirationInSecond = 3600
+const privilegEexpirationInSecond = 3600
 // Build token with uid
-const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, expirationInSeconds)
+const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, tokenExpirationInSecond, privilegEexpirationInSecond)
 console.log("Token with int uid: " + tokenA)
 
 // Build token with user account
-const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(appID, appCertificate, channelName, account, role, expirationInSeconds)
+const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(appID, appCertificate, channelName, account, role, tokenExpirationInSecond, privilegEexpirationInSecond)
 console.log("Token with user account: " + tokenB)
 
 const tokenC = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid,
