@@ -24,7 +24,7 @@ class RtcTokenBuilder2Test
 
     public function test_buildTokenWithUid_ROLE_PUBLISHER()
     {
-        $token = RtcTokenBuilder2::buildTokenWithUid($this->appId, $this->appCertificate, $this->channelName, $this->uid, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire);
+        $token = RtcTokenBuilder2::buildTokenWithUid($this->appId, $this->appCertificate, $this->channelName, $this->uid, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
@@ -41,7 +41,7 @@ class RtcTokenBuilder2Test
 
     public function test_buildTokenWithUserAccount_ROLE_PUBLISHER()
     {
-        $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire);
+        $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
@@ -58,7 +58,7 @@ class RtcTokenBuilder2Test
 
     public function test_buildTokenWithUserAccount_ROLE_SUBSCRIBER()
     {
-        $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_SUBSCRIBER, $this->expire);
+        $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_SUBSCRIBER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
