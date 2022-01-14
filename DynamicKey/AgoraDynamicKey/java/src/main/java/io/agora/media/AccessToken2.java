@@ -66,12 +66,26 @@ public class AccessToken2 {
         }
     }
 
+    public enum PrivilegeEducation {
+        PRIVILEGE_ROOM_USER(1),
+        PRIVILEGE_USER(2),
+        PRIVILEGE_APP(3),
+        ;
+
+        public short intValue;
+
+        PrivilegeEducation(int value) {
+            intValue = (short) value;
+        }
+    }
+
     private static final String VERSION = "007";
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
     public static final short SERVICE_TYPE_STREAMING = 3;
     public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
+    public static final short SERVICE_TYPE_EDUCATION = 6;
 
     public String appCert = "";
     public String appId = "";
@@ -133,6 +147,9 @@ public class AccessToken2 {
         }
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
+        }
+        if (serviceType == SERVICE_TYPE_EDUCATION) {
+            return new ServiceEducation();
         }
         throw new IllegalArgumentException(String.format("unknown service type: `%d`", serviceType));
     }
@@ -203,6 +220,10 @@ public class AccessToken2 {
         }
 
         public void addPrivilegeChat(PrivilegeChat privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        public void addPrivilegeEducation(PrivilegeEducation privilege, int expire) {
             this.privileges.put(privilege.intValue, expire);
         }
 
@@ -345,6 +366,59 @@ public class AccessToken2 {
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
             this.userId = byteBuf.readString();
+        }
+    }
+
+    public static class ServiceEducation extends Service {
+        public String roomUuid;
+        public String userUuid;
+        public String chatUserId;
+        public Integer role;
+
+        public ServiceEducation() {
+            this.type = SERVICE_TYPE_EDUCATION;
+            this.roomUuid = "";
+            this.userUuid = "";
+            this.role = -1;
+        }
+
+        public ServiceEducation(String roomUuid, String userUuid, String chatUserId, Integer role) {
+            this.type = SERVICE_TYPE_EDUCATION;
+            this.roomUuid = roomUuid;
+            this.userUuid = userUuid;
+            this.chatUserId = chatUserId;
+            this.role = role;
+        }
+
+        public ServiceEducation(String userUuid) {
+            this.type = SERVICE_TYPE_EDUCATION;
+            this.roomUuid = "";
+            this.userUuid = userUuid;
+            this.role = -1;
+        }
+
+        public String getRoomUuid() {
+            return this.roomUuid;
+        }
+
+        public String getUserUuid() {
+            return this.userUuid;
+        }
+
+        public Integer getRole() {
+            return this.role;
+        }
+
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf).put(this.roomUuid).put(this.userUuid).put(this.chatUserId).put(this.role);
+        }
+
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+            this.roomUuid = byteBuf.readString();
+            this.userUuid = byteBuf.readString();
+            this.chatUserId = byteBuf.readString();
+            this.role = byteBuf.readInt();
         }
     }
 }
