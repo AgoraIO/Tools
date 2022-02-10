@@ -74,10 +74,10 @@ public class EducationTokenBuilder2 {
      */
     public String buildAppToken(String appId, String appCertificate, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
-        AccessToken2.Service serviceChat = new AccessToken2.ServiceEducation();
+        AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation();
 
-        serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_APP, expire);
-        accessToken.addService(serviceChat);
+        serviceEducation.addPrivilegeEducation(AccessToken2.PrivilegeEducation.PRIVILEGE_APP, expire);
+        accessToken.addService(serviceEducation);
 
         try {
             return accessToken.build();
