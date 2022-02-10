@@ -140,6 +140,35 @@ module AgoraDynamicKey2
     end
   end
 
+  class ServiceEducation < Service
+    attr_accessor :room_uuid, :user_uuid, :chat_user_id, :role
+
+    SERVICE_TYPE = 6
+    PRIVILEGE_ROOM_USER = 1
+    PRIVILEGE_USER = 2
+    PRIVILEGE_APP = 3
+
+    def initialize(room_uuid = '', user_uuid = '', chat_user_id = '', role = -1)
+      super(SERVICE_TYPE)
+      @room_uuid = room_uuid
+      @user_uuid = user_uuid
+      @chat_user_id = chat_user_id
+      @role = role
+    end
+
+    def pack
+      super() + Util.pack_string(@room_uuid) + Util.pack_string(@user_uuid) + Util.pack_string(@chat_user_id) + Util.pack_int16(@role)
+    end
+
+    def unpack(data)
+      _, data = super(data)
+      @room_uuid, data = Util.unpack_string(data)
+      @user_uuid, data = Util.unpack_string(data)
+      @chat_user_id, data = Util.unpack_string(data)
+      @role, data = Util.unpack_int16(data)
+    end
+  end
+
   class AccessToken
     attr_accessor :app_cert, :app_id, :expire, :issue_ts, :salt, :services
 
@@ -149,7 +178,8 @@ module AgoraDynamicKey2
                  ServiceRtm::SERVICE_TYPE => ServiceRtm,
                  ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
                  ServiceFpa::SERVICE_TYPE => ServiceFpa,
-                 ServiceChat::SERVICE_TYPE => ServiceChat }.freeze
+                 ServiceChat::SERVICE_TYPE => ServiceChat,
+                 ServiceEducation::SERVICE_TYPE => ServiceEducation }.freeze
 
     def initialize(app_id = '', app_cert = '', expire = 900)
       @app_id = app_id

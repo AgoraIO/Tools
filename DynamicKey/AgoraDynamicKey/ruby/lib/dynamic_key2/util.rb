@@ -2,6 +2,14 @@ require 'base64'
 
 module AgoraDynamicKey2
   class Util
+    def self.pack_int16(int)
+      [int].pack('s')
+    end
+
+    def self.unpack_int16(data)
+      [data[0..2].unpack1('s'), data[2..-1]]
+    end
+
     def self.pack_uint16(int)
       [int].pack('v')
     end
@@ -24,6 +32,9 @@ module AgoraDynamicKey2
 
     def self.unpack_string(data)
       len, data = unpack_uint16(data)
+      if len.zero?
+        return ['', data[len..-1]]
+      end
       [data[0..len - 1], data[len..-1]]
     end
 
