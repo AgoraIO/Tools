@@ -147,7 +147,7 @@ class ServiceEducation extends Service {
         this.__room_uuid = roomUuid || ""
         this.__user_uuid = userUuid || ""
         this.__chat_userId = chatUserId || ""
-        this.__role = role || 0
+        this.__role = role || -1
     }
 
     pack() {
@@ -155,7 +155,7 @@ class ServiceEducation extends Service {
         buffer.putString(this.__room_uuid)
         buffer.putString(this.__user_uuid)
         buffer.putString(this.__chat_userId)
-        buffer.putUint32(this.__role)
+        buffer.putInt16(this.__role)
         return Buffer.concat([super.pack(), buffer.pack()])
     }
 
@@ -164,7 +164,7 @@ class ServiceEducation extends Service {
         this.__room_uuid = bufReader.getString()
         this.__user_uuid = bufReader.getString()
         this.__chat_userId = bufReader.getString()
-        this.__role = bufReader.getUint32()
+        this.__role = bufReader.getInt16()
         return bufReader
     }
 }
@@ -291,6 +291,17 @@ var ByteBuf = function () {
         that.position += 4
         return that
     }
+    that.putInt32 = function (v) {
+        that.buffer.writeInt32LE(v, that.position)
+        that.position += 4
+        return that
+    }
+
+    that.putInt16 = function (v) {
+        that.buffer.writeInt16LE(v, that.position)
+        that.position += 2
+        return that
+    }
 
     that.putBytes = function (bytes) {
         that.putUint16(bytes.length)
@@ -351,6 +362,12 @@ var ReadByteBuf = function (bytes) {
     that.getUint32 = function () {
         var ret = that.buffer.readUInt32LE(that.position)
         that.position += 4
+        return ret
+    }
+
+    that.getInt16 = function () {
+        var ret = that.buffer.readUInt16LE(that.position)
+        that.position += 2
         return ret
     }
 
