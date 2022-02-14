@@ -21,15 +21,19 @@ class EducationTokenBuilder {
      */
     static buildRoomUserToken(appId, appCertificate, roomUuid, userUuid,  role, expire) {
       let chatUserId = md5(userUuid);
+
       let accessToken = new AccessToken(appId, appCertificate, 0, expire)
       let eduService = new ServiceEducation(roomUuid, userUuid, chatUserId, role)
       accessToken.add_service(eduService)
+
       let rtmService = new ServiceRtm(userUuid)
       rtmService.add_privilege(ServiceRtm.kPrivilegeLogin, expire)
       accessToken.add_service(rtmService)
+
       let chatService = new ServiceChat(userUuid)
       chatService.add_privilege(ServiceChat.kPrivilegeUser, expire)
       accessToken.add_service(chatService)
+
       return accessToken.build()
     }
 
@@ -51,6 +55,7 @@ class EducationTokenBuilder {
       let eduService = new ServiceEducation("", userUuid)
       eduService.add_privilege(ServiceEducation.PRIVILEGE_USER, expire)
       accessToken.add_service(eduService)
+
       return accessToken.build()
     }
 
@@ -71,6 +76,7 @@ class EducationTokenBuilder {
       let eduService = new ServiceEducation()
       eduService.add_privilege(ServiceEducation.PRIVILEGE_APP, expire)
       accessToken.add_service(eduService)
+
       return accessToken.build()
     }
 }
