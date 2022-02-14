@@ -161,6 +161,43 @@ class ServiceChat extends Service
     }
 }
 
+class ServiceEducation extends Service
+{
+    const SERVICE_TYPE = 6;
+    const PRIVILEGE_ROOM_USER = 1;
+    const PRIVILEGE_USER = 2;
+    const PRIVILEGE_APP = 3;
+
+    public $roomUuid;
+    public $userUuid;
+    public $chatUserId;
+    public $role;
+
+
+    public function __construct($roomUuid = "", $userUuid = "", $chatUserId = "", $role = -1)
+    {
+        parent::__construct(self::SERVICE_TYPE);
+        $this->roomUuid = $roomUuid;
+        $this->userUuid = $userUuid;
+        $this->chatUserId = $chatUserId;
+        $this->role = $role;
+    }
+
+    public function pack()
+    {
+        return parent::pack() . Util::packString($this->roomUuid) . Util::packString($this->userUuid) . Util::packString($this->chatUserId) . Util::packInt16($this->role);
+    }
+
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+        $this->roomUuid = Util::unpackString($data);
+        $this->userUuid = Util::unpackString($data);
+        $this->chatUserId = Util::unpackString($data);
+        $this->role = Util::unpackInt16($data);
+    }
+}
+
 class AccessToken2
 {
     const VERSION = "007";
@@ -243,7 +280,8 @@ class AccessToken2
             ServiceRtm::SERVICE_TYPE => new ServiceRtm(),
             ServiceStreaming::SERVICE_TYPE => new ServiceStreaming(),
             ServiceFpa::SERVICE_TYPE => new ServiceFpa(),
-            ServiceChat::SERVICE_TYPE => new ServiceChat()
+            ServiceChat::SERVICE_TYPE => new ServiceChat(),
+            ServiceEducation::SERVICE_TYPE => new ServiceEducation(),
         ];
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceTye = Util::unpackUint16($data);
