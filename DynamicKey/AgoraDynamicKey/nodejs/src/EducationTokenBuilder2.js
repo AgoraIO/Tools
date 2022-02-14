@@ -37,8 +37,6 @@ class EducationTokenBuilder {
       return accessToken.build()
     }
 
-
-
     /**
      * build user individual token
      * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
@@ -58,8 +56,6 @@ class EducationTokenBuilder {
 
       return accessToken.build()
     }
-
-
 
     /**
      * build app global token
