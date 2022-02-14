@@ -23,6 +23,15 @@ def unpack_uint32(buffer):
     return struct.unpack('<I', buffer[:data_length])[0], buffer[data_length:]
 
 
+def pack_int16(x):
+    return struct.pack('<h', int(x))
+
+
+def unpack_int16(buffer):
+    data_length = struct.calcsize('h')
+    return struct.unpack('<h', buffer[:data_length])[0], buffer[data_length:]
+
+
 def pack_string(string):
     if isinstance(string, str):
         string = string.encode('utf-8')
