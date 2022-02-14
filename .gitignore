@@ -21,3 +21,5 @@ Golem/include/*
 .DS_Store
 .vs
 Gemfile.lock
+.idea
+

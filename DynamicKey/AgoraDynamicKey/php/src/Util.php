@@ -37,6 +37,18 @@ class Util
         return $up[1];
     }
 
+    public static function packInt16($x)
+    {
+        return pack("l", $x);
+    }
+
+    public static function unpackInt16(&$data)
+    {
+        $up = unpack("l", substr($data, 0, 4));
+        $data = substr($data, 4);
+        return $up[1];
+    }
+
     public static function packString($str)
     {
         return self::packUint16(strlen($str)) . $str;
