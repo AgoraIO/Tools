@@ -17,5 +17,5 @@ console.log("Build room user token: " + tokenA);
 const tokenB = EduTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
 console.log("Build user token " + tokenB);
 const tokenC = EduTokenBuilder.buildAppToken(appId, appCertificate, expire)
-console.log("Build app token: " + tokenB);
+console.log("Build app token: " + tokenC);
  
