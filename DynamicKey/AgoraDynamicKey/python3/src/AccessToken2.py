@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
-
 import time
 import hmac
 import zlib
@@ -12,7 +11,6 @@ from hashlib import sha256
 from collections import OrderedDict
 
 from .Packer import *
-
 
 VERSION_LENGTH = 3
 
@@ -30,7 +28,8 @@ class Service:
         return pack_uint16(self.__type)
 
     def __pack_privileges(self):
-        privileges = OrderedDict(sorted(iter(self.__privileges.items()), key=lambda x: int(x[0])))
+        privileges = OrderedDict(
+            sorted(iter(self.__privileges.items()), key=lambda x: int(x[0])))
         return pack_map_uint32(privileges)
 
     def add_privilege(self, privilege, expire):
@@ -130,7 +129,7 @@ class ServiceChat(Service):
 
     kPrivilegeUser = 1
     kPrivilegeApp = 2
-    
+
     def __init__(self, user_id=''):
         super(ServiceChat, self).__init__(ServiceChat.kServiceType)
         self.__user_id = user_id.encode('utf-8')
@@ -144,13 +143,41 @@ class ServiceChat(Service):
         return buffer
 
 
+class ServiceEducation(Service):
+    kServiceType = 6
+
+    kPrivilegeRoomUser = 1
+    kPrivilegeUser = 2
+    kPrivilegeApp = 3
+
+    def __init__(self, room_uuid='', user_uuid='', chat_user_id='', role=-1):
+        super(ServiceEducation, self).__init__(ServiceEducation.kServiceType)
+        self.__room_uuid = room_uuid.encode('utf-8')
+        self.__user_uuid = user_uuid.encode('utf-8')
+        self.__chat_user_id = chat_user_id.encode('utf-8')
+        self.__role = role
+
+    def pack(self):
+        return super(ServiceEducation, self).pack() + pack_string(self.__room_uuid) + pack_string(
+            self.__user_uuid) + pack_string(self.__chat_user_id) + pack_int16(self.__role)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceEducation, self).unpack(buffer)
+        self.__room_uuid, buffer = unpack_string(buffer)
+        self.__user_uuid, buffer = unpack_string(buffer)
+        self.__chat_user_id, buffer = unpack_string(buffer)
+        self.__role, buffer = unpack_int16(buffer)
+        return buffer
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceStreaming.kServiceType: ServiceStreaming,
         ServiceFpa.kServiceType: ServiceFpa,
-        ServiceChat.kServiceType: ServiceChat
+        ServiceChat.kServiceType: ServiceChat,
+        ServiceEducation.kServiceType: ServiceEducation,
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
@@ -164,7 +191,8 @@ class AccessToken:
         self.__service = {}
 
     def __signing(self):
-        signing = hmac.new(pack_uint32(self.__issue_ts), self.__app_cert, sha256).digest()
+        signing = hmac.new(pack_uint32(self.__issue_ts),
+                           self.__app_cert, sha256).digest()
         signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
         return signing
 
@@ -177,6 +205,7 @@ class AccessToken:
             except:
                 return False
             return True
+
         if not is_uuid(self.__app_id) or not is_uuid(self.__app_cert):
             return False
         if not self.__service:
@@ -194,7 +223,7 @@ class AccessToken:
         self.__app_cert = self.__app_cert.encode('utf-8')
         signing = self.__signing()
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
+                       pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
         for _, service in self.__service.items():
             signing_info += service.pack()
@@ -209,7 +238,8 @@ class AccessToken:
             if origin_version != get_version():
                 return False
 
-            buffer = zlib.decompress(base64.b64decode(origin_token[VERSION_LENGTH:]))
+            buffer = zlib.decompress(
+                base64.b64decode(origin_token[VERSION_LENGTH:]))
             signature, buffer = unpack_string(buffer)
             self.__app_id, buffer = unpack_string(buffer)
             self.__issue_ts, buffer = unpack_uint32(buffer)
@@ -226,4 +256,3 @@ class AccessToken:
             print('Error: {}'.format(repr(e)))
             raise ValueError('Error: parse origin token failed')
         return True
-

@@ -141,13 +141,41 @@ class ServiceChat(Service):
         return buffer
 
 
+class ServiceEducation(Service):
+    kServiceType = 6
+
+    kPrivilegeRoomUser = 1
+    kPrivilegeUser = 2
+    kPrivilegeApp = 3
+
+    def __init__(self, room_uuid='', user_uuid='', chat_user_id='', role=-1):
+        super(ServiceEducation, self).__init__(ServiceEducation.kServiceType)
+        self.__room_uuid = room_uuid.encode('utf-8')
+        self.__user_uuid = user_uuid.encode('utf-8')
+        self.__chat_user_id = chat_user_id.encode('utf-8')
+        self.__role = role
+
+    def pack(self):
+        return super(ServiceEducation, self).pack() + pack_string(self.__room_uuid) + pack_string(
+            self.__user_uuid) + pack_string(self.__chat_user_id) + pack_int16(self.__role)
+
+    def unpack(self, buffer):
+        buffer = super(ServiceEducation, self).unpack(buffer)
+        self.__room_uuid, buffer = unpack_string(buffer)
+        self.__user_uuid, buffer = unpack_string(buffer)
+        self.__chat_user_id, buffer = unpack_string(buffer)
+        self.__role, buffer = unpack_int16(buffer)
+        return buffer
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceStreaming.kServiceType: ServiceStreaming,
         ServiceFpa.kServiceType: ServiceFpa,
-        ServiceChat.kServiceType: ServiceChat
+        ServiceChat.kServiceType: ServiceChat,
+        ServiceEducation.kServiceType: ServiceEducation
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
