@@ -3,8 +3,10 @@ package accesstoken2
 import (
 	"bytes"
 	"compress/zlib"
+	"crypto/md5"
 	"encoding/base64"
 	"encoding/binary"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"math/rand"
@@ -99,6 +101,15 @@ func unPackUint32(r io.Reader) (n uint32, err error) {
 	return
 }
 
+func packInt16(w io.Writer, n int16) error {
+	return binary.Write(w, binary.LittleEndian, n)
+}
+
+func unPackInt16(r io.Reader) (n int16, err error) {
+	err = binary.Read(r, binary.LittleEndian, &n)
+	return
+}
+
 func packString(w io.Writer, s string) (err error) {
 	err = packUint16(w, uint16(len(s)))
 	if err != nil {
@@ -168,4 +179,10 @@ func unPackMapUint32(r io.Reader) (data map[uint16]uint32, err error) {
 		data[key] = value
 	}
 	return
+}
+
+func Md5(str string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(str))
+	return hex.EncodeToString(hasher.Sum(nil))
 }
