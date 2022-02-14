@@ -6,12 +6,16 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class EducationTokenBuilder2Test {
-    private static String appId = "f488493d1886435f963dfb3d95984fd4";
-    private static String appCertificate = "f488493d1886435f963dfb3d95984fd4";
-    private static String roomUuid = "123";
-    private static String userUuid = "jason";
+    private String appId = "970CA35de60c44645bbae8a215061b33";
+    private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
+    private static String roomUuid = "7d72365eb983485397e3e3f9d460bdda";
+    private static String userUuid = "2882341273";
     private static Integer role = 1;
     private static int expire = 600;
+
+    private static Integer defaultRole = -1;
+    private static String defaultRoomUuid = "";
+    private static String defaultUserUuid = "";
 
     @Test
     public void testBuildRoomUserToken() {
@@ -22,9 +26,9 @@ public class EducationTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(roomUuid, ((AccessToken2.ServiceEducation)accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRoomUuid());
-        assertEquals(userUuid, ((AccessToken2.ServiceEducation)accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getUserUuid());
-        assertEquals(role, ((AccessToken2.ServiceEducation)accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRole());
+        assertEquals(roomUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRoomUuid());
+        assertEquals(userUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getUserUuid());
+        assertEquals(role, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRole());
     }
 
     @Test
@@ -36,7 +40,9 @@ public class EducationTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(userUuid, ((AccessToken2.ServiceEducation)accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getUserUuid());
+        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRoomUuid());
+        assertEquals(userUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getUserUuid());
+        assertEquals(defaultRole, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRole());
     }
 
     @Test
@@ -48,5 +54,8 @@ public class EducationTokenBuilder2Test {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
+        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRoomUuid());
+        assertEquals(defaultUserUuid, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getUserUuid());
+        assertEquals(defaultRole, ((AccessToken2.ServiceEducation) accessToken.services.get(AccessToken2.SERVICE_TYPE_EDUCATION)).getRole());
     }
 }
