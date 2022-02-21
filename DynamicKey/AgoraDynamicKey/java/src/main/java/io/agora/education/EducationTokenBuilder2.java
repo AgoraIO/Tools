@@ -19,7 +19,7 @@ public class EducationTokenBuilder2 {
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The education user room token.
      */
-    public String buildRoomUserToken(String appId, String appCertificate, String roomUuid, String userUuid, Integer role, int expire) {
+    public String buildRoomUserToken(String appId, String appCertificate, String roomUuid, String userUuid, Short role, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
         String chatUserId = Utils.md5(userUuid);
 

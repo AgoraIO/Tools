@@ -7,7 +7,7 @@ public class EducationTokenBuilder2Sample {
     private static String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
     private static String roomUuid = "123";
     private static String userUuid = "2882341273";
-    private static Integer role = 1;
+    private static Short role = 1;
     private static int expire = 600;
 
     public static void main(String[] args) {
