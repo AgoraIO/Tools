@@ -23,7 +23,7 @@ public class EducationTokenBuilder2 {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
         String chatUserId = Utils.md5(userUuid);
 
-        AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation(roomUuid, userUuid, chatUserId, role);
+        AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation(roomUuid, userUuid, role);
         serviceEducation.addPrivilegeEducation(AccessToken2.PrivilegeEducation.PRIVILEGE_ROOM_USER, expire);
         accessToken.addService(serviceEducation);
 

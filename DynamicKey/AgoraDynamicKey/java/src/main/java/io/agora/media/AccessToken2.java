@@ -372,7 +372,6 @@ public class AccessToken2 {
     public static class ServiceEducation extends Service {
         public String roomUuid;
         public String userUuid;
-        public String chatUserId;
         public Short role;
 
         public ServiceEducation() {
@@ -382,11 +381,10 @@ public class AccessToken2 {
             this.role = -1;
         }
 
-        public ServiceEducation(String roomUuid, String userUuid, String chatUserId, Short role) {
+        public ServiceEducation(String roomUuid, String userUuid, Short role) {
             this.type = SERVICE_TYPE_EDUCATION;
             this.roomUuid = roomUuid;
             this.userUuid = userUuid;
-            this.chatUserId = chatUserId;
             this.role = role;
         }
 
@@ -410,14 +408,13 @@ public class AccessToken2 {
         }
 
         public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf).put(this.roomUuid).put(this.userUuid).put(this.chatUserId).put(this.role);
+            return super.pack(buf).put(this.roomUuid).put(this.userUuid).put(this.role);
         }
 
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
             this.roomUuid = byteBuf.readString();
             this.userUuid = byteBuf.readString();
-            this.chatUserId = byteBuf.readString();
             this.role = byteBuf.readShort();
         }
     }
