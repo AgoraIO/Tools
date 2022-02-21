@@ -141,30 +141,28 @@ module AgoraDynamicKey2
   end
 
   class ServiceEducation < Service
-    attr_accessor :room_uuid, :user_uuid, :chat_user_id, :role
+    attr_accessor :room_uuid, :user_uuid, :role
 
     SERVICE_TYPE = 6
     PRIVILEGE_ROOM_USER = 1
     PRIVILEGE_USER = 2
     PRIVILEGE_APP = 3
 
-    def initialize(room_uuid = '', user_uuid = '', chat_user_id = '', role = -1)
+    def initialize(room_uuid = '', user_uuid = '', role = -1)
       super(SERVICE_TYPE)
       @room_uuid = room_uuid
       @user_uuid = user_uuid
-      @chat_user_id = chat_user_id
       @role = role
     end
 
     def pack
-      super() + Util.pack_string(@room_uuid) + Util.pack_string(@user_uuid) + Util.pack_string(@chat_user_id) + Util.pack_int16(@role)
+      super() + Util.pack_string(@room_uuid) + Util.pack_string(@user_uuid) + Util.pack_int16(@role)
     end
 
     def unpack(data)
       _, data = super(data)
       @room_uuid, data = Util.unpack_string(data)
       @user_uuid, data = Util.unpack_string(data)
-      @chat_user_id, data = Util.unpack_string(data)
       @role, data = Util.unpack_int16(data)
     end
   end

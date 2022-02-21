@@ -16,7 +16,7 @@ module AgoraDynamicKey2
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
 
       chat_user_id = Digest::MD5.hexdigest user_uuid
-      service_education = AgoraDynamicKey2::ServiceEducation.new(room_uuid, user_uuid, chat_user_id, role)
+      service_education = AgoraDynamicKey2::ServiceEducation.new(room_uuid, user_uuid, role)
       service_education.add_privilege(AgoraDynamicKey2::ServiceEducation::PRIVILEGE_ROOM_USER, expire)
       access_token.add_service(service_education)
 
