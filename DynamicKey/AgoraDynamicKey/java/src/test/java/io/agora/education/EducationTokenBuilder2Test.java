@@ -8,9 +8,9 @@ import static org.junit.Assert.*;
 public class EducationTokenBuilder2Test {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
-    private static String roomUuid = "7d72365eb983485397e3e3f9d460bdda";
+    private static String roomUuid = "123";
     private static String userUuid = "2882341273";
-    private static Integer role = 1;
+    private static Short role = 1;
     private static int expire = 600;
 
     private static Integer defaultRole = -1;
