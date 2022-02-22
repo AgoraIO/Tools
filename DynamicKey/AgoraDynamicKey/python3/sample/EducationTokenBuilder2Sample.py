@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')))
 
-from src.EducationTokenBuilder2 import EducationTokenBuilder
+from src.education_token_builder import EducationTokenBuilder
 
 
 def main():
