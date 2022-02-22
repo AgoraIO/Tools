@@ -19,22 +19,22 @@ class EducationTokenBuilder {
      *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The education user room token.
      */
-    static buildRoomUserToken(appId, appCertificate, roomUuid, userUuid,  role, expire) {
-      let chatUserId = md5(userUuid);
+    static buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire) {
+        let accessToken = new AccessToken(appId, appCertificate, 0, expire)
 
-      let accessToken = new AccessToken(appId, appCertificate, 0, expire)
-      let eduService = new ServiceEducation(roomUuid, userUuid, chatUserId, role)
-      accessToken.add_service(eduService)
+        let chatUserId = md5(userUuid)
+        let eduService = new ServiceEducation(roomUuid, userUuid, role)
+        accessToken.add_service(eduService)
 
-      let rtmService = new ServiceRtm(userUuid)
-      rtmService.add_privilege(ServiceRtm.kPrivilegeLogin, expire)
-      accessToken.add_service(rtmService)
+        let rtmService = new ServiceRtm(userUuid)
+        rtmService.add_privilege(ServiceRtm.kPrivilegeLogin, expire)
+        accessToken.add_service(rtmService)
 
-      let chatService = new ServiceChat(userUuid)
-      chatService.add_privilege(ServiceChat.kPrivilegeUser, expire)
-      accessToken.add_service(chatService)
+        let chatService = new ServiceChat(chatUserId)
+        chatService.add_privilege(ServiceChat.kPrivilegeUser, expire)
+        accessToken.add_service(chatService)
 
-      return accessToken.build()
+        return accessToken.build()
     }
 
     /**
@@ -49,12 +49,12 @@ class EducationTokenBuilder {
      * @return The education user token.
      */
     static buildUserToken(appId, appCertificate, userUuid, expire) {
-      let accessToken = new AccessToken(appId, appCertificate, 0, expire)
-      let eduService = new ServiceEducation("", userUuid)
-      eduService.add_privilege(ServiceEducation.PRIVILEGE_USER, expire)
-      accessToken.add_service(eduService)
+        let accessToken = new AccessToken(appId, appCertificate, 0, expire)
+        let eduService = new ServiceEducation("", userUuid)
+        eduService.add_privilege(ServiceEducation.PRIVILEGE_USER, expire)
+        accessToken.add_service(eduService)
 
-      return accessToken.build()
+        return accessToken.build()
     }
 
     /**
@@ -68,12 +68,12 @@ class EducationTokenBuilder {
      * @return The education global token.
      */
     static buildAppToken(appId, appCertificate, expire) {
-      let accessToken = new AccessToken(appId, appCertificate, 0, expire)
-      let eduService = new ServiceEducation()
-      eduService.add_privilege(ServiceEducation.PRIVILEGE_APP, expire)
-      accessToken.add_service(eduService)
+        let accessToken = new AccessToken(appId, appCertificate, 0, expire)
+        let eduService = new ServiceEducation()
+        eduService.add_privilege(ServiceEducation.PRIVILEGE_APP, expire)
+        accessToken.add_service(eduService)
 
-      return accessToken.build()
+        return accessToken.build()
     }
 }
 

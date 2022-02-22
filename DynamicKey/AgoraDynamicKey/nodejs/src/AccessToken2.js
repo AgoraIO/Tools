@@ -141,12 +141,12 @@ ServiceChat.kPrivilegeUser = 1
 ServiceChat.kPrivilegeApp = 2
 
 const kEducationServiceType = 6
+
 class ServiceEducation extends Service {
-    constructor(roomUuid, userUuid, chatUserId, role) {
+    constructor(roomUuid, userUuid, role) {
         super(kEducationServiceType)
         this.__room_uuid = roomUuid || ""
         this.__user_uuid = userUuid || ""
-        this.__chat_userId = chatUserId || ""
         this.__role = role || -1
     }
 
@@ -154,7 +154,6 @@ class ServiceEducation extends Service {
         let buffer = new ByteBuf()
         buffer.putString(this.__room_uuid)
         buffer.putString(this.__user_uuid)
-        buffer.putString(this.__chat_userId)
         buffer.putInt16(this.__role)
         return Buffer.concat([super.pack(), buffer.pack()])
     }
@@ -163,7 +162,6 @@ class ServiceEducation extends Service {
         let bufReader = super.unpack(buffer)
         this.__room_uuid = bufReader.getString()
         this.__user_uuid = bufReader.getString()
-        this.__chat_userId = bufReader.getString()
         this.__role = bufReader.getInt16()
         return bufReader
     }
@@ -172,6 +170,8 @@ class ServiceEducation extends Service {
 ServiceEducation.PRIVILEGE_ROOM_USER = 1
 ServiceEducation.PRIVILEGE_USER = 2
 ServiceEducation.PRIVILEGE_APP = 3
+
+
 class AccessToken2 {
     constructor(appId, appCertificate, issueTs, expire) {
         this.appId = appId
