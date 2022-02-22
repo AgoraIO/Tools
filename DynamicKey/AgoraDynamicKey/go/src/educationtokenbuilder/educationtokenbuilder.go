@@ -19,9 +19,9 @@ import (
 //    timestamp + 600 (seconds).
 func BuildRoomUserToken(appID string, appCertificate string, roomUuid string, userUuid string, role int16, expire uint32) (string, error) {
 	token := accesstoken2.NewAccessToken(appID, appCertificate, expire)
-	chatUserId := accesstoken2.Md5(userUuid)
 
-	serviceEducation := accesstoken2.NewServiceEducation(roomUuid, userUuid, chatUserId, role)
+	chatUserId := accesstoken2.Md5(userUuid)
+	serviceEducation := accesstoken2.NewServiceEducation(roomUuid, userUuid, role)
 	serviceEducation.AddPrivilege(accesstoken2.PrivilegeEducationRoomUser, expire)
 	token.AddService(serviceEducation)
 
@@ -50,7 +50,7 @@ func BuildRoomUserToken(appID string, appCertificate string, roomUuid string, us
 func BuildUserToken(appID string, appCertificate string, userUuid string, expire uint32) (string, error) {
 	token := accesstoken2.NewAccessToken(appID, appCertificate, expire)
 
-	serviceEducation := accesstoken2.NewServiceEducation("", userUuid, "", -1)
+	serviceEducation := accesstoken2.NewServiceEducation("", userUuid, -1)
 	serviceEducation.AddPrivilege(accesstoken2.PrivilegeEducationUser, expire)
 	token.AddService(serviceEducation)
 
@@ -70,7 +70,7 @@ func BuildUserToken(appID string, appCertificate string, userUuid string, expire
 func BuildAppToken(appID string, appCertificate string, expire uint32) (string, error) {
 	token := accesstoken2.NewAccessToken(appID, appCertificate, expire)
 
-	serviceEducation := accesstoken2.NewServiceEducation("", "", "", -1)
+	serviceEducation := accesstoken2.NewServiceEducation("", "", -1)
 	serviceEducation.AddPrivilege(accesstoken2.PrivilegeEducationApp, expire)
 	token.AddService(serviceEducation)
 

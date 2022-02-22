@@ -244,14 +244,13 @@ func (serviceChat *ServiceChat) UnPack(r io.Reader) (err error) {
 
 type ServiceEducation struct {
 	*Service
-	RoomUuid   string
-	UserUuid   string
-	ChatUserId string
-	Role       int16
+	RoomUuid string
+	UserUuid string
+	Role     int16
 }
 
-func NewServiceEducation(roomUuid string, userUuid string, chatUserId string, role int16) (serviceEducation *ServiceEducation) {
-	serviceEducation = &ServiceEducation{Service: NewService(ServiceTypeEducation), RoomUuid: roomUuid, UserUuid: userUuid, ChatUserId: chatUserId, Role: role}
+func NewServiceEducation(roomUuid string, userUuid string, role int16) (serviceEducation *ServiceEducation) {
+	serviceEducation = &ServiceEducation{Service: NewService(ServiceTypeEducation), RoomUuid: roomUuid, UserUuid: userUuid, Role: role}
 	return
 }
 
@@ -268,10 +267,6 @@ func (serviceEducation *ServiceEducation) Pack(w io.Writer) (err error) {
 	if err != nil {
 		return
 	}
-	err = packString(w, serviceEducation.ChatUserId)
-	if err != nil {
-		return
-	}
 	err = packInt16(w, serviceEducation.Role)
 	return
 }
@@ -283,7 +278,6 @@ func (serviceEducation *ServiceEducation) UnPack(r io.Reader) (err error) {
 	}
 	serviceEducation.RoomUuid, err = unPackString(r)
 	serviceEducation.UserUuid, err = unPackString(r)
-	serviceEducation.ChatUserId, err = unPackString(r)
 	serviceEducation.Role, err = unPackInt16(r)
 	return
 }
@@ -452,7 +446,7 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 	case ServiceTypeChat:
 		service = NewServiceChat("")
 	case ServiceTypeEducation:
-		service = NewServiceEducation("", "", "", -1)
+		service = NewServiceEducation("", "", -1)
 	default:
 		panic(fmt.Sprintf("new service failed: unknown service type `%v`", serviceType))
 	}
