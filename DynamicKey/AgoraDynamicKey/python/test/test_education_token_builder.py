@@ -4,15 +4,14 @@ __copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
 import sys
 import unittest
 import os
-
+from src.education_token_builder import *
 
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')))
 
-from src.EducationTokenBuilder2 import *
 
-class EducationTokenBuidler2Test(unittest.TestCase):
-    def setUp(self) -> None:
+class EducationTokenBuilderTest(unittest.TestCase):
+    def setUp(self):
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
         self.__room_uuid = "123"

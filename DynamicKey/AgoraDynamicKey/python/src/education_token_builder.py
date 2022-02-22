@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 __copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
 
-from . import Utils
 from .AccessToken2 import *
+from .utils import *
 
 
 class EducationTokenBuilder:
@@ -23,9 +23,8 @@ class EducationTokenBuilder:
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
 
-        char_user_id = Utils.get_md5(user_uuid)
-
-        education_service = ServiceEducation(room_uuid, user_uuid, char_user_id, role)
+        char_user_id = get_md5(user_uuid)
+        education_service = ServiceEducation(room_uuid, user_uuid, role)
         education_service.add_privilege(ServiceEducation.kPrivilegeRoomUser, expire)
         token.add_service(education_service)
 

@@ -7,7 +7,7 @@ import sys
 sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..')))
 
-from src.EducationTokenBuilder2 import *
+from src.education_token_builder import *
 
 def main():
     app_id = "970CA35de60c44645bbae8a215061b33"
