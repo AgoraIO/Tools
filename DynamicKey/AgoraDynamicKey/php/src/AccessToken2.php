@@ -170,22 +170,20 @@ class ServiceEducation extends Service
 
     public $roomUuid;
     public $userUuid;
-    public $chatUserId;
     public $role;
 
 
-    public function __construct($roomUuid = "", $userUuid = "", $chatUserId = "", $role = -1)
+    public function __construct($roomUuid = "", $userUuid = "", $role = -1)
     {
         parent::__construct(self::SERVICE_TYPE);
         $this->roomUuid = $roomUuid;
         $this->userUuid = $userUuid;
-        $this->chatUserId = $chatUserId;
         $this->role = $role;
     }
 
     public function pack()
     {
-        return parent::pack() . Util::packString($this->roomUuid) . Util::packString($this->userUuid) . Util::packString($this->chatUserId) . Util::packInt16($this->role);
+        return parent::pack() . Util::packString($this->roomUuid) . Util::packString($this->userUuid) . Util::packInt16($this->role);
     }
 
     public function unpack(&$data)
@@ -193,7 +191,6 @@ class ServiceEducation extends Service
         parent::unpack($data);
         $this->roomUuid = Util::unpackString($data);
         $this->userUuid = Util::unpackString($data);
-        $this->chatUserId = Util::unpackString($data);
         $this->role = Util::unpackInt16($data);
     }
 }
