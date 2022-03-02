@@ -143,7 +143,7 @@ module AgoraDynamicKey2
   class ServiceEducation < Service
     attr_accessor :room_uuid, :user_uuid, :role
 
-    SERVICE_TYPE = 6
+    SERVICE_TYPE = 7
     PRIVILEGE_ROOM_USER = 1
     PRIVILEGE_USER = 2
     PRIVILEGE_APP = 3

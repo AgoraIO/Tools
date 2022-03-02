@@ -21,7 +21,7 @@ const (
 	ServiceTypeStreaming = 3
 	ServiceTypeFpa       = 4
 	ServiceTypeChat      = 5
-	ServiceTypeEducation = 6
+	ServiceTypeEducation = 7
 
 	// Rtc
 	PrivilegeJoinChannel        = 1

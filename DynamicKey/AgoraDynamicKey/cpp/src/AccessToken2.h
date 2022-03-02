@@ -279,7 +279,7 @@ class ServiceChat : public Service {
 class ServiceEducation : public Service {
  public:
   enum {
-    kServiceType = 6,
+    kServiceType = 7,
 
     kPrivilegeRoomUser = 1,
     kPrivilegeUser = 2,

@@ -142,7 +142,7 @@ class ServiceChat(Service):
 
 
 class ServiceEducation(Service):
-    kServiceType = 6
+    kServiceType = 7
 
     kPrivilegeRoomUser = 1
     kPrivilegeUser = 2
