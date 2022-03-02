@@ -5,6 +5,7 @@
 #define protected public
 
 #include "../src/AccessToken2.h"
+#include "../src/md5/md5.h"
 
 #include <gtest/gtest.h>
 
@@ -24,6 +25,9 @@ class AccessToken2_test : public testing::Test {
     account_ = "2882341273";
     expire_ = 600;
     issue_ts_ = 1111111;
+
+    room_uuid_ = "123";
+    role_ = 1;
   }
 
   void VerifyService(Service *l, Service *r) {
@@ -83,6 +87,17 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
   }
 
+  void VerifyServiceEducation(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_education = dynamic_cast<ServiceEducation *>(l);
+    auto r_education = dynamic_cast<ServiceEducation *>(r);
+
+    EXPECT_EQ(l_education->room_uuid_, r_education->room_uuid_);
+    EXPECT_EQ(l_education->user_uuid_, r_education->user_uuid_);
+    EXPECT_EQ(l_education->role_, r_education->role_);
+  }
+
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
     std::string result = key->Build();
     EXPECT_EQ(expected, result);
@@ -114,6 +129,8 @@ class AccessToken2_test : public testing::Test {
          &AccessToken2_test::VerifyServiceStreaming},
         {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
+        {ServiceEducation::kServiceType,
+         &AccessToken2_test::VerifyServiceEducation},
     };
 
     auto k7_it = k7.services_.begin();
@@ -231,6 +248,70 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  void TestAccessToken2EducationRoomUser() {
+    MD5 h{user_id_};
+    std::string char_user_id(reinterpret_cast<const char *>(h.getDigest()));
+
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> education_service(
+        new ServiceEducation(room_uuid_, user_id_, role_));
+    education_service->AddPrivilege(ServiceEducation::kPrivilegeRoomUser,
+                                    expire_);
+    token.AddService(std::move(education_service));
+
+    std::unique_ptr<Service> rtm_service(new ServiceRtm(user_id_));
+    rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
+    token.AddService(std::move(rtm_service));
+
+    std::unique_ptr<Service> chat_service(new ServiceChat(char_user_id));
+    chat_service->AddPrivilege(ServiceChat::kPrivilegeApp, expire_);
+    token.AddService(std::move(chat_service));
+
+    std::string expected =
+        "007eJxTYAi07DjM9jO3cd7mI4qim1Zf2ztvi7ygfvepvwxPlPs2u81RYLA0N3B2NDZNSTU"
+        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwMzABKQZwXxOhpLU4pL40uLUI"
+        "lagEBNYUIBh7sIfD9admdvWvVYwULMgq5wNroGZwdDIGEkXIwMAtIUstA==";
+
+    VerifyAccessToken2(expected, &token);
+  }
+
+  void TestAccessToken2EducationUser() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> education_service(
+        new ServiceEducation(room_uuid_, user_id_, role_));
+    education_service->AddPrivilege(ServiceEducation::kPrivilegeUser, expire_);
+    token.AddService(std::move(education_service));
+
+    std::string expected =
+        "007eJxTYBCyYwu2b9n3YXqc45wD6w1+13VKfFPQv/"
+        "q7crOWbCUb30YFBktzA2dHY9OUVDODZBMTMxPTpKTEVItEI0NTAzPDJGNj9y8CDBFMDAyM"
+        "DCDMBsRMYD4zg6GRMSdDSWpxSXxpcWoRIwMAnhsddg==";
+
+    VerifyAccessToken2(expected, &token);
+  }
+
+  void TestAccessToken2EducationApp() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> education_service(
+        new ServiceEducation(room_uuid_, user_id_, role_));
+    education_service->AddPrivilege(ServiceEducation::kPrivilegeApp, expire_);
+    token.AddService(std::move(education_service));
+
+    std::string expected =
+        "007eJxTYFB+"
+        "ba86NzRtXsTrZvF0IfvsgozDht4SxcL7i5dNZzntv1KBwdLcwNnR2DQl1cwg2cTEzMQ0KS"
+        "kx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwizATEzmM/"
+        "MYGhkzMlQklpcEl9anFrEyAAANqwcXw==";
+
+    VerifyAccessToken2(expected, &token);
+  }
+
   void TestAccessToken2WithMultiService() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -278,10 +359,12 @@ class AccessToken2_test : public testing::Test {
   std::string channel_name_;
   std::string account_;
   std::string user_id_;
+  std::string room_uuid_;
 
   uint32_t uid_;
   uint32_t expire_;
   uint32_t issue_ts_;
+  int16_t role_;
 };
 
 TEST_F(AccessToken2_test, testAccessToken2WithIntUid) {
@@ -301,6 +384,15 @@ TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
 }
 TEST_F(AccessToken2_test, testAccessToken2ChatApp) {
   TestAccessToken2ChatApp();
+}
+TEST_F(AccessToken2_test, testAccessToken2EducationRoomUser) {
+  TestAccessToken2EducationRoomUser();
+}
+TEST_F(AccessToken2_test, testAccessToken2EducationUser) {
+  TestAccessToken2EducationUser();
+}
+TEST_F(AccessToken2_test, testAccessToken2EducationApp) {
+  TestAccessToken2EducationApp();
 }
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
   TestAccessToken2WithMultiService();
