@@ -276,6 +276,52 @@ class ServiceChat : public Service {
   std::string user_id_;
 };
 
+class ServiceEducation : public Service {
+ public:
+  enum {
+    kServiceType = 6,
+
+    kPrivilegeRoomUser = 1,
+    kPrivilegeUser = 2,
+    kPrivilegeApp = 3,
+  };
+
+ public:
+  ServiceEducation(const std::string &room_uuid = "",
+                   const std::string &user_uuid = "", int16_t role = -1)
+      : Service(kServiceType),
+        room_uuid_(room_uuid),
+        user_uuid_(user_uuid),
+        role_(role) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  virtual std::unique_ptr<Service> Clone() const override {
+    return std::unique_ptr<Service>(new ServiceEducation(*this));
+  }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
+                                          const ServiceEducation *x) {
+    p << dynamic_cast<const Service *>(x) << x->room_uuid_ << x->user_uuid_
+      << x->role_;
+    return p;
+  }
+
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
+                                            ServiceEducation *x) {
+    p >> dynamic_cast<Service *>(x) >> x->room_uuid_ >> x->user_uuid_ >>
+        x->role_;
+    return p;
+  }
+
+ public:
+  std::string room_uuid_;
+  std::string user_uuid_;
+  int16_t role_;
+};
+
 template <class T>
 struct ServiceCreator {
   static Service *New() { return (new T()); }
@@ -286,6 +332,7 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
     {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},
     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
+    {ServiceEducation::kServiceType, ServiceCreator<ServiceEducation>::New},
 };
 
 class AccessToken2 {
