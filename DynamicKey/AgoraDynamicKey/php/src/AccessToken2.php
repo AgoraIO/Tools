@@ -163,7 +163,7 @@ class ServiceChat extends Service
 
 class ServiceEducation extends Service
 {
-    const SERVICE_TYPE = 6;
+    const SERVICE_TYPE = 7;
     const PRIVILEGE_ROOM_USER = 1;
     const PRIVILEGE_USER = 2;
     const PRIVILEGE_APP = 3;

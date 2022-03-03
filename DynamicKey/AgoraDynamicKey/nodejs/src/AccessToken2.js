@@ -140,7 +140,7 @@ class ServiceChat extends Service {
 ServiceChat.kPrivilegeUser = 1
 ServiceChat.kPrivilegeApp = 2
 
-const kEducationServiceType = 6
+const kEducationServiceType = 7
 
 class ServiceEducation extends Service {
     constructor(roomUuid, userUuid, role) {
