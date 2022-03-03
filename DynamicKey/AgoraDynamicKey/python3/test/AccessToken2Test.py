@@ -4,10 +4,10 @@ __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 import os
 import sys
 import unittest
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.AccessToken2 import *
 from src.utils import *
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 class AccessToken2Test(unittest.TestCase):

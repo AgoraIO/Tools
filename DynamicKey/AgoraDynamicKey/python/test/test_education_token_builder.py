@@ -6,8 +6,7 @@ import unittest
 import os
 from src.education_token_builder import *
 
-sys.path.insert(0, os.path.abspath(
-    os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
 class EducationTokenBuilderTest(unittest.TestCase):
