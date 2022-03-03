@@ -85,7 +85,7 @@ public class AccessToken2 {
     public static final short SERVICE_TYPE_STREAMING = 3;
     public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
-    public static final short SERVICE_TYPE_EDUCATION = 6;
+    public static final short SERVICE_TYPE_EDUCATION = 7;
 
     public String appCert = "";
     public String appId = "";
