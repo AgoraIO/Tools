@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
-import hashlib
 import os
 import sys
 import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 from src.AccessToken2 import *
+from src.utils import *
 
 
 class AccessToken2Test(unittest.TestCase):
@@ -85,11 +84,8 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_education_room_user(self):
-        h = hashlib.md5()
-        h.update(self.__uid_str.encode('utf-8'))
-        char_user_id = h.hexdigest()
-        print(char_user_id)
-        education_service = ServiceEducation(self.__room_uuid, self.__uid_str, char_user_id, self.__role)
+        char_user_id = get_md5(self.__uid_str)
+        education_service = ServiceEducation(self.__room_uuid, self.__uid_str, self.__role)
         education_service.add_privilege(ServiceEducation.kPrivilegeRoomUser, self.__expire)
         self.__token.add_service(education_service)
 
@@ -103,8 +99,7 @@ class AccessToken2Test(unittest.TestCase):
 
         result = self.__token.build()
 
-        expected = '007eJxTYJi7wefZVLVsY4X8uZuuSzHN8fGUOipjsHH95c89bH94TH8qMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu' \
-                   '38RYIhgYmBgZGBgYGZgA9KMYD4zg6GRMReDkYWFkbGJoZG5sQKDmYGZsbGFsYmRRaKxWVpSonFakpmBsUFSanKahYGlSSojAxNcO7JOVrgoYTMAxgkwUw=='
+        expected = '007eJxTYPDt2Lmu+dWxJ0sv/ZP/56n/cMLkSc3XOmpZA6/NtOlbWumjwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgZmBHUgzgvnMDIZGxlwMRhYWRsYmhkbmxowMTHBJZHFWuKgCg5mBmbGxhbGJkUWisVlaUqJxWpKZgbFBUmpymoWBpUkqAGF8Kv8='
 
         self.assertEqual(expected, result)
 
@@ -115,9 +110,7 @@ class AccessToken2Test(unittest.TestCase):
 
         result = self.__token.build()
 
-        expected = '007eJxTYNgvZNueGi525KrO6mvvtmxZKqoiH7Jl/2R9uVUPb' \
-                   '/P0smkoMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhNiBmAvMZGLgYjCwsjIxNDI3MjRkY' \
-                   '/v8HAMBXHW4='
+        expected = '007eJxTYEg4e9Zj9gch+QkfFi1qM7tdkn1G3Kzt6FTJpTpzRQ4brixTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADC7EDMBOYzMHAxGFlYGBmbGBqZG///DwDuNR56'
         self.assertEqual(expected, result)
 
     def test_service_education_app(self):
@@ -127,9 +120,7 @@ class AccessToken2Test(unittest.TestCase):
 
         result = self.__token.build()
 
-        expected = '007eJxTYKhbOXM12wH3qKid7oeex9ze/rF' \
-                   '+5Q3PBZf2djIKOi1rjmBTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCbEDMDOZDwP' \
-                   '//AEVlHRk='
+        expected = '007eJxTYJgT3rumdJdoWJpC3aNTb4o76swyLsrHvmznOn/x1cQM9gcKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGUCYHYiZwXwQ+P8fAADUHTQ='
         self.assertEqual(expected, result)
 
     def test_multi_service(self):
@@ -164,10 +155,6 @@ class AccessToken2Test(unittest.TestCase):
 
         result = self.__token.build()
 
-        expected = '007eJxTYAjazHr1sODnOw25kg2FSttZl2oY/855/+Km94Gjy' \
-                   '+7HhJUrMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhk' \
-                   'bu38RYIhgYmBgZGBgYAOSLEAM4jOBSWYwyQImFRjMU8yNjM1MU5' \
-                   'MsLYxNLEyNLc1TjVON0yxTTMwMklJSErkYjCwsjIxNDI3MjZmA5kB' \
-                   'MQhZlZmBCMZ80M1ngZrJiNR3kfoi5qOIMDP//AwBU6jy3'
+        expected = '007eJxTYPhoYK+7SDk39KyyavaWJIvG958FqjUtWb631r8Sbb7U+FGBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwMDG5BkAWIQnwlMMoNJFjCpwGCeYm5kbGaammRpYWxiYWpsaZ5qnGqcZpliYmaQlJKSyMVgZGFhZGxiaGRuzAQ0B2ISsigzAxOK+aSZyQI3kxWr6exAMYi5qOL//wMAs006ww=='
 
         self.assertEqual(expected, result)
