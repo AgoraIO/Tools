@@ -249,30 +249,31 @@ class AccessToken2_test : public testing::Test {
   }
 
   void TestAccessToken2EducationRoomUser() {
-    MD5 h{user_id_};
-    std::string char_user_id(reinterpret_cast<const char *>(h.getDigest()));
+    MD5 h{account_};
+    std::string char_user_id = h.toStr();
 
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
 
     std::unique_ptr<Service> education_service(
-        new ServiceEducation(room_uuid_, user_id_, role_));
+        new ServiceEducation(room_uuid_, account_, role_));
     education_service->AddPrivilege(ServiceEducation::kPrivilegeRoomUser,
                                     expire_);
     token.AddService(std::move(education_service));
 
-    std::unique_ptr<Service> rtm_service(new ServiceRtm(user_id_));
+    std::unique_ptr<Service> rtm_service(new ServiceRtm(account_));
     rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
     token.AddService(std::move(rtm_service));
 
     std::unique_ptr<Service> chat_service(new ServiceChat(char_user_id));
-    chat_service->AddPrivilege(ServiceChat::kPrivilegeApp, expire_);
+    chat_service->AddPrivilege(ServiceChat::kPrivilegeUser, expire_);
     token.AddService(std::move(chat_service));
 
     std::string expected =
-        "007eJxTYAi07DjM9jO3cd7mI4qim1Zf2ztvi7ygfvepvwxPlPs2u81RYLA0N3B2NDZNSTU"
-        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwMzABKQZwXxOhpLU4pL40uLUI"
-        "lagEBNYUIBh7sIfD9admdvWvVYwULMgq5wNroGZwdDIGEkXIwMAtIUstA==";
+        "007eJxTYOi6fYVB7qlA2ZWQ+Ko3N2IafQOddj+K4tjh3PS7P2vx4a0KDJbmBs6OxqYpqWY"
+        "GySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmBmYgDQjmM/FYGRhYWRsYmhkb"
+        "swKF1VgMDMwMza2MDYxskg0NktLSjROSzIzMDZISk1OszCwNEllh6tlZjA0MkY2hpEBANq"
+        "IKYQ=";
 
     VerifyAccessToken2(expected, &token);
   }
@@ -282,14 +283,14 @@ class AccessToken2_test : public testing::Test {
     token.salt_ = 1;
 
     std::unique_ptr<Service> education_service(
-        new ServiceEducation(room_uuid_, user_id_, role_));
+        new ServiceEducation("", account_));
     education_service->AddPrivilege(ServiceEducation::kPrivilegeUser, expire_);
     token.AddService(std::move(education_service));
 
     std::string expected =
-        "007eJxTYBCyYwu2b9n3YXqc45wD6w1+13VKfFPQv/"
-        "q7crOWbCUb30YFBktzA2dHY9OUVDODZBMTMxPTpKTEVItEI0NTAzPDJGNj9y8CDBFMDAyM"
-        "DCDMBsRMYD4zg6GRMSdDSWpxSXxpcWoRIwMAnhsddg==";
+        "007eJxTYEg4e9Zj9gch+QkfFi1qM7tdkn1G3Kzt6FTJpTpzRQ4brixTYLA0N3B2NDZNSTU"
+        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADC7EDMBOYzMHAxGFlYGBmbGBqZG"
+        "///DwDuNR56";
 
     VerifyAccessToken2(expected, &token);
   }
@@ -298,16 +299,13 @@ class AccessToken2_test : public testing::Test {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
 
-    std::unique_ptr<Service> education_service(
-        new ServiceEducation(room_uuid_, user_id_, role_));
+    std::unique_ptr<Service> education_service(new ServiceEducation());
     education_service->AddPrivilege(ServiceEducation::kPrivilegeApp, expire_);
     token.AddService(std::move(education_service));
 
     std::string expected =
-        "007eJxTYFB+"
-        "ba86NzRtXsTrZvF0IfvsgozDht4SxcL7i5dNZzntv1KBwdLcwNnR2DQl1cwg2cTEzMQ0KS"
-        "kx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwizATEzmM/"
-        "MYGhkzMlQklpcEl9anFrEyAAANqwcXw==";
+        "007eJxTYJgT3rumdJdoWJpC3aNTb4o76swyLsrHvmznOn/x1cQM9gcKDJbmBs6OxqYpqWY"
+        "GySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGUCYHYiZwXwQ+P8fAADUHTQ=";
 
     VerifyAccessToken2(expected, &token);
   }
