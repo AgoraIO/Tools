@@ -1437,10 +1437,17 @@
   "resolved" "https://registry.npmjs.org/address/-/address-1.1.2.tgz"
   "version" "1.1.2"
 
-"agora-rtc-sdk-ng@4.7.1":
-  "integrity" "sha512-jf+azF8B/rAMHVQrc853PE0Th6InGmeXnGQ7ROK1+iU+4MSPwNlFWY3VBk5N8jsELGtplrNQGIOkjv1jTiLmjA=="
-  "resolved" "https://registry.npmjs.org/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.7.1.tgz"
-  "version" "4.7.1"
+"agora-rtc-sdk-ng@4.11.0":
+  "integrity" "sha512-T4eE1RwBXOuJgimeqqnNR/hD6pTHowJrMN2HJqD6YTwMI/V7ZTKNYiETNRtykyJ7VIPCVlvVcC9yZgHBJb5vrg=="
+  "resolved" "https://registry.npmjs.org/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.11.0.tgz"
+  "version" "4.11.0"
+  dependencies:
+    "agora-rte-extension" "^1.0.22"
+
+"agora-rte-extension@^1.0.22":
+  "integrity" "sha512-X2cGBg+L5ZJIFU91qvMASvRsBfg1HXTktVG3YROw9wxHsILSI7jgF9R9XraLc3fNX/UjovaYAlUW+hiJe0v6Xw=="
+  "resolved" "https://registry.npmjs.org/agora-rte-extension/-/agora-rte-extension-1.0.23.tgz"
+  "version" "1.0.23"
 
 "ajv-errors@^1.0.0":
   "integrity" "sha512-DCRfO/4nQ+89p/RK43i8Ezd41EqdGIU4ld7nGF8OQ14oc/we5rEntLCUa7+jrn3nn83BosfwZA0wb4pon2o8iQ=="

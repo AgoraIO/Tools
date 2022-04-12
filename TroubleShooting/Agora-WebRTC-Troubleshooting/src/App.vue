@@ -588,58 +588,60 @@ export default {
     initRecvClient() {
 
       return new Promise(async (resolve, reject) => {
-      // join 
-      await this.recvClient.join(APP_ID, this.channel, null, this.recvId).catch(e => {
-          console.error(" recv join failed "+e.message);
-          logger.error(e);
-          reject(e);
+        // join 
+        await this.recvClient.join(APP_ID, this.channel, null, this.recvId).catch(e => {
+            console.error(" recv join failed "+e.message);
+            logger.error(e);
+            reject(e);
+          });
+
+
+
+        this.recvClient.on("user-published",  async (user, mediaType) => {
+
+          this.recvClient.subscribe(user, mediaType).then(response => {
+            if (mediaType === 'video') {
+              user.videoTrack.play("test-recv");
+              let i = 1;
+              this.detectInterval = setInterval(() => {
+
+                const remoteTracksStats = {
+                    video: this.recvClient.getRemoteVideoStats()[user.uid],
+                    audio: this.recvClient.getRemoteAudioStats()[user.uid]
+                  };
+
+                    this.bitrateData.rows.push({
+                      index: i,
+                      tVideoBitrate: this._calcBitrate(
+                        remoteTracksStats.video.receiveBytes , i
+                      ),
+                      tAudioBitrate: this._calcBitrate(
+                        remoteTracksStats.audio.receiveBytes , i
+                      )
+                    });
+
+                    this.packetsData.rows.push({
+                      index: i,
+                      tVideoPacketLoss: this._calcPacketLoss(
+                      remoteTracksStats.video.receivePackets,
+                      remoteTracksStats.video.receivePacketsLost                     
+                      ),
+                      tAudioPacketLoss: this._calcPacketLoss(
+                      remoteTracksStats.audio.receivePackets,
+                      remoteTracksStats.audio.receivePacketsLost
+                      ),
+                    });
+                    i++;
+              }, 1000);
+            }
+            if (mediaType === 'audio') {
+              //user.audioTrack.play();
+            } 
+          }).catch(e => {
+            console.error(9);
+            logger.error(e);
+          });
         });
-
-      this.recvClient.on("user-published",  async (user, mediaType) => {
-
-        this.recvClient.subscribe(user, mediaType).then(response => {
-          if (mediaType === 'video') {
-            user.videoTrack.play("test-recv");
-            let i = 1;
-            this.detectInterval = setInterval(() => {
-
-               const remoteTracksStats = {
-                  video: this.recvClient.getRemoteVideoStats()[user.uid],
-                  audio: this.recvClient.getRemoteAudioStats()[user.uid]
-                };
-
-                  this.bitrateData.rows.push({
-                    index: i,
-                    tVideoBitrate: this._calcBitrate(
-                       remoteTracksStats.video.receiveBytes , i
-                    ),
-                    tAudioBitrate: this._calcBitrate(
-                       remoteTracksStats.audio.receiveBytes , i
-                    )
-                  });
-
-                  this.packetsData.rows.push({
-                    index: i,
-                    tVideoPacketLoss: this._calcPacketLoss(
-                     remoteTracksStats.video.receivePackets,
-                     remoteTracksStats.video.receivePacketsLost                     
-                    ),
-                    tAudioPacketLoss: this._calcPacketLoss(
-                     remoteTracksStats.audio.receivePackets,
-                     remoteTracksStats.audio.receivePacketsLost
-                    ),
-                  });
-                  i++;
-            }, 1000);
-          }
-          if (mediaType === 'audio') {
-            //user.audioTrack.play();
-          } 
-        }).catch(e => {
-          console.error(9);
-          logger.error(e);
-        });
-       });
 
             resolve();
       });
@@ -888,11 +890,23 @@ export default {
       let testSuite = this.testSuites["4"];
       // init client and stream
       try {
-        await this.initRecvClient();
+        await  Promise.all([
+          Promise.race([
+            this.initRecvClient(), 
+            new Promise((resolve, reject) => {
+                  setTimeout(() => {                   
+                      reject(); // calls back to the catch block below
+                  },10000);                  
+              })
+          ])         
+        ]);
+        
         await this.initSendClient();
         this.renderChart = true;
-      } catch (err) {
-        //console.error("ERR "+ err);
+      } catch (err) {       
+        if (this.isEnableCloudProxy==0) {
+          alert("try again with proxy");
+        }
         testSuite.extra = err; //"Connection Failed"
         testSuite.notError = false;
 
