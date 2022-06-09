@@ -285,3 +285,7 @@ my $media_channel_key = Agora::DynamicKey5::gen_media_channel_key($app_id, $app_
 
 say "media_channel_key:$media_channel_key";
 ```
+
+## License
+
+The sample projects are under the MIT license.
