@@ -1,38 +1,36 @@
-# How to use
-## Install
+# Authenticate Users with a token
 
-```shell
-npm i agora-access-token
-```
+To enhance communication security, Agora uses tokens to authenticate users before they access the Agora service, or joining an RTC channel.
 
-## Import
-```javascript
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('agora-access-token')
-```
+## Code structure
 
-### Generate
-```javascript
-// Rtc Examples
-const appID = '<Your app ID>';
-const appCertificate = '<Your app certificate>';
-const channelName = '<The channel this token is generated for>';
-const uid = 2882341273;
-const account = "2882341273";
-const role = RtcRole.PUBLISHER;
+Under the `nodejs` directory:
 
-const expirationTimeInSeconds = 3600
+* `/src/` contains the source code for generating a token, where `RtcTokenBuilder.js` is used for generating an RTC token, and `RtmTokenBuilder.js` is used for generating an RTM token.
+* `/sample/` contains the sample code for generating a token, where `RtcTokenBuilderSample.js` is used for generating an RTC token, and `RtmTokenBuilderSample.js` is used for generating an RTM token.
 
-const currentTimestamp = Math.floor(Date.now() / 1000)
+## Generate a token with the sample code
 
-const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
+This section takes `RtcTokenBuilderSample.js` as an example to show how to generate a token with the sample code.
 
-// IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+Before proceeding, ensure that you have installed the LTS version of Node.js.
 
-// Build token with uid
-const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
-console.log("Token With Integer Number Uid: " + tokenA);
+1. Run the following command to install the Node.js dependencies:
 
-// Build token with user account
-const tokenB = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
-console.log("Token With UserAccount: " + tokenB);
-```
+   ```
+   npm install
+   ```
+
+2. Download or clone the [Tools](https://github.com/AgoraIO/Tools) repository.
+
+3. Open the `DynamicKey/AgoraDynamicKey/nodejs/sample/RtcTokenBuilderSample.js` file, replace the value of `appID`, `appCertificate`, `channelName`, and `uid` with your own, and comment out the code snippets of `buildTokenWithUserAccount`.
+
+4. Open your Terminal, navigate to the same directory that holds `RtcTokenBuilderSample.js`, and run the following command. The token is generated and printed in your Terminal window.
+
+   ```
+   node RtcTokenBuilderSample.js
+   ```
+
+## Reference
+
+For a complete authentication flow between the app server and app client, see [Authenticate Your Users with Tokens]().
