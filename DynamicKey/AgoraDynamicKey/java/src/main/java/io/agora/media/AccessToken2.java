@@ -31,18 +31,6 @@ public class AccessToken2 {
         }
     }
 
-    public enum PrivilegeStreaming {
-        PRIVILEGE_PUBLISH_MIX_STREAM(1),
-        PRIVILEGE_PUBLISH_RAW_STREAM(2),
-        ;
-
-        public short intValue;
-
-        PrivilegeStreaming(int value) {
-            intValue = (short) value;
-        }
-    }
-
     public enum PrivilegeFpa {
         PRIVILEGE_LOGIN(1),
         ;
@@ -82,7 +70,6 @@ public class AccessToken2 {
     private static final String VERSION = "007";
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
-    public static final short SERVICE_TYPE_STREAMING = 3;
     public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
     public static final short SERVICE_TYPE_EDUCATION = 7;
@@ -138,9 +125,6 @@ public class AccessToken2 {
         }
         if (serviceType == SERVICE_TYPE_RTM) {
             return new ServiceRtm();
-        }
-        if (serviceType == SERVICE_TYPE_STREAMING) {
-            return new ServiceStreaming();
         }
         if (serviceType == SERVICE_TYPE_FPA) {
             return new ServiceFpa();
@@ -300,31 +284,6 @@ public class AccessToken2 {
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
             this.userId = byteBuf.readString();
-        }
-    }
-
-    public static class ServiceStreaming extends Service {
-        public String channelName;
-        public String uid;
-
-        public ServiceStreaming() {
-            this.type = SERVICE_TYPE_STREAMING;
-        }
-
-        public ServiceStreaming(String channelName, String uid) {
-            this.type = SERVICE_TYPE_STREAMING;
-            this.channelName = channelName;
-            this.uid = uid;
-        }
-
-        public ByteBuf pack(ByteBuf buf) {
-            return super.pack(buf).put(this.channelName).put(this.uid);
-        }
-
-        public void unpack(ByteBuf byteBuf) {
-            super.unpack(byteBuf);
-            this.channelName = byteBuf.readString();
-            this.uid = byteBuf.readString();
         }
     }
 
