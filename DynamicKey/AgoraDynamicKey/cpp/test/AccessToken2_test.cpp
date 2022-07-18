@@ -5,11 +5,12 @@
 #define protected public
 
 #include "../src/AccessToken2.h"
-#include "../src/md5/md5.h"
 
 #include <gtest/gtest.h>
 
 #include <string>
+
+#include "../src/md5/md5.h"
 
 using namespace agora::tools;
 
@@ -59,16 +60,6 @@ class AccessToken2_test : public testing::Test {
     auto r_rtc = dynamic_cast<ServiceRtm *>(r);
 
     EXPECT_EQ(l_rtc->user_id_, r_rtc->user_id_);
-  }
-
-  void VerifyServiceStreaming(Service *l, Service *r) {
-    VerifyService(l, r);
-
-    auto l_rtc = dynamic_cast<ServiceStreaming *>(l);
-    auto r_rtc = dynamic_cast<ServiceStreaming *>(r);
-
-    EXPECT_EQ(l_rtc->channel_name_, r_rtc->channel_name_);
-    EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
   void VerifyServiceFpa(Service *l, Service *r) {
@@ -125,8 +116,6 @@ class AccessToken2_test : public testing::Test {
     static const std::map<uint16_t, VerifyServiceHandler> kVerifyServices = {
         {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},
         {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
-        {ServiceStreaming::kServiceType,
-         &AccessToken2_test::VerifyServiceStreaming},
         {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
         {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
         {ServiceEducation::kServiceType,
@@ -207,7 +196,7 @@ class AccessToken2_test : public testing::Test {
 
     key.AddService(std::move(service));
 
-    std::string expected = 
+    std::string expected =
         "007eJxTYEhuZrAR/XT+XPihI+6t4t5F9RtUltw9em3Pwi2sr6P/lAspMFiaGzg7GpumpJo"
         "ZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPO5GIwsLIyMTQyNzI0Bn"
         "dAdKg==";
@@ -224,7 +213,7 @@ class AccessToken2_test : public testing::Test {
 
     key.AddService(std::move(service));
 
-    std::string expected = 
+    std::string expected =
         "007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTU"
         "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDA"
         "B+lHrg=";
@@ -241,7 +230,7 @@ class AccessToken2_test : public testing::Test {
 
     key.AddService(std::move(service));
 
-    std::string expected = 
+    std::string expected =
         "007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSama"
         "QbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr";
 
@@ -323,13 +312,6 @@ class AccessToken2_test : public testing::Test {
     std::unique_ptr<Service> rtm(new ServiceRtm(user_id_));
     rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
 
-    std::unique_ptr<Service> streaming(
-        new ServiceStreaming(channel_name_, uid_));
-    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream,
-                            expire_);
-    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream,
-                            expire_);
-
     std::unique_ptr<Service> fpa(new ServiceFpa());
     fpa->AddPrivilege(ServiceFpa::kPrivilegeLogin, expire_);
 
@@ -338,15 +320,14 @@ class AccessToken2_test : public testing::Test {
 
     key.AddService(std::move(rtc));
     key.AddService(std::move(rtm));
-    key.AddService(std::move(streaming));
     key.AddService(std::move(fpa));
     key.AddService(std::move(chat));
 
     std::string expected =
-        "007eJxTYLgzwyF4z+F775+LdK4+u313oKDtdBXruNf31QTrlydWfuRSYLA0N3B2NDZNSTU"
-        "zSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAokWYAYxGcCk8xgkgVMKjCYp"
-        "5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklp"
-        "cEl9anFrEzMCEYjxpRrLAjWSFs5DlAYHiOdw=";
+        "007eJxTYLjhFiNy2/+8zqRJj20tt73SKA2e3/"
+        "joPVv4761qZnrOyqYKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKY"
+        "GBgYGRgYWIAkCIP4TGCSGUyygEkFBvMUcyNjM9PUJEsLYxMLU2NL81TjVOM0yxQTM4OklJ"
+        "RELgYjCwsjYxNDI3NjJqA5EJM4GUpSi0viS4tTi1jggqxwFrImAAIiLHc=";
 
     VerifyAccessToken2(expected, &key);
   }
@@ -368,30 +349,37 @@ class AccessToken2_test : public testing::Test {
 TEST_F(AccessToken2_test, testAccessToken2WithIntUid) {
   TestAccessToken2WithIntUid();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) {
   TestAccessToken2WithIntUidZero();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2WithStringUid) {
   TestAccessToken2WithStringUid();
 }
-TEST_F(AccessToken2_test, testAccessToken2Rtm) {
-  TestAccessToken2Rtm();
-}
+
+TEST_F(AccessToken2_test, testAccessToken2Rtm) { TestAccessToken2Rtm(); }
+
 TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
   TestAccessToken2ChatUser();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2ChatApp) {
   TestAccessToken2ChatApp();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2EducationRoomUser) {
   TestAccessToken2EducationRoomUser();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2EducationUser) {
   TestAccessToken2EducationUser();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2EducationApp) {
   TestAccessToken2EducationApp();
 }
+
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
   TestAccessToken2WithMultiService();
 }
