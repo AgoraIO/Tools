@@ -117,23 +117,6 @@ func Test_AccessToken_Build_ServiceRtm(t *testing.T) {
 	AssertEqual(t, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A", token)
 }
 
-func Test_AccessToken_Build_ServiceStreaming(t *testing.T) {
-	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
-	accessToken.IssueTs = DataMockIssueTs
-	accessToken.Salt = DataMockSalt
-
-	serviceStreaming := NewServiceStreaming(DataMockChannelName, DataMockUidStr)
-	serviceStreaming.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
-	accessToken.AddService(serviceStreaming)
-
-	AssertEqual(t, DataMockChannelName, serviceStreaming.ChannelName)
-	AssertEqual(t, DataMockUidStr, serviceStreaming.Uid)
-
-	token, err := accessToken.Build()
-	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYGBj//4jzGnul2n88j7n7tb9njDzn/j5BhulK6yLV5/YlWKnwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkQGEmRkYGRjBfAUG8xRzI2Mz09QkSwtjEwtTY0vzVONU4zTLFBMzg6SUlEQuBiMLCyNjE0Mjc2NAAAAA//8zyyXw", token)
-}
-
 func Test_AccessToken_Build_ServiceChatUser(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -181,22 +164,14 @@ func Test_AccessToken_Build_MultipleServices(t *testing.T) {
 	serviceRtm.AddPrivilege(PrivilegeLogin, DataMockExpire)
 	accessToken.AddService(serviceRtm)
 
-	// STREAMING
-	serviceStreaming := NewServiceStreaming(DataMockChannelName, DataMockUidStr)
-	serviceStreaming.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
-	accessToken.AddService(serviceStreaming)
-
 	// CHAT
 	serviceChat := NewServiceChat(DataMockUidStr)
 	serviceChat.AddPrivilege(PrivilegeChatUser, DataMockExpire)
 	accessToken.AddService(serviceChat)
 
-	AssertEqual(t, DataMockChannelName, serviceStreaming.ChannelName)
-	AssertEqual(t, DataMockUidStr, serviceStreaming.Uid)
-
 	token, err := accessToken.Build()
 	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYHh7j83I4Q6X9f94Vt1zS7du+NrqujQ86nSB+NJZn+eYG1kqMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZGBgYGFgBEMQX4HBPMXcyNjMNDXJ0sLYxMLU2NI81TjVOM0yxcTMICklJZGLwcjCwsjYxNDI3JgJro+ToSS1uCS+tDi1iJlMw1jh+pBFAQEAAP//oGY29w==", token)
+	AssertEqual(t, "007eJxSYJjqLJBlM239wwWvmBZ7tW619coNnPKSXaHayfKzZODswxMVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwMDMwgiGIr8BgnmJuZGxmmppkaWFsYmFqbGmeapxqnGaZYmJmkJSSksjFYGRhYWRsYmhkbswE18fJUJJaXBJfWpxaxAoXRFYKCAAA///aoiqr", token)
 }
 
 func Test_AccessToken_Parse_TokenRtc(t *testing.T) {

@@ -18,7 +18,6 @@ const (
 	// Service type
 	ServiceTypeRtc       = 1
 	ServiceTypeRtm       = 2
-	ServiceTypeStreaming = 3
 	ServiceTypeFpa       = 4
 	ServiceTypeChat      = 5
 	ServiceTypeEducation = 7
@@ -32,10 +31,6 @@ const (
 	// Rtm
 	// Fpa
 	PrivilegeLogin = 1
-
-	// Streaming
-	PrivilegePublishMixStream = 1
-	PrivilegePublishRawStream = 2
 
 	// Chat
 	PrivilegeChatUser = 1
@@ -152,40 +147,6 @@ func (serviceRtm *ServiceRtm) UnPack(r io.Reader) (err error) {
 		return
 	}
 	serviceRtm.UserId, err = unPackString(r)
-	return
-}
-
-type ServiceStreaming struct {
-	*Service
-	ChannelName string
-	Uid         string
-}
-
-func NewServiceStreaming(channelName string, uid string) (serviceStreaming *ServiceStreaming) {
-	serviceStreaming = &ServiceStreaming{ChannelName: channelName, Service: NewService(ServiceTypeStreaming), Uid: uid}
-	return
-}
-
-func (serviceStreaming *ServiceStreaming) Pack(w io.Writer) (err error) {
-	err = serviceStreaming.Service.Pack(w)
-	if err != nil {
-		return
-	}
-	err = packString(w, serviceStreaming.ChannelName)
-	if err != nil {
-		return
-	}
-	err = packString(w, serviceStreaming.Uid)
-	return
-}
-
-func (serviceStreaming *ServiceStreaming) UnPack(r io.Reader) (err error) {
-	err = serviceStreaming.Service.UnPack(r)
-	if err != nil {
-		return
-	}
-	serviceStreaming.ChannelName, err = unPackString(r)
-	serviceStreaming.Uid, err = unPackString(r)
 	return
 }
 
@@ -339,7 +300,7 @@ func (accessToken *AccessToken) Build() (res string, err error) {
 	}
 
 	// Pack services in definite order
-	serviceTypes := []uint16{ServiceTypeRtc, ServiceTypeRtm, ServiceTypeStreaming, ServiceTypeFpa, ServiceTypeChat, ServiceTypeEducation}
+	serviceTypes := []uint16{ServiceTypeRtc, ServiceTypeRtm, ServiceTypeFpa, ServiceTypeChat, ServiceTypeEducation}
 	for _, serviceType := range serviceTypes {
 		if service, ok := accessToken.Services[serviceType]; ok {
 			err = service.Pack(buf)
@@ -439,8 +400,6 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 		service = NewServiceRtc("", "")
 	case ServiceTypeRtm:
 		service = NewServiceRtm("")
-	case ServiceTypeStreaming:
-		service = NewServiceStreaming("", "")
 	case ServiceTypeFpa:
 		service = NewServiceFpa()
 	case ServiceTypeChat:
