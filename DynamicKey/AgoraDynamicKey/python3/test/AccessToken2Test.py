@@ -133,10 +133,6 @@ class AccessToken2Test(unittest.TestCase):
         rtm = ServiceRtm(self.__uid_str)
         rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
 
-        streaming = ServiceStreaming(self.__channel_name, self.__uid)
-        streaming.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, self.__expire)
-        streaming.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
-
         fpa = ServiceFpa()
         fpa.add_privilege(ServiceFpa.kPrivilegeLogin, self.__expire)
 
@@ -148,13 +144,12 @@ class AccessToken2Test(unittest.TestCase):
 
         self.__token.add_service(rtc)
         self.__token.add_service(rtm)
-        self.__token.add_service(streaming)
         self.__token.add_service(fpa)
         self.__token.add_service(chat)
         self.__token.add_service(education)
 
         result = self.__token.build()
 
-        expected = '007eJxTYPhoYK+7SDk39KyyavaWJIvG958FqjUtWb631r8Sbb7U+FGBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwMDG5BkAWIQnwlMMoNJFjCpwGCeYm5kbGaammRpYWxiYWpsaZ5qnGqcZpliYmaQlJKSyMVgZGFhZGxiaGRuzAQ0B2ISsigzAxOK+aSZyQI3kxWr6exAMYi5qOL//wMAs006ww=='
+        expected = '007eJxTYHh8IPKzTvBdf9ce8bk7G61vs06oca1e815/ot4+x7rfjDIKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYWIEkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzYyagORCTkEVZ4KKsWOXZgWIQm1HF//8HAL01L5I='
 
         self.assertEqual(expected, result)
