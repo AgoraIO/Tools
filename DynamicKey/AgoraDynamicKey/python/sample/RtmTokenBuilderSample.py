@@ -16,7 +16,7 @@ currentTimestamp = int(time.time())
 privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 
 def main():
-    token = RtmTokenBuilder.build_token(appID, appCertificate, user, Role_Rtm_User, privilegeExpiredTs)
+    token = RtmTokenBuilder.buildToken(appID, appCertificate, user, Role_Rtm_User, privilegeExpiredTs)
     print("Rtm Token: {}".format(token))
 
 

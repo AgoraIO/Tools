@@ -17,7 +17,7 @@ ts = 1111111
 class RtmTokenBuilderTest(unittest.TestCase):
 
     def test_(self):
-        token = RtmTokenBuilder.buildToken(appID, appCertificate, userAccount, Role_Rtm_User, expireTimestamp)
+        token = RtmTokenBuilder.build_token(appID, appCertificate, userAccount, Role_Rtm_User, expireTimestamp)
         parser = AccessToken()
         parser.fromString(token)
         self.assertEqual(parser.messages[kRtmLogin], expireTimestamp)

@@ -1,15 +1,9 @@
-# -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
-
+import sys
+import os
 
 from .AccessToken import *
 
-
-warnings.warn('The RtmTokenBuilder module is deprecated', DeprecationWarning)
-
-
 Role_Rtm_User = 1
-
 
 class RtmTokenBuilder:
     # appID: The App ID issued to you by Agora. Apply for a new App ID from 

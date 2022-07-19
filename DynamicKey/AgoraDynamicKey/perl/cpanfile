@@ -1,0 +1,12 @@
+requires 'perl', '5.10.0';
+
+requires 'Carp';
+requires 'Digest::MD5';
+requires 'Digest::SHA';
+requires 'MIME::Base64';
+requires 'Math::Random::MT::Auto';
+requires 'String::CRC32';
+
+on 'test' => sub {
+    requires 'Test::More';
+};
