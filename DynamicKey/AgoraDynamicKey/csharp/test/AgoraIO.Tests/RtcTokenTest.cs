@@ -12,6 +12,7 @@ namespace AgoraIO.Tests
         private string _channelName = "7d72365eb983485397e3e3f9d460bdda";
         private string _uid = "2882341273";
         private uint _expireTimeInSeconds = 3600;
+        private uint _salt = 1;
         protected readonly ITestOutputHelper Output;
 
         public RtcTokenTest(ITestOutputHelper tempOutput)
@@ -23,7 +24,7 @@ namespace AgoraIO.Tests
         public void test()
         {
             uint privilegeExpiredTs = _expireTimeInSeconds + (uint)Utils.getTimestamp();
-            AccessToken accessToken = new AccessToken(_appId, _appCertificate, _channelName, _uid);
+            AccessToken accessToken = new AccessToken(_appId, _appCertificate, _channelName, _uid, privilegeExpiredTs, _salt);
             accessToken.addPrivilege(Privileges.kJoinChannel, privilegeExpiredTs);
             accessToken.addPrivilege(Privileges.kPublishAudioStream, privilegeExpiredTs);
             accessToken.addPrivilege(Privileges.kPublishVideoStream, privilegeExpiredTs);
@@ -32,7 +33,6 @@ namespace AgoraIO.Tests
             string token = accessToken.build();
             Output.WriteLine(">> token");
             Output.WriteLine(token);
-            // Assert.Equal("", token);
         }
     }
 }
