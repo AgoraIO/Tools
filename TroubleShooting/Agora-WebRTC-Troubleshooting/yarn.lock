@@ -1437,10 +1437,10 @@
   "resolved" "https://registry.npmjs.org/address/-/address-1.1.2.tgz"
   "version" "1.1.2"
 
-"agora-rtc-sdk-ng@4.11.0":
-  "integrity" "sha512-T4eE1RwBXOuJgimeqqnNR/hD6pTHowJrMN2HJqD6YTwMI/V7ZTKNYiETNRtykyJ7VIPCVlvVcC9yZgHBJb5vrg=="
-  "resolved" "https://registry.npmjs.org/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.11.0.tgz"
-  "version" "4.11.0"
+"agora-rtc-sdk-ng@4.13":
+  "integrity" "sha512-+ZVVPgaSbAVjTREbOtyyfhVyJ24dgvTug68kFFRDxEhSuGHqReOwS8obwJiDmH9JvYhc8CzuWWwAebWEmbupsg=="
+  "resolved" "https://registry.npmjs.org/agora-rtc-sdk-ng/-/agora-rtc-sdk-ng-4.13.0.tgz"
+  "version" "4.13.0"
   dependencies:
     "agora-rte-extension" "^1.0.22"
 
