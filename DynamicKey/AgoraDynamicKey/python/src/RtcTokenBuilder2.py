@@ -17,7 +17,7 @@ class RtcTokenBuilder:
         :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
             See Get an App Certificate.
         :param channel_name: Unique channel name for the AgoraRTC session in the string format.
-        :param uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
+        :param uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (232-1).
             optionalUid must be unique.
         :param role: Role_Publisher: A broadcaster/host in a live-broadcast profile.
             Role_Subscriber: An audience(default) in a live-broadcast profile.
@@ -54,15 +54,11 @@ class RtcTokenBuilder:
         token = AccessToken(app_id, app_certificate, expire=token_expire)
 
         rtc_service = ServiceRtc(channel_name, account)
-        rtc_service.add_privilege(
-            ServiceRtc.kPrivilegeJoinChannel, privilege_expire)
+        rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilege_expire)
         if role == Role_Publisher:
-            rtc_service.add_privilege(
-                ServiceRtc.kPrivilegePublishAudioStream, privilege_expire)
-            rtc_service.add_privilege(
-                ServiceRtc.kPrivilegePublishVideoStream, privilege_expire)
-            rtc_service.add_privilege(
-                ServiceRtc.kPrivilegePublishDataStream, privilege_expire)
+            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilege_expire)
+            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilege_expire)
+            rtc_service.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilege_expire)
 
         token.add_service(rtc_service)
         return token.build()
@@ -99,7 +95,7 @@ class RtcTokenBuilder:
         - All numeric characters: 0 to 9.
         - The space character.
         - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
-        :param uid: The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
+        :param uid: The user ID. A 32-bit unsigned integer with a value range from 1 to (232 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
         :param token_expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
         Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
         :param join_channel_privilege_expire: The Unix timestamp when the privilege for joining the channel expires, represented
@@ -183,14 +179,10 @@ class RtcTokenBuilder:
         token = AccessToken(app_id, app_certificate, expire=token_expire)
 
         service_rtc = ServiceRtc(channel_name, account)
-        service_rtc.add_privilege(
-            ServiceRtc.kPrivilegeJoinChannel, join_channel_privilege_expire)
-        service_rtc.add_privilege(
-            ServiceRtc.kPrivilegePublishAudioStream, pub_audio_privilege_expire)
-        service_rtc.add_privilege(
-            ServiceRtc.kPrivilegePublishVideoStream, pub_video_privilege_expire)
-        service_rtc.add_privilege(
-            ServiceRtc.kPrivilegePublishDataStream, pub_data_stream_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, join_channel_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, pub_audio_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, pub_video_privilege_expire)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, pub_data_stream_privilege_expire)
         token.add_service(service_rtc)
 
         return token.build()

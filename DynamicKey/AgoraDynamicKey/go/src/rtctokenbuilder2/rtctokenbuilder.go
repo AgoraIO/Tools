@@ -18,7 +18,7 @@ const (
 // appCertificate: Certificate of the application that you registered in
 //     the Agora Dashboard. See Get an App Certificate.
 // channelName: Unique channel name for the AgoraRTC session in the string format
-// uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). optionalUid must be unique.
+// uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (232-1). optionalUid must be unique.
 // role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
@@ -96,7 +96,7 @@ func BuildTokenWithUserAccount(appId string, appCertificate string, channelName 
 // - All numeric characters: 0 to 9.
 // - The space character.
 // - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
-// @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
+// @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (232 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
 // @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
 // Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
 // @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
