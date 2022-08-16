@@ -13,7 +13,7 @@ public class EducationTokenBuilder2Test {
     private static Short role = 1;
     private static int expire = 600;
 
-    private static Integer defaultRole = -1;
+    private static Short defaultRole = -1;
     private static String defaultRoomUuid = "";
     private static String defaultUserUuid = "";
 
