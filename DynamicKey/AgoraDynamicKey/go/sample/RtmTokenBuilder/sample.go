@@ -1,13 +1,13 @@
 package main
 
 import (
-	rtmtokenbuilder "RtmTokenBuilder"
 	"fmt"
 	"time"
+
+	rtmtokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/RtmTokenBuilder"
 )
 
 func main() {
-
 	appID := "970CA35de60c44645bbae8a215061b33"
 	appCertificate := "5CFd2fd1755d40ecb72977518be15d3b"
 	user := "test_user_id"
