@@ -7,9 +7,11 @@ import java.util.List;
 import java.util.TreeMap;
 
 public class AccessTokenInspector {
+    private static String token = "007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj";
+
     public static void main(String[] args) {
         AccessTokenInspector inspector = new AccessTokenInspector();
-        inspector.inspect(args[0]);
+        inspector.inspect(token);
     }
 
     void inspect(String input) {
@@ -44,8 +46,6 @@ public class AccessTokenInspector {
         }
         return "unknown";
     }
-
-
 
     private String toRtcPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
