@@ -4,9 +4,10 @@ __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 import os
 import sys
 import unittest
-from src.RtcTokenBuilder2 import *
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.RtcTokenBuilder2 import *
 
 
 class RtcTokenBuilder2Test(unittest.TestCase):
