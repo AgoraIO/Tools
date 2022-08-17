@@ -3,9 +3,10 @@ __copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
 
 import os
 import sys
-from src.fpa_token_builder import *
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.fpa_token_builder import *
 
 
 def main():
