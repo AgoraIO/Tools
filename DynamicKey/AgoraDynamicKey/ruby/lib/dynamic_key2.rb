@@ -6,5 +6,5 @@ require_relative 'dynamic_key2/fpa_token_builder'
 require_relative 'dynamic_key2/util'
 
 module AgoraDynamicKey2
-  VERSION = '0.2.0'.freeze
+  VERSION = '007'.freeze
 end
