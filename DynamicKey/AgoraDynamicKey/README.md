@@ -25,50 +25,95 @@ Sample Code for generating AccessToken are available on the following platforms:
  + Java
  + Node.js
  + Python
+ + Python3
  + PHP
  + Perl
  + CSharp
+ + Ruby
 
-> You can use either the following SimpleTokenBuilder or AccessToken sample code to generate an AccessToken. SimpleTokenBuilder encapsulates the underlying AccessToken sample code and is easy to use.
+> You can use RTC/RTM sample code to generate an AccessToken. 
 
 ### C++
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/src/SimpleTokenBuilder.h
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/src/AccessToken.h
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/sample/RtcTokenBuilder2Sample.cpp
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/sample/RtmTokenBuilder2Sample.cpp
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/sample/RtcTokenBuilderSample.cpp
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/cpp/sample/RtmTokenBuilderSample.cpp
 
 ### Go
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/src/SimpleTokenBuilder/SimpleTokenBuilder.go
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/src/AccessToken/AccessToken.go
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/sample/rtctokenbuilder2/sample.go
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/sample/rtmtokenbuilder2/sample.go
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/sample/RtcTokenBuilder/sample.go
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/go/sample/RtmTokenBuilder/sample.go
 
 ### Java
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/media/SimpleTokenBuilder.java
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/media/AccessToken.java
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtcTokenBuilder2Sample.java
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtmTokenBuilder2Sample.java
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtcTokenBuilderSample.java
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtmTokenBuilderSample.java
 
 ### Node.js
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/nodejs/src/SimpleTokenBuilder.js
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/nodejs/src/AccessToken.js
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/nodejs/sample/RtcTokenBuilder2Sample.js
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/nodejs/sample/RtcTokenBuilderSample.js
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/nodejs/sample/RtmTokenBuilderSample.js
 
 ### Python
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/src/SimpleTokenBuilder.py
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/src/AccessToken.py
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/sample/RtcTokenBuilder2Sample.py
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/sample/RtmTokenBuilder2Sample.py
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/sample/RtcTokenBuilderSample.py
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python/sample/RtmTokenBuilderSample.py
+
+### Python3
+
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python3/sample/RtcTokenBuilder2Sample.py
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python3/sample/RtmTokenBuilder2Sample.py
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python3/sample/RtcTokenBuilderSample.py
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/python3/sample/RtmTokenBuilderSample.py
 
 ### PHP
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/src/SimpleTokenBuilder.php
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/src/AccessToken.php
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/sample/RtcTokenBuilder2Sample.php
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/sample/RtmTokenBuilder2Sample.php
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/sample/RtcTokenBuilderSample.php
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/php/sample/RtmTokenBuilderSample.php
 
 ### Perl
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/src/Agora/SimpleTokenBuilder.pm
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/src/Agora/AccessToken.pm
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/sample/sample_access_token.pl
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/perl/sample/sample_simple_token_builder.pl
 
 ### CSharp
 
-+ https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/src/AgoraIO/Media/AccessToken.cs
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/sample/RtcTokenBuilderSample.cs
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/sample/RtmTokenBuilderSample.cs
+
+### Ruby
+
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/ruby/sample/rtc_token_builder2_sample.rb
+- Version 006
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/ruby/sample/rtc_token_builder_sample.rb
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/ruby/sample/rtm_token_builder_sample.rb
 
 ### **YOUR IMPLEMENTATIONS ARE VERY WELCOME.**
 
@@ -285,3 +330,20 @@ my $media_channel_key = Agora::DynamicKey5::gen_media_channel_key($app_id, $app_
 
 say "media_channel_key:$media_channel_key";
 ```
+
+## Tool 
+### Parse token
+    ```
+    Usage
+    # python3 parse.py YOUR_TOKEN
+    OR
+    # make parse token=YOUR_TOKEN
+
+    Test token with web page
+    - For RTC, https://webdemo.agora.io/agora-web-showcase/examples/Agora-Web-Tutorial-1to1-Web/
+    - For RTM, https://webdemo.agora.io/agora-web-showcase/examples/Agora-RTM-Tutorial-Web/
+    ```
+
+## License
+
+The sample projects are under the MIT license.

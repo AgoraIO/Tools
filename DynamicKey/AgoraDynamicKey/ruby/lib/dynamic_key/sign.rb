@@ -51,7 +51,7 @@ module AgoraDynamicKey
 
       def decode! string
         version = string[0..2]
-        raise InvalidToken, "can't match version" unless version == VERSION
+        raise InvalidToken, "can't match version" unless version == AgoraDynamicKey::AccessToken::VERSION
         appId = string[3..3+31]
         content = string[3+32..-1]
         content_binary = Base64.strict_decode64(content)
