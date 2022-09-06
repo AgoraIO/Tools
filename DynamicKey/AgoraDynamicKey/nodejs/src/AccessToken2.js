@@ -1,4 +1,4 @@
-var crypto = require('crypto')
+var createHmac = require('create-hmac')
 const zlib = require('zlib')
 const VERSION_LENGTH = 3
 const APP_ID_LENGTH = 32
@@ -263,7 +263,7 @@ class AccessToken2 {
 }
 
 var encodeHMac = function (key, message) {
-    return crypto.createHmac('sha256', key).update(message).digest()
+    return createHmac('sha256', key).update(message).digest()
 }
 
 var ByteBuf = function () {

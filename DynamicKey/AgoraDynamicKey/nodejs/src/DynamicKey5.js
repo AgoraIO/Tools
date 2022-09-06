@@ -1,4 +1,4 @@
-var crypto = require('crypto');
+var createHmac = require('create-hmac');
 
 var version = "005";
 var noUpload = "0";
@@ -68,7 +68,7 @@ var generateSignature5 = function(appCertificate, serviceType, appID, unixTs, ra
 };
 
 var encodeHMac = function(key, message) {
-    return crypto.createHmac('sha1', key).update(message).digest('hex').toUpperCase();
+    return createHmac('sha1', key).update(message).digest('hex').toUpperCase();
 };
 
 var hexDecode = function(str) {

@@ -1,4 +1,4 @@
-var crypto = require("crypto");
+var createHmac = require('create-hmac');
 var crc32 = require("crc-32");
 var UINT32 = require("cuint").UINT32;
 var version = "006";
@@ -85,7 +85,7 @@ module.exports.priviledges = {
 };
 
 var encodeHMac = function (key, message) {
-    return crypto.createHmac("sha256", key).update(message).digest();
+    return createHmac("sha256", key).update(message).digest();
 };
 
 var ByteBuf = function () {
