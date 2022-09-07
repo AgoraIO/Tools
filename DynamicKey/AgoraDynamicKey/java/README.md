@@ -21,18 +21,6 @@ Before proceeding, ensure that you have installed a Java IDE.
 3. Open the `DynamicKey/AgoraDynamicKey/java/src/io/agora/sample/RtcTokenBuilder.java` file, replace the value of `appID`, `appCertificate`, `channelName`, and `uid` with your own, and comment out the code snippets of `buildTokenWithUserAccount`.
 4. Run the sample project. Your token is generated and printed in your IDE.
 
-## Maven Dependency
-
-SDK can be obtained automatically via [Maven's dependency management](https://mvnrepository.com/artifact/io.agora/authentication) by adding the following configuration in the application's Project Object Model (POM) file:
-
-    ```
-    <dependency>
-        <groupId>io.agora</groupId>
-        <artifactId>authentication</artifactId>
-        <version>${version}</version>
-    </dependency>
-    ```
-
 ## Reference
 
 For a complete authentication flow between the app server and app client, see [Authenticate Your Users with Tokens]().
