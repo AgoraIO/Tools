@@ -1,4 +1,4 @@
-const {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} = require('./index')
+import {RtcTokenBuilder, RtmTokenBuilder, RtcRole, RtmRole} from './index.js'
 
 const generateRtcToken = () => {
   // Rtc Examples
