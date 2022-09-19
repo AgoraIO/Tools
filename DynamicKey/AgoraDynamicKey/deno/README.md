@@ -13,22 +13,16 @@ Under the `nodejs` directory:
 
 This section takes `RtcTokenBuilderSample.js` as an example to show how to generate a token with the sample code.
 
-Before proceeding, ensure that you have installed the LTS version of Node.js.
+Before proceeding, ensure that you have installed the LTS version of Deno.
 
-1. Run the following command to install the Node.js dependencies:
+1. Download or clone the [Tools](https://github.com/AgoraIO/Tools) repository.
 
-   ```
-   npm install
-   ```
+2. Open the `DynamicKey/AgoraDynamicKey/nodejs/sample/RtcTokenBuilderSample.js` file, replace the value of `appID`, `appCertificate`, `channelName`, and `uid` with your own, and comment out the code snippets of `buildTokenWithUserAccount`.
 
-2. Download or clone the [Tools](https://github.com/AgoraIO/Tools) repository.
-
-3. Open the `DynamicKey/AgoraDynamicKey/nodejs/sample/RtcTokenBuilderSample.js` file, replace the value of `appID`, `appCertificate`, `channelName`, and `uid` with your own, and comment out the code snippets of `buildTokenWithUserAccount`.
-
-4. Open your Terminal, navigate to the same directory that holds `RtcTokenBuilderSample.js`, and run the following command. The token is generated and printed in your Terminal window.
+3. Open your Terminal, navigate to the same directory that holds `RtcTokenBuilderSample.js`, and run the following command. The token is generated and printed in your Terminal window.
 
    ```
-   node RtcTokenBuilderSample.js
+   deno run RtcTokenBuilderSample.js
    ```
 
 ## Reference
