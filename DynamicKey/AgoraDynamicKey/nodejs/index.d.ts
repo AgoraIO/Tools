@@ -53,15 +53,13 @@ export namespace RtmTokenBuilder {
      * @param {*} appCertificate:	Certificate of the application that you registered in 
      *                 the Agora Dashboard. See Get an App Certificate.
      * @param {*} account: The user account. 
-     * @param {*} role : Role_Publisher = 1: A broadcaster (host) in a live-broadcast profile.
-     *      Role_Subscriber = 2: (Default) A audience in a live-broadcast profile.
      * @param {*} privilegeExpiredTs : represented by the number of seconds elapsed since 
      *                   1/1/1970. If, for example, you want to access the
      *                   Agora Service within 10 minutes after the token is 
      *                   generated, set expireTimestamp as the current 
      * @return token
      */
-    export function buildToken(appID: string, appCertificate: string, account: string | number, role: number, privilegeExpiredTs: number): string;
+    export function buildToken(appID: string, appCertificate: string, account: string | number, privilegeExpiredTs: number): string;
 
 }
 
