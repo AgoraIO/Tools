@@ -116,7 +116,7 @@ class RtcTokenBuilder2
                                                          $tokenExpire, $joinChannelPrivilegeExpire, $pubAudioPrivilegeExpire,
                                                          $pubVideoPrivilegeExpire, $pubDataStreamPrivilegeExpire)
     {
-        return self::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, $uid,
+        return self::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, (string) $uid,
             $tokenExpire, $joinChannelPrivilegeExpire, $pubAudioPrivilegeExpire, $pubVideoPrivilegeExpire, $pubDataStreamPrivilegeExpire);
     }
 
