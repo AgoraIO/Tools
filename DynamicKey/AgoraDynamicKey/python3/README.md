@@ -21,7 +21,7 @@ Before proceeding, ensure that you have Python 3 as the development environment.
 
 2. Open the `DynamicKey/AgoraDynamicKey/python/sample/RtcTokenBuilderSample.py` file, replace the value of `appID`, `appCertificate`, `channelName`, and `uid` with your own, and comment out the code snippets of `buildTokenWithUserAccount`.
 
-3. Open your Terminal, navigate to the same directory that holds `RtcTokenBuilderSample.cpp`, and run the following command. The token is generated and printed in your Terminal window:
+3. Open your Terminal, navigate to the same directory that holds `RtcTokenBuilderSample.py`, and run the following command. The token is generated and printed in your Terminal window:
 
    ```
    python RtcTokenBuilderSample.py
