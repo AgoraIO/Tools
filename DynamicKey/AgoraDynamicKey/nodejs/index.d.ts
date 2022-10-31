@@ -230,3 +230,32 @@ export namespace FpaTokenBuilder {
      */
     export function buildToken(appId: string, appCertificate: string): string;
 }
+
+export namespace ChatTokenBuilder {
+    /**
+     * Build the Chat user token.
+     *
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @param userUuid The user's id, must be unique.
+     * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
+     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The chat user token.
+     */
+     export function buildUserToken(appId: string, appCertificate: string, userId: string | number, expire: number): string;
+
+    /**
+     * Build the Chat App token.
+     *
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
+     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The chat App token.
+     */
+     export function buildAppToken(appId: string, appCertificate: string, expire: number): string;
+}
