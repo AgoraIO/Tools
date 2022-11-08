@@ -1,7 +1,7 @@
 package chatTokenBuilder
 
 import (
-	accesstoken2 "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/accessToken2"
+	accesstoken2 "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/accesstoken2"
 )
 
 //BuildChatUserToken method
