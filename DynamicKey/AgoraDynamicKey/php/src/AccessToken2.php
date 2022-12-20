@@ -202,6 +202,7 @@ class AccessToken2
         $data = Util::packString($this->appId) . Util::packUint32($this->issueTs) . Util::packUint32($this->expire)
             . Util::packUint32($this->salt) . Util::packUint16(count($this->services));
 
+        ksort($this->services);
         foreach ($this->services as $key => $service) {
             $data .= $service->pack();
         }
