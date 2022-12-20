@@ -39,13 +39,13 @@ class Util
 
     public static function packInt16($x)
     {
-        return pack("l", $x);
+        return pack("s", $x);
     }
 
     public static function unpackInt16(&$data)
     {
-        $up = unpack("l", substr($data, 0, 4));
-        $data = substr($data, 4);
+        $up = unpack("s", substr($data, 0, 2));
+        $data = substr($data, 2);
         return $up[1];
     }
 
