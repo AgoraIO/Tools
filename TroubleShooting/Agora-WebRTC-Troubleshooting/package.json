@@ -19,10 +19,10 @@
     "@babel/plugin-proposal-export-namespace-from": "^7.10.1",
     "@babel/polyfill": "^7.0.0-beta.49",
     "@babel/preset-env": "^7.9.0",
-    "@vue/cli-plugin-babel": "^3.0.0-rc.5",
+    "@vue/cli-plugin-babel": "^3.12.1",
     "@vue/cli-plugin-eslint": "^3.0.0-rc.5",
     "@vue/cli-plugin-pwa": "^3.0.0-rc.5",
-    "@vue/cli-service": "^3.0.0-rc.5",
+    "@vue/cli-service": "^5.0.8",
     "vue-cli-plugin-vuetify": "^0.1.6",
     "vue-template-compiler": "^2.5.16"
   },
