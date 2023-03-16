@@ -5,7 +5,7 @@
   "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "nodeunit test/*.js"
   },
   "types": "index.d.ts",
   "author": "",
@@ -13,7 +13,9 @@
   "dependencies": {
     "crc-32": "^1.2.0",
     "cuint": "0.2.2",
-    "md5": "^2.3.0",
+    "md5": "^2.3.0"
+  },
+  "devDependencies": {
     "nodeunit": "^0.11.3"
   }
 }
