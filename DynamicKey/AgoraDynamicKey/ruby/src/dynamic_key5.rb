@@ -165,15 +165,15 @@ module DynamicKey5
   end
 
   def pack_uint16(x)
-    [x].pack('<S')
+    [x].pack('S<')
   end
 
   def pack_uint32(x)
-    [x].pack('<I')
+    [x].pack('I<')
   end
 
   def pack_int32(x)
-    [x].pack('<i')
+    [x].pack('i<')
   end
 
   def pack_string(string)
