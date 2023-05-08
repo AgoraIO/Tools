@@ -4,6 +4,11 @@ This page describes the authentication mechanism used by the Agora SDK, as well 
 
 **For users who want a quick deployable sample server to test with, please look at [here](https://github.com/AgoraIO-Community/TokenServer-nodejs)**
 
+> **Agora recommend using AccessToken2(version 007)**
+
+Refer to [Secure authentication with tokens
+](https://docs.agora.io/en/signaling/develop/authentication-workflow?platform=android)
+
 ## AccessToken
 
 AccessToken is more powerful than the legacy Dynamic Key. It encapsulates several privileges in one token to cover various services provided by Agora.
