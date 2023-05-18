@@ -183,7 +183,7 @@ module DynamicKey5
   def pack_map(m)
     ret = pack_uint16(m.size)
     m.each do |k, v|
-      pack_uint16(k) + pack_string(v.to_s)
+      ret += pack_uint16(k) + pack_string(v.to_s)
     end
     ret
   end
