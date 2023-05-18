@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
   std::string(argv[4]).empty()
   )
   {
-    std::cerr << "Illegal arguments\n";
+    std::cerr << "Illegal arguments " << argc << "\n";
     print_usage();
     return -1;
   }

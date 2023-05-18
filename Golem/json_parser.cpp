@@ -75,9 +75,18 @@ void json_parser::parse_golem_settings(std::string golem_settings)
     assert(item != nullptr);
 
     settings_.audio_file = std::string(item->valuestring);
+
     item = cJSON_GetObjectItem(root, "uid");
-    assert(item != nullptr);
-    settings_.uid = item->valueint;
+    cJSON *account_item = nullptr;
+    account_item = cJSON_GetObjectItem(root, "account");
+    assert((item != nullptr) || (item != nullptr));
+    if(item != nullptr) {
+        settings_.uid = item->valueint;
+    }
+    if(account_item != nullptr) {
+        settings_.account = account_item->valuestring;
+    }
+
     mute_obj = cJSON_GetObjectItem(root, "mute");
     assert(mute_obj != nullptr);
     {
