@@ -31,6 +31,54 @@ Before proceeding, ensure that you have installed the latest version of Golang.
    ./RtcTokenBuilder
    ```
 
+## Deploying the Token Service Using Docker
+
+Two Ways to quickly start the Token Service
+
+### Option 1: Start the Service Using Docker Commands
+
+Use the following Docker command to start the Token service:
+
+```
+docker run -d -it -p 8080:8080 -e APP_ID=[YOUR_APP_ID] -e APP_CERTIFICATE=[YOUR_APP_CERTIFICATE] --name agora-token-service agoracn/token:0.1.2023053011
+```
+
+> Replace `[YOUR_APP_ID]` and `[YOUR_APP_CERTIFICATE]` with your App ID and App Certificate.
+
+After the service starts, you can use the following `curl` command to test it:
+
+```
+curl --location 'http://localhost:8080/token/generate' \
+--header 'Content-Type: application/json' \
+--data '{
+    "channelName": "channel_name_test",
+    "uid": "12345678",
+    "tokenExpireTs": 3600,
+    "privilegeExpireTs": 3600,
+    "serviceRtc": {
+        "enable": true,
+        "role": 1
+    },
+    "serviceRtm": {
+        "enable": true
+    }
+}'
+```
+
+> You can deploy the service on a virtual machine or [Alibaba Cloud ECS](https://www.aliyun.com/product/ecs), and after deployment, you need to replace `localhost` with your server's IP address.
+
+For more information about the parameters, refer to [docker/server.go](docker/server.go).
+
+### Option 2: Start the Service Using Docker Compose
+
+In the `docker` directory, open the `docker-compose.yaml` file and set the `APP_ID` and `APP_CERTIFICATE` parameters. Then, use the following command to start the service:
+
+```
+docker-compose up
+```
+
+> You can modify the source code as needed. The source code can be found in [docker/server.go](docker/server.go).
+
 ## Reference
 
 For a complete authentication flow between the app server and app client, see [Authenticate Your Users with Tokens]().
