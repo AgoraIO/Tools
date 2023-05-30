@@ -338,16 +338,20 @@ say "media_channel_key:$media_channel_key";
 
 ## Tool 
 ### Parse token
-    ```
-    Usage
-    # python3 parse.py YOUR_TOKEN
-    OR
-    # make parse token=YOUR_TOKEN
 
-    Test token with web page
-    - For RTC, https://webdemo.agora.io/agora-web-showcase/examples/Agora-Web-Tutorial-1to1-Web/
-    - For RTM, https://webdemo.agora.io/agora-web-showcase/examples/Agora-RTM-Tutorial-Web/
-    ```
+```
+Usage
+# python3 parse.py YOUR_TOKEN
+OR
+# make parse token=YOUR_TOKEN
+
+Test token with web page
+- For RTC, https://webdemo.agora.io/agora-web-showcase/examples/Agora-Web-Tutorial-1to1-Web/
+- For RTM, https://webdemo.agora.io/agora-web-showcase/examples/Agora-RTM-Tutorial-Web/
+```
+
+## Deploying the Token Service Using Docker
+Please refer to the [go/README.md](go/README.md#deploying-the-token-service-using-docker) file located in the "go" directory for instructions on how to deploy the Token Service using Docker.
 
 ## License
 
