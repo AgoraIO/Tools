@@ -22,7 +22,7 @@ const generateRtcToken = () => {
   console.log("Token With Integer Number Uid: " + tokenA);
 
   // Build token with user account
-  const tokenB = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
+  const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
   console.log("Token With UserAccount: " + tokenB);
 }
 
