@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>AgoraDynamicKey</id>
+        <version>1.0.0</version>
+        <title>Agora Dynamic Key</title>
+        <authors>cipchk</authors>
+        <projectUrl>https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/csharp</projectUrl>
+        <description>This page describes the authentication mechanism used by the Agora SDK, as well
+            as providing the related code for generating AccessToken (v2.1.0) or Dynamic Key (v2.0.2
+            or earlier).</description>
+        <tags>AgoraIO Dynamic Token</tags>
+    </metadata>
+</package>
