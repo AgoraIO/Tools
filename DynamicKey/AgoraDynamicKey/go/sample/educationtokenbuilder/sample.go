@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	educationtokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/educationTokenBuilder"
+	educationtokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/educationtokenbuilder"
 )
 
 func main() {
