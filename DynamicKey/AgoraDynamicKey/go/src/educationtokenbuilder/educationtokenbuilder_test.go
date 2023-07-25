@@ -3,7 +3,7 @@ package educationtokenbuilder
 import (
 	"testing"
 
-	accesstoken "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/accessToken2"
+	accesstoken "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/accesstoken2"
 )
 
 const (
