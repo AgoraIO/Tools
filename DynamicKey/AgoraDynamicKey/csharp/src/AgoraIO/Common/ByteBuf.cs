@@ -45,6 +45,12 @@ namespace AgoraIO.Media
             return this;
         }
 
+        public ByteBuf copy(byte[] v)
+        {
+            buffer.PushByteArray(v);
+            return this;
+        }
+
         public ByteBuf putIntMap(Dictionary<ushort, uint> extra)
         {
             put((ushort)extra.Count);

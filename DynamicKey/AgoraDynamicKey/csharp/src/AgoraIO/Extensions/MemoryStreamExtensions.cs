@@ -19,5 +19,10 @@ namespace AgoraIO.Media
         {
             return Encoding.UTF8.GetBytes(obj);
         }
+
+        public static string getString(this byte[] obj)
+        {
+            return Encoding.UTF8.GetString(obj);
+        }
     }
 }
