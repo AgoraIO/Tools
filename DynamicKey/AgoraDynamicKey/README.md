@@ -112,6 +112,9 @@ Sample Code for generating AccessToken are available on the following platforms:
   + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/sample/RtcTokenBuilderSample.cs
   + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/sample/RtmTokenBuilderSample.cs
 
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/csharp/sample/AccessToken2BuilderSample.cs
+
 ### Ruby
 
 - Version 007
