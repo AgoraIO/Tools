@@ -386,7 +386,7 @@ namespace AgoraIO.Tests
         {
             string appid = "f1dc778bddc646ad8f260976ca2d015c";
             string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string usrid = "4ac3bae0-6f9e-11ec-8c27-8dc232279082";
+            string usrid = "userid";
 
             RtmTokenBuilder2 tokenBuilder = new RtmTokenBuilder2();
 
