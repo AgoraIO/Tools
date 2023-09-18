@@ -81,7 +81,7 @@ module AgoraDynamicKey2
     SERVICE_TYPE = 4
     PRIVILEGE_LOGIN = 1
 
-    def initialize()
+    def initialize
       super(SERVICE_TYPE)
     end
 
@@ -168,9 +168,7 @@ module AgoraDynamicKey2
     end
 
     def build
-      if !uuid?(@app_id) || !uuid?(@app_cert)
-        return ''
-      end
+      return '' if !uuid?(@app_id) || !uuid?(@app_cert)
 
       signing = fetch_sign
       data = Util.pack_string(@app_id) + Util.pack_uint32(@issue_ts) + Util.pack_uint32(@expire) \
@@ -196,7 +194,7 @@ module AgoraDynamicKey2
     def uuid?(str)
       return false if str.length != 32
 
-      str.to_i(16).to_s(16) == str.downcase
+      true
     end
 
     def parse(token)
