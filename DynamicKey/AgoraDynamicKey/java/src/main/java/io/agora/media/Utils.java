@@ -1,12 +1,6 @@
 package io.agora.media;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.codec.binary.Base64;
-
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
@@ -16,6 +10,11 @@ import java.util.Date;
 import java.util.zip.CRC32;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
+import org.apache.commons.codec.binary.Base64;
 
 public class Utils {
     public static final long HMAC_SHA256_LENGTH = 32;
@@ -58,11 +57,11 @@ public class Utils {
     public static int crc32(byte[] bytes) {
         CRC32 checksum = new CRC32();
         checksum.update(bytes);
-        return (int)checksum.getValue();
+        return (int) checksum.getValue();
     }
 
     public static int getTimestamp() {
-        return (int)((new Date().getTime())/1000);
+        return (int) ((new Date().getTime()) / 1000);
     }
 
     public static int randomInt() {
@@ -109,10 +108,11 @@ public class Utils {
 
         try {
             inflater.setInput(data);
-            byte[] buf = new byte[data.length];
-            while (!inflater.finished()) {
-                int i = inflater.inflate(buf);
-                bos.write(buf, 0, i);
+            byte[] buf = new byte[8192];
+            int len;
+
+            while ((len = inflater.inflate(buf)) > 0) {
+                bos.write(buf, 0, len);
             }
         } catch (Exception e) {
             e.printStackTrace();
