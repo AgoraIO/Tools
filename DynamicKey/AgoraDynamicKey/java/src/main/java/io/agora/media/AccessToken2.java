@@ -1,9 +1,10 @@
 package io.agora.media;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 public class AccessToken2 {
     public enum PrivilegeRtc {
@@ -101,7 +102,8 @@ public class AccessToken2 {
             return "";
         }
 
-        ByteBuf buf = new ByteBuf().put(this.appId).put(this.issueTs).put(this.expire).put(this.salt).put((short) this.services.size());
+        ByteBuf buf = new ByteBuf().put(this.appId).put(this.issueTs).put(this.expire).put(this.salt)
+                .put((short) this.services.size());
         byte[] signing = getSign();
 
         this.services.forEach((k, v) -> {
@@ -161,21 +163,28 @@ public class AccessToken2 {
         if (!getVersion().equals(token.substring(0, Utils.VERSION_LENGTH))) {
             return false;
         }
-        byte[] data = Utils.decompress(Utils.base64Decode(token.substring(Utils.VERSION_LENGTH)));
-        ByteBuf buff = new ByteBuf(data);
-        String signature = buff.readString();
-        this.appId = buff.readString();
-        this.issueTs = buff.readInt();
-        this.expire = buff.readInt();
-        this.salt = buff.readInt();
-        short servicesNum = buff.readShort();
 
-        for (int i = 0; i < servicesNum; i++) {
-            short serviceType = buff.readShort();
-            Service service = getService(serviceType);
-            service.unpack(buff);
-            this.services.put(serviceType, service);
+        try {
+            byte[] data = Utils.decompress(Utils.base64Decode(token.substring(Utils.VERSION_LENGTH)));
+            ByteBuf buff = new ByteBuf(data);
+            String signature = buff.readString();
+            this.appId = buff.readString();
+            this.issueTs = buff.readInt();
+            this.expire = buff.readInt();
+            this.salt = buff.readInt();
+            short servicesNum = buff.readShort();
+
+            for (int i = 0; i < servicesNum; i++) {
+                short serviceType = buff.readShort();
+                Service service = getService(serviceType);
+                service.unpack(buff);
+                this.services.put(serviceType, service);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
+
         return true;
     }
 
