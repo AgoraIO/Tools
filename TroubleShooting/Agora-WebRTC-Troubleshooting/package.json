@@ -1,13 +1,14 @@
 {
   "name": "agora-webrtc-precall-test",
-  "version": "0.2.0",
+  "version": "4.1.2",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "agora-rtc-sdk": "3.1.1",
+    "agora-rtc-sdk-ng": "4.13",
+    "debugout.js": "^1.0.0",
     "echarts": "^4.7.0",
     "register-service-worker": "^1.0.0",
     "v-charts": "^1.19.0",

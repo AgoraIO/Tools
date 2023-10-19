@@ -55,8 +55,10 @@ export default {
   'cloudProxy_disable': 'disable',
   'cloudProxy_mode': 'Proxy Mode',
   'cloudProxy_default': 'default',
-  'cloudProxy_fix': 'TCP 443',
-  'cloudProxy_tips': 'To use proxy via TCP port 443 only, please call startProxyServer(2), for details please check:',
+  'cloudProxy_mode_3': 'Mode 3',
+  'cloudProxy_mode_4': 'Mode 4',
+  'cloudProxy_mode_5': 'Mode 5',
+  'cloudProxy_tips': 'Mode 3: UDP 443, no TCP fallback; Mode 4: UDP 443 with TCP fallback; Mode 5: TCP TLS.',
   'cloudProxy_tips_link': 'here'
 
 }
