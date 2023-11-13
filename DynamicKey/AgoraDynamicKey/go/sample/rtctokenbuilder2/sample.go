@@ -14,6 +14,10 @@ func main() {
 	uidStr := "2882341273"
 	tokenExpirationInSeconds := uint32(3600)
 	privilegeExpirationInSeconds := uint32(3600)
+	joinChannelPrivilegeExpireInSeconds := uint32(3600)
+	pubAudioPrivilegeExpireInSeconds := uint32(3600)
+	pubVideoPrivilegeExpireInSeconds := uint32(3600)
+	pubDataStreamPrivilegeExpireInSeconds := uint32(3600)
 
 	result, err := rtctokenbuilder.BuildTokenWithUid(appID, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
@@ -30,18 +34,18 @@ func main() {
 	}
 
 	result, err1 := rtctokenbuilder.BuildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid,
-		privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds)
+		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
 	if err1 != nil {
-		fmt.Println(err)
+		fmt.Println(err1)
 	} else {
 		fmt.Printf("Token with int uid and privilege: %s\n", result)
 	}
 
 	result, err1 = rtctokenbuilder.BuildTokenWithUserAccountAndPrivilege(appID, appCertificate, channelName, uidStr,
-		privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds, privilegeExpirationInSeconds)
+		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
 
 	if err1 != nil {
-		fmt.Println(err)
+		fmt.Println(err1)
 	} else {
 		fmt.Printf("Token with user account and privilege: %s\n", result)
 	}
