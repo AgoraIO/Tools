@@ -25,7 +25,7 @@ class RtcTokenBuilder2
      */
     public static function buildTokenWithUid($appId, $appCertificate, $channelName, $uid, $role, $tokenExpire, $privilegeExpire = 0)
     {
-        return self::buildTokenWithUserAccount($appId, $appCertificate, $channelName, $uid, $role, $tokenExpire, $privilegeExpire);
+        return self::buildTokenWithUserAccount($appId, $appCertificate, $channelName, (string) $uid, $role, $tokenExpire, $privilegeExpire);
     }
 
     /**
@@ -116,7 +116,7 @@ class RtcTokenBuilder2
                                                          $tokenExpire, $joinChannelPrivilegeExpire, $pubAudioPrivilegeExpire,
                                                          $pubVideoPrivilegeExpire, $pubDataStreamPrivilegeExpire)
     {
-        return self::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, $uid,
+        return self::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, (string) $uid,
             $tokenExpire, $joinChannelPrivilegeExpire, $pubAudioPrivilegeExpire, $pubVideoPrivilegeExpire, $pubDataStreamPrivilegeExpire);
     }
 
