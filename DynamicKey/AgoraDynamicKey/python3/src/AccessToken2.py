@@ -201,8 +201,8 @@ class AccessToken:
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
                        pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
-        for _, service in self.__service.items():
-            signing_info += service.pack()
+        for service_type in sorted(self.__service.keys()):
+            signing_info += self.__service[service_type].pack()
 
         signature = hmac.new(signing, signing_info, sha256).digest()
 
