@@ -17,6 +17,10 @@ def main():
     account = "2882341273"
     token_expiration_in_seconds = 3600
     privilege_expiration_in_seconds = 3600
+    join_channel_privilege_expiration_in_seconds = 3600
+    pub_audio_privilege_expiration_in_seconds = 3600
+    pub_video_privilege_expiration_in_seconds = 3600
+    pub_data_stream_privilege_expiration_in_seconds = 3600
 
     token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
                                                  token_expiration_in_seconds, privilege_expiration_in_seconds)
@@ -28,14 +32,13 @@ def main():
     print("Token with user account: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_uid_and_privilege(
-        app_id, app_certificate, channel_name, uid, privilege_expiration_in_seconds, privilege_expiration_in_seconds,
-        privilege_expiration_in_seconds, privilege_expiration_in_seconds, privilege_expiration_in_seconds)
+        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds, 
+        join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with int uid and privilege: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
-        app_id, app_certificate, channel_name, account, privilege_expiration_in_seconds,
-        privilege_expiration_in_seconds,
-        privilege_expiration_in_seconds, privilege_expiration_in_seconds, privilege_expiration_in_seconds)
+        app_id, app_certificate, channel_name, account, token_expiration_in_seconds,
+        join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with user account and privilege: {}".format(token))
 
 
