@@ -3,7 +3,7 @@
  * nodeunit ChatTokenBuilderTest.js
  * see https://github.com/caolan/nodeunit
  */
-const ChatTokenBuilder = require("../src/ChatTokenBuilder").ChatTokenBuilder;
+const ChatTokenBuilder = require("../src/ChatTokenBuilder2").ChatTokenBuilder;
 const { AccessToken2, ServiceChat, kChatServiceType } = require("../src/AccessToken2");
 
 const appId = "970CA35de60c44645bbae8a215061b33";
