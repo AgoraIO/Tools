@@ -10,8 +10,11 @@ from src.RtmTokenBuilder2 import *
 
 
 def main():
-    app_id = "970CA35de60c44645bbae8a215061b33"
-    app_certificate = "5CFd2fd1755d40ecb72977518be15d3b"
+    # Need to set environment variable AGORA_APP_ID
+    app_id = os.environ.get("AGORA_APP_ID")
+    # Need to set environment variable AGORA_APP_CERTIFICATE
+    app_certificate = os.environ.get("AGORA_APP_CERTIFICATE")
+
     user_id = "test_user_id"
     expiration_in_seconds = 3600
 
