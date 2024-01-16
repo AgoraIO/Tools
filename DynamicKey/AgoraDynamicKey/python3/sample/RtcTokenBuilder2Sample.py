@@ -10,8 +10,11 @@ from src.RtcTokenBuilder2 import *
 
 
 def main():
-    app_id = "970CA35de60c44645bbae8a215061b33"
-    app_certificate = "5CFd2fd1755d40ecb72977518be15d3b"
+    # Need to set environment variable AGORA_APP_ID
+    app_id = os.environ.get("AGORA_APP_ID")
+    # Need to set environment variable AGORA_APP_CERTIFICATE
+    app_certificate = os.environ.get("AGORA_APP_CERTIFICATE")
+
     channel_name = "7d72365eb983485397e3e3f9d460bdda"
     uid = 2882341273
     account = "2882341273"
