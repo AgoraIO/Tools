@@ -2,13 +2,17 @@ package main
 
 import (
 	"fmt"
+	"os"
 
 	educationtokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/educationtokenbuilder"
 )
 
 func main() {
-	appID := "970CA35de60c44645bbae8a215061b33"
-	appCertificate := "5CFd2fd1755d40ecb72977518be15d3b"
+	// Need to set environment variable AGORA_APP_ID
+	appID := os.Getenv("AGORA_APP_ID")
+	// Need to set environment variable AGORA_APP_CERTIFICATE
+	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
+
 	roomUuid := "123"
 	userUuid := "2882341273"
 	role := int16(1)
