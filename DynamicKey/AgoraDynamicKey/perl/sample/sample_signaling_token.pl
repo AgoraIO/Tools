@@ -10,9 +10,12 @@ use lib $FindBin::Bin."/../src";
 
 use Agora::SignalingToken;
 
+# Need to set environment variable AGORA_APP_ID
+my $app_id                = $ENV{AGORA_APP_ID};
+# Need to set environment variable AGORA_APP_CERTIFICATE
+my $app_certificate       = $ENV{AGORA_APP_CERTIFICATE};
+
 my $account               = "2882341273";
-my $app_id                = "970CA35de60c44645bbae8a215061b33";
-my $app_certificate       = "5CFd2fd1755d40ecb72977518be15d3b";
 my $now                   = time();
 my $valid_time_in_seconds = 3600*24;
 my $expired_ts_in_seconds = $now + $valid_time_in_seconds;

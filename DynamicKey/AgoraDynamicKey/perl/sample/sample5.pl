@@ -10,8 +10,11 @@ use lib $FindBin::Bin."/../src";
 
 use Agora::DynamicKey5;
 
-my $app_id          = "970ca35de60c44645bbae8a215061b33";
-my $app_certificate = "5cfd2fd1755d40ecb72977518be15d3b";
+# Need to set environment variable AGORA_APP_ID
+my $app_id          = $ENV{AGORA_APP_ID};
+# Need to set environment variable AGORA_APP_CERTIFICATE
+my $app_certificate = $ENV{AGORA_APP_CERTIFICATE};
+
 my $channel_name    = "7d72365eb983485397e3e3f9d460bdda";
 my $unix_ts         = time();
 my $uid             = 2882341273;
