@@ -1,6 +1,10 @@
 import { RtmTokenBuilder } from "../src/RtmTokenBuilder2.js";
-const appId = "970CA35de60c44645bbae8a215061b33";
-const appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
+
+// Need to set environment variable AGORA_APP_ID
+const appId = Deno.env.get("AGORA_APP_ID");
+// Need to set environment variable AGORA_APP_CERTIFICATE
+const appCertificate = Deno.env.get("AGORA_APP_CERTIFICATE");
+
 const userId = "test_user_id";
 const expirationInSeconds = 3600;
 
