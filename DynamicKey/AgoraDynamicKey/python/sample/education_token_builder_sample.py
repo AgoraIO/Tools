@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 import os
 import sys
@@ -20,16 +20,19 @@ def main():
     user_id = "2882341273"
     expiration_in_seconds = 600
 
-    token = EducationTokenBuilder.build_room_user_token(
-        app_id, app_certificate, room_uuid, user_id, role, expiration_in_seconds)
+    print("App Id: %s" % app_id)
+    print("App Certificate: %s" % app_certificate)
+    if not app_id or not app_certificate:
+        print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+        return
+    
+    token = EducationTokenBuilder.build_room_user_token(app_id, app_certificate, room_uuid, user_id, role, expiration_in_seconds)
     print("Education room user token: {}".format(token))
 
-    token = EducationTokenBuilder.build_user_token(
-        app_id, app_certificate, user_id, expiration_in_seconds)
+    token = EducationTokenBuilder.build_user_token(app_id, app_certificate, user_id, expiration_in_seconds)
     print("Education user token: {}".format(token))
 
-    token = EducationTokenBuilder.build_app_token(
-        app_id, app_certificate, expiration_in_seconds)
+    token = EducationTokenBuilder.build_app_token(app_id, app_certificate, expiration_in_seconds)
     print("Education app token: {}".format(token))
 
 

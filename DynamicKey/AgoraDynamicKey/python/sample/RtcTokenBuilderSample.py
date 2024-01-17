@@ -1,17 +1,14 @@
 # ! -*- coding: utf-8 -*-
 
 import sys
-import unittest
 import os
 import time
-from random import randint
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
 from RtcTokenBuilder import *
-import AccessToken
 
 # Need to set environment variable AGORA_APP_ID
-appID = os.environ.get("AGORA_APP_ID")
+appId = os.environ.get("AGORA_APP_ID")
 # Need to set environment variable AGORA_APP_CERTIFICATE
 appCertificate = os.environ.get("AGORA_APP_CERTIFICATE")
 
@@ -24,9 +21,16 @@ privilegeExpiredTs = currentTimestamp + expireTimeInSeconds
 
 
 def main():
-    token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Attendee, privilegeExpiredTs)
+    print("App Id: %s" % appId)
+    print("App Certificate: %s" % appCertificate)
+    if not appId or not appCertificate:
+        print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+        return
+    
+    token = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, Role_Attendee, privilegeExpiredTs)
     print("Token with int uid: {}".format(token))
-    token = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, userAccount, Role_Attendee, privilegeExpiredTs)
+    
+    token = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, userAccount, Role_Attendee, privilegeExpiredTs)
     print("Token with user account: {}".format(token))
 
 if __name__ == "__main__":
