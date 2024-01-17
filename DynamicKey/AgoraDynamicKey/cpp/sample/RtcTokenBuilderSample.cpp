@@ -5,14 +5,18 @@
 #include "../src/RtcTokenBuilder.h"
 #include <iostream>
 #include <cstdint>
+#include <cstdlib>
+
 using namespace agora::tools;
 
 int main(int argc, char const *argv[])
 {
   // Need to set environment variable AGORA_APP_ID
-  std::string appID = getenv("AGORA_APP_ID");
+  const char *envAppId = getenv("AGORA_APP_ID");
+  std::string appId = envAppId ? envAppId : "";
   // Need to set environment variable AGORA_APP_CERTIFICATE
-  std::string appCertificate = getenv("AGORA_APP_CERTIFICATE");
+  const char *envAppCertificate = getenv("AGORA_APP_CERTIFICATE");
+  std::string appCertificate = envAppCertificate ? envAppCertificate : "";
 
   std::string channelName = "7d72365eb983485397e3e3f9d460bdda";
   uint32_t uid = 2882341273;
@@ -22,13 +26,21 @@ int main(int argc, char const *argv[])
   uint32_t privilegeExpiredTs = currentTimeStamp + expirationTimeInSeconds;
   std::string result;
 
+  std::cout << "App Id:" << appId << std::endl;
+  std::cout << "App Certificate:" << appCertificate << std::endl;
+  if (appId == "" || appCertificate == "")
+  {
+    std::cout << "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE" << std::endl;
+    return -1;
+  }
+
   result = RtcTokenBuilder::buildTokenWithUid(
-      appID, appCertificate, channelName, uid, UserRole::Role_Publisher,
+      appId, appCertificate, channelName, uid, UserRole::Role_Publisher,
       privilegeExpiredTs);
   std::cout << "Token With Int Uid:" << result << std::endl;
 
   result = RtcTokenBuilder::buildTokenWithUserAccount(
-      appID, appCertificate, channelName, userAccount, UserRole::Role_Publisher,
+      appId, appCertificate, channelName, userAccount, UserRole::Role_Publisher,
       privilegeExpiredTs);
   std::cout << "Token With UserAccount:" << result << std::endl;
 
