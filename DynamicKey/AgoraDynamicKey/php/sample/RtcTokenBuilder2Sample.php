@@ -16,6 +16,13 @@ $pubAudioPrivilegeExpireInSeconds = 3600;
 $pubVideoPrivilegeExpireInSeconds = 3600;
 $pubDataStreamPrivilegeExpireInSeconds = 3600;
 
+echo "App Id: " . $appId . PHP_EOL;
+echo "App Certificate: " . $appCertificate . PHP_EOL;
+if ($appId == "" || $appCertificate == "") {
+    echo "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE" . PHP_EOL;
+    exit;
+}
+
 $token = RtcTokenBuilder2::buildTokenWithUid($appId, $appCertificate, $channelName, $uid, RtcTokenBuilder2::ROLE_PUBLISHER, $tokenExpirationInSeconds, $privilegeExpirationInSeconds);
 echo 'Token with int uid: ' . $token . PHP_EOL;
 
