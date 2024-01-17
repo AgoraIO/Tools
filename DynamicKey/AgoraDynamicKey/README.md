@@ -617,11 +617,18 @@ my $channel_name     = "7d72365eb983485397e3e3f9d460bdda";
 my $uid              = 2882341273;
 my $expire_timestamp = 0;
 
+if (!defined($app_id) || $app_id eq "" || !defined($app_certificate) || $app_certificate eq "") {
+    say "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE";
+    exit 1;
+}
+say "App Id: $app_id";
+say "App Certificate: $app_certificate";
+
 my $token = Agora::AccessToken::create_access_token($app_id, $app_certificate, $channel_name, $uid);
 $token->add_privilege(Agora::AccessToken::KJoinChannel, $expire_timestamp);
 
 my $token_str = $token->build;
-say "access_token\t$token_str";
+say "Token: $token_str";
 ```
 
 ## Tool 

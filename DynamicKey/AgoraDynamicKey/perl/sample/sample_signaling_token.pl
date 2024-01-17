@@ -20,5 +20,12 @@ my $now                   = time();
 my $valid_time_in_seconds = 3600*24;
 my $expired_ts_in_seconds = $now + $valid_time_in_seconds;
 
+if (!defined($app_id) || $app_id eq "" || !defined($app_certificate) || $app_certificate eq "") {
+    say "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE";
+    exit 1;
+}
+say "App Id: $app_id";
+say "App Certificate: $app_certificate";
+
 my $token = Agora::SignalingToken::gen_signaling_token($account, $app_id, $app_certificate, $expired_ts_in_seconds);
-say "signaling_token\t$token";
+say "Token: $token";
