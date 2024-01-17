@@ -15,9 +15,18 @@ const roomUuid = "123";
 const userUuid = "2882341273";
 const role = 1;
 
-const tokenA = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire);
-console.log("Build room user token: " + tokenA);
-const tokenB = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire);
-console.log("Build user token " + tokenB);
-const tokenC = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire);
-console.log("Build app token: " + tokenC);
+console.log("App Id:", appId);
+console.log("App Certificate:", appCertificate);
+if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
+    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
+    Deno.exit(1);
+}
+
+const tokenRoomUserToken = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire);
+console.log("Build room user token:", tokenRoomUserToken);
+
+const tokenUserToken = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire);
+console.log("Build user token:", tokenUserToken);
+
+const tokenAppToken = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire);
+console.log("Build app token:", tokenAppToken);
