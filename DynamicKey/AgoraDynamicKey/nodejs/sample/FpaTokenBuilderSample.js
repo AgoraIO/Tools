@@ -1,7 +1,16 @@
-const FpaTokenBuilder = require('../src/FpaTokenBuilder').FpaTokenBuilder
+const FpaTokenBuilder = require("../src/FpaTokenBuilder").FpaTokenBuilder;
 
-const appID = '970CA35de60c44645bbae8a215061b33'
-const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b'
+// Need to set environment variable AGORA_APP_ID
+const appId = process.env.AGORA_APP_ID;
+// Need to set environment variable AGORA_APP_CERTIFICATE
+const appCertificate = process.env.AGORA_APP_CERTIFICATE;
 
-let token = FpaTokenBuilder.buildToken(appID, appCertificate)
-console.log("Token with FPA service: " + token)
+console.log("App Id:", appId);
+console.log("App Certificate:", appCertificate);
+if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
+    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
+    process.exit(1);
+}
+
+let token = FpaTokenBuilder.buildToken(appId, appCertificate);
+console.log("Token with FPA service:", token);

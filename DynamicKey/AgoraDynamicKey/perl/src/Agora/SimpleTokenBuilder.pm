@@ -27,18 +27,18 @@ my $publisher_privileges = {
     Agora::AccessToken::KPublishAudioStream()       => 0,
     Agora::AccessToken::KPublishVideoStream()       => 0,
     Agora::AccessToken::KPublishDataStream()        => 0,
-    Agora::AccessToken::KPublishAudiocdn()          => 0,
-    Agora::AccessToken::KPublishVideoCdn()          => 0,
-    Agora::AccessToken::KInvitePublishAudioStream() => 0,
-    Agora::AccessToken::KInvitePublishVideoStream() => 0,
-    Agora::AccessToken::KInvitePublishDataStream()  => 0,
+    # Agora::AccessToken::KPublishAudiocdn()          => 0,
+    # Agora::AccessToken::KPublishVideoCdn()          => 0,
+    # Agora::AccessToken::KInvitePublishAudioStream() => 0,
+    # Agora::AccessToken::KInvitePublishVideoStream() => 0,
+    # Agora::AccessToken::KInvitePublishDataStream()  => 0,
 };
 
 my $subscriber_privileges = {
     Agora::AccessToken::KJoinChannel()               => 0,
-    Agora::AccessToken::KRequestPublishAudioStream() => 0,
-    Agora::AccessToken::KRequestPublishVideoStream() => 0,
-    Agora::AccessToken::KRequestPublishDataStream()  => 0,
+    # Agora::AccessToken::KRequestPublishAudioStream() => 0,
+    # Agora::AccessToken::KRequestPublishVideoStream() => 0,
+    # Agora::AccessToken::KRequestPublishDataStream()  => 0,
 };
 
 my $admin_privileges = {
@@ -46,7 +46,7 @@ my $admin_privileges = {
     Agora::AccessToken::KPublishAudioStream()  => 0,
     Agora::AccessToken::KPublishVideoStream()  => 0,
     Agora::AccessToken::KPublishDataStream()   => 0,
-    Agora::AccessToken::KAdministrateChannel() => 0,
+    # Agora::AccessToken::KAdministrateChannel() => 0,
 };
 
 our $RolePrivileges = {

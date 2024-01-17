@@ -169,31 +169,72 @@ If you are using the Agora SDK of a version earlier than 2.1 and looking at impl
 
 ### C++
 ```c
-/**
- * build with command:
- * g++ main.cpp  -lcrypto -std=c++0x
- */
-#include "../src/DynamicKey5.h"
+#include <cstdlib>
 #include <iostream>
-#include <cstdint>
+
+#include "../src/RtcTokenBuilder2.h"
+
 using namespace agora::tools;
 
 int main(int argc, char const *argv[]) {
-  ::srand(::time(NULL));
+  (void)argc;
+  (void)argv;
 
-  auto appID  = "970ca35de60c44645bbae8a215061b33";
-  auto  appCertificate   = "5cfd2fd1755d40ecb72977518be15d3b";
-  auto channelName= "my channel name for recording";
-  auto  unixTs = ::time(NULL);
-  int randomInt = (::rand()%256 << 24) + (::rand()%256 << 16) + (::rand()%256 << 8) + (::rand()%256);
-  uint32_t uid = 2882341273u;
-  auto  expiredTs = 0;
+  // Need to set environment variable AGORA_APP_ID
+  const char *env_app_id = getenv("AGORA_APP_ID");
+  std::string app_id = env_app_id ? env_app_id : "";
+  // Need to set environment variable AGORA_APP_CERTIFICATE
+  const char *env_app_certificate = getenv("AGORA_APP_CERTIFICATE");
+  std::string app_certificate = env_app_certificate ? env_app_certificate : "";
 
-  std::cout << std::endl;
-  std::cout << DynamicKey5::generateMediaChannelKey(appID, appCertificate, channelName, unixTs, randomInt, uid, expiredTs) << std::endl;
+  std::string channel_name = "7d72365eb983485397e3e3f9d460bdda";
+  uint32_t uid = 2882341273;
+  std::string account = "2882341273";
+  uint32_t token_expiration_in_seconds = 3600;
+  uint32_t privilege_expiration_in_seconds = 3600;
+  uint32_t join_channel_privilege_expiration_in_seconds = 3600;
+  uint32_t pub_audio_privilege_expiration_in_seconds = 3600;
+  uint32_t pub_video_privilege_expiration_in_seconds = 3600;
+  uint32_t pub_data_stream_privilege_expiration_in_seconds = 3600;
+  std::string result;
+
+  std::cout << "App Id:" << app_id << std::endl;
+  std::cout << "App Certificate:" << app_certificate << std::endl;
+  if (app_id == "" || app_certificate == "") {
+    std::cout << "Need to set environment variable AGORA_APP_ID and "
+                 "AGORA_APP_CERTIFICATE"
+              << std::endl;
+    return -1;
+  }
+
+  result = RtcTokenBuilder2::BuildTokenWithUid(
+      app_id, app_certificate, channel_name, uid, UserRole::kRolePublisher,
+      token_expiration_in_seconds, privilege_expiration_in_seconds);
+  std::cout << "Token With Int Uid:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithUserAccount(
+      app_id, app_certificate, channel_name, account, UserRole::kRolePublisher,
+      token_expiration_in_seconds, privilege_expiration_in_seconds);
+  std::cout << "Token With UserAccount:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithUid(
+      app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
+      join_channel_privilege_expiration_in_seconds,
+      pub_audio_privilege_expiration_in_seconds,
+      pub_video_privilege_expiration_in_seconds,
+      pub_data_stream_privilege_expiration_in_seconds);
+  std::cout << "Token With Int Uid:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithUserAccount(
+      app_id, app_certificate, channel_name, account,
+      token_expiration_in_seconds, join_channel_privilege_expiration_in_seconds,
+      pub_audio_privilege_expiration_in_seconds,
+      pub_video_privilege_expiration_in_seconds,
+      pub_data_stream_privilege_expiration_in_seconds);
+  std::cout << "Token With UserAccount:" << result << std::endl;
+
   return 0;
 }
-
 ```
 
 ### Go
@@ -201,142 +242,378 @@ int main(int argc, char const *argv[]) {
 package main
 
 import (
-    "../src/DynamicKey5"
-    "fmt"
+	"fmt"
+	"os"
+
+	rtctokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/rtctokenbuilder2"
 )
 
 func main() {
-    appID:="970ca35de60c44645bbae8a215061b33"
-    appCertificate:="5cfd2fd1755d40ecb72977518be15d3b"
-    channelName := "7d72365eb983485397e3e3f9d460bdda"
-    unixTs:=uint32(1446455472)
-    uid:=uint32(2882341273)
-    randomInt:=uint32(58964981)
-    expiredTs:=uint32(1446455471)
+	// Need to set environment variable AGORA_APP_ID
+	appId := os.Getenv("AGORA_APP_ID")
+	// Need to set environment variable AGORA_APP_CERTIFICATE
+	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
 
-    var mediaChannelKey,channelError = DynamicKey5.GenerateMediaChannelKey(appID, appCertificate, channelName, unixTs, randomInt, uid, expiredTs)
-    if channelError == nil {
-        fmt.Println(mediaChannelKey)
-    }
+	channelName := "7d72365eb983485397e3e3f9d460bdda"
+	uid := uint32(2882341273)
+	uidStr := "2882341273"
+	tokenExpirationInSeconds := uint32(3600)
+	privilegeExpirationInSeconds := uint32(3600)
+	joinChannelPrivilegeExpireInSeconds := uint32(3600)
+	pubAudioPrivilegeExpireInSeconds := uint32(3600)
+	pubVideoPrivilegeExpireInSeconds := uint32(3600)
+	pubDataStreamPrivilegeExpireInSeconds := uint32(3600)
 
+	fmt.Println("App Id:", appId)
+	fmt.Println("App Certificate:", appCertificate)
+	if appId == "" || appCertificate == "" {
+		fmt.Println("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+		return
+	}
+
+	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with int uid: %s\n", result)
+	}
+
+	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with user account: %s\n", result)
+	}
+
+	result, err = rtctokenbuilder.BuildTokenWithUidAndPrivilege(appId, appCertificate, channelName, uid,
+		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with int uid and privilege: %s\n", result)
+	}
+
+	result, err = rtctokenbuilder.BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, uidStr,
+		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with user account and privilege: %s\n", result)
+	}
 }
 ```
 
 ### Java
 ```java
-package io.agora.media.sample;
+package io.agora.sample;
 
-import io.agora.media.DynamicKey5;
+import io.agora.media.RtcTokenBuilder2;
+import io.agora.media.RtcTokenBuilder2.Role;
 
-import java.util.Date;
-import java.util.Random;
+public class RtcTokenBuilder2Sample {
+    // Need to set environment variable AGORA_APP_ID
+    static String appId = System.getenv("AGORA_APP_ID");
+    // Need to set environment variable AGORA_APP_CERTIFICATE
+    static String appCertificate = System.getenv("AGORA_APP_CERTIFICATE");
 
-public class DynamicKey5Sample {
-    static String appID = "970ca35de60c44645bbae8a215061b33";
-    static String appCertificate = "5cfd2fd1755d40ecb72977518be15d3b";
-    static String channel = "7d72365eb983485397e3e3f9d460bdda";
-    static int ts = (int)(new Date().getTime()/1000);
-    static int r = new Random().nextInt();
-    static long uid = 2882341273L;
-    static int expiredTs = 0;
+    static String channelName = "7d72365eb983485397e3e3f9d460bdda";
+    static String account = "2082341273";
+    static int uid = 2082341273;
+    static int tokenExpirationInSeconds = 3600;
+    static int privilegeExpirationInSeconds = 3600;
+    static int joinChannelPrivilegeExpireInSeconds = 3600;
+    static int pubAudioPrivilegeExpireInSeconds = 3600;
+    static int pubVideoPrivilegeExpireInSeconds = 3600;
+    static int pubDataStreamPrivilegeExpireInSeconds = 3600;
 
-    public static void main(String[] args) throws Exception {
-        System.out.println(DynamicKey5.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs));
+    public static void main(String[] args) {
+        System.out.printf("App Id: %s\n", appId);
+        System.out.printf("App Certificate: %s\n", appCertificate);
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            System.out.printf("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE\n");
+            return;
+        }
+
+        RtcTokenBuilder2 token = new RtcTokenBuilder2();
+        String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_SUBSCRIBER,
+                tokenExpirationInSeconds, privilegeExpirationInSeconds);
+        System.out.printf("Token with uid: %s\n", result);
+
+        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
+                Role.ROLE_SUBSCRIBER,
+                tokenExpirationInSeconds, privilegeExpirationInSeconds);
+        System.out.printf("Token with account: %s\n", result);
+
+        result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, tokenExpirationInSeconds,
+                joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
+                pubVideoPrivilegeExpireInSeconds,
+                pubDataStreamPrivilegeExpireInSeconds);
+        System.out.printf("Token with uid and privilege: %s\n", result);
+
+        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
+                tokenExpirationInSeconds,
+                joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
+                pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
+        System.out.printf("Token with account and privilege: %s\n", result);
     }
 }
 ```
 
 ### Node.js
 ```javascript
-var DynamicKey5 = require('../src/DynamicKey5');
-var appID  = "970ca35de60c44645bbae8a215061b33";
-var appCertificate     = "5cfd2fd1755d40ecb72977518be15d3b";
-var channel = "my channel name";
-var ts = Math.floor(new Date() / 1000);
-var r = Math.floor(Math.random() * 0xFFFFFFFF);
-var uid = 2882341273;
-var expiredTs = 0;
+const RtcTokenBuilder = require("../src/RtcTokenBuilder2").RtcTokenBuilder;
+const RtcRole = require("../src/RtcTokenBuilder2").Role;
 
-console.log("5 channel key: " + DynamicKey5.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs));
+// Need to set environment variable AGORA_APP_ID
+const appId = process.env.AGORA_APP_ID;
+// Need to set environment variable AGORA_APP_CERTIFICATE
+const appCertificate = process.env.AGORA_APP_CERTIFICATE;
+
+const channelName = "7d72365eb983485397e3e3f9d460bdda";
+const uid = 2882341273;
+const account = "2882341273";
+const role = RtcRole.PUBLISHER;
+const tokenExpirationInSecond = 3600;
+const privilegeExpirationInSecond = 3600;
+const joinChannelPrivilegeExpireInSeconds = 3600;
+const pubAudioPrivilegeExpireInSeconds = 3600;
+const pubVideoPrivilegeExpireInSeconds = 3600;
+const pubDataStreamPrivilegeExpireInSeconds = 3600;
+
+console.log("App Id:", appId);
+console.log("App Certificate:", appCertificate);
+if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
+    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
+    process.exit(1);
+}
+
+// Build token with uid
+const tokenWithUid = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, tokenExpirationInSecond, privilegeExpirationInSecond);
+console.log("Token with int uid:", tokenWithUid);
+
+// Build token with user account
+const tokenWithUserAccount = RtcTokenBuilder.buildTokenWithUserAccount(
+    appId,
+    appCertificate,
+    channelName,
+    account,
+    role,
+    tokenExpirationInSecond,
+    privilegeExpirationInSecond
+);
+console.log("Token with user account:", tokenWithUserAccount);
+
+const tokenWithUidAndPrivilege = RtcTokenBuilder.buildTokenWithUidAndPrivilege(
+    appId,
+    appCertificate,
+    channelName,
+    uid,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds
+);
+console.log("Token with int uid and privilege:", tokenWithUidAndPrivilege);
+
+const tokenWithUserAccountAndPrivilege = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(
+    appId,
+    appCertificate,
+    channelName,
+    account,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds
+);
+console.log("Token with user account and privilege:", tokenWithUserAccountAndPrivilege);
 ```
 
 ### PHP
 ```php
 <?php
-include "../src/DynamicKey5.php";
+include("../src/RtcTokenBuilder2.php");
 
-$appID = '970ca35de60c44645bbae8a215061b33';
-$appCertificate = '5cfd2fd1755d40ecb72977518be15d3b';
+// Need to set environment variable AGORA_APP_ID
+$appId = getenv("AGORA_APP_ID");
+// Need to set environment variable AGORA_APP_CERTIFICATE
+$appCertificate = getenv("AGORA_APP_CERTIFICATE");
+
 $channelName = "7d72365eb983485397e3e3f9d460bdda";
-$ts = 1446455472;
-$randomInt = 58964981;
 $uid = 2882341273;
-$expiredTs = 1446455471;
+$uidStr = "2882341273";
+$tokenExpirationInSeconds = 3600;
+$privilegeExpirationInSeconds = 3600;
+$joinChannelPrivilegeExpireInSeconds = 3600;
+$pubAudioPrivilegeExpireInSeconds = 3600;
+$pubVideoPrivilegeExpireInSeconds = 3600;
+$pubDataStreamPrivilegeExpireInSeconds = 3600;
 
-echo generateMediaChannelKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs) . "\n";
-?>
+echo "App Id: " . $appId . PHP_EOL;
+echo "App Certificate: " . $appCertificate . PHP_EOL;
+if ($appId == "" || $appCertificate == "") {
+    echo "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE" . PHP_EOL;
+    exit;
+}
 
+$token = RtcTokenBuilder2::buildTokenWithUid($appId, $appCertificate, $channelName, $uid, RtcTokenBuilder2::ROLE_PUBLISHER, $tokenExpirationInSeconds, $privilegeExpirationInSeconds);
+echo 'Token with int uid: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder2::buildTokenWithUserAccount($appId, $appCertificate, $channelName, $uidStr, RtcTokenBuilder2::ROLE_PUBLISHER, $tokenExpirationInSeconds, $privilegeExpirationInSeconds);
+echo 'Token with user account: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder2::buildTokenWithUidAndPrivilege($appId, $appCertificate, $channelName, $uid, $tokenExpirationInSeconds, $joinChannelPrivilegeExpireInSeconds, $pubAudioPrivilegeExpireInSeconds, $pubVideoPrivilegeExpireInSeconds, $pubDataStreamPrivilegeExpireInSeconds);
+echo 'Token with int uid and privilege: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder2::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, $uidStr, $tokenExpirationInSeconds, $joinChannelPrivilegeExpireInSeconds, $pubAudioPrivilegeExpireInSeconds, $pubVideoPrivilegeExpireInSeconds, $pubDataStreamPrivilegeExpireInSeconds);
+echo 'Token with user account and privilege: ' . $token . PHP_EOL;
 ```
 
 ### Python
 ```python
-import sys
 import os
-import time
-from random import randint
+import sys
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '../src'))
-from DynamicKey5 import *
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-appID   = "970ca35de60c44645bbae8a215061b33"
-appCertificate     = "5cfd2fd1755d40ecb72977518be15d3b"
-channelname = "7d72365eb983485397e3e3f9d460bdda"
-unixts = int(time.time());
-uid = 2882341273
-randomint = -2147483647
-expiredts = 0
+from src.RtcTokenBuilder2 import *
 
-print "%.8x" % (randomint & 0xFFFFFFFF)
+
+def main():
+    # Need to set environment variable AGORA_APP_ID
+    app_id = os.environ.get("AGORA_APP_ID")
+    # Need to set environment variable AGORA_APP_CERTIFICATE
+    app_certificate = os.environ.get("AGORA_APP_CERTIFICATE")
+
+    channel_name = "7d72365eb983485397e3e3f9d460bdda"
+    uid = 2882341273
+    account = "2882341273"
+    token_expiration_in_seconds = 3600
+    privilege_expiration_in_seconds = 3600
+    join_channel_privilege_expiration_in_seconds = 3600
+    pub_audio_privilege_expiration_in_seconds = 3600
+    pub_video_privilege_expiration_in_seconds = 3600
+    pub_data_stream_privilege_expiration_in_seconds = 3600
+
+    print("App Id: %s" % app_id)
+    print("App Certificate: %s" % app_certificate)
+    if not app_id or not app_certificate:
+        print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+        return
+    
+    token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
+                                                 token_expiration_in_seconds, privilege_expiration_in_seconds)
+    print("Token with int uid: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
+                                                          Role_Subscriber, token_expiration_in_seconds,
+                                                          privilege_expiration_in_seconds)
+    print("Token with user account: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_uid_and_privilege(
+        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds, 
+        join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
+    print("Token with int uid and privilege: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
+        app_id, app_certificate, channel_name, account, token_expiration_in_seconds,
+        join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
+    print("Token with user account and privilege: {}".format(token))
+
 
 if __name__ == "__main__":
-    print generateMediaChannelKey(appID, appCertificate, channelname, unixts, randomint, uid, expiredts)
-
+    main()
 ```
 
 ### Ruby
 ```ruby
-require '../src/dynamic_key5'
-app_id = "970ca35de60c44645bbae8a215061b33"
-app_certificate = "5cfd2fd1755d40ecb72977518be15d3b"
-channel_name = "7d72365eb983485397e3e3f9d460bdda"
-unix_ts = Time.now.utc.to_i
-uid = 2882341273
-random_int = -2147483647
-expired_ts = 0
+require_relative '../lib/dynamic_key2'
 
-puts "%.8x" % (random_int & 0xFFFFFFFF)
+# Need to set environment variable AGORA_APP_ID
+app_id = ENV['AGORA_APP_ID']
+# Need to set environment variable AGORA_APP_CERTIFICATE
+app_certificate = ENV['AGORA_APP_CERTIFICATE']
 
-media_channel_key = DynamicKey5.gen_media_channel_key(app_id, app_certificate, channel_name, unix_ts, random_int, uid, expired_ts)
+channel_name = '7d72365eb983485397e3e3f9d460bdda'
+uid = 2_882_341_273
+account = '2882341273'
+token_expiration_in_seconds = 3600
+privilege_expiration_in_seconds = 3600
+join_channel_privilege_expiration_in_seconds = 3600
+pub_audio_privilege_expiration_in_seconds = 3600
+pub_video_privilege_expiration_in_seconds = 3600
+pub_data_stream_privilege_expiration_in_seconds = 3600
 
-puts "media_channel_key:#{media_channel_key}"
+puts "App Id: #{app_id}"
+puts "App Certificate: #{app_certificate}"
+if !app_id || app_id == '' || !app_certificate || app_certificate == ''
+  puts 'Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE'
+  exit
+end
 
+token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(
+  app_id, app_certificate, channel_name, uid,
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+)
+puts "Token with int uid: #{token}"
 
+token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(
+  app_id, app_certificate, channel_name, account,
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+)
+puts "Token with user account: #{token}"
+
+token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid_and_privilege(
+  app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
+  join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds,
+  pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds
+)
+puts "Token with int uid and privilege: #{token}"
+
+token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account_and_privilege(
+  app_id, app_certificate, channel_name, account, token_expiration_in_seconds,
+  join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds,
+  pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds
+)
+puts "Token with user account and privilege: #{token}"
 ```
+
 ### Perl
 ```perl
-use Agora::DynamicKey5;
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use utf8;
+use 5.010;
 
-my $app_id          = "970ca35de60c44645bbae8a215061b33";
-my $app_certificate = "5cfd2fd1755d40ecb72977518be15d3b";
-my $channel_name    = "7d72365eb983485397e3e3f9d460bdda";
-my $unix_ts         = time();
-my $uid             = 2882341273;
-my $random_int      = -2147483647;
-my $expired_ts      = 0;
+use FindBin;
 
-my $media_channel_key = Agora::DynamicKey5::gen_media_channel_key($app_id, $app_certificate, $channel_name, $unix_ts, $random_int, $uid, $expired_ts);
+use lib $FindBin::Bin."/../src";
 
-say "media_channel_key:$media_channel_key";
+use Agora::AccessToken;
+
+# Need to set environment variable AGORA_APP_ID
+my $app_id           = $ENV{AGORA_APP_ID};
+# Need to set environment variable AGORA_APP_CERTIFICATE
+my $app_certificate  = $ENV{AGORA_APP_CERTIFICATE};
+
+my $channel_name     = "7d72365eb983485397e3e3f9d460bdda";
+my $uid              = 2882341273;
+my $expire_timestamp = 0;
+
+if (!defined($app_id) || $app_id eq "" || !defined($app_certificate) || $app_certificate eq "") {
+    say "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE";
+    exit 1;
+}
+say "App Id: $app_id";
+say "App Certificate: $app_certificate";
+
+my $token = Agora::AccessToken::create_access_token($app_id, $app_certificate, $channel_name, $uid);
+$token->add_privilege(Agora::AccessToken::KJoinChannel, $expire_timestamp);
+
+my $token_str = $token->build;
+say "Token: $token_str";
 ```
 
 ## Tool 
