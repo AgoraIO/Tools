@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 import os
 import sys
@@ -21,6 +21,12 @@ def main():
     chat_user_id = "2882341273"
     expiration_in_seconds = 3600
 
+    print("App Id: %s" % app_id)
+    print("App Certificate: %s" % app_certificate)
+    if not app_id or not app_certificate:
+        print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+        return
+    
     rtc_service = ServiceRtc(channel_name, uid)
     rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expiration_in_seconds)
 

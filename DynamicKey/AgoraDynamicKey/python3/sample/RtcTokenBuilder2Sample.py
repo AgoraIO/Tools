@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2017 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 import os
 import sys
@@ -25,6 +25,12 @@ def main():
     pub_video_privilege_expiration_in_seconds = 3600
     pub_data_stream_privilege_expiration_in_seconds = 3600
 
+    print("App Id: %s" % app_id)
+    print("App Certificate: %s" % app_certificate)
+    if not app_id or not app_certificate:
+        print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+        return
+    
     token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
                                                  token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid: {}".format(token))
