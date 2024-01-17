@@ -1,16 +1,16 @@
 /**
  * build with command:
- * g++ -std=c++0x -O0 -I../../ RtmTokenBuilderSample.cpp  -lz -lcrypto -o RtmTokenBuilderSample
+ * g++ -std=c++0x -O0 -I../../ RtmTokenBuilderSample.cpp  -lz -lcrypto -o
+ * RtmTokenBuilderSample
  */
 #include "../src/RtmTokenBuilder.h"
-#include <iostream>
 #include <cstdint>
 #include <cstdlib>
+#include <iostream>
 
 using namespace agora::tools;
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
   // Need to set environment variable AGORA_APP_ID
   const char *envAppId = getenv("AGORA_APP_ID");
   std::string appId = envAppId ? envAppId : "";
@@ -25,13 +25,15 @@ int main(int argc, char const *argv[])
 
   std::cout << "App Id:" << appId << std::endl;
   std::cout << "App Certificate:" << appCertificate << std::endl;
-  if (appId == "" || appCertificate == "")
-  {
-    std::cout << "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE" << std::endl;
+  if (appId == "" || appCertificate == "") {
+    std::cout << "Need to set environment variable AGORA_APP_ID and "
+                 "AGORA_APP_CERTIFICATE"
+              << std::endl;
     return -1;
   }
 
-  std::string result = RtmTokenBuilder::buildToken(appId, appCertificate, user, RtmUserRole::Rtm_User, privilegeExpiredTs);
+  std::string result = RtmTokenBuilder::buildToken(
+      appId, appCertificate, user, RtmUserRole::Rtm_User, privilegeExpiredTs);
   std::cout << "Rtm Token:" << result << std::endl;
 
   return 0;

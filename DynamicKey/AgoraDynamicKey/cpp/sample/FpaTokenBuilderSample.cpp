@@ -1,14 +1,13 @@
 // Copyright (c) 2014-2024 Agora.io, Inc.
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 #include "../src/FpaTokenBuilder.h"
 
 using namespace agora::tools;
 
-int main(int argc, char const *argv[])
-{
+int main(int argc, char const *argv[]) {
   (void)argc;
   (void)argv;
 
@@ -21,9 +20,10 @@ int main(int argc, char const *argv[])
 
   std::cout << "App Id:" << app_id << std::endl;
   std::cout << "App Certificate:" << app_certificate << std::endl;
-  if (app_id == "" || app_certificate == "")
-  {
-    std::cout << "Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE" << std::endl;
+  if (app_id == "" || app_certificate == "") {
+    std::cout << "Need to set environment variable AGORA_APP_ID and "
+                 "AGORA_APP_CERTIFICATE"
+              << std::endl;
     return -1;
   }
 
