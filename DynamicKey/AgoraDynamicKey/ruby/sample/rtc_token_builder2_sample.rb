@@ -15,6 +15,13 @@ pub_audio_privilege_expiration_in_seconds = 3600
 pub_video_privilege_expiration_in_seconds = 3600
 pub_data_stream_privilege_expiration_in_seconds = 3600
 
+puts "App Id: #{app_id}"
+puts "App Certificate: #{app_certificate}"
+if !app_id || app_id == '' || !app_certificate || app_certificate == ''
+  puts 'Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE'
+  exit
+end
+
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(
   app_id, app_certificate, channel_name, uid,
   AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds

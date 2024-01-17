@@ -10,6 +10,13 @@ user_uuid = '2882341273'
 role = 1
 token_expiration_in_seconds = 3600
 
+puts "App Id: #{app_id}"
+puts "App Certificate: #{app_certificate}"
+if !app_id || app_id == '' || !app_certificate || app_certificate == ''
+  puts 'Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE'
+  exit
+end
+
 token = AgoraDynamicKey2::EducationTokenBuilder.build_room_user_token(app_id, app_certificate, room_uuid, user_uuid,
                                                                       role, token_expiration_in_seconds)
 puts "Education room user token: #{token}"
