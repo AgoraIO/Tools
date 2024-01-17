@@ -2,7 +2,7 @@ const RtcTokenBuilder = require("../src/RtcTokenBuilder2").RtcTokenBuilder;
 const RtcRole = require("../src/RtcTokenBuilder2").Role;
 
 // Need to set environment variable AGORA_APP_ID
-const appID = process.env.AGORA_APP_ID;
+const appId = process.env.AGORA_APP_ID;
 // Need to set environment variable AGORA_APP_CERTIFICATE
 const appCertificate = process.env.AGORA_APP_CERTIFICATE;
 
@@ -17,13 +17,20 @@ const pubAudioPrivilegeExpireInSeconds = 3600;
 const pubVideoPrivilegeExpireInSeconds = 3600;
 const pubDataStreamPrivilegeExpireInSeconds = 3600;
 
+console.log("App Id:", appId);
+console.log("App Certificate:", appCertificate);
+if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
+    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
+    process.exit(1);
+}
+
 // Build token with uid
-const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, tokenExpirationInSecond, privilegeExpirationInSecond);
-console.log("Token with int uid: " + tokenA);
+const tokenWithUid = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, tokenExpirationInSecond, privilegeExpirationInSecond);
+console.log("Token with int uid:", tokenWithUid);
 
 // Build token with user account
-const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(
-    appID,
+const tokenWithUserAccount = RtcTokenBuilder.buildTokenWithUserAccount(
+    appId,
     appCertificate,
     channelName,
     account,
@@ -31,10 +38,10 @@ const tokenB = RtcTokenBuilder.buildTokenWithUserAccount(
     tokenExpirationInSecond,
     privilegeExpirationInSecond
 );
-console.log("Token with user account: " + tokenB);
+console.log("Token with user account:", tokenWithUserAccount);
 
-const tokenC = RtcTokenBuilder.buildTokenWithUidAndPrivilege(
-    appID,
+const tokenWithUidAndPrivilege = RtcTokenBuilder.buildTokenWithUidAndPrivilege(
+    appId,
     appCertificate,
     channelName,
     uid,
@@ -44,10 +51,10 @@ const tokenC = RtcTokenBuilder.buildTokenWithUidAndPrivilege(
     pubVideoPrivilegeExpireInSeconds,
     pubDataStreamPrivilegeExpireInSeconds
 );
-console.log("Token with int uid and privilege:" + tokenC);
+console.log("Token with int uid and privilege:", tokenWithUidAndPrivilege);
 
-const tokenD = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(
-    appID,
+const tokenWithUserAccountAndPrivilege = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(
+    appId,
     appCertificate,
     channelName,
     account,
@@ -57,4 +64,4 @@ const tokenD = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(
     pubVideoPrivilegeExpireInSeconds,
     pubDataStreamPrivilegeExpireInSeconds
 );
-console.log("Token with user account and privilege:" + tokenD);
+console.log("Token with user account and privilege:", tokenWithUserAccountAndPrivilege);

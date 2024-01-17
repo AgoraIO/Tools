@@ -20,8 +20,6 @@ if (appId == undefined || appId == "" || appCertificate == undefined || appCerti
     Deno.exit(1);
 }
 
-// IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
-
 // Build token with uid
 const tokenWithUid = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, privilegeExpiredTs);
 console.log("Token With Integer Number Uid:", tokenWithUid);

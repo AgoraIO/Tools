@@ -2,7 +2,7 @@ const RtcTokenBuilder = require("../src/RtcTokenBuilder").RtcTokenBuilder;
 const RtcRole = require("../src/RtcTokenBuilder").Role;
 
 // Need to set environment variable AGORA_APP_ID
-const appID = process.env.AGORA_APP_ID;
+const appId = process.env.AGORA_APP_ID;
 // Need to set environment variable AGORA_APP_CERTIFICATE
 const appCertificate = process.env.AGORA_APP_CERTIFICATE;
 
@@ -14,12 +14,17 @@ const expirationTimeInSeconds = 3600;
 const currentTimestamp = Math.floor(Date.now() / 1000);
 const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
 
-// IMPORTANT! Build token with either the uid or with the user account. Comment out the option you do not want to use below.
+console.log("App Id:", appId);
+console.log("App Certificate:", appCertificate);
+if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
+    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
+    process.exit(1);
+}
 
 // Build token with uid
-const tokenA = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, role, privilegeExpiredTs);
-console.log("Token With Integer Number Uid: " + tokenA);
+const tokenWithUid = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, role, privilegeExpiredTs);
+console.log("Token With Integer Number Uid:", tokenWithUid);
 
 // Build token with user account
-const tokenB = RtcTokenBuilder.buildTokenWithAccount(appID, appCertificate, channelName, account, role, privilegeExpiredTs);
-console.log("Token With UserAccount: " + tokenB);
+const tokenWithAccount = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, account, role, privilegeExpiredTs);
+console.log("Token With UserAccount:", tokenWithAccount);
