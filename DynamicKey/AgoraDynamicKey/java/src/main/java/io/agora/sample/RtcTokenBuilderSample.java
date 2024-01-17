@@ -15,14 +15,21 @@ public class RtcTokenBuilderSample {
     static int expirationTimeInSeconds = 3600;
 
     public static void main(String[] args) throws Exception {
+        System.out.printf("App Id: %s\n", appId);
+        System.out.printf("App Certificate: %s\n", appCertificate);
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            System.out.printf("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE\n");
+            return;
+        }
+
         RtcTokenBuilder token = new RtcTokenBuilder();
         int timestamp = (int) (System.currentTimeMillis() / 1000 + expirationTimeInSeconds);
         String result = token.buildTokenWithUserAccount(appId, appCertificate,
                 channelName, userAccount, Role.Role_Publisher, timestamp);
-        System.out.println(result);
+        System.out.printf("Token with uid: %s\n", result);
 
         result = token.buildTokenWithUid(appId, appCertificate,
                 channelName, uid, Role.Role_Publisher, timestamp);
-        System.out.println(result);
+        System.out.printf("Token with account: %s\n", result);
     }
 }

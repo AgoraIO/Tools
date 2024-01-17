@@ -20,26 +20,33 @@ public class RtcTokenBuilder2Sample {
     static int pubDataStreamPrivilegeExpireInSeconds = 3600;
 
     public static void main(String[] args) {
+        System.out.printf("App Id: %s\n", appId);
+        System.out.printf("App Certificate: %s\n", appCertificate);
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            System.out.printf("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE\n");
+            return;
+        }
+
         RtcTokenBuilder2 token = new RtcTokenBuilder2();
         String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_SUBSCRIBER,
                 tokenExpirationInSeconds, privilegeExpirationInSeconds);
-        System.out.println("Token with uid: " + result);
+        System.out.printf("Token with uid: %s\n", result);
 
         result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
                 Role.ROLE_SUBSCRIBER,
                 tokenExpirationInSeconds, privilegeExpirationInSeconds);
-        System.out.println("Token with account: " + result);
+        System.out.printf("Token with account: %s\n", result);
 
         result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, tokenExpirationInSeconds,
                 joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
                 pubVideoPrivilegeExpireInSeconds,
                 pubDataStreamPrivilegeExpireInSeconds);
-        System.out.println("Token with uid and privilege: " + result);
+        System.out.printf("Token with uid and privilege: %s\n", result);
 
         result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
                 tokenExpirationInSeconds,
                 joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
                 pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
-        System.out.println("Token with account and privilege: " + result);
+        System.out.printf("Token with account and privilege: %s\n", result);
     }
 }

@@ -10,7 +10,7 @@ import io.agora.media.DynamicKey5;
  */
 public class DynamicKey5Sample {
     // Need to set environment variable AGORA_APP_ID
-    static String appID = System.getenv("AGORA_APP_ID");
+    static String appId = System.getenv("AGORA_APP_ID");
     // Need to set environment variable AGORA_APP_CERTIFICATE
     static String appCertificate = System.getenv("AGORA_APP_CERTIFICATE");
 
@@ -21,11 +21,18 @@ public class DynamicKey5Sample {
     static int expiredTs = 0;
 
     public static void main(String[] args) throws Exception {
-        System.out.println(DynamicKey5.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs));
-        System.out.println(DynamicKey5.generateRecordingKey(appID, appCertificate, channel, ts, r, uid, expiredTs));
-        System.out.println(DynamicKey5.generateInChannelPermissionKey(appID, appCertificate, channel, ts, r, uid,
+        System.out.printf("App Id: %s\n", appId);
+        System.out.printf("App Certificate: %s\n", appCertificate);
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            System.out.printf("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE\n");
+            return;
+        }
+
+        System.out.println(DynamicKey5.generateMediaChannelKey(appId, appCertificate, channel, ts, r, uid, expiredTs));
+        System.out.println(DynamicKey5.generateRecordingKey(appId, appCertificate, channel, ts, r, uid, expiredTs));
+        System.out.println(DynamicKey5.generateInChannelPermissionKey(appId, appCertificate, channel, ts, r, uid,
                 expiredTs, DynamicKey5.noUpload));
-        System.out.println(DynamicKey5.generateInChannelPermissionKey(appID, appCertificate, channel, ts, r, uid,
+        System.out.println(DynamicKey5.generateInChannelPermissionKey(appId, appCertificate, channel, ts, r, uid,
                 expiredTs, DynamicKey5.audioVideoUpload));
     }
 }

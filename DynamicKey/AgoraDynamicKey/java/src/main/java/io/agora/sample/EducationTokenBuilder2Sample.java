@@ -14,6 +14,13 @@ public class EducationTokenBuilder2Sample {
     private static int expire = 600;
 
     public static void main(String[] args) {
+        System.out.printf("App Id: %s\n", appId);
+        System.out.printf("App Certificate: %s\n", appCertificate);
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            System.out.printf("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE\n");
+            return;
+        }
+
         EducationTokenBuilder2 tokenBuilder = new EducationTokenBuilder2();
         String roomUserToken = tokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire);
         System.out.printf("Education room user token: %s\n", roomUserToken);
