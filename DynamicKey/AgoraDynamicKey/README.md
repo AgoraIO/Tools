@@ -246,7 +246,7 @@ import (
 
 func main() {
 	// Need to set environment variable AGORA_APP_ID
-	appID := os.Getenv("AGORA_APP_ID")
+	appId := os.Getenv("AGORA_APP_ID")
 	// Need to set environment variable AGORA_APP_CERTIFICATE
 	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
 
@@ -260,33 +260,39 @@ func main() {
 	pubVideoPrivilegeExpireInSeconds := uint32(3600)
 	pubDataStreamPrivilegeExpireInSeconds := uint32(3600)
 
-	result, err := rtctokenbuilder.BuildTokenWithUid(appID, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	fmt.Println("App Id:", appId)
+	fmt.Println("App Certificate:", appCertificate)
+	if appId == "" || appCertificate == "" {
+		fmt.Println("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+		return
+	}
+
+	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with int uid: %s\n", result)
 	}
 
-	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appID, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with user account: %s\n", result)
 	}
 
-	result, err1 := rtctokenbuilder.BuildTokenWithUidAndPrivilege(appID, appCertificate, channelName, uid,
+	result, err = rtctokenbuilder.BuildTokenWithUidAndPrivilege(appId, appCertificate, channelName, uid,
 		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
-	if err1 != nil {
-		fmt.Println(err1)
+	if err != nil {
+		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with int uid and privilege: %s\n", result)
 	}
 
-	result, err1 = rtctokenbuilder.BuildTokenWithUserAccountAndPrivilege(appID, appCertificate, channelName, uidStr,
+	result, err = rtctokenbuilder.BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, uidStr,
 		tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds)
-
-	if err1 != nil {
-		fmt.Println(err1)
+	if err != nil {
+		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with user account and privilege: %s\n", result)
 	}

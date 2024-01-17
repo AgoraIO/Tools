@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Need to set environment variable AGORA_APP_ID
-	appID := os.Getenv("AGORA_APP_ID")
+	appId := os.Getenv("AGORA_APP_ID")
 	// Need to set environment variable AGORA_APP_CERTIFICATE
 	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
 
@@ -18,21 +18,28 @@ func main() {
 	role := int16(1)
 	expire := uint32(600)
 
-	result, err := educationtokenbuilder.BuildRoomUserToken(appID, appCertificate, roomUuid, userUuid, role, expire)
+	fmt.Println("App Id:", appId)
+	fmt.Println("App Certificate:", appCertificate)
+	if appId == "" || appCertificate == "" {
+		fmt.Println("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+		return
+	}
+
+	result, err := educationtokenbuilder.BuildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("RoomUserToken: %s\n", result)
 	}
 
-	result, err = educationtokenbuilder.BuildUserToken(appID, appCertificate, userUuid, expire)
+	result, err = educationtokenbuilder.BuildUserToken(appId, appCertificate, userUuid, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("UserToken: %s\n", result)
 	}
 
-	result, err = educationtokenbuilder.BuildAppToken(appID, appCertificate, expire)
+	result, err = educationtokenbuilder.BuildAppToken(appId, appCertificate, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
