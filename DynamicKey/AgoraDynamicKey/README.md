@@ -624,10 +624,6 @@ Usage
 # python3 parse.py YOUR_TOKEN
 OR
 # make parse token=YOUR_TOKEN
-
-Test token with web page
-- For RTC, https://webdemo.agora.io/agora-web-showcase/examples/Agora-Web-Tutorial-1to1-Web/
-- For RTM, https://webdemo.agora.io/agora-web-showcase/examples/Agora-RTM-Tutorial-Web/
 ```
 
 ## Deploying the Token Service Using Docker
