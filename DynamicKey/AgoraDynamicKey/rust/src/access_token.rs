@@ -1,6 +1,7 @@
 use crate::utils;
 use hmac::{Hmac, Mac};
 use sha2::Sha256;
+use std::any::Any;
 use std::collections::HashMap;
 use std::io::{Error, Read, Write};
 use std::panic;
@@ -35,11 +36,13 @@ pub const PRIVILEGE_EDUCATION_USER: u16 = 2;
 pub const PRIVILEGE_EDUCATION_APP: u16 = 3;
 
 pub trait IService {
+    fn as_any(&self) -> &dyn Any;
     fn get_service_type(&self) -> u16;
     fn pack(&self, writer: &mut dyn Write) -> Result<(), Error>;
     fn unpack(&mut self, reader: &mut dyn Read) -> Result<(), Error>;
 }
 
+#[derive(Debug)]
 pub struct Service {
     privileges: HashMap<u16, u32>,
     service_type: u16,
@@ -67,6 +70,10 @@ impl Service {
 }
 
 impl IService for Service {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service_type
     }
@@ -82,6 +89,7 @@ impl IService for Service {
     }
 }
 
+#[derive(Debug)]
 pub struct ServiceRtc {
     pub service: Service,
     channel_name: String,
@@ -97,6 +105,10 @@ pub fn new_service_rtc(channel_name: &str, uid: &str) -> ServiceRtc {
 }
 
 impl IService for ServiceRtc {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service.service_type
     }
@@ -115,6 +127,7 @@ impl IService for ServiceRtc {
     }
 }
 
+#[derive(Debug)]
 pub struct ServiceRtm {
     pub service: Service,
     user_id: String,
@@ -128,6 +141,10 @@ pub fn new_service_rtm(user_id: &str) -> ServiceRtm {
 }
 
 impl IService for ServiceRtm {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service.service_type
     }
@@ -144,6 +161,7 @@ impl IService for ServiceRtm {
     }
 }
 
+#[derive(Debug)]
 pub struct ServiceFpa {
     pub service: Service,
 }
@@ -155,6 +173,10 @@ pub fn new_service_fpa() -> ServiceFpa {
 }
 
 impl IService for ServiceFpa {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service.service_type
     }
@@ -168,6 +190,7 @@ impl IService for ServiceFpa {
     }
 }
 
+#[derive(Debug)]
 pub struct ServiceChat {
     pub service: Service,
     user_id: String,
@@ -181,6 +204,10 @@ pub fn new_service_chat(user_id: &str) -> ServiceChat {
 }
 
 impl IService for ServiceChat {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service.service_type
     }
@@ -197,6 +224,7 @@ impl IService for ServiceChat {
     }
 }
 
+#[derive(Debug)]
 pub struct ServiceEducation {
     pub service: Service,
     room_uuid: String,
@@ -214,6 +242,10 @@ pub fn new_service_education(room_uuid: &str, user_uuid: &str, role: i16) -> Ser
 }
 
 impl IService for ServiceEducation {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
     fn get_service_type(&self) -> u16 {
         self.service.service_type
     }
@@ -234,6 +266,7 @@ impl IService for ServiceEducation {
     }
 }
 
+#[derive(Debug)]
 pub struct AccessToken {
     app_cert: String,
     app_id: String,
@@ -250,18 +283,24 @@ pub fn new_access_token(app_id: &str, app_cert: &str, expire: u32) -> AccessToke
         .as_secs() as u32;
     let salt = utils::get_rand(1, 99999999) as u32;
 
-    AccessToken {
+    return AccessToken {
         app_cert: app_cert.to_string(),
         app_id: app_id.to_string(),
         expire,
         issue_ts,
         salt,
         services: HashMap::new(),
-    }
+    };
 }
 
 pub fn create_access_token() -> AccessToken {
     new_access_token("", "", 900)
+}
+
+impl std::fmt::Debug for dyn IService + 'static {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "service_type:{:?}", self.get_service_type())
+    }
 }
 
 impl AccessToken {
@@ -301,14 +340,14 @@ impl AccessToken {
         // Signature
         let mut h_sign = Hmac::<Sha256>::new_from_slice(&sign)?;
         h_sign.update(&buf);
-        let signature = h_sign.finalize();
+        let signature = h_sign.finalize().into_bytes();
 
         let mut buf_content = Vec::new();
-        utils::pack_string(
-            &mut buf_content,
-            &String::from_utf8_lossy(&signature.into_bytes()).to_string(),
-        )?;
-        buf_content.extend_from_slice(&buf);
+        utils::pack_string(&mut buf_content, unsafe {
+            &String::from_utf8_unchecked(signature.to_vec())
+        })?;
+
+        buf_content.extend(&buf);
 
         let res = get_version() + &utils::base64_encode_str(&utils::compress_zlib(&buf_content));
         Ok(res)
@@ -396,4 +435,61 @@ pub fn is_uuid(s: &str) -> bool {
     }
 
     return s.chars().all(|c| c.is_digit(16));
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_service_rtc() {
+        let app_id: &str = "970CA35de60c44645bbae8a215061b33";
+        let app_cert: &str = "5CFd2fd1755d40ecb72977518be15d3b";
+        let channel_name: &str = "7d72365eb983485397e3e3f9d460bdda";
+        let uid_str: &str = "2882341273";
+        let expire: u32 = 600;
+        let salt: u32 = 1;
+        let ts: u32 = 1111111;
+
+        let mut access_token = new_access_token(app_id, app_cert, expire);
+        access_token.issue_ts = ts;
+        access_token.salt = salt;
+
+        let mut service_rtc = new_service_rtc(channel_name, uid_str);
+        service_rtc
+            .service
+            .add_privilege(PRIVILEGE_JOIN_CHANNEL, expire);
+
+        access_token.add_service(Box::new(service_rtc));
+
+        assert_eq!("007eJwBigB1/yAAFqC4TFpegsv3T7gT0J9ZxUvaycBhIFgFOayXV46VixogADk3MENBMzVkZTYwYzQ0NjQ1YmJhZThhMjE1MDYxYjMzR/QQAFgCAAABAAAAAQABAAEAAQBYAgAAIAA3ZDcyMzY1ZWI5ODM0ODUzOTdlM2UzZjlkNDYwYmRkYQoAMjg4MjM0MTI3M8JqJOM=", access_token.build().unwrap());
+    }
+
+    #[test]
+    fn test_parse() {
+        let app_id: &str = "970CA35de60c44645bbae8a215061b33";
+        let channel_name: &str = "7d72365eb983485397e3e3f9d460bdda";
+        let uid_str: &str = "2882341273";
+        let expire: u32 = 600;
+        let salt: u32 = 1;
+        let ts: u32 = 1111111;
+
+        let mut access_token = create_access_token();
+        let token = "007eJwBigB1/yAAFqC4TFpegsv3T7gT0J9ZxUvaycBhIFgFOayXV46VixogADk3MENBMzVkZTYwYzQ0NjQ1YmJhZThhMjE1MDYxYjMzR/QQAFgCAAABAAAAAQABAAEAAQBYAgAAIAA3ZDcyMzY1ZWI5ODM0ODUzOTdlM2UzZjlkNDYwYmRkYQoAMjg4MjM0MTI3M8JqJOM=";
+
+        let res = access_token.parse(token).unwrap();
+        let service_rtc: &Box<dyn IService> = access_token.services.get(&SERVICE_TYPE_RTC).unwrap();
+
+        assert_eq!(true, res);
+        assert_eq!(app_id, access_token.app_id);
+        assert_eq!(expire, access_token.expire);
+        assert_eq!(salt, access_token.salt);
+        assert_eq!(ts, access_token.issue_ts);
+        assert_eq!(SERVICE_TYPE_RTC, service_rtc.get_service_type());
+
+        if let Some(service_rtc_downcast) = service_rtc.as_any().downcast_ref::<ServiceRtc>() {
+            assert_eq!(channel_name, service_rtc_downcast.channel_name);
+            assert_eq!(uid_str, service_rtc_downcast.uid);
+        }
+    }
 }
