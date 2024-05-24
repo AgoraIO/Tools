@@ -13,7 +13,7 @@ Under the `rust`  directory:
 
 This section takes `rtc_token_builder` as an example to show how to generate a token with the sample code.
 
-Before proceeding, ensure that you have installed the latest version of Golang.
+Before proceeding, ensure that you have installed the latest version of Rust.
 
 1. Download or clone the [Tools](https://github.com/AgoraIO/Tools) repository.
 
