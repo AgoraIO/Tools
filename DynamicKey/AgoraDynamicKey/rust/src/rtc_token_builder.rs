@@ -7,20 +7,21 @@ pub const ROLE_PUBLISHER: Role = 1; // for live broadcaster
 pub const ROLE_SUBSCRIBER: Role = 2; // default, for live audience
 
 // Build the RTC token with uid.
-// appId: The App ID issued to you by Agora. Apply for a new App ID from
+//
+// app_id: The App ID issued to you by Agora. Apply for a new App ID from
 //     Agora Dashboard if it is missing from your kit. See Get an App ID.
-// appCertificate: Certificate of the application that you registered in
+// app_certificate: Certificate of the application that you registered in
 //     the Agora Dashboard. See Get an App Certificate.
-// channelName: Unique channel name for the AgoraRTC session in the string format
+// channel_name: Unique channel name for the AgoraRTC session in the string format
 // uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). optionalUid must be unique.
 // role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
 //     Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-// tokenExpire: represented by the number of seconds elapsed since now. If, for example,
+// token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
 //     set token_expire as 600(seconds).
-// privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
+// privilege_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
 // return The RTC token.
 pub fn build_token_with_uid(
@@ -45,18 +46,18 @@ pub fn build_token_with_uid(
 
 // Build the RTC token with account.
 //
-// appId: The App ID issued to you by Agora. Apply for a new App ID from
+// app_id: The App ID issued to you by Agora. Apply for a new App ID from
 //     Agora Dashboard if it is missing from your kit. See Get an App ID.
-// appCertificate: Certificate of the application that you registered in
+// app_certificate: Certificate of the application that you registered in
 //     the Agora Dashboard. See Get an App Certificate.
-// channelName: Unique channel name for the AgoraRTC session in the string format
+// channel_name: Unique channel name for the AgoraRTC session in the string format
 // account: The user's account, max length is 255 Bytes.
 // role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
-// tokenExpire: represented by the number of seconds elapsed since now. If, for example,
+// token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
 //     set token_expire as 600(seconds).
-// privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
+// privilege_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
 // return The RTC token.
 pub fn build_token_with_user_account(
