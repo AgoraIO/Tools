@@ -23,7 +23,7 @@ class EducationTokenBuilder:
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
 
-        char_user_id = get_md5(user_uuid)
+        chat_user_id = get_md5(user_uuid)
         education_service = ServiceEducation(room_uuid, user_uuid, role)
         education_service.add_privilege(ServiceEducation.kPrivilegeRoomUser, expire)
         token.add_service(education_service)
@@ -32,7 +32,7 @@ class EducationTokenBuilder:
         rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, expire)
         token.add_service(rtm_service)
 
-        chat_service = ServiceChat(char_user_id)
+        chat_service = ServiceChat(chat_user_id)
         chat_service.add_privilege(ServiceChat.kPrivilegeUser, expire)
         token.add_service(chat_service)
 

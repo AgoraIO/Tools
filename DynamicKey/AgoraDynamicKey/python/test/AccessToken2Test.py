@@ -80,7 +80,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_education_room_user(self):
-        char_user_id = get_md5(self.__uid_str)
+        chat_user_id = get_md5(self.__uid_str)
         education_service = ServiceEducation(
             self.__room_uuid, self.__uid_str, self.__role)
         education_service.add_privilege(
@@ -91,7 +91,7 @@ class AccessToken2Test(unittest.TestCase):
         rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
         self.__token.add_service(rtm_service)
 
-        chat_service = ServiceChat(char_user_id)
+        chat_service = ServiceChat(chat_user_id)
         chat_service.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
         self.__token.add_service(chat_service)
 
