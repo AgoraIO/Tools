@@ -25,7 +25,7 @@ enum UserRole {
   /**
    Only use this role if your scenario require authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
 
-   @note In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+   @note In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
    */
   Role_Subscriber = 2,
   /**
@@ -52,7 +52,7 @@ class RtcTokenBuilder {
     @param uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
     @param role See #userRole.
     - Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-    - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+    - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
     @param privilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
     @return The new Token.
     */
@@ -78,7 +78,7 @@ class RtcTokenBuilder {
    @param userAccount The user account.
    @param role See #userRole.
    - Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-   - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+   - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
    @param privilegeExpiredTs represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
    @return The new Token.
    */

@@ -13,7 +13,7 @@ public class RtcTokenBuilder {
         /**
          * Only use this role if your scenario require authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
          *
-         * @note In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+         * @note In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
          */
         Role_Subscriber(2),
         /**
@@ -47,7 +47,7 @@ public class RtcTokenBuilder {
      * @param role The user role.
      * <ul>
      *     <li> Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a live broadcast.</li>
-     *     <li> Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.</li>
+     *     <li> Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.</li>
      * </ul>
      * @param privilegeTs Represented by the number of seconds elapsed since 1/1/1970.
      *        If, for example, you want to access the Agora Service within 10 minutes
@@ -79,7 +79,7 @@ public class RtcTokenBuilder {
      * @param role The user role.
      * <ul>
      *     <li> Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a live broadcast.</li>
-     *     <li> Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.</li>
+     *     <li> Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.</li>
      * </ul>
      * @param privilegeTs represented by the number of seconds elapsed since 1/1/1970.
      *        If, for example, you want to access the Agora Service within 10 minutes

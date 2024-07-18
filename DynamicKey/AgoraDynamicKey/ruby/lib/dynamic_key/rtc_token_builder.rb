@@ -18,7 +18,7 @@ module AgoraDynamicKey
       PUBLISHER = 1
 
       # Only use this role if your scenario require authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
-      # @note In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role::SUBSCRIBER still has the same privileges as Role::PUBLISHER.
+      # @note In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role::SUBSCRIBER still has the same privileges as Role::PUBLISHER.
       SUBSCRIBER = 2
 
       # DEPRECATED. Role::ADMIN has the same privileges as Role::PUBLISHER.
@@ -41,7 +41,7 @@ module AgoraDynamicKey
       # :uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
       # :role See #userRole.
       # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
       # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
       #
       # @return The new Token.
@@ -65,7 +65,7 @@ module AgoraDynamicKey
       # :account The user account.
       # :role See #userRole.
       # - Role::PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+      # - Role::SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
       # :privilege_expired_ts represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
       #
       # @return The new Token.
