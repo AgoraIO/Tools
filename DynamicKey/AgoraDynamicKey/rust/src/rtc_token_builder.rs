@@ -3,8 +3,17 @@ use crate::access_token;
 // Role type
 pub type Role = u16;
 
-pub const ROLE_PUBLISHER: Role = 1; // for live broadcaster
-pub const ROLE_SUBSCRIBER: Role = 2; // default, for live audience
+// RECOMMENDED. Use this role for a voice/video call or a live broadcast, if
+// your scenario does not require authentication for
+// [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
+pub const ROLE_PUBLISHER: Role = 1;
+
+// Only use this role if your scenario require authentication for
+// [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
+// @note In order for this role to take effect, please contact our support team
+// to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
+// still has the same privileges as Role_Publisher.
+pub const ROLE_SUBSCRIBER: Role = 2;
 
 // Build the RTC token with uid.
 //

@@ -1,11 +1,9 @@
-
 export namespace RtcRole {
-    export const PUBLISHER: number;
-    export const SUBSCRIBER: number;
+    export const PUBLISHER: number
+    export const SUBSCRIBER: number
 }
 
 export namespace RtcTokenBuilder {
-
     /**
      * Builds an RTC token using an Integer uid.
      * @param {*} appId  The App ID issued to you by Agora.
@@ -19,11 +17,19 @@ export namespace RtcTokenBuilder {
      * @param {*} uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
      * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).     * @return The new Token.
      */
-     export function buildTokenWithUid(appId: string, appCertificate: string, channelName: string, uid: string | number, role: number,  token_expire: number, privilege_expire: number): string;
+    export function buildTokenWithUid(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        uid: string | number,
+        role: number,
+        token_expire: number,
+        privilege_expire: number
+    ): string
 
     /**
      * Builds an RTC token using an Integer uid.
@@ -38,14 +44,22 @@ export namespace RtcTokenBuilder {
      * @param {*} account The user account.
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
      * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The new Token.
      */
-     export function buildTokenWithUserAccount(appId: string, appCertificate: string, channelName: string, account: string | number, role: number, token_expire: number, privilege_expire: number): string;
+    export function buildTokenWithUserAccount(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        account: string | number,
+        role: number,
+        token_expire: number,
+        privilege_expire: number
+    ): string
 
-     /**
+    /**
      * Generates an RTC token with the specified privilege.
      *
      * This method supports generating a token with the following privileges:
@@ -98,9 +112,17 @@ export namespace RtcTokenBuilder {
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
      * @return The new Token
      */
-    export function buildTokenWithUidAndPrivilege(appId: string, appCertificate: string, channelName: string, uid: string | number,
-        tokenExpire: number, joinChannelPrivilegeExpire: number, pubAudioPrivilegeExpire: number,
-        pubVideoPrivilegeExpire: number, pubDataStreamPrivilegeExpire: number): string;
+    export function buildTokenWithUidAndPrivilege(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        uid: string | number,
+        tokenExpire: number,
+        joinChannelPrivilegeExpire: number,
+        pubAudioPrivilegeExpire: number,
+        pubVideoPrivilegeExpire: number,
+        pubDataStreamPrivilegeExpire: number
+    ): string
 
     /**
      * Generates an RTC token with the specified privilege.
@@ -155,13 +177,20 @@ export namespace RtcTokenBuilder {
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
      * @return The new Token.
      */
-    export function BuildTokenWithUserAccountAndPrivilege(appId: string, appCertificate: string, channelName: string, account: string | number,
-        tokenExpire: number, joinChannelPrivilegeExpire: number, pubAudioPrivilegeExpire: number,
-        pubVideoPrivilegeExpire: number, pubDataStreamPrivilegeExpire: number): string;
+    export function BuildTokenWithUserAccountAndPrivilege(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        account: string | number,
+        tokenExpire: number,
+        joinChannelPrivilegeExpire: number,
+        pubAudioPrivilegeExpire: number,
+        pubVideoPrivilegeExpire: number,
+        pubDataStreamPrivilegeExpire: number
+    ): string
 }
 
 export namespace RtmTokenBuilder {
-
     /**
      * Build the RTM token.
      *
@@ -174,7 +203,7 @@ export namespace RtmTokenBuilder {
      * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The RTM token.
      */
-     export function buildToken(appId: string, appCertificate: string, userId: string | number, expire: number): string;
+    export function buildToken(appId: string, appCertificate: string, userId: string | number, expire: number): string
 }
 
 export namespace EducationTokenBuilder {
@@ -191,7 +220,14 @@ export namespace EducationTokenBuilder {
      *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The education user room token.
      */
-     export function buildRoomUserToken(appId: string, appCertificate: string, roomUuid: string, userUuid: string | number, role: number, expire: number): string;
+    export function buildRoomUserToken(
+        appId: string,
+        appCertificate: string,
+        roomUuid: string,
+        userUuid: string | number,
+        role: number,
+        expire: number
+    ): string
 
     /**
      * build user individual token
@@ -204,7 +240,12 @@ export namespace EducationTokenBuilder {
      *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The education user token.
      */
-    export function buildUserToken(appId: string, appCertificate: string, userUuid: string | number, expire: number): string;
+    export function buildUserToken(
+        appId: string,
+        appCertificate: string,
+        userUuid: string | number,
+        expire: number
+    ): string
 
     /**
      * build app global token
@@ -216,7 +257,7 @@ export namespace EducationTokenBuilder {
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The education global token.
      */
-     export function buildAppToken(appId: string, appCertificate: string, expire: number): string;
+    export function buildAppToken(appId: string, appCertificate: string, expire: number): string
 }
 
 export namespace FpaTokenBuilder {
@@ -228,7 +269,7 @@ export namespace FpaTokenBuilder {
      * the Agora Dashboard. See Get an App Certificate.
      * @return The FPA token.
      */
-    export function buildToken(appId: string, appCertificate: string): string;
+    export function buildToken(appId: string, appCertificate: string): string
 }
 
 export namespace ChatTokenBuilder {
@@ -244,7 +285,12 @@ export namespace ChatTokenBuilder {
      * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The chat user token.
      */
-     export function buildUserToken(appId: string, appCertificate: string, userId: string | number, expire: number): string;
+    export function buildUserToken(
+        appId: string,
+        appCertificate: string,
+        userId: string | number,
+        expire: number
+    ): string
 
     /**
      * Build the Chat App token.
@@ -257,5 +303,5 @@ export namespace ChatTokenBuilder {
      * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
      * @return The chat App token.
      */
-     export function buildAppToken(appId: string, appCertificate: string, expire: number): string;
+    export function buildAppToken(appId: string, appCertificate: string, expire: number): string
 }

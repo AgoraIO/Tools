@@ -1,8 +1,5 @@
 module AgoraDynamicKey2
   class RtmTokenBuilder
-    ROLE_PUBLISHER = 1
-    ROLE_SUBSCRIBER = 2
-
     # Build the RTM token.
     #
     # @param app_id:          The App ID issued to you by Agora. Apply for a new App ID from
