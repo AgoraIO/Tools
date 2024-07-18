@@ -6,7 +6,7 @@ const Role = {
     PUBLISHER: 1,
 
     // default, for live audience
-    SUBSCRIBER: 2,
+    SUBSCRIBER: 2
 }
 
 class RtcTokenBuilder {
@@ -23,12 +23,20 @@ class RtcTokenBuilder {
      * @param {*} uid User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
      * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).     * @return The new Token.
      */
-    static buildTokenWithUid(appId, appCertificate, channelName, uid, role,  token_expire, privilege_expire = 0) {
-        return this.buildTokenWithUserAccount(appId, appCertificate, channelName, uid, role, token_expire, privilege_expire)
+    static buildTokenWithUid(appId, appCertificate, channelName, uid, role, token_expire, privilege_expire = 0) {
+        return this.buildTokenWithUserAccount(
+            appId,
+            appCertificate,
+            channelName,
+            uid,
+            role,
+            token_expire,
+            privilege_expire
+        )
     }
 
     /**
@@ -44,12 +52,20 @@ class RtcTokenBuilder {
      * @param {*} account The user account.
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
-     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Hosting-in](https://docs.agora.io/en/Agora%20Platform/terms?platform=All%20Platforms#hosting-in). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
      * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The new Token.
      */
-    static buildTokenWithUserAccount(appId, appCertificate, channelName, account, role, token_expire, privilege_expire = 0) {
+    static buildTokenWithUserAccount(
+        appId,
+        appCertificate,
+        channelName,
+        account,
+        role,
+        token_expire,
+        privilege_expire = 0
+    ) {
         let token = new AccessToken(appId, appCertificate, 0, token_expire)
 
         let serviceRtc = new ServiceRtc(channelName, account)
@@ -117,11 +133,28 @@ class RtcTokenBuilder {
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
      * @return The new Token
      */
-    static buildTokenWithUidAndPrivilege(appId, appCertificate, channelName, uid,
-                                         tokenExpire, joinChannelPrivilegeExpire, pubAudioPrivilegeExpire,
-                                         pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire) {
-        return this.BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, uid,
-            tokenExpire, joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire)
+    static buildTokenWithUidAndPrivilege(
+        appId,
+        appCertificate,
+        channelName,
+        uid,
+        tokenExpire,
+        joinChannelPrivilegeExpire,
+        pubAudioPrivilegeExpire,
+        pubVideoPrivilegeExpire,
+        pubDataStreamPrivilegeExpire
+    ) {
+        return this.BuildTokenWithUserAccountAndPrivilege(
+            appId,
+            appCertificate,
+            channelName,
+            uid,
+            tokenExpire,
+            joinChannelPrivilegeExpire,
+            pubAudioPrivilegeExpire,
+            pubVideoPrivilegeExpire,
+            pubDataStreamPrivilegeExpire
+        )
     }
 
     /**
@@ -177,9 +210,17 @@ class RtcTokenBuilder {
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
      * @return The new Token.
      */
-    static BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, account,
-                                                 tokenExpire, joinChannelPrivilegeExpire, pubAudioPrivilegeExpire,
-                                                 pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire) {
+    static BuildTokenWithUserAccountAndPrivilege(
+        appId,
+        appCertificate,
+        channelName,
+        account,
+        tokenExpire,
+        joinChannelPrivilegeExpire,
+        pubAudioPrivilegeExpire,
+        pubVideoPrivilegeExpire,
+        pubDataStreamPrivilegeExpire
+    ) {
         let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
 
         let serviceRtc = new ServiceRtc(channelName, account)
