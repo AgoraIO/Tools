@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-csharp",
+    "image": "mcr.microsoft.com/devcontainers/dotnet:8.0",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-dotnettools.csharp"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
