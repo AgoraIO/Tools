@@ -18,6 +18,7 @@ enum class UserRole {
    [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
    */
   kRolePublisher = 1,
+
   /**
    Only use this role if your scenario require authentication for
    [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).

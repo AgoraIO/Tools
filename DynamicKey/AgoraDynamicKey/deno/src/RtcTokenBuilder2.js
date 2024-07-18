@@ -1,10 +1,21 @@
 import { AccessToken2 as AccessToken, ServiceRtc } from '../src/AccessToken2.js'
 
 const Role = {
-    // for live broadcaster
+    /**
+     * RECOMMENDED. Use this role for a voice/video call or a live broadcast, if
+     * your scenario does not require authentication for
+     * [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
+     */
     PUBLISHER: 1,
 
-    // default, for live audience
+    /**
+     * Only use this role if your scenario require authentication for
+     * [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
+     *
+     * @note In order for this role to take effect, please contact our support team
+     * to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
+     * still has the same privileges as Role_Publisher.
+     */
     SUBSCRIBER: 2
 }
 
