@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-php",
+    "image": "php:8.3",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "xdebug.php-pack"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
