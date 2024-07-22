@@ -22,7 +22,7 @@ pub const ROLE_SUBSCRIBER: Role = 2;
 // app_certificate: Certificate of the application that you registered in
 //     the Agora Dashboard. See Get an App Certificate.
 // channel_name: Unique channel name for the AgoraRTC session in the string format
-// uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). optionalUid must be unique.
+// uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). uid must be unique.
 // role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // expire: represented by the number of seconds elapsed since now. If, for example, you want to access the

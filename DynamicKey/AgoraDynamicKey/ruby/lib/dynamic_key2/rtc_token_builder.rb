@@ -20,7 +20,7 @@ module AgoraDynamicKey2
     #     See Get an App Certificate.
     # channel_name: Unique channel name for the AgoraRTC session in the string format.
     # uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
-    #     optionalUid must be unique.
+    #     uid must be unique.
     # role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
     # token_expire: represented by the number of seconds elapsed since now. If, for example,
@@ -41,7 +41,7 @@ module AgoraDynamicKey2
     #     See Get an App Certificate.
     # channel_name: Unique channel name for the AgoraRTC session in the string format.
     # uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
-    #     optionalUid must be unique.
+    #     uid must be unique.
     # role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
     # token_expire: represented by the number of seconds elapsed since now. If, for example,

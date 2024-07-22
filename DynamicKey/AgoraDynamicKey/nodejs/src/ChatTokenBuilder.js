@@ -1,5 +1,5 @@
-const AccessToken = require("../src/AccessToken2").AccessToken2;
-const ServiceChat = require("../src/AccessToken2").ServiceChat;
+const AccessToken = require('../src/AccessToken2').AccessToken2
+const ServiceChat = require('../src/AccessToken2').ServiceChat
 
 class ChatTokenBuilder {
     /**
@@ -12,14 +12,14 @@ class ChatTokenBuilder {
      * @param userUuid The user's id, must be unique.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
      * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The chat user token.
+     * @return The Chat User token.
      */
     static buildUserToken(appId, appCertificate, userUuid, expire) {
-        const token = new AccessToken(appId, appCertificate, null, expire);
-        const serviceChat = new ServiceChat(userUuid);
-        serviceChat.add_privilege(ServiceChat.kPrivilegeUser, expire);
-        token.add_service(serviceChat);
-        return token.build();
+        const token = new AccessToken(appId, appCertificate, null, expire)
+        const serviceChat = new ServiceChat(userUuid)
+        serviceChat.add_privilege(ServiceChat.kPrivilegeUser, expire)
+        token.add_service(serviceChat)
+        return token.build()
     }
 
     /**
@@ -31,16 +31,15 @@ class ChatTokenBuilder {
      * the Agora Dashboard. See Get an App Certificate.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
      * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The chat App token.
+     * @return The Chat App token.
      */
     static buildAppToken(appId, appCertificate, expire) {
-    	const token = new AccessToken(appId, appCertificate, null, expire);
-    	const serviceChat = new ServiceChat();
-    	serviceChat.add_privilege(ServiceChat.kPrivilegeApp, expire);
-    	token.add_service(serviceChat);
-    	return token.build();
+        const token = new AccessToken(appId, appCertificate, null, expire)
+        const serviceChat = new ServiceChat()
+        serviceChat.add_privilege(ServiceChat.kPrivilegeApp, expire)
+        token.add_service(serviceChat)
+        return token.build()
     }
 }
 
-exports.ChatTokenBuilder = ChatTokenBuilder;
-
+exports.ChatTokenBuilder = ChatTokenBuilder

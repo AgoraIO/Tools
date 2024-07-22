@@ -14,7 +14,7 @@ namespace tools {
 class ChatTokenBuilder2 {
  public:
   /**
-   Builds an Chat User token. 
+   Builds an Chat User token.
 
    @param app_id The App ID issued to you by Agora.
    @param app_certificate Certificate of the application that you registered in
@@ -23,7 +23,7 @@ class ChatTokenBuilder2 {
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
    token is generated, set expireTimestamp as 600(seconds).
-   @return The new Token.
+   @return The Chat User token.
    */
   static std::string BuildUserToken(const std::string& app_id,
                                     const std::string& app_certificate,
@@ -39,7 +39,7 @@ class ChatTokenBuilder2 {
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
    token is generated, set expireTimestamp as 600(seconds).
-   @return The new Token.
+   @return The Chat App token.
    */
   static std::string BuildAppToken(const std::string& app_id,
                                    const std::string& app_certificate,

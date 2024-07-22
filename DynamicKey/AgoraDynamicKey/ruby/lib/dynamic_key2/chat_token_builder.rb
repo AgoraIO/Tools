@@ -9,7 +9,7 @@ module AgoraDynamicKey2
     # @param user_id:         The user's account, max length is 64 Bytes.
     # @param expire:          represented by the number of seconds elapsed since now. If, for example, you want to access the
     #                         Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-    # @return The chat user token.
+    # @return The Chat User token.
     def self.build_user_token(app_id, app_certificate, user_id, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
 
@@ -28,7 +28,7 @@ module AgoraDynamicKey2
     #                         the Agora Dashboard. See Get an App Certificate.
     # @param expire:          represented by the number of seconds elapsed since now. If, for example, you want to access the
     #                         Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-    # @return The chat app token.
+    # @return The Chat App token.
     def self.build_app_token(app_id, app_certificate, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
 
