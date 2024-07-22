@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-nodejs",
+    "image": "node:22.4",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "swellaby.node-pack"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
