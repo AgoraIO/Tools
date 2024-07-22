@@ -10,8 +10,8 @@ use crate::access_token;
 // expire: represented by the number of seconds elapsed since
 // 1/1/1970. If, for example, you want to access the
 // Agora Service within 10 minutes after the token is
-// generated, set expireTimestamp as the current
-// timestamp + 600 (seconds).
+// generated, set expireTimestamp as the current timestamp + 600 (seconds).
+// @return The Chat User token.
 pub fn build_chat_user_token(
     app_id: &str,
     app_certificate: &str,
@@ -37,8 +37,8 @@ pub fn build_chat_user_token(
 // expire: represented by the number of seconds elapsed since
 // 1/1/1970. If, for example, you want to access the
 // Agora Service within 10 minutes after the token is
-// generated, set expireTimestamp as the current
-// timestamp + 600 (seconds).
+// generated, set expireTimestamp as the current timestamp + 600 (seconds).
+// @return The Chat App token.
 pub fn build_chat_app_token(
     app_id: &str,
     app_certificate: &str,
