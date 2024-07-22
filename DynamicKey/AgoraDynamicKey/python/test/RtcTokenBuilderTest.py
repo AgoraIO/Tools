@@ -16,22 +16,15 @@ ts = 1111111
 
 
 class RtcTokenBuilderTest(unittest.TestCase):
-
-    def test_(self):
-        token = RtcTokenBuilder.build_token_with_uid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
+    def test_buildTokenWithUid(self):
+        token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
         parser = AccessToken()
         parser.fromString(token)
 
-    def test_(self):
-        # token = RtcTokenBuilder.buildTokenWithUid(appID, appCertificate, channelName, uid, Role_Subscriber, expireTimestamp)
-        # parser = AccessToken()
-        # parser.fromString(token)
-
-        # self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
-        # self.assertNotIn(kPublishVideoStream, parser.messages)
-        # self.assertNotIn(kPublishAudioStream, parser.messages)
-        # self.assertNotIn(kPublishDataStream, parser.messages)
-
+        self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
+        self.assertNotIn(kPublishVideoStream, parser.messages)
+        self.assertNotIn(kPublishAudioStream, parser.messages)
+        self.assertNotIn(kPublishDataStream, parser.messages)
 
 
 if __name__ == "__main__":
