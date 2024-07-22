@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-python",
+    "image": "python:2.7",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "donjayamanne.python-extension-pack"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
