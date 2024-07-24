@@ -1,0 +1,17 @@
+{
+    "name": "AgoraDynamicKey-ruby",
+    "image": "ruby:3.3",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "Shopify.ruby-extensions-pack",
+                "connorshea.vscode-ruby-test-adapter"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app",
+    "postCreateCommand": {
+        "bundle install": "bundle install"
+    }
+}
