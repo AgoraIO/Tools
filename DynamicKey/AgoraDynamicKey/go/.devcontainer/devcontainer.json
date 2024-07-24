@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-go",
+    "image": "golang:1.22",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "doggy8088.go-extension-pack"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
