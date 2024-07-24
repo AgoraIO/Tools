@@ -1,0 +1,16 @@
+{
+    "name": "AgoraDynamicKey-java",
+    "image": "openjdk:8",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app",
+    "postCreateCommand": {
+        "install maven": "apt-get update && apt-get install -y maven"
+    }
+}
