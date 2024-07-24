@@ -1,0 +1,14 @@
+{
+    "name": "AgoraDynamicKey-rust",
+    "image": "rust:1.79",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "swellaby.rust-pack",
+                "swellaby.vscode-rust-test-adapter"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
