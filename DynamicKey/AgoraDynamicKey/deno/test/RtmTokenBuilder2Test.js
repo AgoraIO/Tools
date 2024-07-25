@@ -1,7 +1,6 @@
 /**
  * run this test with command:
- * nodeunit test/RtmTokenBuilder2Test.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/RtmTokenBuilder2Test.js
  */
 import { RtmTokenBuilder } from "../src/RtmTokenBuilder2.js";
 import { AccessToken2, ServiceRtm, kRtmServiceType } from "../src/AccessToken2.js";

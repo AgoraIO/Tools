@@ -1,7 +1,6 @@
 /**
  * run this test with command:
- * nodeunit test/RtcTokenBuilder2Test.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/RtcTokenBuilder2Test.js
  */
 import { RtcTokenBuilder, Role } from "../src/RtcTokenBuilder2.js";
 import {AccessToken2, ServiceRtc, kRtcServiceType} from "../src/AccessToken2.js"

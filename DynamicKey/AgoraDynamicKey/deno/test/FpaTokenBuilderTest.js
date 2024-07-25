@@ -1,7 +1,6 @@
 /**
  * run this test with command:
- * nodeunit test/FpaTokenBuilderTest.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/FpaTokenBuilderTest.js
  */
 import { FpaTokenBuilder } from '../src/FpaTokenBuilder.js'
 import { AccessToken2, ServiceFpa, kFpaServiceType } from '../src/AccessToken2.js'

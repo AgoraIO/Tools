@@ -1,7 +1,6 @@
 /**
  * run this test with command:
- * nodeunit AccessTokenTest.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/AccessTokenTest.js
  */
 import { AccessToken, priviledges as Priviledges } from "../src/AccessToken.js";
 import {assert, assertThrows} from "https://deno.land/std/testing/asserts.ts";
