@@ -1,11 +1,10 @@
 /**
  * run this test with command:
- * nodeunit AccessTokenTest.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/AccessTokenTest.js
  */
 import {AccessToken2, ServiceRtc, ServiceRtm, ServiceChat} from '../src/AccessToken2.js'
 import {assert, assertThrows} from "https://deno.land/std/testing/asserts.ts";
- 
+
  var appID = "970CA35de60c44645bbae8a215061b33";
  var appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
  var channel = "7d72365eb983485397e3e3f9d460bdda";
@@ -15,24 +14,24 @@ import {assert, assertThrows} from "https://deno.land/std/testing/asserts.ts";
  var expire = 600;
  var salt = 1;
  var user_id = "test_user"
- 
+
  Deno.test('AccessToken_Test', (test) => {
    var expected = "007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj";
- 
+
    var token = new AccessToken2(appID, appCertificate, ts, expire);
    token.salt = salt;
    let rtc_service = new ServiceRtc(channel, uid)
    rtc_service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expire)
    token.add_service(rtc_service)
- 
+
    var actual = token.build();
    assert(expected === actual);
  })
- 
+
  // test uid = 0
  Deno.test('AccessToken_Test2', (test) => {
   var expected = "007eJxTYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMADacImo=";
- 
+
   var token = new AccessToken2(appID, appCertificate, ts, expire);
   token.salt = salt;
   let rtc_service = new ServiceRtc(channel, 0)
@@ -46,7 +45,7 @@ import {assert, assertThrows} from "https://deno.land/std/testing/asserts.ts";
  // test service rtc account
  Deno.test('AccessToken_Test3', (test) => {
   var expected = "007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj";
- 
+
   var token = new AccessToken2(appID, appCertificate, ts, expire);
   token.salt = salt;
   let rtc_service = new ServiceRtc(channel, `${uid}`)
@@ -60,7 +59,7 @@ import {assert, assertThrows} from "https://deno.land/std/testing/asserts.ts";
  // test service multi service
  Deno.test('AccessToken_Test4', (test) => {
   var expected = "007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4";
- 
+
   var token = new AccessToken2(appID, appCertificate, ts, expire);
   token.salt = salt;
   let rtc_service = new ServiceRtc(channel, uid)

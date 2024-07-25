@@ -1,7 +1,6 @@
 /**
  * run this test with command:
- * nodeunit test/EducationTokenBuilderTest.js
- * see https://github.com/caolan/nodeunit
+ * deno test test/EducationTokenBuilderTest.js
  */
 import { EducationTokenBuilder as EduTokenBuilder} from '../src/EducationTokenBuilder.js'
 import { AccessToken2, kEducationServiceType } from '../src/AccessToken2.js'
@@ -23,7 +22,7 @@ Deno.test('BuildRoomUserToken_Test', (test) => {
    assert(userUuid===accessToken.services[kEducationServiceType].__user_uuid)
    assert(role===accessToken.services[kEducationServiceType].__role)
 })
- 
+
 Deno.test('BuildUserToken_Test', (test) => {
    let accessToken = new AccessToken2('', '', 0, 0)
    let token = EduTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
@@ -33,7 +32,7 @@ Deno.test('BuildUserToken_Test', (test) => {
    assert(expire===accessToken.expire)
    assert(userUuid===accessToken.services[kEducationServiceType].__user_uuid)
  })
- 
+
  Deno.test('BuildAppToken_Test', (test) => {
    let accessToken = new AccessToken2('', '', 0, 0)
    let token = EduTokenBuilder.buildAppToken(appId, appCertificate, expire)
