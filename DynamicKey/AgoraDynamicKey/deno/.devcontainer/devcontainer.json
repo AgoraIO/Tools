@@ -1,0 +1,13 @@
+{
+    "name": "AgoraDynamicKey-deno",
+    "image": "denoland/deno:1.45.3",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "denoland.vscode-deno"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app"
+}
