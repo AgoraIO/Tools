@@ -1,8 +1,8 @@
 // Copyright (c) 2014-2017 Agora.io, Inc.
 //
 
-#define private public
-#define protected public
+// #define private public
+// #define protected public
 
 #include "../src/ChatTokenBuilder2.h"
 
@@ -22,8 +22,8 @@ class ChatTokenBuilder2_test : public testing::Test {
   }
 
   void TestChatTokenBuilderBuildUserToken() {
-    std::string token = ChatTokenBuilder2::BuildUserToken(app_id_,
-      app_cert_, user_id_, expire_);
+    std::string token = ChatTokenBuilder2::BuildUserToken(app_id_, app_cert_,
+                                                          user_id_, expire_);
 
     AccessToken2 parser;
     bool parsed = parser.FromString(token);
@@ -41,10 +41,9 @@ class ChatTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(service->privileges_[ServiceChat::kPrivilegeUser], expire_);
   }
 
-
   void TestChatTokenBuilderBuildAppToken() {
-    std::string token = ChatTokenBuilder2::BuildAppToken(app_id_,
-      app_cert_, expire_);
+    std::string token =
+        ChatTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
 
     AccessToken2 parser;
     bool parsed = parser.FromString(token);
@@ -68,5 +67,9 @@ class ChatTokenBuilder2_test : public testing::Test {
   uint32_t expire_;
 };
 
-TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildUserToken) { TestChatTokenBuilderBuildUserToken(); }
-TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildAppToken) { TestChatTokenBuilderBuildAppToken(); }
+TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildUserToken) {
+  TestChatTokenBuilderBuildUserToken();
+}
+TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildAppToken) {
+  TestChatTokenBuilderBuildAppToken();
+}

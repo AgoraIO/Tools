@@ -1,14 +1,16 @@
 // Copyright (c) 2014-2022 Agora.io, Inc.
 //
 
-#define private public
-#define protected public
+// #define private public
+// #define protected public
+
+#include "../src/EducationTokenBuilder2.h"
 
 #include <gtest/gtest.h>
+
 #include <string>
 
 #include "../src/AccessToken2.h"
-#include "../src/EducationTokenBuilder2.h"
 
 using namespace agora::tools;
 

@@ -1,8 +1,8 @@
 // Copyright (c) 2014-2017 Agora.io, Inc.
 //
 
-#define private public
-#define protected public
+// #define private public
+// #define protected public
 
 #include "../src/RtmTokenBuilder2.h"
 
