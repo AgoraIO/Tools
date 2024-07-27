@@ -1,0 +1,18 @@
+{
+    "name": "AgoraDynamicKey-cpp",
+    "image": "ubuntu:22.04",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools-extension-pack",
+                "matepek.vscode-catch2-test-adapter",
+                "xaver.clang-format"
+            ]
+        }
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app/cpp,type=bind",
+    "workspaceFolder": "/app/cpp",
+    "postCreateCommand": {
+        "install dependencies": "apt-get update && apt-get install -y g++ clang cmake libssl-dev zlib1g-dev libgtest-dev gdb"
+    }
+}
