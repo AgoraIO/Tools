@@ -59,4 +59,11 @@ func main() {
 	} else {
 		fmt.Printf("Token with user account and privilege: %s\n", result)
 	}
+
+	result, err = rtctokenbuilder.BuildTokenWithRtm(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with rtm: %s\n", result)
+	}
 }
