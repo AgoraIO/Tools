@@ -64,6 +64,6 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("Token with rtm: %s\n", result)
+		fmt.Printf("Token with RTM: %s\n", result)
 	}
 }
