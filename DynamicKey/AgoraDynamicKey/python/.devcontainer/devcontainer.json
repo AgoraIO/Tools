@@ -4,10 +4,21 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "donjayamanne.python-extension-pack"
-            ]
+                "donjayamanne.python-extension-pack",
+                "ms-python.autopep8"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.autopep8",
+                    "editor.formatOnSave": true
+                }
+            }
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
-    "workspaceFolder": "/app"
+    "workspaceFolder": "/app",
+    "postCreateCommand": {
+        "install autopep8": "pip install autopep8==1.5.7"
+    }
 }
