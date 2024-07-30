@@ -34,3 +34,6 @@ echo 'Token with int uid and privilege: ' . $token . PHP_EOL;
 
 $token = RtcTokenBuilder2::buildTokenWithUserAccountAndPrivilege($appId, $appCertificate, $channelName, $uidStr, $tokenExpirationInSeconds, $joinChannelPrivilegeExpireInSeconds, $pubAudioPrivilegeExpireInSeconds, $pubVideoPrivilegeExpireInSeconds, $pubDataStreamPrivilegeExpireInSeconds);
 echo 'Token with user account and privilege: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder2::buildTokenWithRtm($appId, $appCertificate, $channelName, $uidStr, RtcTokenBuilder2::ROLE_PUBLISHER, $tokenExpirationInSeconds, $privilegeExpirationInSeconds);
+echo 'Token with RTM: ' . $token . PHP_EOL;

@@ -225,4 +225,40 @@ class RtcTokenBuilder2
 
         return $token->build();
     }
+
+    /**
+     * Build the RTC and RTM token with account.
+     *
+     * @param $appId :          The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param $appCertificate : Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param $channelName :    Unique channel name for the AgoraRTC session in the string format
+     * @param $account :        The user's account, max length is 255 Bytes.
+     * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
+     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
+     * @return The RTC and RTM token.
+     */
+    public static function buildTokenWithRtm($appId, $appCertificate, $channelName, $account, $role, $tokenExpire, $privilegeExpire = 0)
+    {
+        $token = new AccessToken2($appId, $appCertificate, $tokenExpire);
+        $serviceRtc = new ServiceRtc($channelName, $account);
+
+        $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $privilegeExpire);
+        if ($role == self::ROLE_PUBLISHER) {
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, $privilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $privilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $privilegeExpire);
+        }
+        $token->addService($serviceRtc);
+
+        $serviceRtm = new ServiceRtm($account);
+
+        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $tokenExpire);
+        $token->addService($serviceRtm);
+
+        return $token->build();
+    }
 }
