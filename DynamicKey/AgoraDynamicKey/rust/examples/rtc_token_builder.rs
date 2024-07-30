@@ -79,4 +79,17 @@ fn main() {
         Ok(result) => println!("Token with user account and privilege: {}", result),
         Err(err) => println!("{}", err),
     }
+
+    match rtc_token_builder::build_token_with_rtm(
+        &app_id,
+        &app_certificate,
+        &channel_name,
+        &uid_str,
+        rtc_token_builder::ROLE_SUBSCRIBER,
+        token_expiration_in_seconds,
+        privilege_expiration_in_seconds,
+    ) {
+        Ok(result) => println!("Token with RTM: {}", result),
+        Err(err) => println!("{}", err),
+    }
 }
