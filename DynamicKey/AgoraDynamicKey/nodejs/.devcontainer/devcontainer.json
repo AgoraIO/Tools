@@ -4,8 +4,17 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "swellaby.node-pack"
-            ]
+                "swellaby.node-pack",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "[javascript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                },
+                "[typescript]": {
+                    "editor.defaultFormatter": "esbenp.prettier-vscode"
+                }
+            }
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",

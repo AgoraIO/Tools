@@ -40,7 +40,7 @@ class RtcTokenBuilder {
     }
 
     /**
-     * Builds an RTC token using an Integer uid.
+     * Builds an RTC token with account.
      * @param {*} appID  The App ID issued to you by Agora.
      * @param {*} appCertificate Certificate of the application that you registered in the Agora Dashboard.
      * @param {*} channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
