@@ -5,8 +5,28 @@
         "vscode": {
             "extensions": [
                 "Shopify.ruby-extensions-pack",
+                "misogi.ruby-rubocop",
+                "castwide.solargraph",
                 "connorshea.vscode-ruby-test-adapter"
-            ]
+            ],
+            "settings": {
+                "[ruby]": {
+                    "editor.defaultFormatter": "Shopify.ruby-lsp",
+                    "editor.formatOnSave": true,
+                    "editor.tabSize": 2,
+                    "editor.insertSpaces": true,
+                    "editor.semanticHighlighting.enabled": true,
+                    "editor.formatOnType": true
+                },
+                "solargraph.diagnostics": true,
+                "rubyTestExplorer.filePattern": [
+                    "*_spec.rb"
+                ],
+                "rubyTestExplorer.logpanel": true,
+                "rubyTestExplorer.rspecCommand": "bundle exec rspec",
+                "rubyTestExplorer.rspecDirectory": "./test/",
+                "rubyTestExplorer.testFramework": "rspec"
+            }
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
