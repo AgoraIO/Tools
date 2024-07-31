@@ -11,7 +11,7 @@
          *                        the Agora Dashboard. See Get an App Certificate.
          * @return The FPA token.
          */
-        public string buildToken(string appId, string appCertificate)
+        public static string buildToken(string appId, string appCertificate)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, 24 * 3600);
             AccessToken2.Service serviceFpa = new AccessToken2.ServiceFpa();
