@@ -1,0 +1,5 @@
+chain_width = 160
+fn_args_layout = "Compressed"
+max_width = 160
+tab_spaces = 4
+use_small_heuristics = "Default"

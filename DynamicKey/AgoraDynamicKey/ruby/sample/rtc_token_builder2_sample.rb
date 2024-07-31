@@ -47,3 +47,9 @@ token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account_and_priv
   pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds
 )
 puts "Token with user account and privilege: #{token}"
+
+token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_rtm(
+  app_id, app_certificate, channel_name, account,
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+)
+puts "Token with RTM: #{token}"

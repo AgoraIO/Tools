@@ -4,7 +4,8 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "xdebug.php-pack"
+                "xdebug.php-pack",
+                "bmewburn.vscode-intelephense-client"
             ]
         }
     },

@@ -25,15 +25,10 @@ class RtmTokenBuilder2 {
    token is generated, set expireTimestamp as 600(seconds).
    @return The new Token.
    */
-  static std::string BuildToken(const std::string& app_id,
-                                const std::string& app_certificate,
-                                const std::string& user_id,
-                                uint32_t expire = 0);
+  static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_id, uint32_t expire = 0);
 };
 
-inline std::string RtmTokenBuilder2::BuildToken(
-    const std::string& app_id, const std::string& app_certificate,
-    const std::string& user_id, uint32_t expire) {
+inline std::string RtmTokenBuilder2::BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_id, uint32_t expire) {
   std::unique_ptr<Service> service(new ServiceRtm(user_id));
   service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire);
 

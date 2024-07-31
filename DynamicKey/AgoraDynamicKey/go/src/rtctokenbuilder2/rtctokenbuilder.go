@@ -22,6 +22,7 @@ const (
 )
 
 // BuildTokenWithUid Build the RTC token with uid.
+//
 // @param appId: The App ID issued to you by Agora. Apply for a new App ID from
 // Agora Dashboard if it is missing from your kit. See Get an App ID.
 // @param appCertificate: Certificate of the application that you registered in
@@ -44,12 +45,13 @@ func BuildTokenWithUid(appId string, appCertificate string, channelName string, 
 }
 
 // BuildTokenWithUserAccount Build the RTC token with account.
+//
 // @param appId: The App ID issued to you by Agora. Apply for a new App ID from
 // Agora Dashboard if it is missing from your kit. See Get an App ID.
 // @param appCertificate: Certificate of the application that you registered in
 // the Agora Dashboard. See Get an App Certificate.
 // @param channelName: Unique channel name for the AgoraRTC session in the string format
-// account: The user's account, max length is 255 Bytes.
+// @param account: The user's account, max length is 255 Bytes.
 // @param role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
@@ -190,6 +192,42 @@ func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, 
 	serviceRtc.AddPrivilege(accesstoken.PrivilegePublishVideoStream, pubVideoPrivilegeExpire)
 	serviceRtc.AddPrivilege(accesstoken.PrivilegePublishDataStream, pubDataStreamPrivilegeExpire)
 	token.AddService(serviceRtc)
+
+	return token.Build()
+}
+
+// BuildTokenWithRtm Build the RTC and RTM token with account.
+//
+// @param appId: The App ID issued to you by Agora. Apply for a new App ID from
+// Agora Dashboard if it is missing from your kit. See Get an App ID.
+// @param appCertificate: Certificate of the application that you registered in
+// the Agora Dashboard. See Get an App Certificate.
+// @param channelName: Unique channel name for the AgoraRTC session in the string format
+// @param account: The user's account, max length is 255 Bytes.
+// @param role: RolePublisher: A broadcaster/host in a live-broadcast profile.
+// RoleSubscriber: An audience(default) in a live-broadcast profile.
+// @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
+// you want to access the Agora Service within 10 minutes after the token is generated,
+// set token_expire as 600(seconds).
+// @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
+// you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+//
+// return The RTC and RTM token.
+func BuildTokenWithRtm(appId string, appCertificate string, channelName string, account string, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
+	token := accesstoken.NewAccessToken(appId, appCertificate, tokenExpire)
+
+	serviceRtc := accesstoken.NewServiceRtc(channelName, account)
+	serviceRtc.AddPrivilege(accesstoken.PrivilegeJoinChannel, privilegeExpire)
+	if role == RolePublisher {
+		serviceRtc.AddPrivilege(accesstoken.PrivilegePublishAudioStream, privilegeExpire)
+		serviceRtc.AddPrivilege(accesstoken.PrivilegePublishVideoStream, privilegeExpire)
+		serviceRtc.AddPrivilege(accesstoken.PrivilegePublishDataStream, privilegeExpire)
+	}
+	token.AddService(serviceRtc)
+
+	serviceRtm := accesstoken.NewServiceRtm(account)
+	serviceRtm.AddPrivilege(accesstoken.PrivilegeLogin, tokenExpire)
+	token.AddService(serviceRtm)
 
 	return token.Build()
 }

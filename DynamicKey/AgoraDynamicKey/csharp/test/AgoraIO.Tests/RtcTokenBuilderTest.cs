@@ -34,7 +34,7 @@ namespace AgoraIO.Tests
         public void testBuildTokenWithUID()
         {
             uint privilegeExpiredTs = _expireTimeInSeconds + (uint)Utils.getTimestamp();
-            string token = RtcTokenBuilder.buildTokenWithUID(_appId, _appCertificate, _channelName, _uid, RtcTokenBuilder.Role.RolePublisher, privilegeExpiredTs);
+            string token = RtcTokenBuilder.buildTokenWithUid(_appId, _appCertificate, _channelName, _uid, RtcTokenBuilder.Role.RolePublisher, privilegeExpiredTs);
 
             Output.WriteLine(">> token");
             Output.WriteLine(token);

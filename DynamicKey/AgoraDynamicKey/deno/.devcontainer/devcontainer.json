@@ -5,7 +5,19 @@
         "vscode": {
             "extensions": [
                 "denoland.vscode-deno"
-            ]
+            ],
+            "settings": {
+                "deno.enable": true,
+                "deno.lint": true,
+                "editor.formatOnSave": true,
+                "editor.tabSize": 4,
+                "[javascript]": {
+                    "editor.defaultFormatter": "denoland.vscode-deno"
+                },
+                "[typescript]": {
+                    "editor.defaultFormatter": "denoland.vscode-deno"
+                }
+            }
         }
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",

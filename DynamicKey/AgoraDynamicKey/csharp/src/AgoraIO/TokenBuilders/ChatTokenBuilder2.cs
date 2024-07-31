@@ -14,7 +14,7 @@
         *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
         * @return The Chat User token.
         */
-        public string buildUserToken(string appId, string appCertificate, string userId, int expire)
+        public static string buildUserToken(string appId, string appCertificate, string userId, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             AccessToken2.Service serviceChat = new AccessToken2.ServiceChat(userId);
@@ -36,7 +36,7 @@
          *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
          * @return The Chat App token.
          */
-        public string buildAppToken(string appId, string appCertificate, int expire)
+        public static string buildAppToken(string appId, string appCertificate, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             AccessToken2.Service serviceChat = new AccessToken2.ServiceChat();

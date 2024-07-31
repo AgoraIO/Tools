@@ -5,20 +5,20 @@ namespace AgoraIO.Media
     public class EducationTokenBuilder2
     {
         /**
-        * build user room token
-        *
-        * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
-        *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
-        * @param appCertificate Certificate of the application that you registered in
-        *                       the Agora Dashboard. See Get an App Certificate.
-        * @param roomUuid       The room's id, must be unique.
-        * @param userUuid       The user's id, must be unique.
-        * @param role           The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
-        * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-        *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        * @return The education user room token.
-        */
-        public string buildRoomUserToken(string appId, string appCertificate, string roomUuid, string userUuid, short role, int expire)
+         * build user room token
+         *
+         * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
+         *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
+         * @param appCertificate Certificate of the application that you registered in
+         *                       the Agora Dashboard. See Get an App Certificate.
+         * @param roomUuid       The room's id, must be unique.
+         * @param userUuid       The user's id, must be unique.
+         * @param role           The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
+         * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
+         *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+         * @return The education user room token.
+         */
+        public static string buildRoomUserToken(string appId, string appCertificate, string roomUuid, string userUuid, short role, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
 
@@ -52,7 +52,7 @@ namespace AgoraIO.Media
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
          * @return The education user token.
          */
-        public string buildUserToken(string appId, string appCertificate, string userUuid, int expire)
+        public static string buildUserToken(string appId, string appCertificate, string userUuid, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             AccessToken2.Service service = new AccessToken2.ServiceEducation(userUuid);
@@ -74,7 +74,7 @@ namespace AgoraIO.Media
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
          * @return The education global token.
          */
-        public string buildAppToken(string appId, string appCertificate, int expire)
+        public static string buildAppToken(string appId, string appCertificate, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation();

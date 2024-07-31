@@ -277,10 +277,7 @@ pub struct AccessToken {
 }
 
 pub fn new_access_token(app_id: &str, app_cert: &str, expire: u32) -> AccessToken {
-    let issue_ts = std::time::SystemTime::now()
-        .duration_since(std::time::UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as u32;
+    let issue_ts = std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_secs() as u32;
     let salt = utils::get_rand(1, 99999999) as u32;
 
     return AccessToken {
@@ -324,13 +321,7 @@ impl AccessToken {
         let sign = self.get_sign()?;
 
         // Pack services in definite order
-        let service_types = vec![
-            SERVICE_TYPE_RTC,
-            SERVICE_TYPE_RTM,
-            SERVICE_TYPE_FPA,
-            SERVICE_TYPE_CHAT,
-            SERVICE_TYPE_EDUCATION,
-        ];
+        let service_types = vec![SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_FPA, SERVICE_TYPE_CHAT, SERVICE_TYPE_EDUCATION];
         for service_type in service_types {
             if let Some(service) = self.services.get(&service_type) {
                 service.pack(&mut buf)?;
@@ -343,9 +334,7 @@ impl AccessToken {
         let signature = h_sign.finalize().into_bytes();
 
         let mut buf_content = Vec::new();
-        utils::pack_string(&mut buf_content, unsafe {
-            &String::from_utf8_unchecked(signature.to_vec())
-        })?;
+        utils::pack_string(&mut buf_content, unsafe { &String::from_utf8_unchecked(signature.to_vec()) })?;
 
         buf_content.extend(&buf);
 
@@ -390,8 +379,7 @@ impl AccessToken {
         // IssueTs
         let mut buf_issue_ts = Vec::new();
         utils::pack_uint32(&mut buf_issue_ts, self.issue_ts)?;
-        let mut h_issue_ts =
-            Hmac::<Sha256>::new_from_slice(&buf_issue_ts).expect("HMAC issue_ts error");
+        let mut h_issue_ts = Hmac::<Sha256>::new_from_slice(&buf_issue_ts).expect("HMAC issue_ts error");
         h_issue_ts.update(self.app_cert.as_bytes());
 
         // Salt
@@ -410,10 +398,7 @@ impl AccessToken {
             SERVICE_TYPE_FPA => Box::new(new_service_fpa()),
             SERVICE_TYPE_CHAT => Box::new(new_service_chat("")),
             SERVICE_TYPE_EDUCATION => Box::new(new_service_education("", "", -1)),
-            _ => panic!(
-                "new service failed: unknown service type `{}`",
-                service_type
-            ),
+            _ => panic!("new service failed: unknown service type `{}`", service_type),
         }
     }
 }
@@ -456,9 +441,7 @@ mod tests {
         access_token.salt = salt;
 
         let mut service_rtc = new_service_rtc(channel_name, uid_str);
-        service_rtc
-            .service
-            .add_privilege(PRIVILEGE_JOIN_CHANNEL, expire);
+        service_rtc.service.add_privilege(PRIVILEGE_JOIN_CHANNEL, expire);
 
         access_token.add_service(Box::new(service_rtc));
 

@@ -132,10 +132,7 @@ mod tests {
         let compressed = compress_zlib(b"hello");
 
         assert_eq!("eJzLSM3JyQcABiwCFQ==", base64_encode_str(&compressed));
-        assert_eq!(
-            "hello",
-            String::from_utf8(decompress_zlib(&compressed)).unwrap()
-        );
+        assert_eq!("hello", String::from_utf8(decompress_zlib(&compressed)).unwrap());
     }
 
     #[test]

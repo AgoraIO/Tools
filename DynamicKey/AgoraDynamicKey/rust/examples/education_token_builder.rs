@@ -19,14 +19,7 @@ fn main() {
         return;
     }
 
-    match education_token_builder::build_room_user_token(
-        &app_id,
-        &app_certificate,
-        &room_uuid,
-        &user_uuid,
-        role,
-        expire,
-    ) {
+    match education_token_builder::build_room_user_token(&app_id, &app_certificate, &room_uuid, &user_uuid, role, expire) {
         Ok(token) => println!("RoomUserToken: {}", token),
         Err(err) => println!("{}", err),
     }

@@ -1,8 +1,19 @@
 # frozen_string_literal: true
 
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
+git_source(:github) { |repo_name| "https://github.com/#{repo_name}" }
 
 gem 'rspec', '~> 3.8'
 # gem "rails"
+
+group :development do
+  gem 'rubocop', require: false
+  gem 'rubocop-packaging', require: false
+  gem 'rubocop-performance', require: false
+  gem 'rubocop-rspec', require: false
+  gem 'rubocop-shopify', require: false
+  gem 'rubocop-thread_safety', require: false
+  gem 'ruby-lsp', require: false
+  gem 'solargraph', require: false
+end

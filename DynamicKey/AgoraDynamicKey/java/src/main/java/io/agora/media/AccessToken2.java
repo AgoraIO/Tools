@@ -2,17 +2,12 @@ package io.agora.media;
 
 import java.util.Map;
 import java.util.TreeMap;
-
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 public class AccessToken2 {
     public enum PrivilegeRtc {
-        PRIVILEGE_JOIN_CHANNEL(1),
-        PRIVILEGE_PUBLISH_AUDIO_STREAM(2),
-        PRIVILEGE_PUBLISH_VIDEO_STREAM(3),
-        PRIVILEGE_PUBLISH_DATA_STREAM(4),
-        ;
+        PRIVILEGE_JOIN_CHANNEL(1), PRIVILEGE_PUBLISH_AUDIO_STREAM(2), PRIVILEGE_PUBLISH_VIDEO_STREAM(3), PRIVILEGE_PUBLISH_DATA_STREAM(4),;
 
         public short intValue;
 
@@ -22,8 +17,7 @@ public class AccessToken2 {
     }
 
     public enum PrivilegeRtm {
-        PRIVILEGE_LOGIN(1),
-        ;
+        PRIVILEGE_LOGIN(1),;
 
         public short intValue;
 
@@ -33,8 +27,7 @@ public class AccessToken2 {
     }
 
     public enum PrivilegeFpa {
-        PRIVILEGE_LOGIN(1),
-        ;
+        PRIVILEGE_LOGIN(1),;
 
         public short intValue;
 
@@ -44,9 +37,7 @@ public class AccessToken2 {
     }
 
     public enum PrivilegeChat {
-        PRIVILEGE_CHAT_USER(1),
-        PRIVILEGE_CHAT_APP(2),
-        ;
+        PRIVILEGE_CHAT_USER(1), PRIVILEGE_CHAT_APP(2),;
 
         public short intValue;
 
@@ -56,10 +47,7 @@ public class AccessToken2 {
     }
 
     public enum PrivilegeEducation {
-        PRIVILEGE_ROOM_USER(1),
-        PRIVILEGE_USER(2),
-        PRIVILEGE_APP(3),
-        ;
+        PRIVILEGE_ROOM_USER(1), PRIVILEGE_USER(2), PRIVILEGE_APP(3),;
 
         public short intValue;
 
@@ -82,8 +70,7 @@ public class AccessToken2 {
     public int salt;
     public Map<Short, Service> services = new TreeMap<>();
 
-    public AccessToken2() {
-    }
+    public AccessToken2() {}
 
     public AccessToken2(String appId, String appCert, int expire) {
         this.appCert = appCert;
@@ -102,8 +89,7 @@ public class AccessToken2 {
             return "";
         }
 
-        ByteBuf buf = new ByteBuf().put(this.appId).put(this.issueTs).put(this.expire).put(this.salt)
-                .put((short) this.services.size());
+        ByteBuf buf = new ByteBuf().put(this.appId).put(this.issueTs).put(this.expire).put(this.salt).put((short) this.services.size());
         byte[] signing = getSign();
 
         this.services.forEach((k, v) -> {
@@ -190,11 +176,9 @@ public class AccessToken2 {
 
     public static class Service {
         public short type;
-        public TreeMap<Short, Integer> privileges = new TreeMap<Short, Integer>() {
-        };
+        public TreeMap<Short, Integer> privileges = new TreeMap<Short, Integer>() {};
 
-        public Service() {
-        }
+        public Service() {}
 
         public Service(short serviceType) {
             this.type = serviceType;

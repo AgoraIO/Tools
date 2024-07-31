@@ -16,8 +16,7 @@ public class RtcTokenBuilder2 {
          * to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
          * still has the same privileges as Role_Publisher.
          */
-        ROLE_SUBSCRIBER(2),
-        ;
+        ROLE_SUBSCRIBER(2),;
 
         public int initValue;
 
@@ -67,7 +66,8 @@ public class RtcTokenBuilder2 {
      *                          you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The RTC token.
      */
-    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, Role role, int token_expire, int privilege_expire) {
+    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, Role role, int token_expire,
+            int privilege_expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, token_expire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
@@ -137,11 +137,10 @@ public class RtcTokenBuilder2 {
      * When the token for joining the channel expires, the user is immediately kicked off the RTC channel
      * and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
      */
-    public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid,
-                                    int tokenExpire, int joinChannelPrivilegeExpire, int pubAudioPrivilegeExpire,
-                                    int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
-        return buildTokenWithUserAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid),
-                tokenExpire, joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire);
+    public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid, int tokenExpire, int joinChannelPrivilegeExpire,
+            int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
+        return buildTokenWithUserAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid), tokenExpire, joinChannelPrivilegeExpire,
+                pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire);
     }
 
     /**
@@ -194,9 +193,8 @@ public class RtcTokenBuilder2 {
      * When the token for joining the channel expires, the user is immediately kicked off the RTC channel
      * and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
      */
-    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account,
-                                            int tokenExpire, int joinChannelPrivilegeExpire, int pubAudioPrivilegeExpire,
-                                            int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
+    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, int tokenExpire,
+            int joinChannelPrivilegeExpire, int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, tokenExpire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
@@ -205,6 +203,49 @@ public class RtcTokenBuilder2 {
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, pubVideoPrivilegeExpire);
         serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, pubDataStreamPrivilegeExpire);
         accessToken.addService(serviceRtc);
+
+        try {
+            return accessToken.build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * Build the RTC and RTM token with account.
+     *
+     * @param appId:            The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate:   Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param channelName:      Unique channel name for the AgoraRTC session in the string format
+     * @param account:          The user's account, max length is 255 Bytes.
+     * @param role:             ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
+     * @param token_expire:     represented by the number of seconds elapsed since now. If, for example,
+     *                          you want to access the Agora Service within 10 minutes after the token is generated,
+     *                          set token_expire as 600(seconds).
+     * @param privilege_expire: represented by the number of seconds elapsed since now. If, for example,
+     *                          you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+     * @return The RTC and RTM token.
+     */
+    public String buildTokenWithRtm(String appId, String appCertificate, String channelName, String account, Role role, int tokenExpire, int privilegeExpire) {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, tokenExpire);
+        AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
+
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, privilegeExpire);
+        if (role == Role.ROLE_PUBLISHER) {
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM, privilegeExpire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, privilegeExpire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, privilegeExpire);
+        }
+        accessToken.addService(serviceRtc);
+
+        AccessToken2.Service serviceRtm = new AccessToken2.ServiceRtm(account);
+
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN, tokenExpire);
+        accessToken.addService(serviceRtm);
 
         try {
             return accessToken.build();

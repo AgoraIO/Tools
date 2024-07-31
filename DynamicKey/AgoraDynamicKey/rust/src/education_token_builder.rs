@@ -16,32 +16,21 @@ use crate::utils;
 //    generated, set expireTimestamp as the current
 //    timestamp + 600 (seconds).
 pub fn build_room_user_token(
-    app_id: &str,
-    app_certificate: &str,
-    room_uuid: &str,
-    user_uuid: &str,
-    role: i16,
-    expire: u32,
+    app_id: &str, app_certificate: &str, room_uuid: &str, user_uuid: &str, role: i16, expire: u32,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let mut token = access_token::new_access_token(app_id, app_certificate, expire);
 
     let chat_user_id = utils::md5(user_uuid);
     let mut service_education = access_token::new_service_education(room_uuid, user_uuid, role);
-    service_education
-        .service
-        .add_privilege(access_token::PRIVILEGE_EDUCATION_ROOM_USER, expire);
+    service_education.service.add_privilege(access_token::PRIVILEGE_EDUCATION_ROOM_USER, expire);
     token.add_service(Box::new(service_education));
 
     let mut service_rtm = access_token::new_service_rtm(user_uuid);
-    service_rtm
-        .service
-        .add_privilege(access_token::PRIVILEGE_LOGIN, expire);
+    service_rtm.service.add_privilege(access_token::PRIVILEGE_LOGIN, expire);
     token.add_service(Box::new(service_rtm));
 
     let mut service_chat = access_token::new_service_chat(&chat_user_id);
-    service_chat
-        .service
-        .add_privilege(access_token::PRIVILEGE_CHAT_USER, expire);
+    service_chat.service.add_privilege(access_token::PRIVILEGE_CHAT_USER, expire);
     token.add_service(Box::new(service_chat));
 
     return token.build();
@@ -59,18 +48,11 @@ pub fn build_room_user_token(
 //    Agora Service within 10 minutes after the token is
 //    generated, set expireTimestamp as the current
 //    timestamp + 600 (seconds).
-pub fn build_user_token(
-    app_id: &str,
-    app_certificate: &str,
-    user_uuid: &str,
-    expire: u32,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub fn build_user_token(app_id: &str, app_certificate: &str, user_uuid: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut token = access_token::new_access_token(app_id, app_certificate, expire);
 
     let mut service_education = access_token::new_service_education("", user_uuid, -1);
-    service_education
-        .service
-        .add_privilege(access_token::PRIVILEGE_EDUCATION_USER, expire);
+    service_education.service.add_privilege(access_token::PRIVILEGE_EDUCATION_USER, expire);
     token.add_service(Box::new(service_education));
 
     return token.build();
@@ -87,17 +69,11 @@ pub fn build_user_token(
 //    Agora Service within 10 minutes after the token is
 //    generated, set expireTimestamp as the current
 //    timestamp + 600 (seconds).
-pub fn build_app_token(
-    app_id: &str,
-    app_certificate: &str,
-    expire: u32,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub fn build_app_token(app_id: &str, app_certificate: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut token = access_token::new_access_token(app_id, app_certificate, expire);
 
     let mut service_education = access_token::new_service_education("", "", -1);
-    service_education
-        .service
-        .add_privilege(access_token::PRIVILEGE_EDUCATION_APP, expire);
+    service_education.service.add_privilege(access_token::PRIVILEGE_EDUCATION_APP, expire);
     token.add_service(Box::new(service_education));
 
     return token.build();

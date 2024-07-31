@@ -38,12 +38,10 @@ class RtcTokenBuilder:
             you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
         :return: The RTC token.
         """
-        return RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid, role,
-                                                             token_expire, privilege_expire)
+        return RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, uid, role, token_expire, privilege_expire)
 
     @staticmethod
-    def build_token_with_user_account(app_id, app_certificate, channel_name, account, role, token_expire,
-                                      privilege_expire=0):
+    def build_token_with_user_account(app_id, app_certificate, channel_name, account, role, token_expire, privilege_expire=0):
         """
         Build the RTC token with account.
         :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
@@ -74,9 +72,8 @@ class RtcTokenBuilder:
         return token.build()
 
     @staticmethod
-    def build_token_with_uid_and_privilege(app_id, app_certificate, channel_name, uid, token_expire,
-                                           join_channel_privilege_expire, pub_audio_privilege_expire,
-                                           pub_video_privilege_expire, pub_data_stream_privilege_expire):
+    def build_token_with_uid_and_privilege(app_id, app_certificate, channel_name, uid, token_expire, join_channel_privilege_expire,
+                                           pub_audio_privilege_expire, pub_video_privilege_expire, pub_data_stream_privilege_expire):
         """
         Generates an RTC token with the specified privilege.
                 This method supports generating a token with the following privileges:
@@ -125,14 +122,12 @@ class RtcTokenBuilder:
         set pub_data_stream_privilege_expire as the current Unix timestamp.
         :return: The new Token
         """
-        return RtcTokenBuilder.build_token_with_user_account_and_privilege(
-            app_id, app_certificate, channel_name, uid, token_expire, join_channel_privilege_expire,
-            pub_audio_privilege_expire, pub_video_privilege_expire, pub_data_stream_privilege_expire)
+        return RtcTokenBuilder.build_token_with_user_account_and_privilege(app_id, app_certificate, channel_name, uid, token_expire, join_channel_privilege_expire,
+                                                                           pub_audio_privilege_expire, pub_video_privilege_expire, pub_data_stream_privilege_expire)
 
     @staticmethod
-    def build_token_with_user_account_and_privilege(app_id, app_certificate, channel_name, account, token_expire,
-                                                    join_channel_privilege_expire, pub_audio_privilege_expire,
-                                                    pub_video_privilege_expire, pub_data_stream_privilege_expire):
+    def build_token_with_user_account_and_privilege(app_id, app_certificate, channel_name, account, token_expire, join_channel_privilege_expire,
+                                                    pub_audio_privilege_expire, pub_video_privilege_expire, pub_data_stream_privilege_expire):
         """
         Generates an RTC token with the specified privilege.
 
@@ -194,5 +189,41 @@ class RtcTokenBuilder:
         service_rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, pub_video_privilege_expire)
         service_rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, pub_data_stream_privilege_expire)
         token.add_service(service_rtc)
+
+        return token.build()
+
+    @staticmethod
+    def build_token_with_rtm(app_id, app_certificate, channel_name, account, role, token_expire, privilege_expire=0):
+        """
+        Build the RTC and RTM token with account.
+        :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
+            from your kit. See Get an App ID.
+        :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
+            See Get an App Certificate.
+        :param channel_name: Unique channel name for the AgoraRTC session in the string format.
+        :param account: The user's account, max length is 255 Bytes.
+        :param role: Role_Publisher: A broadcaster/host in a live-broadcast profile.
+            Role_Subscriber: An audience(default) in a live-broadcast profile.
+        :param token_expire: represented by the number of seconds elapsed since now. If, for example,
+            you want to access the Agora Service within 10 minutes after the token is generated,
+            set token_expire as 600(seconds).
+        :param privilege_expire: represented by the number of seconds elapsed since now. If, for example,
+            you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+        :return: The RTC and RTM token.
+        """
+        token = AccessToken(app_id, app_certificate, expire=token_expire)
+
+        service_rtc = ServiceRtc(channel_name, account)
+        service_rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilege_expire)
+        if role == Role_Publisher:
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilege_expire)
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilege_expire)
+            service_rtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilege_expire)
+        token.add_service(service_rtc)
+
+        rtm_service = ServiceRtm(account)
+        rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, token_expire)
+
+        token.add_service(rtm_service)
 
         return token.build()

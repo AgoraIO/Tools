@@ -1,6 +1,5 @@
 using AgoraIO.Media;
 using Xunit;
-using System;
 using Xunit.Abstractions;
 using System.Collections.Generic;
 
@@ -11,11 +10,13 @@ namespace AgoraIO.Tests
         private string appId = "970CA35de60c44645bbae8a215061b33";
         private string appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
         private string channelName = "7d72365eb983485397e3e3f9d460bdda";
-        private int expire = 600;
-        private int issueTs = 1111111;
-        private int salt = 1;
-        private string uid = "2882341273";
+        private uint expire = 600;
+        private uint issueTs = 1111111;
+        private uint salt = 1;
+        private uint uid = 2882341273;
+        private string uidStr = "2882341273";
         private string userId = "test_user";
+        private string roomId = "test_room_id";
 
         protected readonly ITestOutputHelper Output;
 
@@ -36,7 +37,7 @@ namespace AgoraIO.Tests
             Assert.Equal(expire, accessToken._expire);
             Assert.Equal(issueTs, accessToken._issueTs);
             Assert.Equal(salt, accessToken._salt);
-            
+
             string token = accessToken.build();
             Assert.Equal("007eJxTYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAKtnGK8=", token);
         }
@@ -48,12 +49,12 @@ namespace AgoraIO.Tests
             accessToken._issueTs = issueTs;
             accessToken._salt = salt;
 
-            AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+            AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uidStr);
             serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL, expire);
             accessToken.addService(serviceRtc);
 
             Assert.Equal(channelName, serviceRtc._channelName);
-            Assert.Equal(uid, serviceRtc._uid);
+            Assert.Equal(uidStr, serviceRtc._uid);
 
             string token = accessToken.build();
             Assert.Equal("007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj", token);
@@ -91,7 +92,7 @@ namespace AgoraIO.Tests
             string expected = "007eJxTYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJiBmBPM5GUpSi0viS4tTiwBZVh6A";
 
             Assert.Equal(expected, accessToken.build());
-         }
+        }
 
         [Fact]
         public void build_ServiceChat_userToken()
@@ -100,7 +101,7 @@ namespace AgoraIO.Tests
             accessToken._issueTs = issueTs;
             accessToken._salt = salt;
 
-            AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uid);
+            AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uidStr);
             serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_USER, expire);
 
             accessToken.addService(serviceChat);
@@ -132,7 +133,7 @@ namespace AgoraIO.Tests
             accessToken._issueTs = issueTs;
             accessToken._salt = salt;
 
-            AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+            AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uidStr);
             serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL, expire);
             serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_AUDIO_STREAM, expire);
             serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_VIDEO_STREAM, expire);
@@ -143,12 +144,12 @@ namespace AgoraIO.Tests
             serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN, expire);
             accessToken.addService(serviceRtm);
 
-            AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uid);
+            AccessToken2.ServiceChat serviceChat = new AccessToken2.ServiceChat(uidStr);
             serviceChat.addPrivilegeChat(AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_USER, expire);
             accessToken.addService(serviceChat);
 
             Assert.Equal(channelName, serviceRtc._channelName);
-            Assert.Equal(uid, serviceRtc._uid);
+            Assert.Equal(uidStr, serviceRtc._uid);
             Assert.Equal(userId, serviceRtm._userId);
 
             string expected = "007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==";
@@ -172,8 +173,8 @@ namespace AgoraIO.Tests
             Dictionary<ushort, uint> privileges = serviceRtc.getPrivileges();
 
             Assert.Equal(channelName, serviceRtc.getChannelName());
-            Assert.Equal(uid, serviceRtc.getUid());
-            Assert.Equal(expire, (int)privileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL]);
+            Assert.Equal(uidStr, serviceRtc.getUid());
+            Assert.Equal(expire, privileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL]);
 
             bool checkOtherPrivilege = privileges.ContainsKey((ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_AUDIO_STREAM);
             Assert.False(checkOtherPrivilege);
@@ -198,16 +199,16 @@ namespace AgoraIO.Tests
             Dictionary<ushort, uint> rtmPrivileges = serviceRtm.getPrivileges();
 
             Assert.Equal(channelName, serviceRtc.getChannelName());
-            Assert.Equal(uid, serviceRtc.getUid());
+            Assert.Equal(uidStr, serviceRtc.getUid());
             Assert.Equal(userId, serviceRtm.getUserId());
-            Assert.Equal(expire, (int)rtcPrivileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL]);
-            
+            Assert.Equal(expire, rtcPrivileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_JOIN_CHANNEL]);
+
             bool hasAudioStream = rtmPrivileges.ContainsKey((ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_AUDIO_STREAM);
             if (hasAudioStream)
             {
-                Assert.Equal(expire, (int)rtmPrivileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_AUDIO_STREAM]);
+                Assert.Equal(expire, rtmPrivileges[(ushort)AccessToken2.PrivilegeRtcEnum.PRIVILEGE_PUBLISH_AUDIO_STREAM]);
             }
-            Assert.Equal(expire, (int)rtmPrivileges[(ushort)AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN]);
+            Assert.Equal(expire, rtmPrivileges[(ushort)AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN]);
         }
 
         [Fact]
@@ -226,7 +227,7 @@ namespace AgoraIO.Tests
             Dictionary<ushort, uint> rtmPrivileges = serviceRtm.getPrivileges();
 
             Assert.Equal(userId, serviceRtm.getUserId());
-            Assert.Equal(expire, (int)rtmPrivileges[(ushort)AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN]);
+            Assert.Equal(expire, rtmPrivileges[(ushort)AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN]);
         }
 
         [Fact]
@@ -244,8 +245,8 @@ namespace AgoraIO.Tests
             AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat)accessToken._services[(ushort)AccessToken2.SERVICE_TYPE_CHAT];
             Dictionary<ushort, uint> chatPrivileges = serviceChat.getPrivileges();
 
-            Assert.Equal(uid, serviceChat.getUserId());
-            Assert.Equal(expire, (int)chatPrivileges[(ushort)AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_USER]);
+            Assert.Equal(uidStr, serviceChat.getUserId());
+            Assert.Equal(expire, chatPrivileges[(ushort)AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_USER]);
         }
 
         [Fact]
@@ -264,19 +265,13 @@ namespace AgoraIO.Tests
             Dictionary<ushort, uint> chatPrivileges = serviceChat.getPrivileges();
 
             Assert.Equal("", serviceChat.getUserId());
-            Assert.Equal(expire, (int)chatPrivileges[(ushort)AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_APP]);
+            Assert.Equal(expire, chatPrivileges[(ushort)AccessToken2.PrivilegeChatEnum.PRIVILEGE_CHAT_APP]);
         }
 
         [Fact]
         public void Test_Chat_online_buildUserToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string usrid = "4ac3bae0-6f9e-11ec-8c27-8dc232279082";
-
-            ChatTokenBuilder2 tokenBuilder = new ChatTokenBuilder2();
-
-            string token = tokenBuilder.buildUserToken(appid, appCertificate, usrid, 86400);
+            string token = ChatTokenBuilder2.buildUserToken(appId, appCertificate, userId, expire);
             Output.WriteLine($"token: {token}");
         }
 
@@ -293,7 +288,7 @@ namespace AgoraIO.Tests
             Output.WriteLine($"salt: {accessToken._salt}");
             Output.WriteLine($"service count: {accessToken._services.Count}");
 
-            foreach(var it in accessToken._services)
+            foreach (var it in accessToken._services)
             {
                 Output.WriteLine($"service: key:{it.Key}, value:{it.Value}");
             }
@@ -304,7 +299,7 @@ namespace AgoraIO.Tests
 
             Dictionary<ushort, uint> chatPrivileges = serviceChat.getPrivileges();
 
-            foreach(var it in chatPrivileges)
+            foreach (var it in chatPrivileges)
             {
                 Output.WriteLine($"Chat privilege: key:{it.Key}, value:{it.Value}");
             }
@@ -321,15 +316,7 @@ namespace AgoraIO.Tests
 
         public string RtcToken_buildTokenWithUid1()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string channelName = "rtc_channel";
-            int uid = 123;
-            RtcTokenBuilder2.Role role = RtcTokenBuilder2.Role.ROLE_PUBLISHER;
-
-            RtcTokenBuilder2 tokenBuilder = new RtcTokenBuilder2();
-
-            string token = tokenBuilder.buildTokenWithUid(appid, appCertificate, channelName, uid, role, 600, 600);
+            string token = RtcTokenBuilder2.buildTokenWithUid(appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.RolePublisher, expire, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -338,14 +325,7 @@ namespace AgoraIO.Tests
 
         public string RtcToken_buildTokenWithUid2()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string channelName = "rtc_channel";
-            int uid = 123;
-
-            RtcTokenBuilder2 tokenBuilder = new RtcTokenBuilder2();
-
-            string token = tokenBuilder.buildTokenWithUid(appid, appCertificate, channelName, uid, 600, 600, 600, 600, 600);
+            string token = RtcTokenBuilder2.buildTokenWithUid(appId, appCertificate, channelName, uid, expire, expire, expire, expire, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -353,15 +333,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string RtcToken_buildTokenWithUserAccount1()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string channelName = "rtc_channel";
-            string account = "my_name";
-            RtcTokenBuilder2.Role role = RtcTokenBuilder2.Role.ROLE_PUBLISHER;
-
-            RtcTokenBuilder2 tokenBuilder = new RtcTokenBuilder2();
-
-            string token = tokenBuilder.buildTokenWithUserAccount(appid, appCertificate, channelName, account, role, 600, 600);
+            string token = RtcTokenBuilder2.buildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, RtcTokenBuilder2.Role.RolePublisher, expire, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -369,14 +341,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string RtcToken_buildTokenWithUserAccount2()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string channelName = "rtc_channel";
-            string account = "my_name";
-
-            RtcTokenBuilder2 tokenBuilder = new RtcTokenBuilder2();
-
-            string token = tokenBuilder.buildTokenWithUserAccount(appid, appCertificate, channelName, account, 600, 600, 600, 600, 600);
+            string token = RtcTokenBuilder2.buildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, expire, expire, expire, expire, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -384,13 +349,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string RtmToken_buildToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string usrid = "userid";
-
-            RtmTokenBuilder2 tokenBuilder = new RtmTokenBuilder2();
-
-            string token = tokenBuilder.buildToken(appid, appCertificate, usrid, 86400);
+            string token = RtmTokenBuilder2.buildToken(appId, appCertificate, uidStr, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -398,13 +357,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string ChatToken_buildUserToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string usrid = "4ac3bae0-6f9e-11ec-8c27-8dc232279082";
-
-            ChatTokenBuilder2 tokenBuilder = new ChatTokenBuilder2();
-
-            string token = tokenBuilder.buildUserToken(appid, appCertificate, usrid, 86400);
+            string token = ChatTokenBuilder2.buildUserToken(appId, appCertificate, uidStr, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -413,12 +366,7 @@ namespace AgoraIO.Tests
 
         public string ChatToken_buildAppToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-
-            ChatTokenBuilder2 tokenBuilder = new ChatTokenBuilder2();
-
-            string token = tokenBuilder.buildAppToken(appid, appCertificate, 86400);
+            string token = ChatTokenBuilder2.buildAppToken(appId, appCertificate, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -426,12 +374,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string FpaToken_buildToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-
-            FpaTokenBuilder2 tokenBuilder = new FpaTokenBuilder2();
-
-            string token = tokenBuilder.buildToken(appid, appCertificate);
+            string token = FpaTokenBuilder2.buildToken(appId, appCertificate);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -439,16 +382,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string EducationToken_buildRoomUserToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string roomId = "12345678-6f9e-11ec-8c27-8dc232279082";
-            string userId = "4ac3bae0-6f9e-11ec-8c27-8dc232279082";
-            //The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
-            short role = 1;
-
-            EducationTokenBuilder2 tokenBuilder = new EducationTokenBuilder2();
-
-            string token = tokenBuilder.buildRoomUserToken(appid, appCertificate, roomId, userId, role, 86400);
+            string token = EducationTokenBuilder2.buildRoomUserToken(appId, appCertificate, roomId, userId, 1, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -456,13 +390,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string EducationToken_buildUserToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-            string userId = "4ac3bae0-6f9e-11ec-8c27-8dc232279082";
-
-            EducationTokenBuilder2 tokenBuilder = new EducationTokenBuilder2();
-
-            string token = tokenBuilder.buildUserToken(appid, appCertificate, userId, 86400);
+            string token = EducationTokenBuilder2.buildUserToken(appId, appCertificate, userId, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }
@@ -470,12 +398,7 @@ namespace AgoraIO.Tests
         [Fact]
         public string EducationToken_buildAppToken()
         {
-            string appid = "f1dc778bddc646ad8f260976ca2d015c";
-            string appCertificate = "b5a23fd8013a4db8bb06f7d1e26da789";
-
-            EducationTokenBuilder2 tokenBuilder = new EducationTokenBuilder2();
-
-            string token = tokenBuilder.buildAppToken(appid, appCertificate, 86400);
+            string token = EducationTokenBuilder2.buildAppToken(appId, appCertificate, expire);
             Output.WriteLine($"token : {token}");
             return token;
         }

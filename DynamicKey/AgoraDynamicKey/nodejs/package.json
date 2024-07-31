@@ -1,21 +1,24 @@
 {
-  "name": "agora-token",
-  "version": "2.0.3",
-  "description": "",
-  "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
-  "main": "index.js",
-  "scripts": {
-    "test": "nodeunit test/*.js"
-  },
-  "types": "index.d.ts",
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "crc-32": "^1.2.0",
-    "cuint": "0.2.2",
-    "md5": "^2.3.0"
-  },
-  "devDependencies": {
-    "nodeunit": "^0.11.3"
-  }
+    "name": "agora-token",
+    "version": "2.0.3",
+    "description": "",
+    "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
+    "main": "index.js",
+    "scripts": {
+        "test": "nodeunit test/*.js"
+    },
+    "types": "index.d.ts",
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "crc-32": "^1.2.0",
+        "cuint": "0.2.2",
+        "md5": "^2.3.0"
+    },
+    "devDependencies": {
+        "@eslint/js": "^9.8.0",
+        "eslint": "^9.8.0",
+        "globals": "^15.8.0",
+        "nodeunit": "^0.11.3"
+    }
 }

@@ -14,7 +14,7 @@
          *                        Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
          * @return The RTM token.
          */
-        public string buildToken(string appId, string appCertificate, string userId, int expire)
+        public static string buildToken(string appId, string appCertificate, string userId, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             AccessToken2.Service serviceRtm = new AccessToken2.ServiceRtm(userId);

@@ -30,18 +30,17 @@ def main():
     if not app_id or not app_certificate:
         print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
         return
-    
+
     token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
                                                  token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
-    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
-                                                          Role_Subscriber, token_expiration_in_seconds,
-                                                          privilege_expiration_in_seconds)
+    token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account, Role_Subscriber,
+                                                          token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with user account: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_uid_and_privilege(
-        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds, 
+        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
         join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with int uid and privilege: {}".format(token))
 
@@ -49,6 +48,10 @@ def main():
         app_id, app_certificate, channel_name, account, token_expiration_in_seconds,
         join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with user account and privilege: {}".format(token))
+
+    token = RtcTokenBuilder.build_token_with_rtm(app_id, app_certificate, channel_name, account, Role_Subscriber,
+                                                 token_expiration_in_seconds, privilege_expiration_in_seconds)
+    print("Token with RTM: {}".format(token))
 
 
 if __name__ == "__main__":

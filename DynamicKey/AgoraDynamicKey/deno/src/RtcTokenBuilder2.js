@@ -1,4 +1,4 @@
-import { AccessToken2 as AccessToken, ServiceRtc } from '../src/AccessToken2.js'
+import { AccessToken2 as AccessToken, ServiceRtc, ServiceRtm } from '../src/AccessToken2.js'
 
 const Role = {
     /**
@@ -16,7 +16,7 @@ const Role = {
      * to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
      * still has the same privileges as Role_Publisher.
      */
-    SUBSCRIBER: 2
+    SUBSCRIBER: 2,
 }
 
 class RtcTokenBuilder {
@@ -34,18 +34,18 @@ class RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
-     * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).     * @return The new Token.
+     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).     * @return The new Token.
      */
-    static buildTokenWithUid(appId, appCertificate, channelName, uid, role, token_expire, privilege_expire = 0) {
+    static buildTokenWithUid(appId, appCertificate, channelName, uid, role, tokenExpire, privilegeExpire = 0) {
         return this.buildTokenWithUserAccount(
             appId,
             appCertificate,
             channelName,
             uid,
             role,
-            token_expire,
-            privilege_expire
+            tokenExpire,
+            privilegeExpire,
         )
     }
 
@@ -63,8 +63,8 @@ class RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} token_expire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds)
-     * @param {*} privilege_expire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
      * @return The new Token.
      */
     static buildTokenWithUserAccount(
@@ -73,17 +73,17 @@ class RtcTokenBuilder {
         channelName,
         account,
         role,
-        token_expire,
-        privilege_expire = 0
+        tokenExpire,
+        privilegeExpire = 0,
     ) {
-        let token = new AccessToken(appId, appCertificate, 0, token_expire)
+        let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
 
         let serviceRtc = new ServiceRtc(channelName, account)
-        serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilege_expire)
+        serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilegeExpire)
         if (role == Role.PUBLISHER) {
-            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilege_expire)
-            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilege_expire)
-            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilege_expire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilegeExpire)
         }
         token.add_service(serviceRtc)
 
@@ -125,7 +125,7 @@ class RtcTokenBuilder {
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
      * @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
      * @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
      * by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
      * current timestamp plus 600 seconds, the token expires in 10 minutes.
@@ -152,7 +152,7 @@ class RtcTokenBuilder {
         joinChannelPrivilegeExpire,
         pubAudioPrivilegeExpire,
         pubVideoPrivilegeExpire,
-        pubDataStreamPrivilegeExpire
+        pubDataStreamPrivilegeExpire,
     ) {
         return this.BuildTokenWithUserAccountAndPrivilege(
             appId,
@@ -163,7 +163,7 @@ class RtcTokenBuilder {
             joinChannelPrivilegeExpire,
             pubAudioPrivilegeExpire,
             pubVideoPrivilegeExpire,
-            pubDataStreamPrivilegeExpire
+            pubDataStreamPrivilegeExpire,
         )
     }
 
@@ -202,7 +202,7 @@ class RtcTokenBuilder {
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param userAccount The user account.
      * @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
      * @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
      * by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
      * current timestamp plus 600 seconds, the token expires in 10 minutes.
@@ -229,7 +229,7 @@ class RtcTokenBuilder {
         joinChannelPrivilegeExpire,
         pubAudioPrivilegeExpire,
         pubVideoPrivilegeExpire,
-        pubDataStreamPrivilegeExpire
+        pubDataStreamPrivilegeExpire,
     ) {
         let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
 
@@ -242,6 +242,51 @@ class RtcTokenBuilder {
 
         return token.build()
     }
+
+    /**
+     * Builds an RTC and RTM token with account.
+     * @param {*} appId  The App ID issued to you by Agora.
+     * @param {*} appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param {*} channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+     * - The 26 lowercase English letters: a to z.
+     * - The 26 uppercase English letters: A to Z.
+     * - The 10 digits: 0 to 9.
+     * - The space.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param {*} account The user account.
+     * @param {*} role See #userRole.
+     * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @return The RTC and RTM Token.
+     */
+    static buildTokenWithRtm(
+        appId,
+        appCertificate,
+        channelName,
+        account,
+        role,
+        tokenExpire,
+        privilegeExpire = 0,
+    ) {
+        let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
+
+        let serviceRtc = new ServiceRtc(channelName, account)
+        serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, privilegeExpire)
+        if (role == Role.PUBLISHER) {
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, privilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, privilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, privilegeExpire)
+        }
+        token.add_service(serviceRtc)
+
+        let serviceRtm = new ServiceRtm(account)
+        serviceRtm.add_privilege(ServiceRtm.kPrivilegeLogin, tokenExpire)
+        token.add_service(serviceRtm)
+
+        return token.build()
+    }
 }
 
-export { RtcTokenBuilder, Role }
+export { Role, RtcTokenBuilder }

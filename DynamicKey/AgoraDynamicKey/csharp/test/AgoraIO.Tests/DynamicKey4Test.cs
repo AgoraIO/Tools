@@ -1,6 +1,7 @@
 ﻿using AgoraIO.Media;
 using System;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace AgoraIO.Tests
 {
@@ -8,55 +9,55 @@ namespace AgoraIO.Tests
     {
         String appID = "b9b595bcfd72479d894abe7a8cf0c37e";
         String appCertificate = "3c481e60aac14b06a434a20e70de7c51";
-        public DynamicKey4Test()
-        {
+        String channel = "7d72365eb983485397e3e3f9d460bdda";
 
+        protected readonly ITestOutputHelper Output;
+
+        public DynamicKey4Test(ITestOutputHelper tempOutput)
+        {
+            Output = tempOutput;
         }
+
         [Fact]
         public void testGeneratePublicSharingKey() //throws Exception
         {
-
-            String channel = "7d72365eb983485397e3e3f9d460bdda";
             int ts = 1446455472;
             int r = 58964981;
             string uid = 2882341273L.ToString();
             int expiredTs = 1446455471;
 
-            String expected = "004ec32c0d528e58ef90e8ff437a9706124137dc795970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471";
-            String result = DynamicKey4.generatePublicSharingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
-            Assert.Equal(expected, result);
+            String expected = "0047f60ef0a65df9aad718eb6c4790a3e52a468313bb9b595bcfd72479d894abe7a8cf0c37e14464554720383bbf51446455471";
+            String token = DynamicKey4.generatePublicSharingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
+            Output.WriteLine($"token : {token}");
+            Assert.Equal(expected, token);
         }
 
         [Fact]
         public void testGenerateRecordingKey() //throws Exception
         {
-            //String appID = "970ca35de60c44645bbae8a215061b33";
-            //String appCertificate = "5cfd2fd1755d40ecb72977518be15d3b";
-            String channel = "7d72365eb983485397e3e3f9d460bdda";
             int ts = 1446455472;
             int r = 58964981;
             string uid = 2882341273L.ToString();
             int expiredTs = 1446455471;
 
-            String expected = "004e0c24ac56aae05229a6d9389860a1a0e25e56da8970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471";
-            String result = DynamicKey4.generateRecordingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
-            Assert.Equal(expected, result);
+            String expected = "004d77264727a82bbbeac5c65cc125cda2992ad2106b9b595bcfd72479d894abe7a8cf0c37e14464554720383bbf51446455471";
+            String token = DynamicKey4.generateRecordingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
+            Output.WriteLine($"token : {token}");
+            Assert.Equal(expected, token);
         }
 
         [Fact]
         public void testGenerateMediaChannelKey() //throws Exception
         {
-            //String appID = "970ca35de60c44645bbae8a215061b33";
-            //String appCertificate = "5cfd2fd1755d40ecb72977518be15d3b";
-            String channel = "7d72365eb983485397e3e3f9d460bdda";
             int ts = 1446455472;
             int r = 58964981;
             string uid = 2882341273L.ToString();
             int expiredTs = 1446455471;
 
-            String expected = "004d0ec5ee3179c964fe7c0485c045541de6bff332b970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471";
-            String result = DynamicKey4.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
-            Assert.Equal(expected, result);
+            String expected = "004d4bcd4be9daabe83581b93336313a97c696b0b0bb9b595bcfd72479d894abe7a8cf0c37e14464554720383bbf51446455471";
+            String token = DynamicKey4.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
+            Output.WriteLine($"token : {token}");
+            Assert.Equal(expected, token);
         }
     }
 }

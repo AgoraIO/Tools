@@ -11,22 +11,22 @@ namespace AgoraIO.Media
 
         public string _appCert = "";
         public string _appId = "";
-        public int _expire;
-        public int _issueTs;
-        public int _salt;
+        public uint _expire;
+        public uint _issueTs;
+        public uint _salt;
         public Dictionary<ushort, Service> _services = new Dictionary<ushort, Service>();
 
         public AccessToken2()
         {
         }
 
-        public AccessToken2(string appId, string appCert, int expire)
+        public AccessToken2(string appId, string appCert, uint expire)
         {
             _appCert = appCert;
             _appId = appId;
             _expire = expire;
-            _issueTs = Utils.getTimestamp();
-            _salt = Utils.randomInt();
+            _issueTs = (uint)Utils.getTimestamp();
+            _salt = (uint)Utils.randomInt();
         }
 
         public void addService(Service service)
@@ -65,7 +65,7 @@ namespace AgoraIO.Media
             throw new ArgumentException("unknown service type:", serviceType.ToString());
         }
 
-        public static string getUidStr(int uid)
+        public static string getUidStr(uint uid)
         {
             if (uid == 0)
             {
@@ -87,14 +87,15 @@ namespace AgoraIO.Media
 
         public string build()
         {
-            if (!Utils.isUUID(_appId) || !Utils.isUUID(_appCert)) {
+            if (!Utils.isUUID(_appId) || !Utils.isUUID(_appCert))
+            {
                 return "";
             }
 
-            ByteBuf buf = new ByteBuf().put(_appId.getBytes()).put((uint)_issueTs).put((uint)_expire).put((uint)_salt).put((ushort)_services.Count);
+            ByteBuf buf = new ByteBuf().put(_appId.getBytes()).put((uint)_issueTs).put(_expire).put((uint)_salt).put((ushort)_services.Count);
             byte[] signing = getSign();
 
-            foreach(var it in _services)
+            foreach (var it in _services)
             {
                 it.Value.pack(buf);
             }
@@ -120,12 +121,12 @@ namespace AgoraIO.Media
             ByteBuf buff = new ByteBuf(data);
             string signature = buff.readBytes().getString();
             _appId = buff.readBytes().getString();
-            _issueTs = (int)buff.readInt();
-            _expire = (int)buff.readInt();
-            _salt = (int)buff.readInt();
+            _issueTs = buff.readInt();
+            _expire = buff.readInt();
+            _salt = buff.readInt();
             short servicesNum = (short)buff.readShort();
 
-            for(short i = 0; i< servicesNum; i++)
+            for (short i = 0; i < servicesNum; i++)
             {
                 short serviceType = (short)buff.readShort();
                 Service service = getService(serviceType);
@@ -181,29 +182,29 @@ namespace AgoraIO.Media
                 _type = serviceType;
             }
 
-            public void addPrivilegeRtc(PrivilegeRtcEnum privilege, int expire)
+            public void addPrivilegeRtc(PrivilegeRtcEnum privilege, uint expire)
             {
-                _privileges.Add((ushort)privilege, (uint)expire);
+                _privileges.Add((ushort)privilege, expire);
             }
 
-            public void addPrivilegeRtm(PrivilegeRtmEnum privilege, int expire)
+            public void addPrivilegeRtm(PrivilegeRtmEnum privilege, uint expire)
             {
-                _privileges.Add((ushort)privilege, (uint)expire);
+                _privileges.Add((ushort)privilege, expire);
             }
 
-            public void addPrivilegeFpa(PrivilegeFpaEnum privilege, int expire)
+            public void addPrivilegeFpa(PrivilegeFpaEnum privilege, uint expire)
             {
-                _privileges.Add((ushort)privilege, (uint)expire);
+                _privileges.Add((ushort)privilege, expire);
             }
 
-            public void addPrivilegeChat(PrivilegeChatEnum privilege, int expire)
+            public void addPrivilegeChat(PrivilegeChatEnum privilege, uint expire)
             {
-                _privileges.Add((ushort)privilege, (uint)expire);
+                _privileges.Add((ushort)privilege, expire);
             }
 
-            public void addPrivilegeEducation(PrivilegeEducationEnum privilege, int expire)
+            public void addPrivilegeEducation(PrivilegeEducationEnum privilege, uint expire)
             {
-                _privileges.Add((ushort)privilege, (uint)expire);
+                _privileges.Add((ushort)privilege, expire);
             }
 
             public Dictionary<ushort, uint> getPrivileges()
@@ -413,6 +414,5 @@ namespace AgoraIO.Media
                 _role = (short)byteBuf.readShort();
             }
         }
-
     }
 }

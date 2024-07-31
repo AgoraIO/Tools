@@ -38,31 +38,27 @@ int main(int argc, char const *argv[]) {
     return -1;
   }
 
-  result = RtcTokenBuilder2::BuildTokenWithUid(
-      app_id, app_certificate, channel_name, uid, UserRole::kRolePublisher,
-      token_expiration_in_seconds, privilege_expiration_in_seconds);
+  result = RtcTokenBuilder2::BuildTokenWithUid(app_id, app_certificate, channel_name, uid, UserRole::kRolePublisher, token_expiration_in_seconds,
+                                               privilege_expiration_in_seconds);
   std::cout << "Token With Int Uid:" << result << std::endl;
 
-  result = RtcTokenBuilder2::BuildTokenWithUserAccount(
-      app_id, app_certificate, channel_name, account, UserRole::kRolePublisher,
-      token_expiration_in_seconds, privilege_expiration_in_seconds);
+  result = RtcTokenBuilder2::BuildTokenWithUserAccount(app_id, app_certificate, channel_name, account, UserRole::kRolePublisher, token_expiration_in_seconds,
+                                                       privilege_expiration_in_seconds);
   std::cout << "Token With UserAccount:" << result << std::endl;
 
-  result = RtcTokenBuilder2::BuildTokenWithUid(
-      app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
-      join_channel_privilege_expiration_in_seconds,
-      pub_audio_privilege_expiration_in_seconds,
-      pub_video_privilege_expiration_in_seconds,
-      pub_data_stream_privilege_expiration_in_seconds);
+  result = RtcTokenBuilder2::BuildTokenWithUid(app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
+                                               join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds,
+                                               pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds);
   std::cout << "Token With Int Uid:" << result << std::endl;
 
-  result = RtcTokenBuilder2::BuildTokenWithUserAccount(
-      app_id, app_certificate, channel_name, account,
-      token_expiration_in_seconds, join_channel_privilege_expiration_in_seconds,
-      pub_audio_privilege_expiration_in_seconds,
-      pub_video_privilege_expiration_in_seconds,
-      pub_data_stream_privilege_expiration_in_seconds);
+  result = RtcTokenBuilder2::BuildTokenWithUserAccount(app_id, app_certificate, channel_name, account, token_expiration_in_seconds,
+                                                       join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds,
+                                                       pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds);
   std::cout << "Token With UserAccount:" << result << std::endl;
+
+  result = RtcTokenBuilder2::BuildTokenWithRtm(app_id, app_certificate, channel_name, account, UserRole::kRolePublisher, token_expiration_in_seconds,
+                                               privilege_expiration_in_seconds);
+  std::cout << "Token With RTM:" << result << std::endl;
 
   return 0;
 }

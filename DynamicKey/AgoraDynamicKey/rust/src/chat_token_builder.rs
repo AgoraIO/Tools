@@ -12,17 +12,10 @@ use crate::access_token;
 // Agora Service within 10 minutes after the token is
 // generated, set expireTimestamp as the current timestamp + 600 (seconds).
 // @return The Chat User token.
-pub fn build_chat_user_token(
-    app_id: &str,
-    app_certificate: &str,
-    user_uuid: &str,
-    expire: u32,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub fn build_chat_user_token(app_id: &str, app_certificate: &str, user_uuid: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut access_token = access_token::new_access_token(app_id, app_certificate, expire);
     let mut service_chat = access_token::new_service_chat(user_uuid);
-    service_chat
-        .service
-        .add_privilege(access_token::PRIVILEGE_CHAT_USER, expire);
+    service_chat.service.add_privilege(access_token::PRIVILEGE_CHAT_USER, expire);
     access_token.add_service(Box::new(service_chat));
 
     return access_token.build();
@@ -39,17 +32,11 @@ pub fn build_chat_user_token(
 // Agora Service within 10 minutes after the token is
 // generated, set expireTimestamp as the current timestamp + 600 (seconds).
 // @return The Chat App token.
-pub fn build_chat_app_token(
-    app_id: &str,
-    app_certificate: &str,
-    expire: u32,
-) -> Result<String, Box<dyn std::error::Error>> {
+pub fn build_chat_app_token(app_id: &str, app_certificate: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut access_token = access_token::new_access_token(app_id, app_certificate, expire);
 
     let mut service_chat = access_token::new_service_chat("");
-    service_chat
-        .service
-        .add_privilege(access_token::PRIVILEGE_CHAT_APP, expire);
+    service_chat.service.add_privilege(access_token::PRIVILEGE_CHAT_APP, expire);
     access_token.add_service(Box::new(service_chat));
 
     return access_token.build();
