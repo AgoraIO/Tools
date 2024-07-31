@@ -44,10 +44,8 @@ public class RtcTokenBuilder2 {
      *                          you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The RTC token.
      */
-    public String buildTokenWithUid(String appId, String appCertificate, String channelName,
-            int uid, Role role, int token_expire, int privilege_expire) {
-        return buildTokenWithUserAccount(appId, appCertificate, channelName,
-                AccessToken2.getUidStr(uid), role, token_expire, privilege_expire);
+    public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid, Role role, int token_expire, int privilege_expire) {
+        return buildTokenWithUserAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid), role, token_expire, privilege_expire);
     }
 
     /**
@@ -68,20 +66,16 @@ public class RtcTokenBuilder2 {
      *                          you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The RTC token.
      */
-    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName,
-            String account, Role role, int token_expire, int privilege_expire) {
+    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, Role role, int token_expire,
+            int privilege_expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, token_expire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL,
-                privilege_expire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, privilege_expire);
         if (role == Role.ROLE_PUBLISHER) {
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM,
-                    privilege_expire);
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM,
-                    privilege_expire);
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM,
-                    privilege_expire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM, privilege_expire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, privilege_expire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, privilege_expire);
         }
         accessToken.addService(serviceRtc);
 
@@ -143,11 +137,9 @@ public class RtcTokenBuilder2 {
      * When the token for joining the channel expires, the user is immediately kicked off the RTC channel
      * and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
      */
-    public String buildTokenWithUid(String appId, String appCertificate, String channelName,
-            int uid, int tokenExpire, int joinChannelPrivilegeExpire, int pubAudioPrivilegeExpire,
-            int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
-        return buildTokenWithUserAccount(appId, appCertificate, channelName,
-                AccessToken2.getUidStr(uid), tokenExpire, joinChannelPrivilegeExpire,
+    public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid, int tokenExpire, int joinChannelPrivilegeExpire,
+            int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
+        return buildTokenWithUserAccount(appId, appCertificate, channelName, AccessToken2.getUidStr(uid), tokenExpire, joinChannelPrivilegeExpire,
                 pubAudioPrivilegeExpire, pubVideoPrivilegeExpire, pubDataStreamPrivilegeExpire);
     }
 
@@ -201,21 +193,15 @@ public class RtcTokenBuilder2 {
      * When the token for joining the channel expires, the user is immediately kicked off the RTC channel
      * and cannot publish any audio stream, even though the timestamp for publishing audio has not expired.
      */
-    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName,
-            String account, int tokenExpire, int joinChannelPrivilegeExpire,
-            int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire,
-            int pubDataStreamPrivilegeExpire) {
+    public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, int tokenExpire,
+            int joinChannelPrivilegeExpire, int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, tokenExpire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL,
-                joinChannelPrivilegeExpire);
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM,
-                pubAudioPrivilegeExpire);
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM,
-                pubVideoPrivilegeExpire);
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM,
-                pubDataStreamPrivilegeExpire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, joinChannelPrivilegeExpire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM, pubAudioPrivilegeExpire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, pubVideoPrivilegeExpire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, pubDataStreamPrivilegeExpire);
         accessToken.addService(serviceRtc);
 
         try {
@@ -244,20 +230,15 @@ public class RtcTokenBuilder2 {
      *                          you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
      * @return The RTC and RTM token.
      */
-    public String buildTokenWithRtm(String appId, String appCertificate, String channelName,
-            String account, Role role, int tokenExpire, int privilegeExpire) {
+    public String buildTokenWithRtm(String appId, String appCertificate, String channelName, String account, Role role, int tokenExpire, int privilegeExpire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, tokenExpire);
         AccessToken2.Service serviceRtc = new AccessToken2.ServiceRtc(channelName, account);
 
-        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL,
-                privilegeExpire);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, privilegeExpire);
         if (role == Role.ROLE_PUBLISHER) {
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM,
-                    privilegeExpire);
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM,
-                    privilegeExpire);
-            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM,
-                    privilegeExpire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM, privilegeExpire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_VIDEO_STREAM, privilegeExpire);
+            serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, privilegeExpire);
         }
         accessToken.addService(serviceRtc);
 
