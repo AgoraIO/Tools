@@ -1,0 +1,11 @@
+{
+    "fmt": {
+        "useTabs": false,
+        "lineWidth": 160,
+        "indentWidth": 4,
+        "semiColons": false,
+        "singleQuote": true,
+        "proseWrap": "preserve",
+        "include": ["src/", "sample/", "test/"]
+    }
+}
