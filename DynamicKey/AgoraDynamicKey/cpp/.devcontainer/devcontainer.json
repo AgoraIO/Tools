@@ -13,6 +13,6 @@
     "workspaceMount": "source=${localWorkspaceFolder},target=/app/cpp,type=bind",
     "workspaceFolder": "/app/cpp",
     "postCreateCommand": {
-        "install dependencies": "apt-get update && apt-get install -y g++ clang cmake libssl-dev zlib1g-dev libgtest-dev gdb"
+        "install dependencies": "apt-get update && apt-get install -y g++ clang clang-format cmake libssl-dev zlib1g-dev libgtest-dev gdb"
     }
 }
