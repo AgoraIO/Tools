@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 from .AccessToken2 import *
 from .utils import *
 
 
-class EducationTokenBuilder:
+class ApaasTokenBuilder:
     @staticmethod
     def build_room_user_token(app_id, app_certificate, room_uuid, user_uuid, role, expire):
         """
@@ -19,7 +19,7 @@ class EducationTokenBuilder:
         :param role: The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The education user room token.
+        :return: The apaas user room token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
 
@@ -49,7 +49,7 @@ class EducationTokenBuilder:
         :param user_uuid: The user's id, must be unique.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The education user token.
+        :return: The apaas user token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
         apaas_service = ServiceApaas(user_uuid=user_uuid)
@@ -69,7 +69,7 @@ class EducationTokenBuilder:
             See Get an App Certificate.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The education app token.
+        :return: The apaas app token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
         apaas_service = ServiceApaas()

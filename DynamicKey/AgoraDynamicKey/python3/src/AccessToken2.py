@@ -122,7 +122,7 @@ class ServiceChat(Service):
         return buffer
 
 
-class ServiceEducation(Service):
+class ServiceApaas(Service):
     kServiceType = 7
 
     kPrivilegeRoomUser = 1
@@ -130,17 +130,17 @@ class ServiceEducation(Service):
     kPrivilegeApp = 3
 
     def __init__(self, room_uuid='', user_uuid='', role=-1):
-        super(ServiceEducation, self).__init__(ServiceEducation.kServiceType)
+        super(ServiceApaas, self).__init__(ServiceApaas.kServiceType)
         self.__room_uuid = room_uuid.encode('utf-8')
         self.__user_uuid = user_uuid.encode('utf-8')
         self.__role = role
 
     def pack(self):
-        return super(ServiceEducation, self).pack() + pack_string(self.__room_uuid) + pack_string(
+        return super(ServiceApaas, self).pack() + pack_string(self.__room_uuid) + pack_string(
             self.__user_uuid) + pack_int16(self.__role)
 
     def unpack(self, buffer):
-        buffer = super(ServiceEducation, self).unpack(buffer)
+        buffer = super(ServiceApaas, self).unpack(buffer)
         self.__room_uuid, buffer = unpack_string(buffer)
         self.__user_uuid, buffer = unpack_string(buffer)
         self.__role, buffer = unpack_int16(buffer)
@@ -153,7 +153,7 @@ class AccessToken:
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat,
-        ServiceEducation.kServiceType: ServiceEducation,
+        ServiceApaas.kServiceType: ServiceApaas,
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
@@ -199,7 +199,7 @@ class AccessToken:
         self.__app_cert = self.__app_cert.encode('utf-8')
         signing = self.__signing()
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-                       pack_uint32(self.__salt) + pack_uint16(len(self.__service))
+            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
 
         for service_type in sorted(self.__service.keys()):
             signing_info += self.__service[service_type].pack()

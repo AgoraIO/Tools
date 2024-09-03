@@ -7,10 +7,10 @@ import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from src.education_token_builder import *
+from src.apaas_token_builder import *
 
 
-class EducationTokenBuidlerTest(unittest.TestCase):
+class ApaasTokenBuidlerTest(unittest.TestCase):
     def setUp(self) -> None:
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
@@ -20,7 +20,7 @@ class EducationTokenBuidlerTest(unittest.TestCase):
         self.__expire = 900
 
     def test_room_user_token(self):
-        token = EducationTokenBuilder.build_room_user_token(
+        token = ApaasTokenBuilder.build_room_user_token(
             self.__app_id, self.__app_cert, self.__room_uuid, self.__user_id, self.__role, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
@@ -37,7 +37,7 @@ class EducationTokenBuidlerTest(unittest.TestCase):
         self.assertIn(ServiceApaas.kPrivilegeRoomUser, parser_service._Service__privileges)
 
     def test_user_token(self):
-        token = EducationTokenBuilder.build_user_token(
+        token = ApaasTokenBuilder.build_user_token(
             self.__app_id, self.__app_cert, self.__user_id, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
@@ -53,7 +53,7 @@ class EducationTokenBuidlerTest(unittest.TestCase):
         self.assertIn(ServiceApaas.kPrivilegeUser, parser_service._Service__privileges)
 
     def test_app_token(self):
-        token = EducationTokenBuilder.build_app_token(
+        token = ApaasTokenBuilder.build_app_token(
             self.__app_id, self.__app_cert, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
