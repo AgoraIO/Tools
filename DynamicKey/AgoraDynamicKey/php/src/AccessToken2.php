@@ -133,7 +133,7 @@ class ServiceChat extends Service
     }
 }
 
-class ServiceEducation extends Service
+class ServiceApaas extends Service
 {
     const SERVICE_TYPE = 7;
     const PRIVILEGE_ROOM_USER = 1;
@@ -250,7 +250,7 @@ class AccessToken2
             ServiceRtm::SERVICE_TYPE => new ServiceRtm(),
             ServiceFpa::SERVICE_TYPE => new ServiceFpa(),
             ServiceChat::SERVICE_TYPE => new ServiceChat(),
-            ServiceEducation::SERVICE_TYPE => new ServiceEducation(),
+            ServiceApaas::SERVICE_TYPE => new ServiceApaas(),
         ];
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceTye = Util::unpackUint16($data);

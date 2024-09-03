@@ -1,9 +1,9 @@
 <?php
 
 require_once "../src/AccessToken2.php";
-require_once "../src/EducationTokenBuilder.php";
+require_once "../src/ApaasTokenBuilder.php";
 
-class EducationTokenBuilderTest
+class ApaasTokenBuilderTest
 {
     public $appId = "970CA35de60c44645bbae8a215061b33";
     public $appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -21,7 +21,7 @@ class EducationTokenBuilderTest
 
     public function test_buildRoomUserToken()
     {
-        $token = EducationTokenBuilder::buildRoomUserToken($this->appId, $this->appCertificate, $this->roomUuid, $this->userUuid, $this->role, $this->expire);
+        $token = ApaasTokenBuilder::buildRoomUserToken($this->appId, $this->appCertificate, $this->roomUuid, $this->userUuid, $this->role, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
@@ -35,7 +35,7 @@ class EducationTokenBuilderTest
 
     public function test_buildUserToken()
     {
-        $token = EducationTokenBuilder::buildUserToken($this->appId, $this->appCertificate, $this->userUuid, $this->expire);
+        $token = ApaasTokenBuilder::buildUserToken($this->appId, $this->appCertificate, $this->userUuid, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
@@ -49,7 +49,7 @@ class EducationTokenBuilderTest
 
     public function test_buildAppToken()
     {
-        $token = EducationTokenBuilder::buildAppToken($this->appId, $this->appCertificate, $this->expire);
+        $token = ApaasTokenBuilder::buildAppToken($this->appId, $this->appCertificate, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
 
@@ -63,5 +63,5 @@ class EducationTokenBuilderTest
     }
 }
 
-$educationTokenBuilderTest = new EducationTokenBuilderTest();
-$educationTokenBuilderTest->run();
+$apaasTokenBuilderTest = new ApaasTokenBuilderTest();
+$apaasTokenBuilderTest->run();
