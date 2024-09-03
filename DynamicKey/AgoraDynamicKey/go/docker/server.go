@@ -5,7 +5,7 @@
 // - Agora RTM
 // - Agora FPA
 // - Agora Chat
-// - Agora Education
+// - Agora Apaas
 // This program is for reference only and is not recommended for direct use in a production environment.
 // If you need to use it in a production environment, you need to add a permission verification mechanism.
 // For example, you can add a parameter to the request body, and then verify the parameter in the program.
@@ -62,12 +62,12 @@ type Request struct {
 	TokenExpireTs uint32 `json:"tokenExpireTs,omitempty"`
 	// Represented by the number of seconds elapsed since now. If, for example,
 	// you want to enable your privilege for 10 minutes, set privilegeExpireTs as 600(seconds).
-	PrivilegeExpireTs uint32                  `json:"privilegeExpireTs,omitempty"`
-	ServiceRtc        RequestServiceRtc       `json:"serviceRtc,omitempty"`
-	ServiceRtm        RequestServiceRtm       `json:"serviceRtm,omitempty"`
-	ServiceFpa        RequestServiceFpa       `json:"serviceFpa,omitempty"`
-	ServiceChat       RequestServiceChat      `json:"serviceChat,omitempty"`
-	ServiceEducation  RequestServiceEducation `json:"serviceEducation,omitempty"`
+	PrivilegeExpireTs uint32              `json:"privilegeExpireTs,omitempty"`
+	ServiceRtc        RequestServiceRtc   `json:"serviceRtc,omitempty"`
+	ServiceRtm        RequestServiceRtm   `json:"serviceRtm,omitempty"`
+	ServiceFpa        RequestServiceFpa   `json:"serviceFpa,omitempty"`
+	ServiceChat       RequestServiceChat  `json:"serviceChat,omitempty"`
+	ServiceApaas      RequestServiceApaas `json:"serviceApaas,omitempty"`
 }
 
 type RequestServiceRtc struct {
@@ -94,10 +94,10 @@ type RequestServiceChat struct {
 	UserUuid string `json:"userUuid,omitempty"`
 }
 
-type RequestServiceEducation struct {
-	// Refer to BuildUserToken of src/educationtokenbuilder/educationtokenbuilder.go
+type RequestServiceApaas struct {
+	// Refer to BuildUserToken of src/apaastokenbuilder/apaastokenbuilder.go
 	EnableUser bool `json:"enableUser,omitempty"`
-	// Refer to BuildAppToken of src/educationtokenbuilder/educationtokenbuilder.go
+	// Refer to BuildAppToken of src/apaastokenbuilder/apaastokenbuilder.go
 	EnableApp bool `json:"enableApp,omitempty"`
 	// The user's id, must be unique.
 	UserUuid string `json:"userUuid,omitempty"`
@@ -189,18 +189,18 @@ func generateToken(request *Request) (token string, err error) {
 		accessToken.AddService(serviceChatApp)
 	}
 
-	// refer to src/educationtokenbuilder/educationtokenbuilder.go
-	if request.ServiceEducation.EnableUser {
-		serviceEducationUser := accessTokenBuilder.NewServiceEducation("", request.ServiceEducation.UserUuid, -1)
-		serviceEducationUser.AddPrivilege(accessTokenBuilder.PrivilegeEducationUser, request.TokenExpireTs)
-		accessToken.AddService(serviceEducationUser)
+	// refer to src/apaastokenbuilder/apaastokenbuilder.go
+	if request.ServiceApaas.EnableUser {
+		serviceApaasUser := accessTokenBuilder.NewServiceApaas("", request.ServiceApaas.UserUuid, -1)
+		serviceApaasUser.AddPrivilege(accessTokenBuilder.PrivilegeApaasUser, request.TokenExpireTs)
+		accessToken.AddService(serviceApaasUser)
 	}
 
-	// refer to src/educationtokenbuilder/educationtokenbuilder.go
-	if request.ServiceEducation.EnableApp {
-		serviceEducationApp := accessTokenBuilder.NewServiceEducation("", "", -1)
-		serviceEducationApp.AddPrivilege(accessTokenBuilder.PrivilegeEducationApp, request.TokenExpireTs)
-		accessToken.AddService(serviceEducationApp)
+	// refer to src/apaastokenbuilder/apaastokenbuilder.go
+	if request.ServiceApaas.EnableApp {
+		serviceApaasApp := accessTokenBuilder.NewServiceApaas("", "", -1)
+		serviceApaasApp.AddPrivilege(accessTokenBuilder.PrivilegeApaasApp, request.TokenExpireTs)
+		accessToken.AddService(serviceApaasApp)
 	}
 
 	return accessToken.Build()

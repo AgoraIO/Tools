@@ -1,4 +1,4 @@
-package educationtokenbuilder
+package apaastokenbuilder
 
 import (
 	"testing"

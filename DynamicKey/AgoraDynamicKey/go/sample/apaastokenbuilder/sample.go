@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	educationtokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/educationtokenbuilder"
+	apaastokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/apaastokenbuilder"
 )
 
 func main() {
@@ -25,24 +25,24 @@ func main() {
 		return
 	}
 
-	result, err := educationtokenbuilder.BuildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
+	result, err := apaastokenbuilder.BuildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("Education room user token: %s\n", result)
+		fmt.Printf("Apaas room user token: %s\n", result)
 	}
 
-	result, err = educationtokenbuilder.BuildUserToken(appId, appCertificate, userUuid, expire)
+	result, err = apaastokenbuilder.BuildUserToken(appId, appCertificate, userUuid, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("Education user token: %s\n", result)
+		fmt.Printf("Apaas user token: %s\n", result)
 	}
 
-	result, err = educationtokenbuilder.BuildAppToken(appId, appCertificate, expire)
+	result, err = apaastokenbuilder.BuildAppToken(appId, appCertificate, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("Education app token: %s\n", result)
+		fmt.Printf("Apaas app token: %s\n", result)
 	}
 }

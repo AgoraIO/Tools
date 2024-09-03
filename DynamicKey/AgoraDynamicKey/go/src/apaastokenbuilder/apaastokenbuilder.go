@@ -1,4 +1,4 @@
-package educationtokenbuilder
+package apaastokenbuilder
 
 import (
 	accesstoken2 "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/accesstoken2"
