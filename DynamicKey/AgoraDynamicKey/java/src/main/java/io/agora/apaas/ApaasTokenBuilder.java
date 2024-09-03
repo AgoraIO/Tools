@@ -1,9 +1,9 @@
-package io.agora.education;
+package io.agora.apaas;
 
 import io.agora.media.AccessToken2;
 import io.agora.media.Utils;
 
-public class EducationTokenBuilder2 {
+public class ApaasTokenBuilder {
     /**
      * build user room token
      *
@@ -16,7 +16,7 @@ public class EducationTokenBuilder2 {
      * @param role           The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user room token.
+     * @return The apaas user room token.
      */
     public String buildRoomUserToken(String appId, String appCertificate, String roomUuid, String userUuid, Short role, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -52,7 +52,7 @@ public class EducationTokenBuilder2 {
      * @param userUuid       The user's id, must be unique.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user token.
+     * @return The apaas user token.
      */
     public String buildUserToken(String appId, String appCertificate, String userUuid, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -78,7 +78,7 @@ public class EducationTokenBuilder2 {
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education global token.
+     * @return The apaas global token.
      */
     public String buildAppToken(String appId, String appCertificate, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
