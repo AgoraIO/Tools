@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 from .AccessToken2 import *
 from .utils import *

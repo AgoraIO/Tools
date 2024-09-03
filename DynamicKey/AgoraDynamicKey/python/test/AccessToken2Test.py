@@ -79,13 +79,13 @@ class AccessToken2Test(unittest.TestCase):
         expected = '007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr'
         self.assertEqual(expected, result)
 
-    def test_service_education_room_user(self):
+    def test_service_apaas_room_user(self):
         chat_user_id = get_md5(self.__uid_str)
-        education_service = ServiceEducation(
+        apaas_service = ServiceApaas(
             self.__room_uuid, self.__uid_str, self.__role)
-        education_service.add_privilege(
-            ServiceEducation.kPrivilegeRoomUser, self.__expire)
-        self.__token.add_service(education_service)
+        apaas_service.add_privilege(
+            ServiceApaas.kPrivilegeRoomUser, self.__expire)
+        self.__token.add_service(apaas_service)
 
         rtm_service = ServiceRtm(self.__uid_str)
         rtm_service.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
@@ -101,22 +101,22 @@ class AccessToken2Test(unittest.TestCase):
 
         self.assertEqual(expected, result)
 
-    def test_service_education_user(self):
-        education_service = ServiceEducation(user_uuid=self.__uid_str)
-        education_service.add_privilege(
-            ServiceEducation.kPrivilegeUser, self.__expire)
-        self.__token.add_service(education_service)
+    def test_service_apaas_user(self):
+        apaas_service = ServiceApaas(user_uuid=self.__uid_str)
+        apaas_service.add_privilege(
+            ServiceApaas.kPrivilegeUser, self.__expire)
+        self.__token.add_service(apaas_service)
 
         result = self.__token.build()
 
         expected = '007eJxTYEg4e9Zj9gch+QkfFi1qM7tdkn1G3Kzt6FTJpTpzRQ4brixTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADC7EDMBOYzMHAxGFlYGBmbGBqZG///DwDuNR56'
         self.assertEqual(expected, result)
 
-    def test_service_education_app(self):
-        education_service = ServiceEducation()
-        education_service.add_privilege(
-            ServiceEducation.kPrivilegeApp, self.__expire)
-        self.__token.add_service(education_service)
+    def test_service_apaas_app(self):
+        apaas_service = ServiceApaas()
+        apaas_service.add_privilege(
+            ServiceApaas.kPrivilegeApp, self.__expire)
+        self.__token.add_service(apaas_service)
 
         result = self.__token.build()
 
@@ -139,13 +139,13 @@ class AccessToken2Test(unittest.TestCase):
         chat = ServiceChat(self.__uid_str)
         chat.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
 
-        education = ServiceEducation(user_uuid=self.__uid_str)
-        education.add_privilege(ServiceEducation.kPrivilegeUser, self.__expire)
+        apaas = ServiceApaas(user_uuid=self.__uid_str)
+        apaas.add_privilege(ServiceApaas.kPrivilegeUser, self.__expire)
 
         self.__token.add_service(rtc)
         self.__token.add_service(rtm)
         self.__token.add_service(chat)
-        self.__token.add_service(education)
+        self.__token.add_service(apaas)
 
         result = self.__token.build()
 

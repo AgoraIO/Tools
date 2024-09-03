@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__copyright__ = "Copyright (c) 2014-2022 Agora.io, Inc."
+__copyright__ = "Copyright (c) 2014-2024 Agora.io, Inc."
 
 import sys
 import unittest
@@ -26,14 +26,14 @@ class EducationTokenBuilderTest(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceEducation.kServiceType, parser._AccessToken__service)
+        self.assertIn(ServiceApaas.kServiceType, parser._AccessToken__service)
 
-        parser_service = parser._AccessToken__service[ServiceEducation.kServiceType]
+        parser_service = parser._AccessToken__service[ServiceApaas.kServiceType]
 
-        self.assertEqual(parser_service._ServiceEducation__room_uuid, self.__room_uuid.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__user_uuid, self.__user_id.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__role, self.__role)
-        self.assertIn(ServiceEducation.kPrivilegeRoomUser, parser_service._Service__privileges)
+        self.assertEqual(parser_service._ServiceApaas__room_uuid, self.__room_uuid.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__user_uuid, self.__user_id.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__role, self.__role)
+        self.assertIn(ServiceApaas.kPrivilegeRoomUser, parser_service._Service__privileges)
 
     def test_user_token(self):
         token = EducationTokenBuilder.build_user_token(
@@ -43,13 +43,13 @@ class EducationTokenBuilderTest(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceEducation.kServiceType, parser._AccessToken__service)
+        self.assertIn(ServiceApaas.kServiceType, parser._AccessToken__service)
 
-        parser_service = parser._AccessToken__service[ServiceEducation.kServiceType]
-        self.assertEqual(parser_service._ServiceEducation__room_uuid, ''.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__user_uuid, self.__user_id.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__role, -1)
-        self.assertIn(ServiceEducation.kPrivilegeUser, parser_service._Service__privileges)
+        parser_service = parser._AccessToken__service[ServiceApaas.kServiceType]
+        self.assertEqual(parser_service._ServiceApaas__room_uuid, ''.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__user_uuid, self.__user_id.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__role, -1)
+        self.assertIn(ServiceApaas.kPrivilegeUser, parser_service._Service__privileges)
 
     def test_app_token(self):
         token = EducationTokenBuilder.build_app_token(
@@ -59,10 +59,10 @@ class EducationTokenBuilderTest(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceEducation.kServiceType, parser._AccessToken__service)
+        self.assertIn(ServiceApaas.kServiceType, parser._AccessToken__service)
 
-        parser_service = parser._AccessToken__service[ServiceEducation.kServiceType]
-        self.assertEqual(parser_service._ServiceEducation__room_uuid, ''.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__user_uuid, ''.encode('utf-8'))
-        self.assertEqual(parser_service._ServiceEducation__role, -1)
-        self.assertIn(ServiceEducation.kPrivilegeApp, parser_service._Service__privileges)
+        parser_service = parser._AccessToken__service[ServiceApaas.kServiceType]
+        self.assertEqual(parser_service._ServiceApaas__room_uuid, ''.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__user_uuid, ''.encode('utf-8'))
+        self.assertEqual(parser_service._ServiceApaas__role, -1)
+        self.assertIn(ServiceApaas.kPrivilegeApp, parser_service._Service__privileges)
