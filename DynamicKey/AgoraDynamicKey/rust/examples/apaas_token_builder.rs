@@ -1,4 +1,4 @@
-use agora_token::education_token_builder;
+use agora_token::apaas_token_builder;
 use std::env;
 
 fn main() {
@@ -19,18 +19,18 @@ fn main() {
         return;
     }
 
-    match education_token_builder::build_room_user_token(&app_id, &app_certificate, &room_uuid, &user_uuid, role, expire) {
-        Ok(token) => println!("Education room user token: {}", token),
+    match apaas_token_builder::build_room_user_token(&app_id, &app_certificate, &room_uuid, &user_uuid, role, expire) {
+        Ok(token) => println!("Apaas room user token: {}", token),
         Err(err) => println!("{}", err),
     }
 
-    match education_token_builder::build_user_token(&app_id, &app_certificate, &user_uuid, expire) {
-        Ok(token) => println!("Education user token: {}", token),
+    match apaas_token_builder::build_user_token(&app_id, &app_certificate, &user_uuid, expire) {
+        Ok(token) => println!("Apaas user token: {}", token),
         Err(err) => println!("{}", err),
     }
 
-    match education_token_builder::build_app_token(&app_id, &app_certificate, expire) {
-        Ok(token) => println!("Education app token: {}", token),
+    match apaas_token_builder::build_app_token(&app_id, &app_certificate, expire) {
+        Ok(token) => println!("Apaas app token: {}", token),
         Err(err) => println!("{}", err),
     }
 }

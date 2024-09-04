@@ -19,7 +19,7 @@ class ApaasTokenBuilder:
         :param role: The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The apaas user room token.
+        :return: The user room token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
 
@@ -49,7 +49,7 @@ class ApaasTokenBuilder:
         :param user_uuid: The user's id, must be unique.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The apaas user token.
+        :return: The user token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
         apaas_service = ServiceApaas(user_uuid=user_uuid)
@@ -69,7 +69,7 @@ class ApaasTokenBuilder:
             See Get an App Certificate.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-        :return: The apaas app token.
+        :return: The app token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
         apaas_service = ServiceApaas()

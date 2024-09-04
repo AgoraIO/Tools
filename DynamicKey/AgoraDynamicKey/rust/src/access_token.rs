@@ -14,7 +14,7 @@ pub const SERVICE_TYPE_RTC: u16 = 1;
 pub const SERVICE_TYPE_RTM: u16 = 2;
 pub const SERVICE_TYPE_FPA: u16 = 4;
 pub const SERVICE_TYPE_CHAT: u16 = 5;
-pub const SERVICE_TYPE_EDUCATION: u16 = 7;
+pub const SERVICE_TYPE_APAAS: u16 = 7;
 
 // Rtc
 pub const PRIVILEGE_JOIN_CHANNEL: u16 = 1;
@@ -30,10 +30,10 @@ pub const PRIVILEGE_LOGIN: u16 = 1;
 pub const PRIVILEGE_CHAT_USER: u16 = 1;
 pub const PRIVILEGE_CHAT_APP: u16 = 2;
 
-// Education
-pub const PRIVILEGE_EDUCATION_ROOM_USER: u16 = 1;
-pub const PRIVILEGE_EDUCATION_USER: u16 = 2;
-pub const PRIVILEGE_EDUCATION_APP: u16 = 3;
+// Apaas
+pub const PRIVILEGE_APAAS_ROOM_USER: u16 = 1;
+pub const PRIVILEGE_APAAS_USER: u16 = 2;
+pub const PRIVILEGE_APAAS_APP: u16 = 3;
 
 pub trait IService {
     fn as_any(&self) -> &dyn Any;
@@ -225,23 +225,23 @@ impl IService for ServiceChat {
 }
 
 #[derive(Debug)]
-pub struct ServiceEducation {
+pub struct ServiceApaas {
     pub service: Service,
     room_uuid: String,
     user_uuid: String,
     role: i16,
 }
 
-pub fn new_service_education(room_uuid: &str, user_uuid: &str, role: i16) -> ServiceEducation {
-    ServiceEducation {
-        service: new_service(SERVICE_TYPE_EDUCATION),
+pub fn new_service_apaas(room_uuid: &str, user_uuid: &str, role: i16) -> ServiceApaas {
+    ServiceApaas {
+        service: new_service(SERVICE_TYPE_APAAS),
         room_uuid: room_uuid.to_string(),
         user_uuid: user_uuid.to_string(),
         role,
     }
 }
 
-impl IService for ServiceEducation {
+impl IService for ServiceApaas {
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -321,7 +321,7 @@ impl AccessToken {
         let sign = self.get_sign()?;
 
         // Pack services in definite order
-        let service_types = vec![SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_FPA, SERVICE_TYPE_CHAT, SERVICE_TYPE_EDUCATION];
+        let service_types = vec![SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_FPA, SERVICE_TYPE_CHAT, SERVICE_TYPE_APAAS];
         for service_type in service_types {
             if let Some(service) = self.services.get(&service_type) {
                 service.pack(&mut buf)?;
@@ -397,7 +397,7 @@ impl AccessToken {
             SERVICE_TYPE_RTM => Box::new(new_service_rtm("")),
             SERVICE_TYPE_FPA => Box::new(new_service_fpa()),
             SERVICE_TYPE_CHAT => Box::new(new_service_chat("")),
-            SERVICE_TYPE_EDUCATION => Box::new(new_service_education("", "", -1)),
+            SERVICE_TYPE_APAAS => Box::new(new_service_apaas("", "", -1)),
             _ => panic!("new service failed: unknown service type `{}`", service_type),
         }
     }
