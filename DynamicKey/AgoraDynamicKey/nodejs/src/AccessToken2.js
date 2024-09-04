@@ -4,7 +4,7 @@ const VERSION_LENGTH = 3
 const APP_ID_LENGTH = 32
 
 const getVersion = () => {
-    return "007"
+    return '007'
 }
 
 class Service {
@@ -77,7 +77,7 @@ const kRtmServiceType = 2
 class ServiceRtm extends Service {
     constructor(user_id) {
         super(kRtmServiceType)
-        this.__user_id = user_id || ""
+        this.__user_id = user_id || ''
     }
 
     pack() {
@@ -94,7 +94,6 @@ class ServiceRtm extends Service {
 }
 
 ServiceRtm.kPrivilegeLogin = 1
-
 
 const kFpaServiceType = 4
 
@@ -115,13 +114,12 @@ class ServiceFpa extends Service {
 
 ServiceFpa.kPrivilegeLogin = 1
 
-
 const kChatServiceType = 5
 
 class ServiceChat extends Service {
     constructor(user_id) {
         super(kChatServiceType)
-        this.__user_id = user_id || ""
+        this.__user_id = user_id || ''
     }
 
     pack() {
@@ -140,13 +138,13 @@ class ServiceChat extends Service {
 ServiceChat.kPrivilegeUser = 1
 ServiceChat.kPrivilegeApp = 2
 
-const kEducationServiceType = 7
+const kApaasServiceType = 7
 
-class ServiceEducation extends Service {
+class ServiceApaas extends Service {
     constructor(roomUuid, userUuid, role) {
-        super(kEducationServiceType)
-        this.__room_uuid = roomUuid || ""
-        this.__user_uuid = userUuid || ""
+        super(kApaasServiceType)
+        this.__room_uuid = roomUuid || ''
+        this.__user_uuid = userUuid || ''
         this.__role = role || -1
     }
 
@@ -167,10 +165,9 @@ class ServiceEducation extends Service {
     }
 }
 
-ServiceEducation.PRIVILEGE_ROOM_USER = 1
-ServiceEducation.PRIVILEGE_USER = 2
-ServiceEducation.PRIVILEGE_APP = 3
-
+ServiceApaas.PRIVILEGE_ROOM_USER = 1
+ServiceApaas.PRIVILEGE_USER = 2
+ServiceApaas.PRIVILEGE_APP = 3
 
 class AccessToken2 {
     constructor(appId, appCertificate, issueTs, expire) {
@@ -179,7 +176,7 @@ class AccessToken2 {
         this.issueTs = issueTs || new Date().getTime() / 1000
         this.expire = expire
         // salt ranges in (1, 99999999)
-        this.salt = Math.floor(Math.random() * (99999999)) + 1
+        this.salt = Math.floor(Math.random() * 99999999) + 1
         this.services = {}
     }
 
@@ -190,7 +187,7 @@ class AccessToken2 {
     }
 
     __build_check() {
-        let is_uuid = (data) => {
+        let is_uuid = data => {
             if (data.length !== APP_ID_LENGTH) {
                 return false
             }
@@ -198,7 +195,7 @@ class AccessToken2 {
             return !!buf
         }
 
-        const {appId, appCertificate, services} = this
+        const { appId, appCertificate, services } = this
         if (!is_uuid(appId) || !is_uuid(appCertificate)) {
             return false
         }
@@ -215,15 +212,17 @@ class AccessToken2 {
 
     build() {
         if (!this.__build_check()) {
-            return ""
+            return ''
         }
 
         let signing = this.__signing()
-        let signing_info = new ByteBuf().putString(this.appId)
+        let signing_info = new ByteBuf()
+            .putString(this.appId)
             .putUint32(this.issueTs)
             .putUint32(this.expire)
             .putUint32(this.salt)
-            .putUint16(Object.keys(this.services).length).pack()
+            .putUint16(Object.keys(this.services).length)
+            .pack()
         Object.values(this.services).forEach(service => {
             signing_info = Buffer.concat([signing_info, service.pack()])
         })
@@ -268,8 +267,8 @@ var encodeHMac = function (key, message) {
 
 var ByteBuf = function () {
     var that = {
-        buffer: Buffer.alloc(1024)
-        , position: 0
+        buffer: Buffer.alloc(1024),
+        position: 0
     }
 
     that.buffer.fill(0)
@@ -349,8 +348,8 @@ var ByteBuf = function () {
 
 var ReadByteBuf = function (bytes) {
     var that = {
-        buffer: bytes
-        , position: 0
+        buffer: bytes,
+        position: 0
     }
 
     that.getUint16 = function () {
@@ -375,7 +374,7 @@ var ReadByteBuf = function (bytes) {
         var len = that.getUint16()
 
         var out = Buffer.alloc(len)
-        that.buffer.copy(out, 0, that.position, (that.position + len))
+        that.buffer.copy(out, 0, that.position, that.position + len)
         that.position += len
         return out
     }
@@ -402,13 +401,22 @@ var ReadByteBuf = function (bytes) {
 }
 
 AccessToken2.kServices = {}
+AccessToken2.kServices[kApaasServiceType] = ServiceApaas
+AccessToken2.kServices[kChatServiceType] = ServiceChat
+AccessToken2.kServices[kFpaServiceType] = ServiceFpa
 AccessToken2.kServices[kRtcServiceType] = ServiceRtc
 AccessToken2.kServices[kRtmServiceType] = ServiceRtm
-AccessToken2.kServices[kFpaServiceType] = ServiceFpa
-AccessToken2.kServices[kChatServiceType] = ServiceChat
-AccessToken2.kServices[kEducationServiceType] = ServiceEducation
 
 module.exports = {
-    AccessToken2, ServiceRtc, ServiceRtm, ServiceFpa, ServiceChat, ServiceEducation,
-    kRtcServiceType, kRtmServiceType, kFpaServiceType, kChatServiceType, kEducationServiceType,
+    AccessToken2,
+    kApaasServiceType,
+    kChatServiceType,
+    kFpaServiceType,
+    kRtcServiceType,
+    kRtmServiceType,
+    ServiceApaas,
+    ServiceChat,
+    ServiceFpa,
+    ServiceRtc,
+    ServiceRtm
 }

@@ -1,9 +1,9 @@
 /**
  * run this test with command:
- * nodeunit test/EducationTokenBuilderTest.js
+ * nodeunit test/ApaasTokenBuilderTest.js
  * see https://github.com/caolan/nodeunit
  */
-const EducationTokenBuilder = require('../src/EducationTokenBuilder').EducationTokenBuilder
+const ApaasTokenBuilder = require('../src/ApaasTokenBuilder').ApaasTokenBuilder
 const { AccessToken2, kApaasServiceType } = require('../src/AccessToken2')
 const appId = '970CA35de60c44645bbae8a215061b33'
 const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b'
@@ -14,7 +14,7 @@ const role = 1
 
 exports.BuildRoomUserToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
+    let token = ApaasTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
     accessToken.from_string(token)
     test.equal(appId, accessToken.appId)
     test.equal(expire, accessToken.expire)
@@ -26,7 +26,7 @@ exports.BuildRoomUserToken_Test = function (test) {
 
 exports.BuildUserToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
+    let token = ApaasTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
     accessToken.from_string(token)
 
     test.equal(appId, accessToken.appId)
@@ -37,7 +37,7 @@ exports.BuildUserToken_Test = function (test) {
 
 exports.BuildAppToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire)
+    let token = ApaasTokenBuilder.buildAppToken(appId, appCertificate, expire)
     accessToken.from_string(token)
     test.equal(appId, accessToken.appId)
     test.equal(expire, accessToken.expire)

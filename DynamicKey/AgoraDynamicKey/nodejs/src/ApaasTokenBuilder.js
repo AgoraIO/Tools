@@ -1,11 +1,11 @@
 const md5 = require('md5')
 
-const AccessToken = require('../src/AccessToken2').AccessToken2
-const ServiceApaas = require('../src/AccessToken2').ServiceApaas
-const ServiceChat = require('../src/AccessToken2').ServiceChat
-const ServiceRtm = require('../src/AccessToken2').ServiceRtm
+const AccessToken = require('./AccessToken2').AccessToken2
+const ServiceApaas = require('./AccessToken2').ServiceApaas
+const ServiceChat = require('./AccessToken2').ServiceChat
+const ServiceRtm = require('./AccessToken2').ServiceRtm
 
-class EducationTokenBuilder {
+class ApaasTokenBuilder {
     /**
      * build user room token
      * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
@@ -77,4 +77,4 @@ class EducationTokenBuilder {
     }
 }
 
-module.exports.EducationTokenBuilder = EducationTokenBuilder
+module.exports.ApaasTokenBuilder = ApaasTokenBuilder
