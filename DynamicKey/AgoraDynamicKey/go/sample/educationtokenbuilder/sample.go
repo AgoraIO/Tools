@@ -29,20 +29,20 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("RoomUserToken: %s\n", result)
+		fmt.Printf("Education room user token: %s\n", result)
 	}
 
 	result, err = educationtokenbuilder.BuildUserToken(appId, appCertificate, userUuid, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("UserToken: %s\n", result)
+		fmt.Printf("Education user token: %s\n", result)
 	}
 
 	result, err = educationtokenbuilder.BuildAppToken(appId, appCertificate, expire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("AppToken: %s\n", result)
+		fmt.Printf("Education app token: %s\n", result)
 	}
 }

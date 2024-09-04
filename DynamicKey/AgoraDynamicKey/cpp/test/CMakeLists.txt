@@ -14,6 +14,7 @@ link_libraries(-lgtest -lz -lcrypto)
 add_executable(test.exe
     AccessToken_test.cpp
     AccessToken2_test.cpp
+    ApaasTokenBuilder_test.cpp
     ChatTokenBuilder2_test.cpp
     DynamicKey_test.cpp
     DynamicKey2_test.cpp

@@ -1,6 +1,5 @@
-import { AccessToken2 as AccessToken, ServiceEducation, ServiceRtm, ServiceChat } from '../src/AccessToken2.js'
-import {Md5} from "https://deno.land/std@0.156.0/hash/md5.ts";
-
+import { AccessToken2 as AccessToken, ServiceApaas, ServiceChat, ServiceRtm } from '../src/AccessToken2.js'
+import { Md5 } from 'https://deno.land/std@0.156.0/hash/md5.ts'
 
 class EducationTokenBuilder {
     /**
@@ -11,17 +10,17 @@ class EducationTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param roomUuid          The room's id, must be unique.
      * @param userUuid          The user's id, must be unique.
-     * @param role              The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
+     * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user room token.
+     * @return The user room token.
      */
     static buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire) {
         let accessToken = new AccessToken(appId, appCertificate, 0, expire)
 
         let chatUserId = new Md5().update(userUuid).toString()
-        let eduService = new ServiceEducation(roomUuid, userUuid, role)
-        accessToken.add_service(eduService)
+        let apaasService = new ServiceApaas(roomUuid, userUuid, role)
+        accessToken.add_service(apaasService)
 
         let rtmService = new ServiceRtm(userUuid)
         rtmService.add_privilege(ServiceRtm.kPrivilegeLogin, expire)
@@ -35,7 +34,7 @@ class EducationTokenBuilder {
     }
 
     /**
-     * build user individual token
+     * build user token
      * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
      *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
      * @param appCertificate    Certificate of the application that you registered in
@@ -43,35 +42,35 @@ class EducationTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user token.
+     * @return The user token.
      */
     static buildUserToken(appId, appCertificate, userUuid, expire) {
         let accessToken = new AccessToken(appId, appCertificate, 0, expire)
-        let eduService = new ServiceEducation("", userUuid)
-        eduService.add_privilege(ServiceEducation.PRIVILEGE_USER, expire)
-        accessToken.add_service(eduService)
+        let apaasService = new ServiceApaas('', userUuid)
+        apaasService.add_privilege(ServiceApaas.PRIVILEGE_USER, expire)
+        accessToken.add_service(apaasService)
 
         return accessToken.build()
     }
 
     /**
-     * build app global token
+     * build app token
      * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
      *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education global token.
+     * @return The app token.
      */
     static buildAppToken(appId, appCertificate, expire) {
         let accessToken = new AccessToken(appId, appCertificate, 0, expire)
-        let eduService = new ServiceEducation()
-        eduService.add_privilege(ServiceEducation.PRIVILEGE_APP, expire)
-        accessToken.add_service(eduService)
+        let apaasService = new ServiceApaas()
+        apaasService.add_privilege(ServiceApaas.PRIVILEGE_APP, expire)
+        accessToken.add_service(apaasService)
 
         return accessToken.build()
     }
 }
 
-export {EducationTokenBuilder}
+export { EducationTokenBuilder }

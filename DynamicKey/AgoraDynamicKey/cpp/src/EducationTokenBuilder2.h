@@ -22,21 +22,17 @@ class EducationTokenBuilder2 {
    in the Agora Dashboard. See Get an App Certificate.
    @param room_uuid: The room's id, must be unique.
    @param user_uuid: The user's id, must be unique.
-   @param role: The user's role, such as 0(invisible), 1(teacher), 2(student),
-   3(assistant), 4(observer) etc.
+   @param role: The user's role.
    @param expire: represented by the number of seconds elapsed since now. If,
    for example, you want to access the Agora Service within 10 minutes after
    the token is generated, set expireTimestamp as 600(seconds).
-   @return: The education user room token.
+   @return: The user room token.
    */
-  static std::string BuildRoomUserToken(const std::string& app_id,
-                                        const std::string& app_certificate,
-                                        const std::string& room_uuid,
-                                        const std::string& user_uuid,
-                                        int16_t role, uint32_t expire);
+  static std::string BuildRoomUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& room_uuid,
+                                        const std::string& user_uuid, int16_t role, uint32_t expire);
 
   /*
-  Build user individual token
+  Build user token
   @param app_id: The App ID issued to you by Agora. Apply for a new App ID
   from Agora Dashboard if it is missing from your kit. See Get an App ID.
   @param app_certificate: Certificate of the application that you registered
@@ -45,15 +41,12 @@ class EducationTokenBuilder2 {
   @param expire: represented by the number of seconds elapsed since now. If,
   for example, you want to access the Agora Service within 10 minutes after
   the token is generated, set expireTimestamp as 600(seconds).
-  @return: The education user token.
+  @return: The user token.
    */
-  static std::string BuildUserToken(const std::string& app_id,
-                                    const std::string& app_certificate,
-                                    const std::string& user_uuid,
-                                    uint32_t expire);
+  static std::string BuildUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_uuid, uint32_t expire);
 
   /*
-  Build app global token
+  Build app token
   @param app_id: The App ID issued to you by Agora. Apply for a new App ID from
   Agora Dashboard if it is missing from your kit. See Get an App ID.
   @param app_certificate: Certificate of the application that you registered in
@@ -61,26 +54,21 @@ class EducationTokenBuilder2 {
   @param expire: represented by the number of seconds elapsed since now. If,
   for example, you want to access the Agora Service within 10 minutes after the
   token is generated, set expireTimestamp as 600(seconds).
-  @return: The App token.
+  @return: The app token.
    */
-  static std::string BuildAppToken(const std::string& app_id,
-                                   const std::string& app_certificate,
-                                   uint32_t expire);
+  static std::string BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire);
 };
 
-inline std::string EducationTokenBuilder2::BuildRoomUserToken(
-    const std::string& app_id, const std::string& app_certificate,
-    const std::string& room_uuid, const std::string& user_uuid, int16_t role,
-    uint32_t expire) {
+inline std::string EducationTokenBuilder2::BuildRoomUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& room_uuid,
+                                                              const std::string& user_uuid, int16_t role, uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
   MD5 h{user_uuid};
   std::string char_user_id = h.toStr();
 
-  std::unique_ptr<Service> education_service(
-      new ServiceEducation(room_uuid, user_uuid, role));
-  education_service->AddPrivilege(ServiceEducation::kPrivilegeRoomUser, expire);
-  token.AddService(std::move(education_service));
+  std::unique_ptr<Service> apaas_service(new ServiceApaas(room_uuid, user_uuid, role));
+  apaas_service->AddPrivilege(ServiceApaas::kPrivilegeRoomUser, expire);
+  token.AddService(std::move(apaas_service));
 
   std::unique_ptr<Service> rtm_service(new ServiceRtm(user_uuid));
   rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire);
@@ -93,27 +81,23 @@ inline std::string EducationTokenBuilder2::BuildRoomUserToken(
   return token.Build();
 }
 
-inline std::string EducationTokenBuilder2::BuildUserToken(
-    const std::string& app_id, const std::string& app_certificate,
-    const std::string& user_uuid, uint32_t expire) {
+inline std::string EducationTokenBuilder2::BuildUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_uuid,
+                                                          uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
-  std::unique_ptr<Service> education_service(
-      new ServiceEducation("", user_uuid));
-  education_service->AddPrivilege(ServiceEducation::kPrivilegeUser, expire);
-  token.AddService(std::move(education_service));
+  std::unique_ptr<Service> apaas_service(new ServiceApaas("", user_uuid));
+  apaas_service->AddPrivilege(ServiceApaas::kPrivilegeUser, expire);
+  token.AddService(std::move(apaas_service));
 
   return token.Build();
 }
 
-inline std::string EducationTokenBuilder2::BuildAppToken(
-    const std::string& app_id, const std::string& app_certificate,
-    uint32_t expire) {
+inline std::string EducationTokenBuilder2::BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
-  std::unique_ptr<Service> education_service(new ServiceEducation());
-  education_service->AddPrivilege(ServiceEducation::kPrivilegeApp, expire);
-  token.AddService(std::move(education_service));
+  std::unique_ptr<Service> apaas_service(new ServiceApaas());
+  apaas_service->AddPrivilege(ServiceApaas::kPrivilegeApp, expire);
+  token.AddService(std::move(apaas_service));
 
   return token.Build();
 }

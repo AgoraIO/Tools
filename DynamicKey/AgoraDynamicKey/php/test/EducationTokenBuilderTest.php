@@ -27,10 +27,10 @@ class EducationTokenBuilderTest
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->roomUuid, $accessToken->services[ServiceEducation::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual($this->userUuid, $accessToken->services[ServiceEducation::SERVICE_TYPE]->userUuid);
-        Util::assertEqual($this->role, $accessToken->services[ServiceEducation::SERVICE_TYPE]->role);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceEducation::SERVICE_TYPE]->privileges[ServiceEducation::PRIVILEGE_ROOM_USER]);
+        Util::assertEqual($this->roomUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
+        Util::assertEqual($this->userUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
+        Util::assertEqual($this->role, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_ROOM_USER]);
     }
 
     public function test_buildUserToken()
@@ -41,10 +41,10 @@ class EducationTokenBuilderTest
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->userUuid, $accessToken->services[ServiceEducation::SERVICE_TYPE]->userUuid);
-        Util::assertEqual("", $accessToken->services[ServiceEducation::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual(-1, $accessToken->services[ServiceEducation::SERVICE_TYPE]->role);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceEducation::SERVICE_TYPE]->privileges[ServiceEducation::PRIVILEGE_USER]);
+        Util::assertEqual($this->userUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
+        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
+        Util::assertEqual(-1, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_USER]);
     }
 
     public function test_buildAppToken()
@@ -55,11 +55,11 @@ class EducationTokenBuilderTest
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceEducation::SERVICE_TYPE]->privileges[ServiceEducation::PRIVILEGE_APP]);
+        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_APP]);
 
-        Util::assertEqual("", $accessToken->services[ServiceEducation::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual("", $accessToken->services[ServiceEducation::SERVICE_TYPE]->userUuid);
-        Util::assertEqual(-1, $accessToken->services[ServiceEducation::SERVICE_TYPE]->role);
+        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
+        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
+        Util::assertEqual(-1, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
     }
 }
 

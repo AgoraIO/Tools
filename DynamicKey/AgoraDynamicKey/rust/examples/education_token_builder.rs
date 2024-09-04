@@ -20,17 +20,17 @@ fn main() {
     }
 
     match education_token_builder::build_room_user_token(&app_id, &app_certificate, &room_uuid, &user_uuid, role, expire) {
-        Ok(token) => println!("RoomUserToken: {}", token),
+        Ok(token) => println!("Education room user token: {}", token),
         Err(err) => println!("{}", err),
     }
 
     match education_token_builder::build_user_token(&app_id, &app_certificate, &user_uuid, expire) {
-        Ok(token) => println!("UserToken: {}", token),
+        Ok(token) => println!("Education user token: {}", token),
         Err(err) => println!("{}", err),
     }
 
     match education_token_builder::build_app_token(&app_id, &app_certificate, expire) {
-        Ok(token) => println!("AppToken: {}", token),
+        Ok(token) => println!("Education app token: {}", token),
         Err(err) => println!("{}", err),
     }
 }

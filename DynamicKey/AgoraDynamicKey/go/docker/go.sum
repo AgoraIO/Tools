@@ -1,5 +1,7 @@
 github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src v0.0.0-20230508070600-7420f20fe20a h1:jICcLe0guGRsUBZTxQRiJFQ+j+cNryQAjKdPUG6D/NY=
 github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src v0.0.0-20230508070600-7420f20fe20a/go.mod h1:4bXIK0ntDk9CqAXobmomWd7dedbfNv/aaIpmpqqzt+A=
+github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src v0.0.0-20240903123926-cb33eb535564 h1:fZsZbQmuZl3CyKSXWl2cuutZ3MMSpM6F4ywR4eK9vYE=
+github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src v0.0.0-20240903123926-cb33eb535564/go.mod h1:4bXIK0ntDk9CqAXobmomWd7dedbfNv/aaIpmpqqzt+A=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.8.0 h1:ea0Xadu+sHlu7x5O3gKhRpQ1IKiMrSiHttPF0ybECuA=
 github.com/bytedance/sonic v1.8.0/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=

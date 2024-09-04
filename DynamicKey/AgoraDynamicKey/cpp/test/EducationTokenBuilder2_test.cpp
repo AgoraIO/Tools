@@ -28,8 +28,7 @@ class EducationTokenBuilder2_test : public testing::Test {
   }
 
   void TestRoomUserToken() {
-    std::string token_str = EducationTokenBuilder2::BuildRoomUserToken(
-        app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
+    std::string token_str = EducationTokenBuilder2::BuildRoomUserToken(app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -37,41 +36,34 @@ class EducationTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(expire_, token.expire_);
 
     ASSERT_EQ(3, token.services_.size());
-    ASSERT_TRUE(token.services_.count(ServiceEducation::kServiceType));
+    ASSERT_TRUE(token.services_.count(ServiceApaas::kServiceType));
     ASSERT_TRUE(token.services_.count(ServiceRtm::kServiceType));
     ASSERT_TRUE(token.services_.count(ServiceChat::kServiceType));
 
-    const auto &education_service = dynamic_cast<const ServiceEducation &>(
-        *token.services_[ServiceEducation::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
 
-    EXPECT_EQ(room_uuid_, education_service.room_uuid_);
-    EXPECT_EQ(user_id_, education_service.user_uuid_);
-    EXPECT_EQ(role_, education_service.role_);
-    ASSERT_EQ(1, education_service.privileges_.size());
-    ASSERT_TRUE(education_service.privileges_.count(
-        ServiceEducation::kPrivilegeRoomUser));
-    EXPECT_EQ(expire_, education_service.privileges_.at(
-                           ServiceEducation::kPrivilegeRoomUser));
+    EXPECT_EQ(room_uuid_, apaas_service.room_uuid_);
+    EXPECT_EQ(user_id_, apaas_service.user_uuid_);
+    EXPECT_EQ(role_, apaas_service.role_);
+    ASSERT_EQ(1, apaas_service.privileges_.size());
+    ASSERT_TRUE(apaas_service.privileges_.count(ServiceApaas::kPrivilegeRoomUser));
+    EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeRoomUser));
 
-    const auto &rtm_service = dynamic_cast<const ServiceRtm &>(
-        *token.services_[ServiceRtm::kServiceType]);
+    const auto &rtm_service = dynamic_cast<const ServiceRtm &>(*token.services_[ServiceRtm::kServiceType]);
     EXPECT_EQ(user_id_, rtm_service.user_id_);
     ASSERT_EQ(1, rtm_service.privileges_.size());
     ASSERT_TRUE(rtm_service.privileges_.count(ServiceRtm::kPrivilegeLogin));
     EXPECT_EQ(expire_, rtm_service.privileges_.at(ServiceRtm::kPrivilegeLogin));
 
-    const auto &chat_service = dynamic_cast<const ServiceChat &>(
-        *token.services_[ServiceChat::kServiceType]);
+    const auto &chat_service = dynamic_cast<const ServiceChat &>(*token.services_[ServiceChat::kServiceType]);
     EXPECT_EQ(chat_user_id_, chat_service.user_id_);
     ASSERT_EQ(1, chat_service.privileges_.size());
     ASSERT_TRUE(chat_service.privileges_.count(ServiceChat::kPrivilegeUser));
-    EXPECT_EQ(expire_,
-              chat_service.privileges_.at(ServiceChat::kPrivilegeUser));
+    EXPECT_EQ(expire_, chat_service.privileges_.at(ServiceChat::kPrivilegeUser));
   }
 
   void TestUserToken() {
-    std::string token_str = EducationTokenBuilder2::BuildUserToken(
-        app_id_, app_cert_, user_id_, expire_);
+    std::string token_str = EducationTokenBuilder2::BuildUserToken(app_id_, app_cert_, user_id_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -79,24 +71,20 @@ class EducationTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(expire_, token.expire_);
 
     ASSERT_EQ(1, token.services_.size());
-    ASSERT_TRUE(token.services_.count(ServiceEducation::kServiceType));
+    ASSERT_TRUE(token.services_.count(ServiceApaas::kServiceType));
 
-    const auto &education_service = dynamic_cast<const ServiceEducation &>(
-        *token.services_[ServiceEducation::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
 
-    EXPECT_EQ("", education_service.room_uuid_);
-    EXPECT_EQ(user_id_, education_service.user_uuid_);
-    EXPECT_EQ(-1, education_service.role_);
-    ASSERT_EQ(1, education_service.privileges_.size());
-    ASSERT_TRUE(
-        education_service.privileges_.count(ServiceEducation::kPrivilegeUser));
-    EXPECT_EQ(expire_, education_service.privileges_.at(
-                           ServiceEducation::kPrivilegeUser));
+    EXPECT_EQ("", apaas_service.room_uuid_);
+    EXPECT_EQ(user_id_, apaas_service.user_uuid_);
+    EXPECT_EQ(-1, apaas_service.role_);
+    ASSERT_EQ(1, apaas_service.privileges_.size());
+    ASSERT_TRUE(apaas_service.privileges_.count(ServiceApaas::kPrivilegeUser));
+    EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeUser));
   }
 
   void TestAppToken() {
-    std::string token_str =
-        EducationTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
+    std::string token_str = EducationTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -104,19 +92,16 @@ class EducationTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(expire_, token.expire_);
 
     ASSERT_EQ(1, token.services_.size());
-    ASSERT_TRUE(token.services_.count(ServiceEducation::kServiceType));
+    ASSERT_TRUE(token.services_.count(ServiceApaas::kServiceType));
 
-    const auto &education_service = dynamic_cast<const ServiceEducation &>(
-        *token.services_[ServiceEducation::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
 
-    EXPECT_EQ("", education_service.room_uuid_);
-    EXPECT_EQ("", education_service.user_uuid_);
-    EXPECT_EQ(-1, education_service.role_);
-    ASSERT_EQ(1, education_service.privileges_.size());
-    ASSERT_TRUE(
-        education_service.privileges_.count(ServiceEducation::kPrivilegeApp));
-    EXPECT_EQ(expire_, education_service.privileges_.at(
-                           ServiceEducation::kPrivilegeApp));
+    EXPECT_EQ("", apaas_service.room_uuid_);
+    EXPECT_EQ("", apaas_service.user_uuid_);
+    EXPECT_EQ(-1, apaas_service.role_);
+    ASSERT_EQ(1, apaas_service.privileges_.size());
+    ASSERT_TRUE(apaas_service.privileges_.count(ServiceApaas::kPrivilegeApp));
+    EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeApp));
   }
 
  private:

@@ -1,8 +1,9 @@
 module.exports = {
-  RtcTokenBuilder: require('./src/RtcTokenBuilder2').RtcTokenBuilder,
-  RtcRole: require('./src/RtcTokenBuilder2').Role,
-  RtmTokenBuilder: require('./src/RtmTokenBuilder2').RtmTokenBuilder,
-  EducationTokenBuilder: require('./src/EducationTokenBuilder').EducationTokenBuilder,
-  FpaTokenBuilder: require('./src/FpaTokenBuilder').FpaTokenBuilder,
-  ChatTokenBuilder: require('./src/ChatTokenBuilder').ChatTokenBuilder
-};
+    ApaasTokenBuilder: require('./src/ApaasTokenBuilder').ApaasTokenBuilder,
+    ChatTokenBuilder: require('./src/ChatTokenBuilder').ChatTokenBuilder,
+    EducationTokenBuilder: require('./src/EducationTokenBuilder').EducationTokenBuilder,
+    FpaTokenBuilder: require('./src/FpaTokenBuilder').FpaTokenBuilder,
+    RtcRole: require('./src/RtcTokenBuilder2').Role,
+    RtcTokenBuilder: require('./src/RtcTokenBuilder2').RtcTokenBuilder,
+    RtmTokenBuilder: require('./src/RtmTokenBuilder2').RtmTokenBuilder
+}

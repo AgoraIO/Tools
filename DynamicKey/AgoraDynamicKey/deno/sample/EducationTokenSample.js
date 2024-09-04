@@ -1,32 +1,27 @@
-/**
- * run this test with command:
- * nodeunit test/RtcTokenBuilder2Test.js
- * see https://github.com/caolan/nodeunit
- */
-import { EducationTokenBuilder } from "../src/EducationTokenBuilder.js";
+import { EducationTokenBuilder } from '../src/EducationTokenBuilder.js'
 
 // Need to set environment variable AGORA_APP_ID
-const appId = Deno.env.get("AGORA_APP_ID");
+const appId = Deno.env.get('AGORA_APP_ID')
 // Need to set environment variable AGORA_APP_CERTIFICATE
-const appCertificate = Deno.env.get("AGORA_APP_CERTIFICATE");
+const appCertificate = Deno.env.get('AGORA_APP_CERTIFICATE')
 
-const expire = 600;
-const roomUuid = "123";
-const userUuid = "2882341273";
-const role = 1;
+const expire = 600
+const roomUuid = '123'
+const userUuid = '2882341273'
+const role = 1
 
-console.log("App Id:", appId);
-console.log("App Certificate:", appCertificate);
-if (appId == undefined || appId == "" || appCertificate == undefined || appCertificate == "") {
-    console.log("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE");
-    Deno.exit(1);
+console.log('App Id:', appId)
+console.log('App Certificate:', appCertificate)
+if (appId == undefined || appId == '' || appCertificate == undefined || appCertificate == '') {
+    console.log('Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE')
+    Deno.exit(1)
 }
 
-const tokenRoomUserToken = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire);
-console.log("Build room user token:", tokenRoomUserToken);
+const tokenRoomUserToken = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
+console.log('Education room user token:', tokenRoomUserToken)
 
-const tokenUserToken = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire);
-console.log("Build user token:", tokenUserToken);
+const tokenUserToken = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
+console.log('Education user token:', tokenUserToken)
 
-const tokenAppToken = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire);
-console.log("Build app token:", tokenAppToken);
+const tokenAppToken = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire)
+console.log('Education app token:', tokenAppToken)

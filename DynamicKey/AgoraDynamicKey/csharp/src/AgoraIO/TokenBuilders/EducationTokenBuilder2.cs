@@ -13,10 +13,10 @@ namespace AgoraIO.Media
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param roomUuid       The room's id, must be unique.
          * @param userUuid       The user's id, must be unique.
-         * @param role           The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
+         * @param role           The user's role.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education user room token.
+         * @return The user room token.
          */
         public static string buildRoomUserToken(string appId, string appCertificate, string roomUuid, string userUuid, short role, uint expire)
         {
@@ -25,9 +25,9 @@ namespace AgoraIO.Media
             var md5 = MD5.Create();
             string chatUserId = md5.ComputeHash(userUuid.getBytes()).ToString();
 
-            AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation(roomUuid, userUuid, role);
-            serviceEducation.addPrivilegeEducation(AccessToken2.PrivilegeEducationEnum.PRIVILEGE_ROOM_USER, expire);
-            accessToken.addService(serviceEducation);
+            AccessToken2.Service serviceApaas = new AccessToken2.ServiceApaas(roomUuid, userUuid, role);
+            serviceApaas.addPrivilegeApaas(AccessToken2.PrivilegeApaasEnum.PRIVILEGE_ROOM_USER, expire);
+            accessToken.addService(serviceApaas);
 
             AccessToken2.Service serviceRtm = new AccessToken2.ServiceRtm(userUuid);
             serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtmEnum.PRIVILEGE_LOGIN, expire);
@@ -41,7 +41,7 @@ namespace AgoraIO.Media
         }
 
         /**
-         * build user individual token
+         * build user token
          *
          * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
          *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -50,21 +50,21 @@ namespace AgoraIO.Media
          * @param userUuid       The user's id, must be unique.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education user token.
+         * @return The user token.
          */
         public static string buildUserToken(string appId, string appCertificate, string userUuid, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
-            AccessToken2.Service service = new AccessToken2.ServiceEducation(userUuid);
+            AccessToken2.Service service = new AccessToken2.ServiceApaas(userUuid);
 
-            service.addPrivilegeEducation(AccessToken2.PrivilegeEducationEnum.PRIVILEGE_USER, expire);
+            service.addPrivilegeApaas(AccessToken2.PrivilegeApaasEnum.PRIVILEGE_USER, expire);
             accessToken.addService(service);
 
             return accessToken.build();
         }
 
         /**
-         * build app global token
+         * build app token
          *
          * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
          *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -72,15 +72,15 @@ namespace AgoraIO.Media
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education global token.
+         * @return The app token.
          */
         public static string buildAppToken(string appId, string appCertificate, uint expire)
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
-            AccessToken2.Service serviceEducation = new AccessToken2.ServiceEducation();
+            AccessToken2.Service serviceApaas = new AccessToken2.ServiceApaas();
 
-            serviceEducation.addPrivilegeEducation(AccessToken2.PrivilegeEducationEnum.PRIVILEGE_APP, expire);
-            accessToken.addService(serviceEducation);
+            serviceApaas.addPrivilegeApaas(AccessToken2.PrivilegeApaasEnum.PRIVILEGE_APP, expire);
+            accessToken.addService(serviceApaas);
 
             return accessToken.build();
         }

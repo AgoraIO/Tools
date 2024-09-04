@@ -16,11 +16,11 @@ const (
 	VersionLength = 3
 
 	// Service type
-	ServiceTypeRtc       = 1
-	ServiceTypeRtm       = 2
-	ServiceTypeFpa       = 4
-	ServiceTypeChat      = 5
-	ServiceTypeEducation = 7
+	ServiceTypeRtc   = 1
+	ServiceTypeRtm   = 2
+	ServiceTypeFpa   = 4
+	ServiceTypeChat  = 5
+	ServiceTypeApaas = 7
 
 	// Rtc
 	PrivilegeJoinChannel        = 1
@@ -36,10 +36,10 @@ const (
 	PrivilegeChatUser = 1
 	PrivilegeChatApp  = 2
 
-	// Education
-	PrivilegeEducationRoomUser = 1
-	PrivilegeEducationUser     = 2
-	PrivilegeEducationApp      = 3
+	// Apaas
+	PrivilegeApaasRoomUser = 1
+	PrivilegeApaasUser     = 2
+	PrivilegeApaasApp      = 3
 )
 
 type IService interface {
@@ -203,43 +203,43 @@ func (serviceChat *ServiceChat) UnPack(r io.Reader) (err error) {
 	return
 }
 
-type ServiceEducation struct {
+type ServiceApaas struct {
 	*Service
 	RoomUuid string
 	UserUuid string
 	Role     int16
 }
 
-func NewServiceEducation(roomUuid string, userUuid string, role int16) (serviceEducation *ServiceEducation) {
-	serviceEducation = &ServiceEducation{Service: NewService(ServiceTypeEducation), RoomUuid: roomUuid, UserUuid: userUuid, Role: role}
+func NewServiceApaas(roomUuid string, userUuid string, role int16) (serviceApaas *ServiceApaas) {
+	serviceApaas = &ServiceApaas{Service: NewService(ServiceTypeApaas), RoomUuid: roomUuid, UserUuid: userUuid, Role: role}
 	return
 }
 
-func (serviceEducation *ServiceEducation) Pack(w io.Writer) (err error) {
-	err = serviceEducation.Service.Pack(w)
+func (serviceApaas *ServiceApaas) Pack(w io.Writer) (err error) {
+	err = serviceApaas.Service.Pack(w)
 	if err != nil {
 		return
 	}
-	err = packString(w, serviceEducation.RoomUuid)
+	err = packString(w, serviceApaas.RoomUuid)
 	if err != nil {
 		return
 	}
-	err = packString(w, serviceEducation.UserUuid)
+	err = packString(w, serviceApaas.UserUuid)
 	if err != nil {
 		return
 	}
-	err = packInt16(w, serviceEducation.Role)
+	err = packInt16(w, serviceApaas.Role)
 	return
 }
 
-func (serviceEducation *ServiceEducation) UnPack(r io.Reader) (err error) {
-	err = serviceEducation.Service.UnPack(r)
+func (serviceApaas *ServiceApaas) UnPack(r io.Reader) (err error) {
+	err = serviceApaas.Service.UnPack(r)
 	if err != nil {
 		return
 	}
-	serviceEducation.RoomUuid, err = unPackString(r)
-	serviceEducation.UserUuid, err = unPackString(r)
-	serviceEducation.Role, err = unPackInt16(r)
+	serviceApaas.RoomUuid, err = unPackString(r)
+	serviceApaas.UserUuid, err = unPackString(r)
+	serviceApaas.Role, err = unPackInt16(r)
 	return
 }
 
@@ -300,7 +300,7 @@ func (accessToken *AccessToken) Build() (res string, err error) {
 	}
 
 	// Pack services in definite order
-	serviceTypes := []uint16{ServiceTypeRtc, ServiceTypeRtm, ServiceTypeFpa, ServiceTypeChat, ServiceTypeEducation}
+	serviceTypes := []uint16{ServiceTypeRtc, ServiceTypeRtm, ServiceTypeFpa, ServiceTypeChat, ServiceTypeApaas}
 	for _, serviceType := range serviceTypes {
 		if service, ok := accessToken.Services[serviceType]; ok {
 			err = service.Pack(buf)
@@ -404,8 +404,8 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 		service = NewServiceFpa()
 	case ServiceTypeChat:
 		service = NewServiceChat("")
-	case ServiceTypeEducation:
-		service = NewServiceEducation("", "", -1)
+	case ServiceTypeApaas:
+		service = NewServiceApaas("", "", -1)
 	default:
 		panic(fmt.Sprintf("new service failed: unknown service type `%v`", serviceType))
 	}

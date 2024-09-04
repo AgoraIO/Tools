@@ -402,5 +402,29 @@ namespace AgoraIO.Tests
             Output.WriteLine($"token : {token}");
             return token;
         }
+
+        [Fact]
+        public string ApaasToken_buildRoomUserToken()
+        {
+            string token = ApaasTokenBuilder.buildRoomUserToken(appId, appCertificate, roomId, userId, 1, expire);
+            Output.WriteLine($"token : {token}");
+            return token;
+        }
+
+        [Fact]
+        public string ApaasToken_buildUserToken()
+        {
+            string token = ApaasTokenBuilder.buildUserToken(appId, appCertificate, userId, expire);
+            Output.WriteLine($"token : {token}");
+            return token;
+        }
+
+        [Fact]
+        public string ApaasToken_buildAppToken()
+        {
+            string token = ApaasTokenBuilder.buildAppToken(appId, appCertificate, expire);
+            Output.WriteLine($"token : {token}");
+            return token;
+        }
     }
 }

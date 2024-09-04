@@ -38,7 +38,7 @@ namespace AgoraIO.Media
         public static short SERVICE_TYPE_RTM = 2;
         public static short SERVICE_TYPE_FPA = 4;
         public static short SERVICE_TYPE_CHAT = 5;
-        public static short SERVICE_TYPE_EDUCATION = 7;
+        public static short SERVICE_TYPE_APAAS = 7;
 
         public Service getService(short serviceType)
         {
@@ -58,9 +58,9 @@ namespace AgoraIO.Media
             {
                 return new ServiceChat();
             }
-            if (serviceType == SERVICE_TYPE_EDUCATION)
+            if (serviceType == SERVICE_TYPE_APAAS)
             {
-                return new ServiceEducation();
+                return new ServiceApaas();
             }
             throw new ArgumentException("unknown service type:", serviceType.ToString());
         }
@@ -160,7 +160,7 @@ namespace AgoraIO.Media
             PRIVILEGE_CHAT_USER = 1,
             PRIVILEGE_CHAT_APP = 2
         }
-        public enum PrivilegeEducationEnum
+        public enum PrivilegeApaasEnum
         {
             PRIVILEGE_ROOM_USER = 1,
             PRIVILEGE_USER = 2,
@@ -202,7 +202,7 @@ namespace AgoraIO.Media
                 _privileges.Add((ushort)privilege, expire);
             }
 
-            public void addPrivilegeEducation(PrivilegeEducationEnum privilege, uint expire)
+            public void addPrivilegeApaas(PrivilegeApaasEnum privilege, uint expire)
             {
                 _privileges.Add((ushort)privilege, expire);
             }
@@ -356,31 +356,31 @@ namespace AgoraIO.Media
             }
         }
 
-        public class ServiceEducation : Service
+        public class ServiceApaas : Service
         {
             public string _roomUuid;
             public string _userUuid;
             public short _role;
 
-            public ServiceEducation()
+            public ServiceApaas()
             {
-                setServiceType(SERVICE_TYPE_EDUCATION);
+                setServiceType(SERVICE_TYPE_APAAS);
                 _roomUuid = "";
                 _userUuid = "";
                 _role = -1;
             }
 
-            public ServiceEducation(string roomUuid, string userUuid, short role)
+            public ServiceApaas(string roomUuid, string userUuid, short role)
             {
-                setServiceType(SERVICE_TYPE_EDUCATION);
+                setServiceType(SERVICE_TYPE_APAAS);
                 _roomUuid = roomUuid;
                 _userUuid = userUuid;
                 _role = role;
             }
 
-            public ServiceEducation(string userUuid)
+            public ServiceApaas(string userUuid)
             {
-                setServiceType(SERVICE_TYPE_EDUCATION);
+                setServiceType(SERVICE_TYPE_APAAS);
                 _roomUuid = "";
                 _userUuid = userUuid;
                 _role = -1;

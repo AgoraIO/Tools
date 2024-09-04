@@ -1,3 +1,157 @@
+export namespace ApaasTokenBuilder {
+    /**
+     * build user room token
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate    Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param roomUuid          The room's id, must be unique.
+     * @param userUuid          The user's id, must be unique.
+     * @param role              The user's role.
+     * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The user room token.
+     */
+    export function buildRoomUserToken(
+        appId: string,
+        appCertificate: string,
+        roomUuid: string,
+        userUuid: string | number,
+        role: number,
+        expire: number
+    ): string
+
+    /**
+     * build user token
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate    Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param userUuid          The user's id, must be unique.
+     * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The user token.
+     */
+    export function buildUserToken(
+        appId: string,
+        appCertificate: string,
+        userUuid: string | number,
+        expire: number
+    ): string
+
+    /**
+     * build app token
+     * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
+     *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     *                       the Agora Dashboard. See Get an App Certificate.
+     * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The app token.
+     */
+    export function buildAppToken(appId: string, appCertificate: string, expire: number): string
+}
+
+export namespace ChatTokenBuilder {
+    /**
+     * Build the Chat user token.
+     *
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @param userUuid The user's id, must be unique.
+     * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
+     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The chat user token.
+     */
+    export function buildUserToken(
+        appId: string,
+        appCertificate: string,
+        userId: string | number,
+        expire: number
+    ): string
+
+    /**
+     * Build the Chat App token.
+     *
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
+     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The chat App token.
+     */
+    export function buildAppToken(appId: string, appCertificate: string, expire: number): string
+}
+
+export namespace EducationTokenBuilder {
+    /**
+     * build user room token
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate    Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param roomUuid          The room's id, must be unique.
+     * @param userUuid          The user's id, must be unique.
+     * @param role              The user's role.
+     * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The user room token.
+     */
+    export function buildRoomUserToken(
+        appId: string,
+        appCertificate: string,
+        roomUuid: string,
+        userUuid: string | number,
+        role: number,
+        expire: number
+    ): string
+
+    /**
+     * build user token
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate    Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param userUuid          The user's id, must be unique.
+     * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The user token.
+     */
+    export function buildUserToken(
+        appId: string,
+        appCertificate: string,
+        userUuid: string | number,
+        expire: number
+    ): string
+
+    /**
+     * build app token
+     * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
+     *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     *                       the Agora Dashboard. See Get an App Certificate.
+     * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
+     *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * @return The app token.
+     */
+    export function buildAppToken(appId: string, appCertificate: string, expire: number): string
+}
+
+export namespace FpaTokenBuilder {
+    /**
+     * Build the FPA token.
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @return The FPA token.
+     */
+    export function buildToken(appId: string, appCertificate: string): string
+}
+
 export namespace RtcRole {
     export const PUBLISHER: number
     export const SUBSCRIBER: number
@@ -57,6 +211,10 @@ export namespace RtcTokenBuilder {
     ): string
 }
 
+export namespace RtmRole {
+    export const Rtm_User: number
+}
+
 export namespace RtmTokenBuilder {
     /**
      * @param {*} appID: The App ID issued to you by Agora. Apply for a new App ID from
@@ -79,10 +237,6 @@ export namespace RtmTokenBuilder {
         role: number,
         privilegeExpiredTs: number
     ): string
-}
-
-export namespace RtmRole {
-    export const Rtm_User: number
 }
 
 export namespace RtmTokenBuilder {

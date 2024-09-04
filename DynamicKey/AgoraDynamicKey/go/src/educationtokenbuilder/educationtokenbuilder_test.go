@@ -24,12 +24,12 @@ func Test_BuildRoomUserToken(t *testing.T) {
 
 	accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
-	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeEducation] != nil)
-	accesstoken.AssertEqual(t, DataMockRoomUuid, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).RoomUuid)
-	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).UserUuid)
-	accesstoken.AssertEqual(t, DataMockRole, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Role)
+	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeApaas] != nil)
+	accesstoken.AssertEqual(t, DataMockRoomUuid, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).RoomUuid)
+	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).UserUuid)
+	accesstoken.AssertEqual(t, DataMockRole, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Role)
 
-	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Privileges[accesstoken.PrivilegeEducationRoomUser])
+	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Privileges[accesstoken.PrivilegeApaasRoomUser])
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeRtm].(*accesstoken.ServiceRtm).Privileges[accesstoken.PrivilegeLogin])
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeChat].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatUser])
 }
@@ -43,13 +43,13 @@ func Test_BuildUserToken(t *testing.T) {
 
 	accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
-	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeEducation] != nil)
+	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeApaas] != nil)
 
-	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).UserUuid)
-	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).RoomUuid)
-	accesstoken.AssertEqual(t, int16(-1), accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Role)
+	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).UserUuid)
+	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).RoomUuid)
+	accesstoken.AssertEqual(t, int16(-1), accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Role)
 
-	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Privileges[accesstoken.PrivilegeEducationUser])
+	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Privileges[accesstoken.PrivilegeApaasUser])
 }
 
 func Test_BuildAppToken(t *testing.T) {
@@ -61,11 +61,11 @@ func Test_BuildAppToken(t *testing.T) {
 
 	accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
-	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeEducation] != nil)
+	accesstoken.AssertEqual(t, true, accessToken.Services[accesstoken.ServiceTypeApaas] != nil)
 
-	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).UserUuid)
-	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).RoomUuid)
-	accesstoken.AssertEqual(t, int16(-1), accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Role)
+	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).UserUuid)
+	accesstoken.AssertEqual(t, "", accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).RoomUuid)
+	accesstoken.AssertEqual(t, int16(-1), accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Role)
 
-	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeEducation].(*accesstoken.ServiceEducation).Privileges[accesstoken.PrivilegeEducationApp])
+	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeApaas].(*accesstoken.ServiceApaas).Privileges[accesstoken.PrivilegeApaasApp])
 }
