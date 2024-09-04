@@ -116,7 +116,7 @@ module AgoraDynamicKey2
     end
   end
 
-  class ServiceEducation < Service
+  class ServiceApaas < Service
     attr_accessor :room_uuid, :user_uuid, :role
 
     SERVICE_TYPE = 7
@@ -152,7 +152,7 @@ module AgoraDynamicKey2
                  ServiceRtm::SERVICE_TYPE => ServiceRtm,
                  ServiceFpa::SERVICE_TYPE => ServiceFpa,
                  ServiceChat::SERVICE_TYPE => ServiceChat,
-                 ServiceEducation::SERVICE_TYPE => ServiceEducation }.freeze
+                 ServiceApaas::SERVICE_TYPE => ServiceApaas }.freeze
 
     def initialize(app_id = '', app_cert = '', expire = 900)
       @app_id = app_id

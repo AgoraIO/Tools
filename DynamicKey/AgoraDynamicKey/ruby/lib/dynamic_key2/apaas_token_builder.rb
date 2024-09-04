@@ -1,5 +1,5 @@
 module AgoraDynamicKey2
-  class EducationTokenBuilder
+  class ApaasTokenBuilder
     # Build room user token.
     #
     # app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing

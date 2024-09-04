@@ -1,7 +1,7 @@
 require 'rspec'
 require_relative '../../lib/dynamic_key2'
 
-describe 'AgoraDynamicKey2::EducationTokenBuilder' do
+describe 'AgoraDynamicKey2::ApaasTokenBuilder' do
   let(:app_id) { '970CA35de60c44645bbae8a215061b33' }
   let(:app_certificate) { '5CFd2fd1755d40ecb72977518be15d3b' }
   let(:room_uuid) { '123' }
@@ -10,8 +10,8 @@ describe 'AgoraDynamicKey2::EducationTokenBuilder' do
   let(:expire) { 600 }
 
   it 'test_build_room_user_token' do
-    token = AgoraDynamicKey2::EducationTokenBuilder.build_room_user_token(app_id, app_certificate, room_uuid, user_uuid, role,
-                                                                          expire)
+    token = AgoraDynamicKey2::ApaasTokenBuilder.build_room_user_token(app_id, app_certificate, room_uuid, user_uuid, role,
+                                                                      expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
@@ -29,7 +29,7 @@ describe 'AgoraDynamicKey2::EducationTokenBuilder' do
   end
 
   it 'test_build_user_token' do
-    token = AgoraDynamicKey2::EducationTokenBuilder.build_user_token(app_id, app_certificate, user_uuid, expire)
+    token = AgoraDynamicKey2::ApaasTokenBuilder.build_user_token(app_id, app_certificate, user_uuid, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
@@ -46,7 +46,7 @@ describe 'AgoraDynamicKey2::EducationTokenBuilder' do
   end
 
   it 'test_build_app_token' do
-    token = AgoraDynamicKey2::EducationTokenBuilder.build_app_token(app_id, app_certificate, expire)
+    token = AgoraDynamicKey2::ApaasTokenBuilder.build_app_token(app_id, app_certificate, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
     res = access_token.parse(token)
 
