@@ -45,7 +45,7 @@ service = {
         }
     },
     7: {
-        'name': 'Education',
+        'name': 'Apaas',
         'privilege': {
             1: {'name': 'roomUser'},
             2: {'name': 'user'},
@@ -109,5 +109,5 @@ if __name__ == "__main__":
         token = sys.argv[1]
     else:
         token = '007eJxTYNi/pqL4zazPf+P2/HDX+9fA/KLX+6oIz5O5Wzw2vzTSPdqtwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs/P87S7IAHwOD/mEfBlYGRgYWIAbxmcAkM5hkAZMKDOYp5kbGZqapSZYWxiYWpsaW5qnGqcZplikmZgZJKSmJXAxGFhZGxiaGRubGTEBzICYhi7LARVkZmFBsQlbFDrQX0xV8DEX5+bnxpaWZKfElqcUlfAylxalFCP7//wBAqz0L'
-    
+
     print(parse_token(token))
