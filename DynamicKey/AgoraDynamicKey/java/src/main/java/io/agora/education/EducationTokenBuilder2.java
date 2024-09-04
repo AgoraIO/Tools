@@ -16,7 +16,7 @@ public class EducationTokenBuilder2 {
      * @param role           The user's role.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user room token.
+     * @return The user room token.
      */
     public String buildRoomUserToken(String appId, String appCertificate, String roomUuid, String userUuid, Short role, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -43,7 +43,7 @@ public class EducationTokenBuilder2 {
     }
 
     /**
-     * build user individual token
+     * build user token
      *
      * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
      *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -52,7 +52,7 @@ public class EducationTokenBuilder2 {
      * @param userUuid       The user's id, must be unique.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education user token.
+     * @return The user token.
      */
     public String buildUserToken(String appId, String appCertificate, String userUuid, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -70,7 +70,7 @@ public class EducationTokenBuilder2 {
     }
 
     /**
-     * build app global token
+     * build app token
      *
      * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
      *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -78,7 +78,7 @@ public class EducationTokenBuilder2 {
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-     * @return The education global token.
+     * @return The app token.
      */
     public String buildAppToken(String appId, String appCertificate, int expire) {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);

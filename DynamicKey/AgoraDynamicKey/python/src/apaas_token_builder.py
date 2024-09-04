@@ -41,7 +41,7 @@ class ApaasTokenBuilder:
     @staticmethod
     def build_user_token(app_id, app_certificate, user_uuid, expire):
         """
-        Build user individual token
+        Build user token
         :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
             from your kit. See Get an App ID.
         :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
@@ -62,7 +62,7 @@ class ApaasTokenBuilder:
     @staticmethod
     def build_app_token(app_id, app_certificate, expire):
         """
-        Build the global token for app.
+        Build app token.
         :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
             from your kit. See Get an App ID.
         :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
