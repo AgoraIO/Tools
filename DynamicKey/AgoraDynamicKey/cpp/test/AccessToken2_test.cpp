@@ -36,8 +36,7 @@ class AccessToken2_test : public testing::Test {
 
     auto l_it = l->privileges_.begin();
     auto r_it = r->privileges_.begin();
-    for (; l_it != l->privileges_.end() && r_it != r->privileges_.end();
-         ++l_it, ++r_it) {
+    for (; l_it != l->privileges_.end() && r_it != r->privileges_.end(); ++l_it, ++r_it) {
       EXPECT_EQ(l_it->first, r_it->first);
       EXPECT_EQ(l_it->second, r_it->second);
     }
@@ -78,15 +77,15 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
   }
 
-  void VerifyServiceEducation(Service *l, Service *r) {
+  void VerifyServiceApaas(Service *l, Service *r) {
     VerifyService(l, r);
 
-    auto l_education = dynamic_cast<ServiceEducation *>(l);
-    auto r_education = dynamic_cast<ServiceEducation *>(r);
+    auto l_apaas = dynamic_cast<ServiceApaas *>(l);
+    auto r_apaas = dynamic_cast<ServiceApaas *>(r);
 
-    EXPECT_EQ(l_education->room_uuid_, r_education->room_uuid_);
-    EXPECT_EQ(l_education->user_uuid_, r_education->user_uuid_);
-    EXPECT_EQ(l_education->role_, r_education->role_);
+    EXPECT_EQ(l_apaas->room_uuid_, r_apaas->room_uuid_);
+    EXPECT_EQ(l_apaas->user_uuid_, r_apaas->user_uuid_);
+    EXPECT_EQ(l_apaas->role_, r_apaas->role_);
   }
 
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
@@ -111,21 +110,16 @@ class AccessToken2_test : public testing::Test {
 
     EXPECT_EQ(k7.services_.size(), key->services_.size());
 
-    using VerifyServiceHandler =
-        void (AccessToken2_test::*)(Service *, Service *);
+    using VerifyServiceHandler = void (AccessToken2_test::*)(Service *, Service *);
     static const std::map<uint16_t, VerifyServiceHandler> kVerifyServices = {
-        {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},
-        {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
-        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
-        {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
-        {ServiceEducation::kServiceType,
-         &AccessToken2_test::VerifyServiceEducation},
+        {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},     {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
+        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},     {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
+        {ServiceApaas::kServiceType, &AccessToken2_test::VerifyServiceApaas},
     };
 
     auto k7_it = k7.services_.begin();
     auto key_it = key->services_.begin();
-    for (; k7_it != k7.services_.end() && key_it != key->services_.end();
-         ++k7_it, ++key_it) {
+    for (; k7_it != k7.services_.end() && key_it != key->services_.end(); ++k7_it, ++key_it) {
       EXPECT_EQ(k7_it->first, key_it->first);
 
       Service *k7_s = k7_it->second.get();
@@ -238,18 +232,16 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
-  void TestAccessToken2EducationRoomUser() {
+  void TestAccessToken2ApaasRoomUser() {
     MD5 h{account_};
     std::string char_user_id = h.toStr();
 
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
 
-    std::unique_ptr<Service> education_service(
-        new ServiceEducation(room_uuid_, account_, role_));
-    education_service->AddPrivilege(ServiceEducation::kPrivilegeRoomUser,
-                                    expire_);
-    token.AddService(std::move(education_service));
+    std::unique_ptr<Service> apaas_service(new ServiceApaas(room_uuid_, account_, role_));
+    apaas_service->AddPrivilege(ServiceApaas::kPrivilegeRoomUser, expire_);
+    token.AddService(std::move(apaas_service));
 
     std::unique_ptr<Service> rtm_service(new ServiceRtm(account_));
     rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire_);
@@ -269,14 +261,13 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &token);
   }
 
-  void TestAccessToken2EducationUser() {
+  void TestAccessToken2ApaasUser() {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
 
-    std::unique_ptr<Service> education_service(
-        new ServiceEducation("", account_));
-    education_service->AddPrivilege(ServiceEducation::kPrivilegeUser, expire_);
-    token.AddService(std::move(education_service));
+    std::unique_ptr<Service> apaas_service(new ServiceApaas("", account_));
+    apaas_service->AddPrivilege(ServiceApaas::kPrivilegeUser, expire_);
+    token.AddService(std::move(apaas_service));
 
     std::string expected =
         "007eJxTYEg4e9Zj9gch+"
@@ -286,13 +277,13 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &token);
   }
 
-  void TestAccessToken2EducationApp() {
+  void TestAccessToken2ApaasApp() {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
 
-    std::unique_ptr<Service> education_service(new ServiceEducation());
-    education_service->AddPrivilege(ServiceEducation::kPrivilegeApp, expire_);
-    token.AddService(std::move(education_service));
+    std::unique_ptr<Service> apaas_service(new ServiceApaas());
+    apaas_service->AddPrivilege(ServiceApaas::kPrivilegeApp, expire_);
+    token.AddService(std::move(apaas_service));
 
     std::string expected =
         "007eJxTYJgT3rumdJdoWJpC3aNTb4o76swyLsrHvmznOn/"
@@ -349,40 +340,22 @@ class AccessToken2_test : public testing::Test {
   int16_t role_;
 };
 
-TEST_F(AccessToken2_test, testAccessToken2WithIntUid) {
-  TestAccessToken2WithIntUid();
-}
+TEST_F(AccessToken2_test, testAccessToken2WithIntUid) { TestAccessToken2WithIntUid(); }
 
-TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) {
-  TestAccessToken2WithIntUidZero();
-}
+TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) { TestAccessToken2WithIntUidZero(); }
 
-TEST_F(AccessToken2_test, testAccessToken2WithStringUid) {
-  TestAccessToken2WithStringUid();
-}
+TEST_F(AccessToken2_test, testAccessToken2WithStringUid) { TestAccessToken2WithStringUid(); }
 
 TEST_F(AccessToken2_test, testAccessToken2Rtm) { TestAccessToken2Rtm(); }
 
-TEST_F(AccessToken2_test, testAccessToken2ChatUser) {
-  TestAccessToken2ChatUser();
-}
+TEST_F(AccessToken2_test, testAccessToken2ChatUser) { TestAccessToken2ChatUser(); }
 
-TEST_F(AccessToken2_test, testAccessToken2ChatApp) {
-  TestAccessToken2ChatApp();
-}
+TEST_F(AccessToken2_test, testAccessToken2ChatApp) { TestAccessToken2ChatApp(); }
 
-TEST_F(AccessToken2_test, testAccessToken2EducationRoomUser) {
-  TestAccessToken2EducationRoomUser();
-}
+TEST_F(AccessToken2_test, testAccessToken2ApaasRoomUser) { TestAccessToken2ApaasRoomUser(); }
 
-TEST_F(AccessToken2_test, testAccessToken2EducationUser) {
-  TestAccessToken2EducationUser();
-}
+TEST_F(AccessToken2_test, testAccessToken2ApaasUser) { TestAccessToken2ApaasUser(); }
 
-TEST_F(AccessToken2_test, testAccessToken2EducationApp) {
-  TestAccessToken2EducationApp();
-}
+TEST_F(AccessToken2_test, testAccessToken2ApaasApp) { TestAccessToken2ApaasApp(); }
 
-TEST_F(AccessToken2_test, testAccessToken2WithMultiService) {
-  TestAccessToken2WithMultiService();
-}
+TEST_F(AccessToken2_test, testAccessToken2WithMultiService) { TestAccessToken2WithMultiService(); }

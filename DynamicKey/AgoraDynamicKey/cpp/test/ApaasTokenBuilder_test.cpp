@@ -4,7 +4,7 @@
 // #define private public
 // #define protected public
 
-#include "../src/EducationTokenBuilder2.h"
+#include "../src/ApaasTokenBuilder.h"
 
 #include <gtest/gtest.h>
 
@@ -14,7 +14,7 @@
 
 using namespace agora::tools;
 
-class EducationTokenBuilder2_test : public testing::Test {
+class ApaasTokenBuilder_test : public testing::Test {
  protected:
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
@@ -28,7 +28,7 @@ class EducationTokenBuilder2_test : public testing::Test {
   }
 
   void TestRoomUserToken() {
-    std::string token_str = EducationTokenBuilder2::BuildRoomUserToken(app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
+    std::string token_str = ApaasTokenBuilder::BuildRoomUserToken(app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -63,7 +63,7 @@ class EducationTokenBuilder2_test : public testing::Test {
   }
 
   void TestUserToken() {
-    std::string token_str = EducationTokenBuilder2::BuildUserToken(app_id_, app_cert_, user_id_, expire_);
+    std::string token_str = ApaasTokenBuilder::BuildUserToken(app_id_, app_cert_, user_id_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -84,7 +84,7 @@ class EducationTokenBuilder2_test : public testing::Test {
   }
 
   void TestAppToken() {
-    std::string token_str = EducationTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
+    std::string token_str = ApaasTokenBuilder::BuildAppToken(app_id_, app_cert_, expire_);
     AccessToken2 token;
     ASSERT_TRUE(token.FromString(token_str));
 
@@ -115,6 +115,6 @@ class EducationTokenBuilder2_test : public testing::Test {
   std::string chat_user_id_;
 };
 
-TEST_F(EducationTokenBuilder2_test, TestRoomUserToken) { TestRoomUserToken(); }
-TEST_F(EducationTokenBuilder2_test, TestUserToken) { TestUserToken(); }
-TEST_F(EducationTokenBuilder2_test, TestAppToken) { TestAppToken(); }
+TEST_F(ApaasTokenBuilder_test, TestRoomUserToken) { TestRoomUserToken(); }
+TEST_F(ApaasTokenBuilder_test, TestUserToken) { TestUserToken(); }
+TEST_F(ApaasTokenBuilder_test, TestAppToken) { TestAppToken(); }

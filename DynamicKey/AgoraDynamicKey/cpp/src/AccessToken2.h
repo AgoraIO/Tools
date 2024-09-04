@@ -23,9 +23,7 @@ class Service {
 
   uint16_t ServiceType() { return type_; }
 
-  void AddPrivilege(uint16_t privilege, uint32_t expire) {
-    privileges_[privilege] = expire;
-  }
+  void AddPrivilege(uint16_t privilege, uint32_t expire) { privileges_[privilege] = expire; }
 
   virtual std::string PackService() = 0;
 
@@ -33,14 +31,12 @@ class Service {
 
   virtual std::unique_ptr<Service> Clone() const = 0;
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const Service *x) {
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const Service *x) {
     p << x->type_ << x->privileges_;
     return p;
   }
 
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            Service *x) {
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, Service *x) {
     p >> x->privileges_;
     return p;
   }
@@ -68,8 +64,7 @@ class ServiceRtc : public Service {
   };
 
  public:
-  ServiceRtc(const std::string &channel_name = "", uint32_t uid = 0)
-      : Service(kServiceType), channel_name_(channel_name) {
+  ServiceRtc(const std::string &channel_name = "", uint32_t uid = 0) : Service(kServiceType), channel_name_(channel_name) {
     if (uid == 0) {
       account_ = "";
     } else {
@@ -77,25 +72,20 @@ class ServiceRtc : public Service {
     }
   }
 
-  ServiceRtc(const std::string &channel_name, const std::string &account)
-      : Service(kServiceType), channel_name_(channel_name), account_(account) {}
+  ServiceRtc(const std::string &channel_name, const std::string &account) : Service(kServiceType), channel_name_(channel_name), account_(account) {}
 
   virtual std::string PackService() override { return Pack(this); }
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceRtc(*this));
-  }
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceRtc(*this)); }
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceRtc *x) {
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceRtc *x) {
     p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
     return p;
   }
 
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceRtc *x) {
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceRtc *x) {
     p >> dynamic_cast<Service *>(x) >> x->channel_name_ >> x->account_;
     return p;
   }
@@ -120,25 +110,20 @@ class ServiceRtm : public Service {
   };
 
  public:
-  ServiceRtm(const std::string &user_id = "")
-      : Service(kServiceType), user_id_(user_id) {}
+  ServiceRtm(const std::string &user_id = "") : Service(kServiceType), user_id_(user_id) {}
 
   virtual std::string PackService() override { return Pack(this); }
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceRtm(*this));
-  }
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceRtm(*this)); }
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceRtm *x) {
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceRtm *x) {
     p << dynamic_cast<const Service *>(x) << x->user_id_;
     return p;
   }
 
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceRtm *x) {
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceRtm *x) {
     p >> dynamic_cast<Service *>(x) >> x->user_id_;
     return p;
   }
@@ -166,18 +151,10 @@ class ServiceFpa : public Service {
   virtual std::string PackService() override { return Pack(this); }
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceFpa(*this));
-  }
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceFpa(*this)); }
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceFpa *x) {
-    return p << dynamic_cast<const Service *>(x);
-  }
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceFpa *x) {
-    return p >> dynamic_cast<Service *>(x);
-  }
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceFpa *x) { return p << dynamic_cast<const Service *>(x); }
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceFpa *x) { return p >> dynamic_cast<Service *>(x); }
 
  protected:
   ServiceFpa(const ServiceFpa &) = default;
@@ -196,25 +173,20 @@ class ServiceChat : public Service {
   };
 
  public:
-  ServiceChat(const std::string &user_id = "")
-      : Service(kServiceType), user_id_(user_id) {}
+  ServiceChat(const std::string &user_id = "") : Service(kServiceType), user_id_(user_id) {}
 
   virtual std::string PackService() override { return Pack(this); }
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceChat(*this));
-  }
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceChat(*this)); }
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceChat *x) {
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceChat *x) {
     p << dynamic_cast<const Service *>(x) << x->user_id_;
     return p;
   }
 
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceChat *x) {
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceChat *x) {
     p >> dynamic_cast<Service *>(x) >> x->user_id_;
     return p;
   }
@@ -223,7 +195,7 @@ class ServiceChat : public Service {
   std::string user_id_;
 };
 
-class ServiceEducation : public Service {
+class ServiceApaas : public Service {
  public:
   enum {
     kServiceType = 7,
@@ -234,32 +206,22 @@ class ServiceEducation : public Service {
   };
 
  public:
-  ServiceEducation(const std::string &room_uuid = "",
-                   const std::string &user_uuid = "", int16_t role = -1)
-      : Service(kServiceType),
-        room_uuid_(room_uuid),
-        user_uuid_(user_uuid),
-        role_(role) {}
+  ServiceApaas(const std::string &room_uuid = "", const std::string &user_uuid = "", int16_t role = -1)
+      : Service(kServiceType), room_uuid_(room_uuid), user_uuid_(user_uuid), role_(role) {}
 
   virtual std::string PackService() override { return Pack(this); }
 
   virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
 
-  virtual std::unique_ptr<Service> Clone() const override {
-    return std::unique_ptr<Service>(new ServiceEducation(*this));
-  }
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceApaas(*this)); }
 
-  friend agora::tools::Packer &operator<<(agora::tools::Packer &p,
-                                          const ServiceEducation *x) {
-    p << dynamic_cast<const Service *>(x) << x->room_uuid_ << x->user_uuid_
-      << x->role_;
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceApaas *x) {
+    p << dynamic_cast<const Service *>(x) << x->room_uuid_ << x->user_uuid_ << x->role_;
     return p;
   }
 
-  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p,
-                                            ServiceEducation *x) {
-    p >> dynamic_cast<Service *>(x) >> x->room_uuid_ >> x->user_uuid_ >>
-        x->role_;
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceApaas *x) {
+    p >> dynamic_cast<Service *>(x) >> x->room_uuid_ >> x->user_uuid_ >> x->role_;
     return p;
   }
 
@@ -274,18 +236,14 @@ struct ServiceCreator {
   static Service *New() { return (new T()); }
 };
 static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
-    {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},
-    {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
-    {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},
-    {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
-    {ServiceEducation::kServiceType, ServiceCreator<ServiceEducation>::New},
+    {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
+    {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
+    {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},
 };
 
 class AccessToken2 {
  public:
-  AccessToken2(const std::string &app_id = "",
-               const std::string &app_certificate = "", uint32_t issue_ts = 0,
-               uint32_t expire = 900)
+  AccessToken2(const std::string &app_id = "", const std::string &app_certificate = "", uint32_t issue_ts = 0, uint32_t expire = 900)
       : app_id_(app_id), app_cert_(app_certificate) {
     if (issue_ts != 0) {
       issue_ts_ = issue_ts;
@@ -299,9 +257,7 @@ class AccessToken2 {
 
   static std::string Version() { return "007"; }
 
-  void AddService(std::unique_ptr<Service> service) {
-    services_[service->ServiceType()] = std::move(service);
-  }
+  void AddService(std::unique_ptr<Service> service) { services_[service->ServiceType()] = std::move(service); }
 
   std::string Build() {
     if (!BuildCheck()) return "";
@@ -347,8 +303,7 @@ class AccessToken2 {
   }
 
   std::string SigningInfo() {
-    auto signing_info = Pack(app_id_) + Pack(issue_ts_) + Pack(expire_) +
-                        Pack(salt_) + PackServices();
+    auto signing_info = Pack(app_id_) + Pack(issue_ts_) + Pack(expire_) + Pack(salt_) + PackServices();
     return signing_info;
   }
 
@@ -369,8 +324,7 @@ class AccessToken2 {
       uint16_t service_type;
       *unpacker >> service_type;
 
-      auto service =
-          std::unique_ptr<Service>(kServiceCreator.at(service_type)());
+      auto service = std::unique_ptr<Service>(kServiceCreator.at(service_type)());
       service->UnpackService(unpacker);
       services_[service_type] = std::move(service);
     }

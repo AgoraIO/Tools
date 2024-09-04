@@ -12,7 +12,7 @@
 namespace agora {
 namespace tools {
 
-class EducationTokenBuilder2 {
+class ApaasTokenBuilder {
  public:
   /*
    Build user room token
@@ -59,8 +59,8 @@ class EducationTokenBuilder2 {
   static std::string BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire);
 };
 
-inline std::string EducationTokenBuilder2::BuildRoomUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& room_uuid,
-                                                              const std::string& user_uuid, int16_t role, uint32_t expire) {
+inline std::string ApaasTokenBuilder::BuildRoomUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& room_uuid,
+                                                         const std::string& user_uuid, int16_t role, uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
   MD5 h{user_uuid};
@@ -81,8 +81,8 @@ inline std::string EducationTokenBuilder2::BuildRoomUserToken(const std::string&
   return token.Build();
 }
 
-inline std::string EducationTokenBuilder2::BuildUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_uuid,
-                                                          uint32_t expire) {
+inline std::string ApaasTokenBuilder::BuildUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_uuid,
+                                                     uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
   std::unique_ptr<Service> apaas_service(new ServiceApaas("", user_uuid));
@@ -92,7 +92,7 @@ inline std::string EducationTokenBuilder2::BuildUserToken(const std::string& app
   return token.Build();
 }
 
-inline std::string EducationTokenBuilder2::BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire) {
+inline std::string ApaasTokenBuilder::BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire) {
   AccessToken2 token(app_id, app_certificate, 0, expire);
 
   std::unique_ptr<Service> apaas_service(new ServiceApaas());
