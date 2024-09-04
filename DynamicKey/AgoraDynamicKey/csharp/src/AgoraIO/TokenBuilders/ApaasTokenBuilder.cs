@@ -2,7 +2,7 @@
 
 namespace AgoraIO.Media
 {
-    public class EducationTokenBuilder2
+    public class ApaasTokenBuilder
     {
         /**
          * build user room token
