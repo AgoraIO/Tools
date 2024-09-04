@@ -13,10 +13,10 @@ namespace AgoraIO.Media
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param roomUuid       The room's id, must be unique.
          * @param userUuid       The user's id, must be unique.
-         * @param role           The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
+         * @param role           The user's role
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education user room token.
+         * @return The user room token.
          */
         public static string buildRoomUserToken(string appId, string appCertificate, string roomUuid, string userUuid, short role, uint expire)
         {
@@ -41,7 +41,7 @@ namespace AgoraIO.Media
         }
 
         /**
-         * build user individual token
+         * build user token
          *
          * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
          *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -50,7 +50,7 @@ namespace AgoraIO.Media
          * @param userUuid       The user's id, must be unique.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education user token.
+         * @return The user token.
          */
         public static string buildUserToken(string appId, string appCertificate, string userUuid, uint expire)
         {
@@ -64,7 +64,7 @@ namespace AgoraIO.Media
         }
 
         /**
-         * build app global token
+         * build app token
          *
          * @param appId          The App ID issued to you by Agora. Apply for a new App ID from
          *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
@@ -72,7 +72,7 @@ namespace AgoraIO.Media
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
          *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
-         * @return The education global token.
+         * @return The app token.
          */
         public static string buildAppToken(string appId, string appCertificate, uint expire)
         {

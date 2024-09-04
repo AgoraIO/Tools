@@ -10,7 +10,7 @@ import (
 // @param appCertificate: Certificate of the application that you registered in the Agora Dashboard. See Get an App Certificate.
 // @param roomUuid: The room's id, must be unique.
 // @param userUuid: The user's id, must be unique.
-// @param role: The user's role, such as 0(invisible), 1(teacher), 2(student), 3(assistant), 4(observer) etc.
+// @param role: The user's role.
 // @param expire: represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is
 // generated, set expireTimestamp as the current timestamp + 600 (seconds).
 //

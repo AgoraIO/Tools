@@ -22,8 +22,7 @@ class EducationTokenBuilder2 {
    in the Agora Dashboard. See Get an App Certificate.
    @param room_uuid: The room's id, must be unique.
    @param user_uuid: The user's id, must be unique.
-   @param role: The user's role, such as 0(invisible), 1(teacher), 2(student),
-   3(assistant), 4(observer) etc.
+   @param role: The user's role.
    @param expire: represented by the number of seconds elapsed since now. If,
    for example, you want to access the Agora Service within 10 minutes after
    the token is generated, set expireTimestamp as 600(seconds).
