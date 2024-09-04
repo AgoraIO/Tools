@@ -1,8 +1,8 @@
 /**
  * run this test with command:
- * deno test test/EducationTokenBuilderTest.js
+ * deno test test/ApaasTokenBuilderTest.js
  */
-import { EducationTokenBuilder } from '../src/EducationTokenBuilder.js'
+import { ApaasTokenBuilder } from '../src/ApaasTokenBuilder.js'
 import { AccessToken2, kApaasServiceType } from '../src/AccessToken2.js'
 import { assert } from 'https://deno.land/std/testing/asserts.ts'
 const appId = '970CA35de60c44645bbae8a215061b33'
@@ -14,7 +14,7 @@ const role = 1
 
 Deno.test('BuildRoomUserToken_Test', (test) => {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
+    let token = ApaasTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
     accessToken.from_string(token)
     assert(appId === accessToken.appId)
     assert(expire === accessToken.expire)
@@ -25,7 +25,7 @@ Deno.test('BuildRoomUserToken_Test', (test) => {
 
 Deno.test('BuildUserToken_Test', (test) => {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
+    let token = ApaasTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
     accessToken.from_string(token)
 
     assert(appId === accessToken.appId)
@@ -35,7 +35,7 @@ Deno.test('BuildUserToken_Test', (test) => {
 
 Deno.test('BuildAppToken_Test', (test) => {
     let accessToken = new AccessToken2('', '', 0, 0)
-    let token = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire)
+    let token = ApaasTokenBuilder.buildAppToken(appId, appCertificate, expire)
     accessToken.from_string(token)
     assert(appId === accessToken.appId)
     assert(expire === accessToken.expire)

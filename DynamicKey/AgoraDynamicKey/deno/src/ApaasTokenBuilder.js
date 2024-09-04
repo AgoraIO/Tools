@@ -1,7 +1,7 @@
-import { AccessToken2 as AccessToken, ServiceApaas, ServiceChat, ServiceRtm } from '../src/AccessToken2.js'
+import { AccessToken2 as AccessToken, ServiceApaas, ServiceChat, ServiceRtm } from './AccessToken2.js'
 import { Md5 } from 'https://deno.land/std@0.156.0/hash/md5.ts'
 
-class EducationTokenBuilder {
+class ApaasTokenBuilder {
     /**
      * build user room token
      * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
@@ -73,4 +73,4 @@ class EducationTokenBuilder {
     }
 }
 
-export { EducationTokenBuilder }
+export { ApaasTokenBuilder }

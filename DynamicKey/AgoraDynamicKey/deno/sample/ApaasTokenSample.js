@@ -1,4 +1,4 @@
-import { EducationTokenBuilder } from '../src/EducationTokenBuilder.js'
+import { ApaasTokenBuilder } from '../src/ApaasTokenBuilder.js'
 
 // Need to set environment variable AGORA_APP_ID
 const appId = Deno.env.get('AGORA_APP_ID')
@@ -17,11 +17,11 @@ if (appId == undefined || appId == '' || appCertificate == undefined || appCerti
     Deno.exit(1)
 }
 
-const tokenRoomUserToken = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
-console.log('Education room user token:', tokenRoomUserToken)
+const tokenRoomUserToken = ApaasTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
+console.log('Apaas room user token:', tokenRoomUserToken)
 
-const tokenUserToken = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
-console.log('Education user token:', tokenUserToken)
+const tokenUserToken = ApaasTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
+console.log('Apaas user token:', tokenUserToken)
 
-const tokenAppToken = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire)
-console.log('Education app token:', tokenAppToken)
+const tokenAppToken = ApaasTokenBuilder.buildAppToken(appId, appCertificate, expire)
+console.log('Apaas app token:', tokenAppToken)
