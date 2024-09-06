@@ -28,14 +28,14 @@ func main() {
 		return
 	}
 
-	result, err := rtctokenbuilder.BuildTokenWithUID(appId, appCertificate, channelName, uid, rtctokenbuilder.RoleAttendee, expireTimestamp)
+	result, err := rtctokenbuilder.BuildTokenWithUID(appId, appCertificate, channelName, uid, rtctokenbuilder.RolePublisher, expireTimestamp)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with uid: %s\n", result)
 	}
 
-	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleAttendee, expireTimestamp)
+	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RolePublisher, expireTimestamp)
 	if err != nil {
 		fmt.Println(err)
 	} else {

@@ -1,9 +1,9 @@
 require_relative '../lib/dynamic_key2'
 
 # Need to set environment variable AGORA_APP_ID
-app_id = ENV['AGORA_APP_ID']
+app_id = ENV.fetch('AGORA_APP_ID', nil)
 # Need to set environment variable AGORA_APP_CERTIFICATE
-app_certificate = ENV['AGORA_APP_CERTIFICATE']
+app_certificate = ENV.fetch('AGORA_APP_CERTIFICATE', nil)
 
 channel_name = '7d72365eb983485397e3e3f9d460bdda'
 uid = 2_882_341_273
@@ -24,13 +24,13 @@ end
 
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(
   app_id, app_certificate, channel_name, uid,
-  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, token_expiration_in_seconds, privilege_expiration_in_seconds
 )
 puts "Token with int uid: #{token}"
 
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(
   app_id, app_certificate, channel_name, account,
-  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, token_expiration_in_seconds, privilege_expiration_in_seconds
 )
 puts "Token with user account: #{token}"
 
@@ -50,6 +50,6 @@ puts "Token with user account and privilege: #{token}"
 
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_rtm(
   app_id, app_certificate, channel_name, account,
-  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, token_expiration_in_seconds, privilege_expiration_in_seconds
 )
 puts "Token with RTM: #{token}"
