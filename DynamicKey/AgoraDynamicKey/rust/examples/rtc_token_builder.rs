@@ -29,7 +29,7 @@ fn main() {
         &app_certificate,
         &channel_name,
         uid,
-        rtc_token_builder::ROLE_SUBSCRIBER,
+        rtc_token_builder::ROLE_PUBLISHER,
         token_expiration_in_seconds,
         privilege_expiration_in_seconds,
     ) {
@@ -42,7 +42,7 @@ fn main() {
         &app_certificate,
         &channel_name,
         &uid_str,
-        rtc_token_builder::ROLE_SUBSCRIBER,
+        rtc_token_builder::ROLE_PUBLISHER,
         token_expiration_in_seconds,
         privilege_expiration_in_seconds,
     ) {
@@ -85,7 +85,7 @@ fn main() {
         &app_certificate,
         &channel_name,
         &uid_str,
-        rtc_token_builder::ROLE_SUBSCRIBER,
+        rtc_token_builder::ROLE_PUBLISHER,
         token_expiration_in_seconds,
         privilege_expiration_in_seconds,
     ) {

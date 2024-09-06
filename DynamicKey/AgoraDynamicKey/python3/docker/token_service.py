@@ -29,7 +29,7 @@ def token():
     access_token2 = ''
     try:
         access_token2 = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name,
-                                                             uid, Role_Subscriber, expiration_in_seconds)
+                                                             uid, Role_Publisher, expiration_in_seconds)
     except Exception as e:
         app.logger.info(repr(e))
         flask.abort(500)

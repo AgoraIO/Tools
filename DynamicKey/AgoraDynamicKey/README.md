@@ -36,7 +36,7 @@ Sample Code for generating AccessToken are available on the following platforms:
  + CSharp
  + Ruby
 
-> You can use RTC/RTM sample code to generate an AccessToken. 
+> You can use RTC/RTM sample code to generate an AccessToken.
 
 ### C++
 
@@ -142,28 +142,28 @@ Following are samples for C++, Go, Java, Nodejs, PHP and Python.
 If you are using the Agora SDK of a version earlier than 2.1 and looking at implementing the function of publishing with a permission key, Agora recommends that you upgrade to DynamicKey5.
 
 #### To verify user permission in channel:
-| Dynamic Key Version | UID | SDK Version  |
-|---|---|---|
-| DynamicKey5  | specify the permission | 1.7.0 or later  |
+| Dynamic Key Version | UID                    | SDK Version    |
+| ------------------- | ---------------------- | -------------- |
+| DynamicKey5         | specify the permission | 1.7.0 or later |
 
 
 #### To verify the User ID:
 
-| Dynamic Key Version | UID | SDK Version  |
-|---|---|---|
-| DynamicKey5  | specify uid of user | 1.3.0 or later  |
-| DynamicKey4  | specify uid of user | 1.3.0 or later  |
-| DynamicKey3  | specify uid of user  | 1.2.3 or later  |
-| DynamicKey  |  NA |  NA |
+| Dynamic Key Version | UID                 | SDK Version    |
+| ------------------- | ------------------- | -------------- |
+| DynamicKey5         | specify uid of user | 1.3.0 or later |
+| DynamicKey4         | specify uid of user | 1.3.0 or later |
+| DynamicKey3         | specify uid of user | 1.2.3 or later |
+| DynamicKey          | NA                  | NA             |
 
 #### If you do not need to verify the User ID:
 
-| Dynamic Key Version | UID | SDK Version  |
-|---|---|---|
-| DynamicKey5  | 0 | All |
-| DynamicKey4  | 0 | All |
-| DynamicKey3  | 0 | All |
-| DynamicKey  | All | All |
+| Dynamic Key Version | UID | SDK Version |
+| ------------------- | --- | ----------- |
+| DynamicKey5         | 0   | All         |
+| DynamicKey4         | 0   | All         |
+| DynamicKey3         | 0   | All         |
+| DynamicKey          | All | All         |
 
 
 
@@ -271,14 +271,14 @@ func main() {
 		return
 	}
 
-	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with int uid: %s\n", result)
 	}
 
-	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -335,12 +335,12 @@ public class RtcTokenBuilder2Sample {
         }
 
         RtcTokenBuilder2 token = new RtcTokenBuilder2();
-        String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_SUBSCRIBER,
+        String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_PUBLISHER,
                 tokenExpirationInSeconds, privilegeExpirationInSeconds);
         System.out.printf("Token with uid: %s\n", result);
 
         result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
-                Role.ROLE_SUBSCRIBER,
+                Role.ROLE_PUBLISHER,
                 tokenExpirationInSeconds, privilegeExpirationInSeconds);
         System.out.printf("Token with account: %s\n", result);
 
@@ -501,18 +501,18 @@ def main():
     if not app_id or not app_certificate:
         print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
         return
-    
-    token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
+
+    token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Publisher,
                                                  token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
-                                                          Role_Subscriber, token_expiration_in_seconds,
+                                                          Role_Publisher, token_expiration_in_seconds,
                                                           privilege_expiration_in_seconds)
     print("Token with user account: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_uid_and_privilege(
-        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds, 
+        app_id, app_certificate, channel_name, uid, token_expiration_in_seconds,
         join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with int uid and privilege: {}".format(token))
 
@@ -554,13 +554,13 @@ end
 
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_uid(
   app_id, app_certificate, channel_name, uid,
-  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, token_expiration_in_seconds, privilege_expiration_in_seconds
 )
 puts "Token with int uid: #{token}"
 
 token = AgoraDynamicKey2::RtcTokenBuilder.build_token_with_user_account(
   app_id, app_certificate, channel_name, account,
-  AgoraDynamicKey2::RtcTokenBuilder::ROLE_SUBSCRIBER, token_expiration_in_seconds, privilege_expiration_in_seconds
+  AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER, token_expiration_in_seconds, privilege_expiration_in_seconds
 )
 puts "Token with user account: #{token}"
 
@@ -616,7 +616,7 @@ my $token_str = $token->build;
 say "Token: $token_str";
 ```
 
-## Tool 
+## Tool
 ### Parse token
 
 ```

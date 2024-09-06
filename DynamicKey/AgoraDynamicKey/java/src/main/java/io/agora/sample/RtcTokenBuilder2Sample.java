@@ -28,29 +28,24 @@ public class RtcTokenBuilder2Sample {
         }
 
         RtcTokenBuilder2 token = new RtcTokenBuilder2();
-        String result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_SUBSCRIBER,
-                tokenExpirationInSeconds, privilegeExpirationInSeconds);
+        String result =
+                token.buildTokenWithUid(appId, appCertificate, channelName, uid, Role.ROLE_PUBLISHER, tokenExpirationInSeconds, privilegeExpirationInSeconds);
         System.out.printf("Token with uid: %s\n", result);
 
-        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
-                Role.ROLE_SUBSCRIBER,
-                tokenExpirationInSeconds, privilegeExpirationInSeconds);
+        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account, Role.ROLE_PUBLISHER, tokenExpirationInSeconds,
+                privilegeExpirationInSeconds);
         System.out.printf("Token with account: %s\n", result);
 
-        result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, tokenExpirationInSeconds,
-                joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
-                pubVideoPrivilegeExpireInSeconds,
-                pubDataStreamPrivilegeExpireInSeconds);
+        result = token.buildTokenWithUid(appId, appCertificate, channelName, uid, tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds,
+                pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
         System.out.printf("Token with uid and privilege: %s\n", result);
 
-        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account,
-                tokenExpirationInSeconds,
-                joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
-                pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
+        result = token.buildTokenWithUserAccount(appId, appCertificate, channelName, account, tokenExpirationInSeconds, joinChannelPrivilegeExpireInSeconds,
+                pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
         System.out.printf("Token with account and privilege: %s\n", result);
 
-        result = token.buildTokenWithRtm(appId, appCertificate, channelName, account, Role.ROLE_SUBSCRIBER,
-                tokenExpirationInSeconds, privilegeExpirationInSeconds);
+        result = token.buildTokenWithRtm(appId, appCertificate, channelName, account, Role.ROLE_PUBLISHER, tokenExpirationInSeconds,
+                privilegeExpirationInSeconds);
         System.out.printf("Token with RTM: %s\n", result);
 
     }

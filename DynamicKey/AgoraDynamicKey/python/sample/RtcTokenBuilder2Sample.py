@@ -31,12 +31,12 @@ def main():
         print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
         return
 
-    token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Subscriber,
+    token = RtcTokenBuilder.build_token_with_uid(app_id, app_certificate, channel_name, uid, Role_Publisher,
                                                  token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with int uid: {}".format(token))
 
     token = RtcTokenBuilder.build_token_with_user_account(app_id, app_certificate, channel_name, account,
-                                                          Role_Subscriber, token_expiration_in_seconds,
+                                                          Role_Publisher, token_expiration_in_seconds,
                                                           privilege_expiration_in_seconds)
     print("Token with user account: {}".format(token))
 
@@ -50,7 +50,7 @@ def main():
         join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds, pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds)
     print("Token with user account and privilege: {}".format(token))
 
-    token = RtcTokenBuilder.build_token_with_rtm(app_id, app_certificate, channel_name, account, Role_Subscriber, token_expiration_in_seconds, privilege_expiration_in_seconds)
+    token = RtcTokenBuilder.build_token_with_rtm(app_id, app_certificate, channel_name, account, Role_Publisher, token_expiration_in_seconds, privilege_expiration_in_seconds)
     print("Token with RTM: {}".format(token))
 
 

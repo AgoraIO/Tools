@@ -30,14 +30,14 @@ func main() {
 		return
 	}
 
-	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err := rtctokenbuilder.BuildTokenWithUid(appId, appCertificate, channelName, uid, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
 		fmt.Printf("Token with int uid: %s\n", result)
 	}
 
-	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err = rtctokenbuilder.BuildTokenWithUserAccount(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {
@@ -60,7 +60,7 @@ func main() {
 		fmt.Printf("Token with user account and privilege: %s\n", result)
 	}
 
-	result, err = rtctokenbuilder.BuildTokenWithRtm(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RoleSubscriber, tokenExpirationInSeconds, privilegeExpirationInSeconds)
+	result, err = rtctokenbuilder.BuildTokenWithRtm(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds)
 	if err != nil {
 		fmt.Println(err)
 	} else {

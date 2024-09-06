@@ -6,7 +6,7 @@ import os
 import time
 from random import randint
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.RtcTokenBuilder import RtcTokenBuilder,Role_Attendee
+from src.RtcTokenBuilder import RtcTokenBuilder, Role_Publisher
 
 # Need to set environment variable AGORA_APP_ID
 appId = os.environ.get("AGORA_APP_ID")
@@ -27,11 +27,12 @@ def main():
     if not appId or not appCertificate:
         print("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
         return
-    
-    token = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, Role_Attendee, privilegeExpiredTs)
+
+    token = RtcTokenBuilder.buildTokenWithUid(appId, appCertificate, channelName, uid, Role_Publisher, privilegeExpiredTs)
     print("Token with int uid: {}".format(token))
 
-    token = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName, userAccount, Role_Attendee, privilegeExpiredTs)
+    token = RtcTokenBuilder.buildTokenWithAccount(appId, appCertificate, channelName,
+                                                  userAccount, Role_Publisher, privilegeExpiredTs)
     print("Token with user account: {}".format(token))
 
 
