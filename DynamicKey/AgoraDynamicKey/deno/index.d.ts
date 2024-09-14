@@ -9,7 +9,7 @@ export namespace ApaasTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The user room token.
      */
     export function buildRoomUserToken(
@@ -29,7 +29,7 @@ export namespace ApaasTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The user token.
      */
     export function buildUserToken(
@@ -46,7 +46,7 @@ export namespace ApaasTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The app token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -62,7 +62,7 @@ export namespace ChatTokenBuilder {
      * the Agora Dashboard. See Get an App Certificate.
      * @param userUuid The user's id, must be unique.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The chat user token.
      */
     export function buildUserToken(
@@ -80,7 +80,7 @@ export namespace ChatTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      * the Agora Dashboard. See Get an App Certificate.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The chat App token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -97,7 +97,7 @@ export namespace EducationTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The user room token.
      */
     export function buildRoomUserToken(
@@ -117,7 +117,7 @@ export namespace EducationTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The user token.
      */
     export function buildUserToken(
@@ -134,7 +134,7 @@ export namespace EducationTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
      * @return The app token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -160,7 +160,7 @@ export namespace RtcRole {
 export namespace RtcTokenBuilder {
     /**
      * Builds an RTC token using an Integer uid.
-     * @param {*} appID  The App ID issued to you by Agora.
+     * @param {*} appId  The App ID issued to you by Agora.
      * @param {*} appCertificate Certificate of the application that you registered in the Agora Dashboard.
      * @param {*} channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
      * - The 26 lowercase English letters: a to z.
@@ -172,21 +172,23 @@ export namespace RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} privilegeExpiredTs  represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
-     * @return The new Token.
+     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @return The RTC Token.
      */
     export function buildTokenWithUid(
-        appID: string,
+        appId: string,
         appCertificate: string,
         channelName: string,
         uid: number,
         role: number,
-        privilegeExpiredTs: number
+        tokenExpire: number,
+        privilegeExpire: number
     ): string
 
     /**
      * Builds an RTC token using an Integer uid.
-     * @param {*} appID  The App ID issued to you by Agora.
+     * @param {*} appId  The App ID issued to you by Agora.
      * @param {*} appCertificate Certificate of the application that you registered in the Agora Dashboard.
      * @param {*} channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
      * - The 26 lowercase English letters: a to z.
@@ -198,67 +200,33 @@ export namespace RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} privilegeExpiredTs  represented by the number of seconds elapsed since 1/1/1970. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expireTimestamp as the current timestamp + 600 (seconds).
-     * @return The new Token.
+     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @return The RTC Token.
      */
-    export function buildTokenWithAccount(
-        appID: string,
+    export function buildTokenWithUserAccount(
+        appId: string,
         appCertificate: string,
         channelName: string,
         account: string,
         role: number,
-        privilegeExpiredTs: number
-    ): string
-}
-
-export namespace RtmRole {
-    export const Rtm_User: number
-}
-
-export namespace RtmTokenBuilder {
-    /**
-     * @param {*} appID: The App ID issued to you by Agora. Apply for a new App ID from
-     *       Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param {*} appCertificate:	Certificate of the application that you registered in
-     *                 the Agora Dashboard. See Get an App Certificate.
-     * @param {*} account: The user account.
-     * @param {*} role : Role_Publisher = 1: A broadcaster (host) in a live-broadcast profile.
-     *      Role_Subscriber = 2: (Default) A audience in a live-broadcast profile.
-     * @param {*} privilegeExpiredTs : represented by the number of seconds elapsed since
-     *                   1/1/1970. If, for example, you want to access the
-     *                   Agora Service within 10 minutes after the token is
-     *                   generated, set expireTimestamp as the current
-     * @return token
-     */
-    export function buildToken(
-        appID: string,
-        appCertificate: string,
-        account: string | number,
-        role: number,
-        privilegeExpiredTs: number
+        tokenExpire: number,
+        privilegeExpire: number
     ): string
 }
 
 export namespace RtmTokenBuilder {
     /**
-     * @param {*} appID: The App ID issued to you by Agora. Apply for a new App ID from
-     *       Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param {*} appCertificate:	Certificate of the application that you registered in
-     *                 the Agora Dashboard. See Get an App Certificate.
-     * @param {*} account: The user account.
-     * @param {*} role : Role_Publisher = 1: A broadcaster (host) in a live-broadcast profile.
-     *      Role_Subscriber = 2: (Default) A audience in a live-broadcast profile.
-     * @param {*} privilegeExpiredTs : represented by the number of seconds elapsed since
-     *                   1/1/1970. If, for example, you want to access the
-     *                   Agora Service within 10 minutes after the token is
-     *                   generated, set expireTimestamp as the current
-     * @return token
+     * Build the RTM token.
+     *
+     * @param appId The App ID issued to you by Agora. Apply for a new App ID from
+     * Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param appCertificate Certificate of the application that you registered in
+     * the Agora Dashboard. See Get an App Certificate.
+     * @param userId The user's account, max length is 64 Bytes.
+     * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * @return The RTM token.
      */
-    export function buildToken(
-        appID: string,
-        appCertificate: string,
-        account: string | number,
-        role: number,
-        privilegeExpiredTs: number
-    ): string
+    export function buildToken(appId: string, appCertificate: string, userId: string, expire: number): string
 }

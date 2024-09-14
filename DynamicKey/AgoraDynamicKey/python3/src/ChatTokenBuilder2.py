@@ -15,7 +15,7 @@ class ChatTokenBuilder:
             See Get an App Certificate.
         :param user_id: The user's unique id used in chat service.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-            Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+            Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
         :return: The Chat User token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
@@ -35,7 +35,7 @@ class ChatTokenBuilder:
         :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
             See Get an App Certificate.
         :param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-            Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+            Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
         :return: The Chat App token.
         """
         token = AccessToken(app_id, app_certificate, expire=expire)
