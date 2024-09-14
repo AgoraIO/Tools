@@ -25,8 +25,6 @@ pub const ROLE_SUBSCRIBER: Role = 2;
 // uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). uid must be unique.
 // role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
-// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-//     Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
 // token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
 //     set token_expire as 600(seconds).

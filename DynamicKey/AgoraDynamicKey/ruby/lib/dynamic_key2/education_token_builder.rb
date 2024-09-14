@@ -10,7 +10,7 @@ module AgoraDynamicKey2
     # user_uuid: The user's id, must be unique.
     # role: The user's role.
     # expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-    #     Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+    #     Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
     # return: The room user token.
     def self.build_room_user_token(app_id, app_certificate, room_uuid, user_uuid, role, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
@@ -39,7 +39,7 @@ module AgoraDynamicKey2
     #     See Get an App Certificate.
     # user_uuid: The user's id, must be unique.
     # expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-    #     Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+    #     Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
     # return: The user token.
     def self.build_user_token(app_id, app_certificate, user_uuid, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
@@ -58,7 +58,7 @@ module AgoraDynamicKey2
     # app_certificate: Certificate of the application that you registered in the Agora Dashboard.
     #     See Get an App Certificate.
     # expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-    #     Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+    #     Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
     # return: The app token.
     def self.build_app_token(app_id, app_certificate, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)

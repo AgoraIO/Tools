@@ -15,7 +15,7 @@ namespace AgoraIO.Media
          * @param userUuid       The user's id, must be unique.
          * @param role           The user's role.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-         *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+         *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
          * @return The user room token.
          */
         public static string buildRoomUserToken(string appId, string appCertificate, string roomUuid, string userUuid, short role, uint expire)
@@ -49,7 +49,7 @@ namespace AgoraIO.Media
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param userUuid       The user's id, must be unique.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-         *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+         *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
          * @return The user token.
          */
         public static string buildUserToken(string appId, string appCertificate, string userUuid, uint expire)
@@ -71,7 +71,7 @@ namespace AgoraIO.Media
          * @param appCertificate Certificate of the application that you registered in
          *                       the Agora Dashboard. See Get an App Certificate.
          * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-         *                       Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+         *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
          * @return The app token.
          */
         public static string buildAppToken(string appId, string appCertificate, uint expire)

@@ -8,7 +8,7 @@ module AgoraDynamicKey2
     #                         the Agora Dashboard. See Get an App Certificate.
     # @param user_id:         The user's account, max length is 64 Bytes.
     # @param expire:          represented by the number of seconds elapsed since now. If, for example, you want to access the
-    #                         Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
+    #                         Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
     # @return The RTM token.
     def self.build_token(app_id, app_certificate, user_id, expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)

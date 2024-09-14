@@ -31,13 +31,11 @@ const (
 // @param uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1). uid must be unique.
 // @param role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
-// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
-// Agora Service within 10 minutes after the token is generated, set expireTimestamp as 600(seconds).
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set token_expire as 600(seconds).
+// set tokenExpire as 600(seconds).
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
 //
 // return The RTC token.
 func BuildTokenWithUid(appId string, appCertificate string, channelName string, uid uint32, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
@@ -56,9 +54,9 @@ func BuildTokenWithUid(appId string, appCertificate string, channelName string, 
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set token_expire as 600(seconds).
+// set tokenExpire as 600(seconds).
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
 //
 // return The RTC token.
 func BuildTokenWithUserAccount(appId string, appCertificate string, channelName string, account string, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
@@ -208,9 +206,9 @@ func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, 
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set token_expire as 600(seconds).
+// set tokenExpire as 600(seconds).
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
 //
 // return The RTC and RTM token.
 func BuildTokenWithRtm(appId string, appCertificate string, channelName string, account string, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {

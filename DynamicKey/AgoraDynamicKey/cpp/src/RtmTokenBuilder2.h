@@ -22,7 +22,7 @@ class RtmTokenBuilder2 {
    @param user_id The user's account, max length is 64 Bytes.
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
-   token is generated, set expireTimestamp as 600(seconds).
+   token is generated, set expire as 600(seconds).
    @return The new Token.
    */
   static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_id, uint32_t expire = 0);

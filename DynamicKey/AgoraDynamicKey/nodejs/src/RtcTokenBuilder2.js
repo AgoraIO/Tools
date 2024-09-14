@@ -37,7 +37,8 @@ class RtcTokenBuilder {
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
-     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).     * @return The new Token.
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @return The RTC Token.
      */
     static buildTokenWithUid(appId, appCertificate, channelName, uid, role, tokenExpire, privilegeExpire = 0) {
         return this.buildTokenWithUserAccount(
@@ -67,7 +68,7 @@ class RtcTokenBuilder {
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
      * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
      * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @return The new Token.
+     * @return The RTC Token.
      */
     static buildTokenWithUserAccount(
         appId,
@@ -143,7 +144,7 @@ class RtcTokenBuilder {
      * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
      * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
-     * @return The new Token
+     * @return The RTC Token
      */
     static buildTokenWithUidAndPrivilege(
         appId,
@@ -220,7 +221,7 @@ class RtcTokenBuilder {
      * by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
      * current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
      * set pubDataStreamPrivilegeExpire as the current Unix timestamp.
-     * @return The new Token.
+     * @return The RTC Token.
      */
     static BuildTokenWithUserAccountAndPrivilege(
         appId,
