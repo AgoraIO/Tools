@@ -122,14 +122,14 @@ public class RtcTokenBuilder2 {
      * @param uid                          The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
      * @param tokenExpire                  represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                                     Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
-     * @param joinChannelPrivilegeExpire   The Unix timestamp when the privilege for joining the channel expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubAudioPrivilegeExpire      The Unix timestamp when the privilege for publishing audio expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubVideoPrivilegeExpire      The Unix timestamp when the privilege for publishing video expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @param joinChannelPrivilegeExpire   represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * @param pubAudioPrivilegeExpire      represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * @param pubVideoPrivilegeExpire      represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
      * @return The RTC token.
      */
     public String buildTokenWithUid(String appId, String appCertificate, String channelName, int uid, int tokenExpire, int joinChannelPrivilegeExpire,
@@ -173,14 +173,14 @@ public class RtcTokenBuilder2 {
      * @param account                      The user account.
      * @param tokenExpire                  represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                                     Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
-     * @param joinChannelPrivilegeExpire   The Unix timestamp when the privilege for joining the channel expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubAudioPrivilegeExpire      The Unix timestamp when the privilege for publishing audio expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubVideoPrivilegeExpire      The Unix timestamp when the privilege for publishing video expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-     * @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires,
-     *                                     represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @param joinChannelPrivilegeExpire   represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * @param pubAudioPrivilegeExpire      represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * @param pubVideoPrivilegeExpire      represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
+     *                                     If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
      * @return The RTC token.
      */
     public String buildTokenWithUserAccount(String appId, String appCertificate, String channelName, String account, int tokenExpire,

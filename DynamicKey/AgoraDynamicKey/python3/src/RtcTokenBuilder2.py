@@ -107,14 +107,14 @@ class RtcTokenBuilder:
         :param uid: The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
         :param token_expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
-        :param join_channel_privilege_expire: The Unix timestamp when the privilege for joining the channel expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_audio_privilege_expire: The Unix timestamp when the privilege for publishing audio expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_video_privilege_expire: The Unix timestamp when the privilege for publishing video expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_data_stream_privilege_expire: The Unix timestamp when the privilege for publishing data streams expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+        :param join_channel_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+        :param pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+        :param pub_video_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+        :param pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
         :return: The RTC Token
         """
         return RtcTokenBuilder.build_token_with_user_account_and_privilege(app_id, app_certificate, channel_name, uid, token_expire, join_channel_privilege_expire,
@@ -159,14 +159,14 @@ class RtcTokenBuilder:
         :param account: The user account.
         :param token_expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
             Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
-        :param join_channel_privilege_expire: The Unix timestamp when the privilege for joining the channel expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_audio_privilege_expire: The Unix timestamp when the privilege for publishing audio expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_video_privilege_expire: The Unix timestamp when the privilege for publishing video expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
-        :param pub_data_stream_privilege_expire: The Unix timestamp when the privilege for publishing data streams expires,
-            represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+        :param join_channel_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+        :param pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+        :param pub_video_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+        :param pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
+            If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
         :return: The RTC Token
         """
         token = AccessToken(app_id, app_certificate, expire=token_expire)
