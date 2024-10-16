@@ -109,21 +109,16 @@ func BuildTokenWithUserAccount(appId string, appCertificate string, channelName 
 // @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
 // @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
 // Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
-// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes.
-// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubAudioPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubAudioPrivilegeExpire as the current Unix timestamp.
-// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubVideoPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubVideoPrivilegeExpire as the current Unix timestamp.
-// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubDataStreamPrivilegeExpire as the current Unix timestamp.
+// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+//
+// return The RTC token.
 func BuildTokenWithUidAndPrivilege(appId string, appCertificate string, channelName string, uid uint32,
 	tokenExpire uint32, joinChannelPrivilegeExpire uint32, pubAudioPrivilegeExpire uint32, pubVideoPrivilegeExpire uint32, pubDataStreamPrivilegeExpire uint32) (string, error) {
 	return BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, accesstoken.GetUidStr(uid), tokenExpire,
@@ -165,21 +160,16 @@ func BuildTokenWithUidAndPrivilege(appId string, appCertificate string, channelN
 // @param account The user account.
 // @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
 // Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
-// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set joinChannelPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes.
-// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubAudioPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubAudioPrivilegeExpire as the current Unix timestamp.
-// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubVideoPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubVideoPrivilegeExpire as the current Unix timestamp.
-// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires, represented
-// by the sum of the current timestamp plus the valid time period of the token. For example, if you set pubDataStreamPrivilegeExpire as the
-// current timestamp plus 600 seconds, the token expires in 10 minutes. If you do not want to enable this privilege,
-// set pubDataStreamPrivilegeExpire as the current Unix timestamp.
+// @param joinChannelPrivilegeExpire The Unix timestamp when the privilege for joining the channel expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubAudioPrivilegeExpire The Unix timestamp when the privilege for publishing audio expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubVideoPrivilegeExpire The Unix timestamp when the privilege for publishing video expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// @param pubDataStreamPrivilegeExpire The Unix timestamp when the privilege for publishing data streams expires,
+// represented by the number of seconds elapsed since now. For example, if you want to enable this privilege for 10 minutes, set privilegeExpire as 600(seconds).
+//
+// return The RTC token.
 func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, channelName string, account string,
 	tokenExpire uint32, joinChannelPrivilegeExpire uint32, pubAudioPrivilegeExpire uint32, pubVideoPrivilegeExpire uint32, pubDataStreamPrivilegeExpire uint32) (string, error) {
 	token := accesstoken.NewAccessToken(appId, appCertificate, tokenExpire)
