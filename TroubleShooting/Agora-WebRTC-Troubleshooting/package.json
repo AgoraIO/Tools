@@ -12,7 +12,7 @@
     "register-service-worker": "^1.0.0",
     "v-charts": "^1.19.0",
     "vconsole": "^3.3.4",
-    "vue": "^2.5.16",
+    "vue": "^3.0.0",
     "vuetify": "^1.0.19"
   },
   "devDependencies": {
