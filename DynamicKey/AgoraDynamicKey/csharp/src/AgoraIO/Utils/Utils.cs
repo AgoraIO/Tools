@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.IO;
-using Ionic.Zlib;
+using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 
 namespace AgoraIO.Media
 {
@@ -56,7 +56,7 @@ namespace AgoraIO.Media
             byte[] output;
             using (MemoryStream outputStream = new MemoryStream())
             {
-                using (var zlibStream = new ZlibStream(outputStream, CompressionMode.Compress, CompressionLevel.Level5, true)) // or use Level6
+                using (var zlibStream = new DeflaterOutputStream(outputStream))
                 {
                     zlibStream.Write(data, 0, data.Length);
                 }
@@ -69,11 +69,12 @@ namespace AgoraIO.Media
         public static byte[] decompress(byte[] data)
         {
             byte[] output;
+            using (MemoryStream inputStream = new MemoryStream(data))
             using (MemoryStream outputStream = new MemoryStream())
             {
-                using (var zlibStream = new ZlibStream(outputStream, CompressionMode.Decompress))
+                using (var zlibStream = new InflaterInputStream(inputStream))
                 {
-                    zlibStream.Write(data, 0, data.Length);
+                    zlibStream.CopyTo(outputStream);
                 }
                 output = outputStream.ToArray();
             }
