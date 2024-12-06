@@ -57,7 +57,7 @@ namespace AgoraIO.Tests
             Assert.Equal(uidStr, serviceRtc._uid);
 
             string token = accessToken.build();
-            Assert.Equal("007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj", token);
+            Assert.Equal("007eJwlx6EKQjEUgOGjYDEJgsG0R9h2zrazKAaDgtGrQdg880Gsgk2M+gA+wI0Wg1jMPodglYv8/OFTMLjUs9V69/zO6/7rvLxP349bUlUnXk+Lw3E/VBCDHo/QSfF6Q+TJ5ZwKJ2uc9iYjTj49qNoALWj+11hBkGDRu5IjI7HDGAoW3EYhr7NI6oJltkjGBvwBwmok4w==", token);
         }
 
         [Fact]
@@ -152,8 +152,9 @@ namespace AgoraIO.Tests
             Assert.Equal(uidStr, serviceRtc._uid);
             Assert.Equal(userId, serviceRtm._userId);
 
-            string expected = "007eJxTYPg19dsX8xO2Nys/bpSeoH/0j9CvSs1JWib9291PKC53l85UYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyMDAwAwkWYAYxGcCk8xgkgVMKjCYp5gbGZuZpiZZWhibWJgaW5qnGqcap1mmmJgZJKWkJHIxGFlYGBmbGBqZGzMBzYGYxMlQklpcEl9anFrEChdEVgoAw6ct/Q==";
+            string expected = "007eJxNjD0KwkAUhJ8xFlqJbZpYauNm3/4WFmKRK9hJ1l3B1sQip1AEz2Bt5QmEXMFjCMEiWBgjiMV8MMPwhVCdnqUspvf8cQkOk9trUOWj45jtr3ExPMfBJgQtyXyG3DpBVowJxo1JnEpoxImIDGJc9mHhAbQAoF3Tr/PpXsN2Q79hCNJKioI7oxUyxVFLhw7X2jJBjLVJD6hSFFlEJXq152vqQubSbLlL3bbzG/+vb8OnLf0=";
             string token = accessToken.build();
+
             Assert.Equal(expected, token);
         }
 
