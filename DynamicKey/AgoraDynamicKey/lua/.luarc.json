@@ -1,0 +1,13 @@
+{
+    "workspace": {
+        "library": [
+            "/usr/local"
+        ]
+    },
+    "diagnostics": {
+        "globals": [
+            "error",
+            "os"
+        ]
+    }
+}
