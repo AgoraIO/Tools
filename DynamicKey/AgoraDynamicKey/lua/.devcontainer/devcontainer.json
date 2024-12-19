@@ -1,0 +1,19 @@
+{
+    "name": "AgoraDynamicKey-lua",
+    "image": "nickblah/lua:5.4.7-luarocks-ubuntu",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "sumneko.lua"
+            ]
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {}
+    },
+    "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind",
+    "workspaceFolder": "/app",
+    "postCreateCommand": {
+        "install dependencies": "apt-get update && apt-get install -y build-essential zlib1g-dev libssl-dev && luarocks make agora-token-0.1.0-1.rockspec"
+    }
+}
