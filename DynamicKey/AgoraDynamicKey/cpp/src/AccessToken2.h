@@ -257,7 +257,7 @@ class AccessToken2 {
 
   static std::string Version() { return "007"; }
 
-  void AddService(std::unique_ptr<Service> service) { services_[service->ServiceType()] = std::move(service); }
+  void AddService(std::unique_ptr<Service> service) { services_.insert(std::make_pair(service->ServiceType(), std::move(service))); }
 
   std::string Build() {
     if (!BuildCheck()) return "";
@@ -283,6 +283,32 @@ class AccessToken2 {
       return false;
     }
     return true;
+  }
+
+  bool VerifySignature(std::string token, const std::string &app_certificate) {
+    if (token.substr(0, VERSION_LENGTH) != Version()) {
+      return false;
+    }
+    std::string signature;
+    std::string app_id;
+    uint32_t issue_ts;
+    uint32_t expire;
+    uint32_t salt;
+    try {
+      auto buffer = Decompress(base64Decode(token.substr(VERSION_LENGTH)));
+      Unpacker unpacker(buffer.data(), buffer.length());
+      unpacker >> signature >> app_id >> issue_ts >> expire >> salt;
+
+      auto signing = HmacSign2(Pack(issue_ts), app_certificate, HMAC_SHA256_LENGTH);
+      signing = HmacSign2(Pack(salt), signing, HMAC_SHA256_LENGTH);
+
+      auto signing_info = Pack(app_id) + Pack(issue_ts) + Pack(expire) + Pack(salt) + unpacker.pop_raw_string_to_end();
+      auto gen_signature = HmacSign2(signing, signing_info, HMAC_SHA256_LENGTH);
+      return signature == gen_signature;
+    } catch (std::exception &e) {
+      perror((std::string("VerifySignature error: ") + e.what()).c_str());
+      return false;
+    }
   }
 
   std::string GenerateSignature(const std::string &app_certificate) {
@@ -323,10 +349,14 @@ class AccessToken2 {
     for (auto i = 0; i < service_count; ++i) {
       uint16_t service_type;
       *unpacker >> service_type;
-
-      auto service = std::unique_ptr<Service>(kServiceCreator.at(service_type)());
+      auto service_ptr = kServiceCreator.find(service_type);
+      if (service_ptr == kServiceCreator.end()) {
+        perror((std::string("invalid service type ") + std::to_string(service_type)).c_str());
+        break;
+      }
+      auto service = std::unique_ptr<Service>(service_ptr->second());
       service->UnpackService(unpacker);
-      services_[service_type] = std::move(service);
+      services_.insert(std::make_pair(service_type, std::move(service)));
     }
   }
 
@@ -358,7 +388,7 @@ class AccessToken2 {
   std::string app_cert_;
   std::string signature_;
 
-  std::map<uint16_t, std::unique_ptr<Service>> services_;
+  std::multimap<uint16_t, std::unique_ptr<Service>> services_;
 };
 
 }  // namespace tools
