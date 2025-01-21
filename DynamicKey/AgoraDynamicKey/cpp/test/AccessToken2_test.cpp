@@ -359,8 +359,13 @@ class AccessToken2_test : public testing::Test {
     token.AddService(std::move(BuildRtmStreamServiceAsRtc(channel_name_, uid_, rtm_stream_expire)));
     std::string token_str = token.Build();
     AccessToken2 token_parsed;
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenInvalid);
     ASSERT_TRUE(token_parsed.FromString(token_str));
-    ASSERT_TRUE(token_parsed.VerifySignature(token_str, app_certificate_));
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_+"123"), kTokenInvalidInfo);
+    std::string err_cert = app_certificate_;
+    err_cert[0] = '1';
+    ASSERT_EQ(token_parsed.VerifySignature(err_cert), kTokenVerifyFailed);
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenVerifySuccess);
 
     EXPECT_EQ(app_id_, token.app_id_);
     EXPECT_EQ(rtc_expire, token.expire_);
@@ -407,7 +412,7 @@ class AccessToken2_test : public testing::Test {
         "RELgYjCwsjYxNDI3NjJqA5EJM4GUpSi0viS4tTi1jggqxwFrImAAIiLHc=";
     AccessToken2 token_parsed;
     ASSERT_TRUE(token_parsed.FromString(token_str));
-    ASSERT_TRUE(token_parsed.VerifySignature(token_str, app_certificate_));
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenVerifySuccess);
     EXPECT_EQ(token_parsed.app_id_, app_id_);
     EXPECT_EQ(token_parsed.expire_, expire_);
     EXPECT_EQ(token_parsed.GenerateSignature(app_certificate_), token_parsed.signature_);

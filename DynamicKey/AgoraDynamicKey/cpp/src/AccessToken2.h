@@ -241,6 +241,14 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},
 };
 
+enum TokenStatus {
+  kTokenVerifySuccess = 0,
+  kTokenVerifyFailed = -1,
+  kTokenInvalid = -2,
+  kTokenInvalidInfo = -3,
+  kTokenThrow = -4,
+};
+
 class AccessToken2 {
  public:
   AccessToken2(const std::string &app_id = "", const std::string &app_certificate = "", uint32_t issue_ts = 0, uint32_t expire = 900)
@@ -276,6 +284,7 @@ class AccessToken2 {
 
     try {
       auto buffer = Decompress(base64Decode(token.substr(VERSION_LENGTH)));
+      raw_token_buffer_ = buffer;
       Unpacker unpacker(buffer.data(), buffer.length());
       unpacker >> signature_ >> app_id_ >> issue_ts_ >> expire_ >> salt_;
       UnpackServices(&unpacker);
@@ -285,29 +294,26 @@ class AccessToken2 {
     return true;
   }
 
-  bool VerifySignature(std::string token, const std::string &app_certificate) {
-    if (token.substr(0, VERSION_LENGTH) != Version()) {
-      return false;
+  TokenStatus VerifySignature(const std::string &app_certificate) {
+    app_cert_ = app_certificate;
+    if (raw_token_buffer_.empty()) {
+      perror("invalid token, please unpack first by FromString()");
+      return kTokenInvalid;
+    } else if (!BuildCheck()) {
+      return kTokenInvalidInfo;
     }
-    std::string signature;
-    std::string app_id;
-    uint32_t issue_ts;
-    uint32_t expire;
-    uint32_t salt;
     try {
-      auto buffer = Decompress(base64Decode(token.substr(VERSION_LENGTH)));
-      Unpacker unpacker(buffer.data(), buffer.length());
-      unpacker >> signature >> app_id >> issue_ts >> expire >> salt;
+      std::string signature;
+      Unpacker unpacker(raw_token_buffer_.data(), raw_token_buffer_.length());
+      unpacker >> signature;
+      auto signing = Signing();
 
-      auto signing = HmacSign2(Pack(issue_ts), app_certificate, HMAC_SHA256_LENGTH);
-      signing = HmacSign2(Pack(salt), signing, HMAC_SHA256_LENGTH);
-
-      auto signing_info = Pack(app_id) + Pack(issue_ts) + Pack(expire) + Pack(salt) + unpacker.pop_raw_string_to_end();
+      auto signing_info = unpacker.pop_raw_string_to_end();
       auto gen_signature = HmacSign2(signing, signing_info, HMAC_SHA256_LENGTH);
-      return signature == gen_signature;
+      return signature == gen_signature ? kTokenVerifySuccess : kTokenVerifyFailed;
     } catch (std::exception &e) {
       perror((std::string("VerifySignature error: ") + e.what()).c_str());
-      return false;
+      return kTokenThrow;
     }
   }
 
@@ -387,6 +393,7 @@ class AccessToken2 {
   std::string app_id_;
   std::string app_cert_;
   std::string signature_;
+  std::string raw_token_buffer_;
 
   std::multimap<uint16_t, std::unique_ptr<Service>> services_;
 };
