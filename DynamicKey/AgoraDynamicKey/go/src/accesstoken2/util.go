@@ -127,7 +127,10 @@ func unPackString(r io.Reader) (s string, err error) {
 	}
 
 	buf := make([]byte, n)
-	r.Read(buf)
+	if _, err = io.ReadFull(r, buf); err != nil {
+		return
+	}
+
 	s = string(buf)
 	return
 }
