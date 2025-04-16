@@ -313,6 +313,14 @@ public:
         return s;
     }
 
+    std::string pop_raw_string_to_end() {
+    uint32_t length = length_ - position_;
+    check_size(length, position_);
+    std::string s = std::string(buffer_ + position_, length);
+    position_ += length;
+    return s;
+  }
+
     const char*	buffer() const {
         return buffer_;
     }
