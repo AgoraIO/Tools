@@ -241,6 +241,14 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},
 };
 
+enum TokenStatus {
+  kTokenVerifySuccess = 0,
+  kTokenVerifyFailed = -1,
+  kTokenInvalid = -2,
+  kTokenInvalidInfo = -3,
+  kTokenThrow = -4,
+};
+
 class AccessToken2 {
  public:
   AccessToken2(const std::string &app_id = "", const std::string &app_certificate = "", uint32_t issue_ts = 0, uint32_t expire = 900)
@@ -257,7 +265,7 @@ class AccessToken2 {
 
   static std::string Version() { return "007"; }
 
-  void AddService(std::unique_ptr<Service> service) { services_[service->ServiceType()] = std::move(service); }
+  void AddService(std::unique_ptr<Service> service) { services_.insert(std::make_pair(service->ServiceType(), std::move(service))); }
 
   std::string Build() {
     if (!BuildCheck()) return "";
@@ -276,6 +284,7 @@ class AccessToken2 {
 
     try {
       auto buffer = Decompress(base64Decode(token.substr(VERSION_LENGTH)));
+      raw_token_buffer_ = buffer;
       Unpacker unpacker(buffer.data(), buffer.length());
       unpacker >> signature_ >> app_id_ >> issue_ts_ >> expire_ >> salt_;
       UnpackServices(&unpacker);
@@ -283,6 +292,29 @@ class AccessToken2 {
       return false;
     }
     return true;
+  }
+
+  TokenStatus VerifySignature(const std::string &app_certificate) {
+    app_cert_ = app_certificate;
+    if (raw_token_buffer_.empty()) {
+      perror("invalid token, please unpack first by FromString()");
+      return kTokenInvalid;
+    } else if (!BuildCheck()) {
+      return kTokenInvalidInfo;
+    }
+    try {
+      std::string signature;
+      Unpacker unpacker(raw_token_buffer_.data(), raw_token_buffer_.length());
+      unpacker >> signature;
+      auto signing = Signing();
+
+      auto signing_info = unpacker.pop_raw_string_to_end();
+      auto gen_signature = HmacSign2(signing, signing_info, HMAC_SHA256_LENGTH);
+      return signature == gen_signature ? kTokenVerifySuccess : kTokenVerifyFailed;
+    } catch (std::exception &e) {
+      perror((std::string("VerifySignature error: ") + e.what()).c_str());
+      return kTokenThrow;
+    }
   }
 
   std::string GenerateSignature(const std::string &app_certificate) {
@@ -323,10 +355,14 @@ class AccessToken2 {
     for (auto i = 0; i < service_count; ++i) {
       uint16_t service_type;
       *unpacker >> service_type;
-
-      auto service = std::unique_ptr<Service>(kServiceCreator.at(service_type)());
+      auto service_ptr = kServiceCreator.find(service_type);
+      if (service_ptr == kServiceCreator.end()) {
+        perror((std::string("invalid service type ") + std::to_string(service_type)).c_str());
+        break;
+      }
+      auto service = std::unique_ptr<Service>(service_ptr->second());
       service->UnpackService(unpacker);
-      services_[service_type] = std::move(service);
+      services_.insert(std::make_pair(service_type, std::move(service)));
     }
   }
 
@@ -357,8 +393,9 @@ class AccessToken2 {
   std::string app_id_;
   std::string app_cert_;
   std::string signature_;
+  std::string raw_token_buffer_;
 
-  std::map<uint16_t, std::unique_ptr<Service>> services_;
+  std::multimap<uint16_t, std::unique_ptr<Service>> services_;
 };
 
 }  // namespace tools
