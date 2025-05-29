@@ -40,8 +40,7 @@ module AgoraDynamicKey2
     # app_certificate: Certificate of the application that you registered in the Agora Dashboard.
     #     See Get an App Certificate.
     # channel_name: Unique channel name for the AgoraRTC session in the string format.
-    # uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
-    #     uid must be unique.
+    # account: The user's account, max length is 255 Bytes.
     # role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
     # token_expire: represented by the number of seconds elapsed since now. If, for example,
@@ -182,8 +181,7 @@ module AgoraDynamicKey2
     # app_certificate: Certificate of the application that you registered in the Agora Dashboard.
     #     See Get an App Certificate.
     # channel_name: Unique channel name for the AgoraRTC session in the string format.
-    # uid: User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
-    #     uid must be unique.
+    # account: The user's account, max length is 255 Bytes.
     # role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
     # token_expire: represented by the number of seconds elapsed since now. If, for example,
@@ -207,6 +205,52 @@ module AgoraDynamicKey2
       service_rtm = AgoraDynamicKey2::ServiceRtm.new(account)
 
       service_rtm.add_privilege(AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN, token_expire)
+      access_token.add_service(service_rtm)
+
+      access_token.build
+    end
+
+    # Build the RTC and RTM token with account.
+    #
+    # app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
+    #     from your kit. See Get an App ID.
+    # app_certificate: Certificate of the application that you registered in the Agora Dashboard.
+    #     See Get an App Certificate.
+    # channel_name: Unique channel name for the AgoraRTC session in the string format.
+    # rtc_account: The RTC user's account, max length is 255 Bytes.
+    # rtc_role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+    #     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
+    # rtc_token_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set token_expire as 600(seconds).
+    # join_channel_privilege_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+    # pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+    # pub_video_privilege_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+    # pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
+    # rtm_user_id: The RTM user's account, max length is 255 Bytes.
+    # rtm_token_expire: represented by the number of seconds elapsed since now.
+    #    If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set rtm_token_expire as 600(seconds).
+    # return: The RTC and RTM token.
+    def self.build_token_with_rtm2(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
+                                   join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire, pub_data_stream_privilege_expire,
+                                   rtm_user_id, rtm_token_expire)
+      access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, rtc_token_expire)
+      service_rtc = AgoraDynamicKey2::ServiceRtc.new(channel_name, rtc_account)
+
+      service_rtc.add_privilege(AgoraDynamicKey2::ServiceRtc::PRIVILEGE_JOIN_CHANNEL, join_channel_privilege_expire)
+      if rtc_role == ROLE_PUBLISHER
+        service_rtc.add_privilege(AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, pub_audio_privilege_expire)
+        service_rtc.add_privilege(AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, pub_video_privilege_expire)
+        service_rtc.add_privilege(AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, pub_data_stream_privilege_expire)
+      end
+      access_token.add_service(service_rtc)
+
+      service_rtm = AgoraDynamicKey2::ServiceRtm.new(rtm_user_id)
+
+      service_rtm.add_privilege(AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN, rtm_token_expire)
       access_token.add_service(service_rtm)
 
       access_token.build

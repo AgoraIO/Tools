@@ -37,3 +37,19 @@ echo 'Token with user account and privilege: ' . $token . PHP_EOL;
 
 $token = RtcTokenBuilder2::buildTokenWithRtm($appId, $appCertificate, $channelName, $uidStr, RtcTokenBuilder2::ROLE_PUBLISHER, $tokenExpirationInSeconds, $privilegeExpirationInSeconds);
 echo 'Token with RTM: ' . $token . PHP_EOL;
+
+$token = RtcTokenBuilder2::buildTokenWithRtm2(
+    $appId,
+    $appCertificate,
+    $channelName,
+    $uidStr,
+    RtcTokenBuilder2::ROLE_PUBLISHER,
+    $tokenExpirationInSeconds,
+    $joinChannelPrivilegeExpireInSeconds,
+    $pubAudioPrivilegeExpireInSeconds,
+    $pubVideoPrivilegeExpireInSeconds,
+    $pubDataStreamPrivilegeExpireInSeconds,
+    $uidStr,
+    $tokenExpirationInSeconds
+);
+echo 'Token with RTM: ' . $token . PHP_EOL;

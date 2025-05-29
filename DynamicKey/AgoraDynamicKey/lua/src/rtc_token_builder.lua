@@ -186,12 +186,60 @@ local function build_token_with_rtm(app_id, app_certificate, channel_name, accou
     return token:build()
 end
 
+-- Build the RTC and RTM token with account.
+--
+-- app_id: The App ID issued to you by Agora. Apply for a new App ID from
+--     Agora Dashboard if it is missing from your kit. See Get an App ID.
+-- app_certificate: Certificate of the application that you registered in
+--     the Agora Dashboard. See Get an App Certificate.
+-- channel_name: Unique channel name for the AgoraRTC session in the string format
+-- rtc_account: The RTC user's account, max length is 255 Bytes.
+-- rtc_role: RolePublisher: A broadcaster/host in a live-broadcast profile.
+--     RoleSubscriber: An audience(default) in a live-broadcast profile.
+-- rtc_token_expire: represented by the number of seconds elapsed since now. If, for example,
+--     you want to access the Agora Service within 10 minutes after the token is generated,
+--     set rtc_token_expire as 600(seconds).
+-- join_channel_privilege_expire: represented by the number of seconds elapsed since now.
+--     If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+-- pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
+--     If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+-- pub_video_privilege_expire: represented by the number of seconds elapsed since now.
+--     If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+-- pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
+--     If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
+-- rtm_user_id: The RTM user's account, max length is 255 Bytes.
+-- rtm_token_expire: represented by the number of seconds elapsed since now. If, for example,
+--     you want to access the Agora Service within 10 minutes after the token is generated, set rtm_token_expire as 600(seconds).
+-- return The RTC and RTM token.
+local function build_token_with_rtm2(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
+                                     join_channel_privilege_expire, pub_audio_privilege_expire,
+                                     pub_video_privilege_expire, pub_data_stream_privilege_expire,
+                                     rtm_user_id, rtm_token_expire)
+    local token = access_token.new_access_token(app_id, app_certificate, rtc_token_expire)
+
+    local service_rtc = access_token.new_service_rtc(channel_name, rtc_account)
+    service_rtc.service:add_privilege(access_token.PRIVILEGE_JOIN_CHANNEL, join_channel_privilege_expire)
+    if rtc_role == ROLE_PUBLISHER then
+        service_rtc.service:add_privilege(access_token.PRIVILEGE_PUBLISH_AUDIO_STREAM, pub_audio_privilege_expire)
+        service_rtc.service:add_privilege(access_token.PRIVILEGE_PUBLISH_VIDEO_STREAM, pub_video_privilege_expire)
+        service_rtc.service:add_privilege(access_token.PRIVILEGE_PUBLISH_DATA_STREAM, pub_data_stream_privilege_expire)
+    end
+    token:add_service(service_rtc)
+
+    local service_rtm = access_token.new_service_rtm(rtm_user_id)
+    service_rtm.service:add_privilege(access_token.PRIVILEGE_LOGIN, rtm_token_expire)
+    token:add_service(service_rtm)
+
+    return token:build()
+end
+
 return {
     build_token_with_uid = build_token_with_uid,
     build_token_with_user_account = build_token_with_user_account,
     build_token_with_uid_and_privilege = build_token_with_uid_and_privilege,
     build_token_with_user_account_and_privilege = build_token_with_user_account_and_privilege,
     build_token_with_rtm = build_token_with_rtm,
+    build_token_with_rtm2 = build_token_with_rtm2,
     ROLE_PUBLISHER = ROLE_PUBLISHER,
     ROLE_SUBSCRIBER = ROLE_SUBSCRIBER,
 }

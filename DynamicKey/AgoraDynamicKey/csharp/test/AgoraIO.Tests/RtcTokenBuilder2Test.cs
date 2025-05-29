@@ -14,6 +14,11 @@ namespace AgoraIO.Tests
         private uint _uid = 2882341273;
         private uint _tokenExpirationInSeconds = 3600;
         private uint _privilegeExpirationInSeconds = 3600;
+        private uint _joinChannelPrivilegeExpireInSeconds = 3600;
+        private uint _pubAudioPrivilegeExpireInSeconds = 3600;
+        private uint _pubVideoPrivilegeExpireInSeconds = 3600;
+        private uint _pubDataStreamPrivilegeExpireInSeconds = 3600;
+
         protected readonly ITestOutputHelper Output;
 
         public RtcTokenBuilder2Test(ITestOutputHelper tempOutput)
@@ -43,6 +48,16 @@ namespace AgoraIO.Tests
         public void testbuildTokenWithRtm()
         {
             string token = RtcTokenBuilder2.buildTokenWithRtm(_appId, _appCertificate, _channelName, _account, RtcTokenBuilder2.Role.RolePublisher, _tokenExpirationInSeconds, _privilegeExpirationInSeconds);
+
+            Output.WriteLine(">> token");
+            Output.WriteLine(token);
+        }
+
+        [Fact]
+        public void testbuildTokenWithRtm2()
+        {
+            string token = RtcTokenBuilder2.buildTokenWithRtm2(_appId, _appCertificate, _channelName, _account, RtcTokenBuilder2.Role.RolePublisher, _tokenExpirationInSeconds,
+                _joinChannelPrivilegeExpireInSeconds, _pubAudioPrivilegeExpireInSeconds, _pubVideoPrivilegeExpireInSeconds, _pubDataStreamPrivilegeExpireInSeconds, _account, _tokenExpirationInSeconds);
 
             Output.WriteLine(">> token");
             Output.WriteLine(token);

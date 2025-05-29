@@ -66,4 +66,11 @@ func main() {
 	} else {
 		fmt.Printf("Token with RTM: %s\n", result)
 	}
+
+	result, err = rtctokenbuilder.BuildTokenWithRtm2(appId, appCertificate, channelName, uidStr, rtctokenbuilder.RolePublisher, tokenExpirationInSeconds, privilegeExpirationInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds, uidStr, tokenExpirationInSeconds)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("Token with RTM: %s\n", result)
+	}
 }

@@ -1,6 +1,6 @@
 {
     "name": "agora-token",
-    "version": "2.0.4",
+    "version": "2.0.5",
     "description": "",
     "homepage": "https://github.com/AgoraIO/Tools/tree/master/DynamicKey/AgoraDynamicKey/nodejs",
     "main": "index.js",
