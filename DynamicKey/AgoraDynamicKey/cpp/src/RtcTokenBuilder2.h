@@ -273,6 +273,51 @@ class RtcTokenBuilder2 {
    */
   static std::string BuildTokenWithRtm(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
                                        const std::string& user_account, UserRole role, uint32_t token_expire, uint32_t privilege_expire = 0);
+
+  /**
+   * Builds an RTC and RTM token with account.
+   *
+   * @param app_id The App ID issued to you by Agora.
+   * @param app_certificate Certificate of the application that you registered in
+   * the Agora Dashboard.
+   * @param channel_name Unique channel name for the AgoraRTC session in the
+   * string format. The string length must be less than 64 bytes. Supported
+   * character scopes are:
+   * - The 26 lowercase English letters: a to z.
+   * - The 26 uppercase English letters: A to Z.
+   * - The 10 digits: 0 to 9.
+   * - The space.
+   * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">",
+   * "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+   * @param rtc_account The user account.
+   * @param rtc_role See #userRole.
+   * - Role_Publisher = 1: RECOMMENDED. Use this role for a voice/video call or a
+   * live broadcast.
+   * - Role_Subscriber = 2: ONLY use this role if your live-broadcast scenario
+   * requires authentication for
+   * [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication).
+   * In order for this role to take effect, please contact our support team to
+   * enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
+   * still has the same privileges as Role_Publisher.
+   * @param rtc_token_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set rtc_token_expire as 600(seconds).
+   * @param join_channel_privilege_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+   * @param pub_audio_privilege_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+   * @param pub_video_privilege_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+   * @param pub_data_stream_privilege_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
+   * @param rtm_user_id The RTM user's account, max length is 255 Bytes.
+   * @param rtm_token_expire represented by the number of seconds elapsed since now.
+   * If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set rtm_token_expire as 600(seconds).
+   @return The RTC and RTM token.
+   */
+  static std::string BuildTokenWithRtm2(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
+                                        const std::string& rtc_account, UserRole rtc_role, uint32_t rtc_token_expire, uint32_t join_channel_privilege_expire,
+                                        uint32_t pub_audio_privilege_expire, uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
+                                        const std::string& rtm_user_id, uint32_t rtm_token_expire);
 };
 
 inline std::string RtcTokenBuilder2::BuildTokenWithUid(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
@@ -344,6 +389,30 @@ inline std::string RtcTokenBuilder2::BuildTokenWithRtm(const std::string& app_id
 
   std::unique_ptr<Service> rtm_service(new ServiceRtm(user_account));
   rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, token_expire);
+
+  token.AddService(std::move(rtm_service));
+
+  return token.Build();
+}
+
+inline std::string RtcTokenBuilder2::BuildTokenWithRtm2(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
+                                                        const std::string& rtc_account, UserRole rtc_role, uint32_t rtc_token_expire,
+                                                        uint32_t join_channel_privilege_expire, uint32_t pub_audio_privilege_expire,
+                                                        uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
+                                                        const std::string& rtm_user_id, uint32_t rtm_token_expire) {
+  std::unique_ptr<Service> rtc_service(new ServiceRtc(channel_name, rtc_account));
+  AccessToken2 token(app_id, app_certificate, 0, rtc_token_expire);
+
+  rtc_service->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, join_channel_privilege_expire);
+  if (rtc_role == UserRole::kRolePublisher) {
+    rtc_service->AddPrivilege(ServiceRtc::kPrivilegePublishAudioStream, pub_audio_privilege_expire);
+    rtc_service->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, pub_video_privilege_expire);
+    rtc_service->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, pub_data_stream_privilege_expire);
+  }
+  token.AddService(std::move(rtc_service));
+
+  std::unique_ptr<Service> rtm_service(new ServiceRtm(rtm_user_id));
+  rtm_service->AddPrivilege(ServiceRtm::kPrivilegeLogin, rtm_token_expire);
 
   token.AddService(std::move(rtm_service));
 

@@ -60,5 +60,11 @@ int main(int argc, char const *argv[]) {
                                                privilege_expiration_in_seconds);
   std::cout << "Token With RTM:" << result << std::endl;
 
+  result = RtcTokenBuilder2::BuildTokenWithRtm2(app_id, app_certificate, channel_name, account, UserRole::kRolePublisher, token_expiration_in_seconds,
+                                                join_channel_privilege_expiration_in_seconds, pub_audio_privilege_expiration_in_seconds,
+                                                pub_video_privilege_expiration_in_seconds, pub_data_stream_privilege_expiration_in_seconds, account,
+                                                token_expiration_in_seconds);
+  std::cout << "Token With RTM:" << result << std::endl;
+
   return 0;
 }
