@@ -84,3 +84,19 @@ const tokenWithRtm = RtcTokenBuilder.buildTokenWithRtm(
     privilegeExpirationInSecond
 )
 console.log('Token with RTM:', tokenWithRtm)
+
+const tokenWithRtm2 = RtcTokenBuilder.buildTokenWithRtm2(
+    appId,
+    appCertificate,
+    channelName,
+    account,
+    role,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds,
+    account,
+    tokenExpirationInSecond
+)
+console.log('Token with RTM:', tokenWithRtm2)
