@@ -92,4 +92,22 @@ fn main() {
         Ok(result) => println!("Token with RTM: {}", result),
         Err(err) => println!("{}", err),
     }
+
+    match rtc_token_builder::build_token_with_rtm2(
+        &app_id,
+        &app_certificate,
+        &channel_name,
+        &uid_str,
+        rtc_token_builder::ROLE_PUBLISHER,
+        token_expiration_in_seconds,
+        join_channel_privilege_expire_in_seconds,
+        pub_audio_privilege_expire_in_seconds,
+        pub_video_privilege_expire_in_seconds,
+        pub_data_stream_privilege_expire_in_seconds,
+        &uid_str,
+        token_expiration_in_seconds,
+    ) {
+        Ok(result) => println!("Token with RTM: {}", result),
+        Err(err) => println!("{}", err),
+    }
 }
