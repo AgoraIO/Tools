@@ -247,4 +247,62 @@ class RtcTokenBuilder2
 
         return $token->build();
     }
+
+    /**
+     * Build the RTC and RTM token with account.
+     *
+     * @param $appId            The App ID issued to you by Agora. Apply for a new App ID from
+     *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
+     * @param $appCertificate   Certificate of the application that you registered in
+     *                          the Agora Dashboard. See Get an App Certificate.
+     * @param $channelName      Unique channel name for the AgoraRTC session in the string format
+     * @param $rtcAccount       The RTC user's account, max length is 255 Bytes.
+     * @param $rtcRole          ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
+     * @param $rtcTokenExpire   Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
+     * @param $joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set $joinChannelPrivilegeExpire as 600(seconds).
+     * @param $pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set $pubAudioPrivilegeExpire as 600(seconds).
+     * @param $pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish video privilege for 10 minutes, set $pubVideoPrivilegeExpire as 600(seconds).
+     * @param $pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set $pubDataStreamPrivilegeExpire as 600(seconds).
+     * @param $rtmUserId The RTM user's account, max length is 255 Bytes.
+     * @param $rtmTokenExpire represented by the number of seconds elapsed since now. If, for example,
+     * you want to access the Agora Service within 10 minutes after the token is generated, set $rtmTokenExpire as 600(seconds).
+     * @return The RTC and RTM token.
+     */
+    public static function buildTokenWithRtm2(
+        $appId,
+        $appCertificate,
+        $channelName,
+        $rtcAccount,
+        $rtcRole,
+        $rtcTokenExpire,
+        $joinChannelPrivilegeExpire,
+        $pubAudioPrivilegeExpire,
+        $pubVideoPrivilegeExpire,
+        $pubDataStreamPrivilegeExpire,
+        $rtmUserId,
+        $rtmTokenExpire
+    ) {
+        $token = new AccessToken2($appId, $appCertificate, $rtcTokenExpire);
+        $serviceRtc = new ServiceRtc($channelName, $rtcAccount);
+
+        $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_JOIN_CHANNEL, $joinChannelPrivilegeExpire);
+        if ($rtcRole == self::ROLE_PUBLISHER) {
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM, $pubAudioPrivilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM, $pubVideoPrivilegeExpire);
+            $serviceRtc->addPrivilege($serviceRtc::PRIVILEGE_PUBLISH_DATA_STREAM, $pubDataStreamPrivilegeExpire);
+        }
+        $token->addService($serviceRtc);
+
+        $serviceRtm = new ServiceRtm($rtmUserId);
+
+        $serviceRtm->addPrivilege($serviceRtm::PRIVILEGE_LOGIN, $rtmTokenExpire);
+        $token->addService($serviceRtm);
+
+        return $token->build();
+    }
 }
