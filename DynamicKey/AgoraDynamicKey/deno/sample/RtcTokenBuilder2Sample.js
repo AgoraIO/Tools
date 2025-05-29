@@ -9,9 +9,12 @@ const channelName = '7d72365eb983485397e3e3f9d460bdda'
 const uid = 2882341273
 const account = '2882341273'
 const role = RtcRole.PUBLISHER
-const expirationInSeconds = 3600
 const tokenExpirationInSecond = 3600
 const privilegeExpirationInSecond = 3600
+const joinChannelPrivilegeExpireInSeconds = 3600
+const pubAudioPrivilegeExpireInSeconds = 3600
+const pubVideoPrivilegeExpireInSeconds = 3600
+const pubDataStreamPrivilegeExpireInSeconds = 3600
 
 console.log('App Id:', appId)
 console.log('App Certificate:', appCertificate)
@@ -41,11 +44,11 @@ const tokenWithUidAndPrivilege = RtcTokenBuilder.buildTokenWithUidAndPrivilege(
     appCertificate,
     channelName,
     uid,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds,
 )
 console.log('Token with int uid and privilege:', tokenWithUidAndPrivilege)
 
@@ -54,11 +57,11 @@ const tokenWithUserAccountAndPrivilege = RtcTokenBuilder.BuildTokenWithUserAccou
     appCertificate,
     channelName,
     account,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
-    expirationInSeconds,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds,
 )
 console.log('Token with user account and privilege:', tokenWithUserAccountAndPrivilege)
 
@@ -72,3 +75,19 @@ const tokenWithRtm = RtcTokenBuilder.buildTokenWithRtm(
     privilegeExpirationInSecond,
 )
 console.log('Token with RTM:', tokenWithRtm)
+
+const tokenWithRtm2 = RtcTokenBuilder.buildTokenWithRtm2(
+    appId,
+    appCertificate,
+    channelName,
+    account,
+    role,
+    tokenExpirationInSecond,
+    joinChannelPrivilegeExpireInSeconds,
+    pubAudioPrivilegeExpireInSeconds,
+    pubVideoPrivilegeExpireInSeconds,
+    pubDataStreamPrivilegeExpireInSeconds,
+    account,
+    tokenExpirationInSecond,
+)
+console.log('Token with RTM:', tokenWithRtm2)

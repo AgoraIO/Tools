@@ -16,7 +16,7 @@ const Role = {
      * to enable authentication for Hosting-in for you. Otherwise, Role_Subscriber
      * still has the same privileges as Role_Publisher.
      */
-    SUBSCRIBER: 2
+    SUBSCRIBER: 2,
 }
 
 class RtcTokenBuilder {
@@ -46,7 +46,7 @@ class RtcTokenBuilder {
             uid,
             role,
             tokenExpire,
-            privilegeExpire
+            privilegeExpire,
         )
     }
 
@@ -75,7 +75,7 @@ class RtcTokenBuilder {
         account,
         role,
         tokenExpire,
-        privilegeExpire = 0
+        privilegeExpire = 0,
     ) {
         let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
 
@@ -146,7 +146,7 @@ class RtcTokenBuilder {
         joinChannelPrivilegeExpire,
         pubAudioPrivilegeExpire,
         pubVideoPrivilegeExpire,
-        pubDataStreamPrivilegeExpire
+        pubDataStreamPrivilegeExpire,
     ) {
         return this.BuildTokenWithUserAccountAndPrivilege(
             appId,
@@ -157,7 +157,7 @@ class RtcTokenBuilder {
             joinChannelPrivilegeExpire,
             pubAudioPrivilegeExpire,
             pubVideoPrivilegeExpire,
-            pubDataStreamPrivilegeExpire
+            pubDataStreamPrivilegeExpire,
         )
     }
 
@@ -216,7 +216,7 @@ class RtcTokenBuilder {
         joinChannelPrivilegeExpire,
         pubAudioPrivilegeExpire,
         pubVideoPrivilegeExpire,
-        pubDataStreamPrivilegeExpire
+        pubDataStreamPrivilegeExpire,
     ) {
         let token = new AccessToken(appId, appCertificate, 0, tokenExpire)
 
@@ -262,6 +262,66 @@ class RtcTokenBuilder {
 
         let serviceRtm = new ServiceRtm(account)
         serviceRtm.add_privilege(ServiceRtm.kPrivilegeLogin, tokenExpire)
+        token.add_service(serviceRtm)
+
+        return token.build()
+    }
+
+    /**
+     * Build an RTC and RTM token with account.
+     * @param {*} appId  The App ID issued to you by Agora.
+     * @param {*} appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param {*} channelName The unique channel name for the AgoraRTC session in the string format. The string length must be less than 64 bytes. Supported character scopes are:
+     * - The 26 lowercase English letters: a to z.
+     * - The 26 uppercase English letters: A to Z.
+     * - The 10 digits: 0 to 9.
+     * - The space.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param {*} rtcAccount The RTC user's account, max length is 255 Bytes.
+     * @param {*} rtcRole See #userRole.
+     * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
+     * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
+     * @param {*} rtcTokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * @param {*} pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * @param {*} pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * @param {*} pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+     * @param {*} rtmUserId: The RTM user's account, max length is 255 Bytes.
+     * @param {*} rtmTokenExpire: represented by the number of seconds elapsed since now. If, for example,
+     * you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire as 600(seconds).
+     * * @return The RTC and RTM Token.
+     */
+    static buildTokenWithRtm2(
+        appId,
+        appCertificate,
+        channelName,
+        rtcAccount,
+        rtcRole,
+        rtcTokenExpire,
+        joinChannelPrivilegeExpire,
+        pubAudioPrivilegeExpire,
+        pubVideoPrivilegeExpire,
+        pubDataStreamPrivilegeExpire,
+        rtmUserId,
+        rtmTokenExpire,
+    ) {
+        let token = new AccessToken(appId, appCertificate, 0, rtcTokenExpire)
+
+        let serviceRtc = new ServiceRtc(channelName, rtcAccount)
+        serviceRtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, joinChannelPrivilegeExpire)
+        if (rtcRole == Role.PUBLISHER) {
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishAudioStream, pubAudioPrivilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishVideoStream, pubVideoPrivilegeExpire)
+            serviceRtc.add_privilege(ServiceRtc.kPrivilegePublishDataStream, pubDataStreamPrivilegeExpire)
+        }
+        token.add_service(serviceRtc)
+
+        let serviceRtm = new ServiceRtm(rtmUserId)
+        serviceRtm.add_privilege(ServiceRtm.kPrivilegeLogin, rtmTokenExpire)
         token.add_service(serviceRtm)
 
         return token.build()
