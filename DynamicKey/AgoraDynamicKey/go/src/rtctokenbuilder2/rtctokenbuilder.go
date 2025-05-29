@@ -231,7 +231,7 @@ func BuildTokenWithRtm(appId string, appCertificate string, channelName string, 
 // @param rtcRole: RolePublisher: A broadcaster/host in a live-broadcast profile.
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param rtcTokenExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// you want to access the Agora Service within 10 minutes after the token is generated, set rtcTokenExpire as 600(seconds).
 // @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
 // If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
 // @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
@@ -242,7 +242,7 @@ func BuildTokenWithRtm(appId string, appCertificate string, channelName string, 
 // If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
 // @param rtmUserId: The RTM user's account, max length is 255 Bytes.
 // @param rtmTokenExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire as 600(seconds).
 //
 // return The RTC and RTM token.
 func BuildTokenWithRtm2(appId string, appCertificate string, channelName string, rtcAccount string, rtcRole Role, rtcTokenExpire uint32,

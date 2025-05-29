@@ -48,5 +48,9 @@ public class RtcTokenBuilder2Sample {
                 privilegeExpirationInSeconds);
         System.out.printf("Token with RTM: %s\n", result);
 
+        result = token.buildTokenWithRtm2(appId, appCertificate, channelName, account, Role.ROLE_PUBLISHER, tokenExpirationInSeconds,
+                joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds, pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds,
+                account, tokenExpirationInSeconds);
+        System.out.printf("Token with RTM: %s\n", result);
     }
 }
