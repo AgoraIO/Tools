@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(test)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -9,7 +9,7 @@ include_directories(..)
 include_directories(../../)
 
 link_directories(/usr/lib)
-link_libraries(-lgtest -lz -lcrypto)
+link_libraries(-lgtest -lz -lcrypto -lpthread)
 
 add_executable(test.exe
     AccessToken_test.cpp

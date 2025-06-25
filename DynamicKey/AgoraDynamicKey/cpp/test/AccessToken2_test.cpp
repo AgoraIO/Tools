@@ -13,7 +13,6 @@
 #include "../src/md5/md5.h"
 
 using namespace agora::tools;
-
 class AccessToken2_test : public testing::Test {
  protected:
   virtual void SetUp() override {
@@ -26,9 +25,32 @@ class AccessToken2_test : public testing::Test {
     account_ = "2882341273";
     expire_ = 600;
     issue_ts_ = 1111111;
+    expiredTs_ = time(nullptr) + 3600;
 
     room_uuid_ = "123";
     role_ = 1;
+  }
+
+  std::unique_ptr<Service> BuildRtcService(std::string channelName, uint32_t uid, uint32_t expiredTs) {
+    std::unique_ptr<Service> rtc(new ServiceRtc(channelName, uid));
+    rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expiredTs);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishAudioStream, expiredTs);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishVideoStream, expiredTs);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, expiredTs);
+    return rtc;
+  }
+
+  std::unique_ptr<Service> BuildRtmService(std::string uidStr, uint32_t expiredTs) {
+    std::unique_ptr<Service> rtm(new ServiceRtm(uidStr));
+    rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expiredTs);
+    return rtm;
+  }
+
+  std::unique_ptr<Service> BuildRtmStreamServiceAsRtc(std::string channelName, uint32_t uid, uint32_t expiredTs) {
+    std::unique_ptr<Service> rtc(new ServiceRtc(channelName, uid));
+    rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expiredTs);
+    rtc->AddPrivilege(ServiceRtc::kPrivilegePublishDataStream, expiredTs);
+    return rtc;
   }
 
   void VerifyService(Service *l, Service *r) {
@@ -325,6 +347,77 @@ class AccessToken2_test : public testing::Test {
 
     VerifyAccessToken2(expected, &key);
   }
+  void TestSameServiceMulti() {
+    auto rtc_expire = expiredTs_;
+    auto rtm_expire = expiredTs_ + 100;
+    auto rtm_stream_expire = expiredTs_ + 200;
+
+    AccessToken2 token(app_id_, app_certificate_, 0, rtc_expire);
+
+    token.AddService(std::move(BuildRtcService(channel_name_, uid_, rtc_expire)));
+    token.AddService(std::move(BuildRtmService(account_, rtm_expire)));
+    token.AddService(std::move(BuildRtmStreamServiceAsRtc(channel_name_, uid_, rtm_stream_expire)));
+    std::string token_str = token.Build();
+    AccessToken2 token_parsed;
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenInvalid);
+    ASSERT_TRUE(token_parsed.FromString(token_str));
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_+"123"), kTokenInvalidInfo);
+    std::string err_cert = app_certificate_;
+    err_cert[0] = '1';
+    ASSERT_EQ(token_parsed.VerifySignature(err_cert), kTokenVerifyFailed);
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenVerifySuccess);
+
+    EXPECT_EQ(app_id_, token.app_id_);
+    EXPECT_EQ(rtc_expire, token.expire_);
+
+    ASSERT_EQ(3, token.services_.size());
+    ASSERT_EQ(token.services_.count(ServiceRtc::kServiceType), 2);
+    ASSERT_EQ(token.services_.count(ServiceRtm::kServiceType), 1);
+
+    
+    uint32_t cnt = 0;
+    for (auto srv = token_parsed.services_.begin(); srv != token_parsed.services_.end(); srv++) {
+        if (srv->first == ServiceRtc::kServiceType) {
+            if (cnt == 0 ) {
+                ServiceRtc *rtc = dynamic_cast<ServiceRtc *>(srv->second.get());
+                EXPECT_EQ(rtc->channel_name_, channel_name_);
+                EXPECT_EQ(rtc->account_, account_);
+                EXPECT_EQ(rtc->privileges_[ServiceRtc::kPrivilegeJoinChannel], rtc_expire);
+                EXPECT_EQ(rtc->privileges_[ServiceRtc::kPrivilegePublishAudioStream], rtc_expire);
+                EXPECT_EQ(rtc->privileges_[ServiceRtc::kPrivilegePublishVideoStream], rtc_expire);
+                EXPECT_EQ(rtc->privileges_[ServiceRtc::kPrivilegePublishDataStream], rtc_expire);
+            } else if (cnt == 1) {
+                ServiceRtc *rtm_stream = dynamic_cast<ServiceRtc *>(srv->second.get());
+                EXPECT_EQ(rtm_stream->channel_name_, channel_name_);
+                EXPECT_EQ(rtm_stream->account_, account_);
+                EXPECT_EQ(rtm_stream->privileges_[ServiceRtc::kPrivilegeJoinChannel], rtm_stream_expire);
+                EXPECT_EQ(rtm_stream->privileges_[ServiceRtc::kPrivilegePublishDataStream], rtm_stream_expire);
+            }
+            cnt++;
+        } else if (srv->first == ServiceRtm::kServiceType) {
+            ServiceRtm * rtm = dynamic_cast<ServiceRtm *>(srv->second.get());
+            EXPECT_EQ(rtm->user_id_, account_);
+            EXPECT_EQ(rtm->privileges_[ServiceRtm::kPrivilegeLogin], rtm_expire);
+        } else {
+            EXPECT_TRUE(false);
+        }
+    }
+    EXPECT_EQ(token_parsed.GenerateSignature(app_certificate_), token_parsed.signature_);
+  }
+
+  void TestOldTokenParse() {
+    std::string token_str = "007eJxTYLjhFiNy2/+8zqRJj20tt73SKA2e3/"
+        "joPVv4761qZnrOyqYKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKY"
+        "GBgYGRgYWIAkCIP4TGCSGUyygEkFBvMUcyNjM9PUJEsLYxMLU2NL81TjVOM0yxQTM4OklJ"
+        "RELgYjCwsjYxNDI3NjJqA5EJM4GUpSi0viS4tTi1jggqxwFrImAAIiLHc=";
+    AccessToken2 token_parsed;
+    ASSERT_TRUE(token_parsed.FromString(token_str));
+    ASSERT_EQ(token_parsed.VerifySignature(app_certificate_), kTokenVerifySuccess);
+    EXPECT_EQ(token_parsed.app_id_, app_id_);
+    EXPECT_EQ(token_parsed.expire_, expire_);
+    EXPECT_EQ(token_parsed.GenerateSignature(app_certificate_), token_parsed.signature_);
+    VerifyAccessToken2(token_str, &token_parsed);
+  }
 
  private:
   std::string app_id_;
@@ -337,6 +430,7 @@ class AccessToken2_test : public testing::Test {
   uint32_t uid_;
   uint32_t expire_;
   uint32_t issue_ts_;
+  uint32_t expiredTs_;
   int16_t role_;
 };
 
@@ -359,3 +453,7 @@ TEST_F(AccessToken2_test, testAccessToken2ApaasUser) { TestAccessToken2ApaasUser
 TEST_F(AccessToken2_test, testAccessToken2ApaasApp) { TestAccessToken2ApaasApp(); }
 
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) { TestAccessToken2WithMultiService(); }
+
+TEST_F(AccessToken2_test, testSameServiceMulti) { TestSameServiceMulti(); }
+
+TEST_F(AccessToken2_test, testOldTokenParse) { TestOldTokenParse(); }
