@@ -35,5 +35,19 @@ int main(int argc, char const *argv[]) {
                                              expiration_in_seconds);
   std::cout << "RTM Token:" << result << std::endl;
 
+  ServiceRtm2::Permissions permissions;
+  std::vector<std::string> messageChannelReads = {"channelA", "channelB"};
+  std::vector<std::string> messageChannelWrites = {"channelA*", "channelC"};
+
+  permissions.Add(ServiceRtm2::Permissions::kMessageChannels,
+      ServiceRtm2::Permissions::kRead, messageChannelReads);
+  permissions.Add(ServiceRtm2::Permissions::kMessageChannels,
+      ServiceRtm2::Permissions::kWrite, messageChannelWrites);
+
+  result = RtmTokenBuilder2::BuildToken(app_id, app_certificate, user_id, permissions,
+                                        expiration_in_seconds);
+
+  std::cout << "RTM Token with permissions:\n" << result << std::endl;
+
   return 0;
 }
