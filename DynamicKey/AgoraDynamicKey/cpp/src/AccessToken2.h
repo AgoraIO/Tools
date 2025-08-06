@@ -231,6 +231,65 @@ class ServiceApaas : public Service {
   int16_t role_;
 };
 
+class ServiceRtm2 : public Service {
+ public:
+  enum {
+    kServiceType = 8,
+
+    kPrivilegeLogin = 1,
+  };
+
+  using PermissionsDetail = std::map<uint16_t, std::map<uint16_t, std::vector<std::string>>>;
+  struct Permissions {
+    enum {
+      kMessageChannels = 0,
+      kStreamChannels = 1,
+      kGourpChannels = 2,
+      kServerGroups = 3,
+      kUsers = 4,
+    };
+    enum {
+      kRead = 0,
+      kWrite = 1,
+    };
+    PermissionsDetail details_;
+    void Add(uint16_t resourceType, uint16_t permissionType, std::vector<std::string> resources) {
+      details_[resourceType][permissionType] = resources;
+    }
+    Permissions() : details_() {}
+  };
+
+ public:
+  ServiceRtm2(const std::string &user_id = "", const Permissions &permissions = Permissions())
+      : Service(kServiceType), user_id_(user_id), permissions_(permissions) {}
+
+  virtual std::string PackService() override { return Pack(this); }
+
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceRtm2(*this)); }
+
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceRtm2 *x) {
+    p << dynamic_cast<const Service *>(x) << x->user_id_ << x->permissions_.details_;
+    return p;
+  }
+
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceRtm2 *x) {
+    p >> dynamic_cast<Service *>(x) >> x->user_id_ >> x->permissions_.details_;
+    return p;
+  }
+
+ public:
+  std::string user_id_;
+  Permissions permissions_;
+
+ protected:
+  ServiceRtm2(const ServiceRtm2 &) = default;
+  ServiceRtm2(ServiceRtm2 &&) = default;
+  ServiceRtm2 &operator=(const ServiceRtm2 &) = default;
+  ServiceRtm2 &operator=(ServiceRtm2 &&) = default;
+};
+
 template <class T>
 struct ServiceCreator {
   static Service *New() { return (new T()); }
@@ -239,6 +298,7 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
     {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},
+    {ServiceRtm2::kServiceType, ServiceCreator<ServiceRtm2>::New},
 };
 
 class AccessToken2 {
