@@ -367,7 +367,7 @@ var ByteBuf = function () {
             return that
         }
 
-        // 支持Map和Object两种格式
+        // support Map and Object
         var keys, getValue
         if (permissions instanceof Map) {
             keys = Array.from(permissions.keys())
@@ -387,10 +387,10 @@ var ByteBuf = function () {
             var key = parseInt(keys[i])
             var innerMap = getValue(key)
 
-            // 序列化外层key (uint16_t)
+            // serialize outer key (uint16_t)
             that.putUint16(key)
 
-            // 序列化内层map
+            // serialize inner map
             if (!innerMap) {
                 that.putUint16(0)
             } else {
@@ -413,10 +413,10 @@ var ByteBuf = function () {
                     var innerKey = parseInt(innerKeys[j])
                     var vector = getInnerValue(innerKey)
 
-                    // 序列化内层key (uint16_t)
+                    // serialize inner key (uint16_t)
                     that.putUint16(innerKey)
 
-                    // 序列化vector (string array)
+                    // serialize vector (string array)
                     if (!vector || !Array.isArray(vector)) {
                         that.putUint16(0)
                     } else {
@@ -484,18 +484,18 @@ var ReadByteBuf = function (bytes) {
         var len = that.getUint16()
 
         for (var i = 0; i < len; i++) {
-            // 反序列化外层key (uint16_t)
+            // deserialize outer key (uint16_t)
             var key = that.getUint16()
             var innerMap = new Map()
 
-            // 反序列化内层map
+            // deserialize inner map
             var innerLen = that.getUint16()
             for (var j = 0; j < innerLen; j++) {
-                // 反序列化内层key (uint16_t)
+                // deserialize inner key (uint16_t)
                 var innerKey = that.getUint16()
                 var vector = []
 
-                // 反序列化vector (string array)
+                // deserialize vector (string array)
                 var vectorLen = that.getUint16()
                 for (var k = 0; k < vectorLen; k++) {
                     vector.push(that.getString().toString())

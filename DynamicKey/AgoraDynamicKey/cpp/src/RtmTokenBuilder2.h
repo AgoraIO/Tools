@@ -29,6 +29,10 @@ class RtmTokenBuilder2 {
   /**
    Builds an RTM token.
 
+   @attention This is a special interface that requires Agora assistance for proper 
+   usage. Please seek help from Agora before using this interface to avoid unknown 
+   errors in your application.
+ 
    @param app_id The App ID issued to you by Agora.
    @param app_certificate Certificate of the application that you registered in
    the Agora Dashboard.

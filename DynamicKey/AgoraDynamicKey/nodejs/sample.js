@@ -44,14 +44,19 @@ const generateRtmToken = () => {
 
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds
 
-    // 默认 Permissions
+    // Default Permissions
     console.log('==============================================')
     const token = RtmTokenBuilder.buildToken(appID, appCertificate, uid, privilegeExpiredTs)
     console.log('Rtm Token: ' + token)
     console.log('token Parsed: ')
     RtmTokenBuilder.fromString(token)
 
-    // 自定义 Permissions
+    /**
+     * @attention This is a special interface that requires Agora assistance for proper 
+     * usage. Please seek help from Agora before using this interface to avoid unknown 
+     * errors in your application.
+     */
+    // Custom Permissions
     const permissions = {
         [RtmPermission.resourceKeys.kMessageChannels]: {
             [RtmPermission.permissionKeys.kRead]: ['channel_A*', 'channel_B'],

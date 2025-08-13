@@ -23,6 +23,10 @@ const RtmPermission = {
 class RtmTokenBuilder {
     /**
      * Build the RTM token.
+     * 
+     * @attention This is a special interface that requires Agora assistance for proper 
+     * usage. Please seek help from Agora before using this interface to avoid unknown 
+     * errors in your application.
      *
      * @param appId The App ID issued to you by Agora. Apply for a new App ID from
      * Agora Dashboard if it is missing from your kit. See Get an App ID.

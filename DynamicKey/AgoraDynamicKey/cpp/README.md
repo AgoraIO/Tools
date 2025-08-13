@@ -7,6 +7,7 @@ To enhance communication security, Agora uses tokens to authenticate users befor
 Under the `cpp` directory:
 
 * `/src/` contains the source code for generating a token, where `RtcTokenBuilder.h` is used for generating an RTC token, and `RtmTokenBuilder.h` is used for generating an RTM token.
+* **attention:** `/src/RtmTokenBuilder2.h` contains special token generation interfaces, that requires Agora assistance for proper usage. Using it without proper guidance may cause unknown errors in your application.
 * `/sample/` contains the sample code for generating a token, where `RtcTokenBuilderSample.cpp` is used for generating an RTC token, and `RtmTokenBuilderSample.cpp` is used for generating an RTM token.
 
 ## Generate a token with the sample code

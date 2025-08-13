@@ -21,6 +21,7 @@ $ npm install agora-token
 Under the `nodejs` directory:
 
 * `/src/` contains the source code for generating a token, where `RtcTokenBuilder.js` is used for generating an RTC token, and `RtmTokenBuilder.js` is used for generating an RTM token.
+* **attention** `/src/token3/` contains special token generation interfaces, where `RtmTokenBuilder3.js` is a special interface that requires Agora assistance for proper usage. Using it without proper guidance may cause unknown errors in your application.
 * `/sample/` contains the sample code for generating a token, where `RtcTokenBuilderSample.js` is used for generating an RTC token, and `RtmTokenBuilderSample.js` is used for generating an RTM token.
 
 ## Generate a token with the sample code

@@ -35,6 +35,11 @@ int main(int argc, char const *argv[]) {
                                              expiration_in_seconds);
   std::cout << "RTM Token:" << result << std::endl;
 
+  /**
+   * @attention This is a special interface that requires Agora assistance for proper 
+   * usage. Please seek help from Agora before using this interface to avoid unknown 
+   * errors in your application.
+   */
   ServiceRtm2::Permissions permissions;
   std::vector<std::string> messageChannelReads = {"channelA", "channelB"};
   std::vector<std::string> messageChannelWrites = {"channelA*", "channelC"};
