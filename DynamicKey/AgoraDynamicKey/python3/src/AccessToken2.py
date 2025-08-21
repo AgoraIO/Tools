@@ -147,6 +147,85 @@ class ServiceApaas(Service):
         return buffer
 
 
+class ServiceRtm2(Service):
+    kServiceType = 8
+
+    kPrivilegeLogin = 1
+
+    class Permissions:
+        # Resource types
+        kMessageChannels = 0
+        kStreamChannels = 1
+        kGroupChannels = 2
+        kServerGroups = 3
+        kUsers = 4
+
+        # Permission types
+        kRead = 0
+        kWrite = 1
+
+        def __init__(self):
+            self.details = {}
+
+        def add(self, resource_type, permission_type, resources):
+            if resource_type not in self.details:
+                self.details[resource_type] = {}
+            self.details[resource_type][permission_type] = resources
+
+    def __init__(self, user_id='', permissions=None):
+        super(ServiceRtm2, self).__init__(ServiceRtm2.kServiceType)
+        self.__user_id = user_id.encode('utf-8')
+        self.__permissions = permissions if permissions else ServiceRtm2.Permissions()
+
+    def pack(self):
+        permissions_data = b''
+        # Pack permissions details
+        permissions_data += pack_uint16(len(self.__permissions.details))
+        for resource_type in sorted(self.__permissions.details.keys()):
+            permissions_data += pack_uint16(resource_type)
+            permission_map = self.__permissions.details[resource_type]
+            permissions_data += pack_uint16(len(permission_map))
+            for permission_type in sorted(permission_map.keys()):
+                permissions_data += pack_uint16(permission_type)
+                resources = permission_map[permission_type]
+                permissions_data += pack_uint16(len(resources))
+                for resource in resources:
+                    permissions_data += pack_string(resource.encode('utf-8'))
+        
+        return super(ServiceRtm2, self).pack() + pack_string(self.__user_id) + permissions_data
+
+    def unpack(self, buffer):
+        buffer = super(ServiceRtm2, self).unpack(buffer)
+        self.__user_id, buffer = unpack_string(buffer)
+        
+        # Unpack permissions details
+        self.__permissions = ServiceRtm2.Permissions()
+        resource_count, buffer = unpack_uint16(buffer)
+        
+        for _ in range(resource_count):
+            resource_type, buffer = unpack_uint16(buffer)
+            permission_count, buffer = unpack_uint16(buffer)
+            
+            for _ in range(permission_count):
+                permission_type, buffer = unpack_uint16(buffer)
+                resource_list_count, buffer = unpack_uint16(buffer)
+                
+                resources = []
+                for _ in range(resource_list_count):
+                    resource, buffer = unpack_string(buffer)
+                    resources.append(resource.decode('utf-8'))
+                
+                self.__permissions.add(resource_type, permission_type, resources)
+        
+        return buffer
+
+    def get_user_id(self):
+        return self.__user_id.decode('utf-8')
+
+    def get_permissions(self):
+        return self.__permissions
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
@@ -154,6 +233,7 @@ class AccessToken:
         ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat,
         ServiceApaas.kServiceType: ServiceApaas,
+        ServiceRtm2.kServiceType: ServiceRtm2,
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
