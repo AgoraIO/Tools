@@ -20,7 +20,7 @@
     "@babel/polyfill": "^7.0.0-beta.49",
     "@babel/preset-env": "^7.9.0",
     "@vue/cli-plugin-babel": "^3.0.0-rc.5",
-    "@vue/cli-plugin-eslint": "^3.0.0-rc.5",
+    "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-plugin-pwa": "^3.0.0-rc.5",
     "@vue/cli-service": "^3.0.0-rc.5",
     "vue-cli-plugin-vuetify": "^0.1.6",
