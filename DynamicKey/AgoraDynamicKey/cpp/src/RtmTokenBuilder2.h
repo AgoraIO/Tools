@@ -62,7 +62,7 @@ inline std::string RtmTokenBuilder2::BuildToken(const std::string& app_id, const
     const std::string& user_id, const ServiceRtm2::Permissions &permissions,
     uint32_t expire) {
   std::unique_ptr<Service> service(new ServiceRtm2(user_id, permissions));
-  service->AddPrivilege(ServiceRtm::kPrivilegeLogin, expire);
+  service->AddPrivilege(ServiceRtm2::kPrivilegeLogin, expire);
 
   AccessToken2 generator(app_id, app_certificate, 0, expire);
   generator.AddService(std::move(service));

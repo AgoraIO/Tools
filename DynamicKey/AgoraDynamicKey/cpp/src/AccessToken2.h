@@ -253,7 +253,7 @@ class ServiceRtm2 : public Service {
       kWrite = 1,
     };
     PermissionsDetail details_;
-    void Add(uint16_t resourceType, uint16_t permissionType, std::vector<std::string> resources) {
+    void Add(uint16_t resourceType, uint16_t permissionType, const std::vector<std::string>& resources) {
       details_[resourceType][permissionType] = resources;
     }
     Permissions() : details_() {}
