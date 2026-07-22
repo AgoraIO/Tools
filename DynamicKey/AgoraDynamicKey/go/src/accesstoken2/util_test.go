@@ -17,6 +17,14 @@ func Test_compressZlib(t *testing.T) {
 	compressed := compressZlib([]byte("hello"))
 	AssertEqual(t, "789cca48cdc9c907040000ffff062c0215", fmt.Sprintf("%x", compressed))
 	AssertEqual(t, "hello", string(decompressZlib(compressed)))
+
+	decompressed, err := decompressZlibWithError(compressed)
+	AssertNil(t, err)
+	AssertEqual(t, "hello", string(decompressed))
+
+	decompressed, err = decompressZlibWithError([]byte("invalid"))
+	AssertEqual(t, 0, len(decompressed))
+	AssertEqual(t, true, err != nil)
 }
 
 func Test_packUint16(t *testing.T) {

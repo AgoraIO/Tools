@@ -22,8 +22,8 @@ func Test_BuildChatUserToken(t *testing.T) {
 
 	accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
-	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.Services[accesstoken.ServiceTypeChat].(*accesstoken.ServiceChat).UserId)
-	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeChat].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatUser])
+	accesstoken.AssertEqual(t, DataMockUserUuid, accessToken.GetServices(accesstoken.ServiceTypeChat)[0].(*accesstoken.ServiceChat).UserId)
+	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeChat)[0].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatUser])
 }
 
 func Test_BuildChatAppToken(t *testing.T) {
@@ -35,6 +35,6 @@ func Test_BuildChatAppToken(t *testing.T) {
 
 	accesstoken.AssertEqual(t, DataMockAppId, accessToken.AppId)
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Expire)
-	accesstoken.AssertEqual(t, DataMockExpire, accessToken.Services[accesstoken.ServiceTypeChat].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatApp])
+	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeChat)[0].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatApp])
 
 }
