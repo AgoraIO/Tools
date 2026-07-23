@@ -15,6 +15,7 @@ const (
 	DataMockExpire         = uint32(600)
 )
 
+// Test_BuildRoomUserToken verifies education room-user token contents and privileges.
 func Test_BuildRoomUserToken(t *testing.T) {
 	token, err := BuildRoomUserToken(DataMockAppId, DataMockAppCertificate, DataMockRoomUuid, DataMockUserUuid, DataMockRole, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -34,6 +35,7 @@ func Test_BuildRoomUserToken(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeChat)[0].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatUser])
 }
 
+// Test_BuildUserToken verifies education user token contents and privileges.
 func Test_BuildUserToken(t *testing.T) {
 	token, err := BuildUserToken(DataMockAppId, DataMockAppCertificate, DataMockUserUuid, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -52,6 +54,7 @@ func Test_BuildUserToken(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeApaas)[0].(*accesstoken.ServiceApaas).Privileges[accesstoken.PrivilegeApaasUser])
 }
 
+// Test_BuildAppToken verifies education app token contents and privileges.
 func Test_BuildAppToken(t *testing.T) {
 	token, err := BuildAppToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accesstoken.AssertNil(t, err)

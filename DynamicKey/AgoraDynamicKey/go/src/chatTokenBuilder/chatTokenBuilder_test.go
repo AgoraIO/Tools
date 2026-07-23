@@ -13,6 +13,7 @@ const (
 	DataMockExpire         = uint32(600)
 )
 
+// Test_BuildChatUserToken verifies Chat user token contents and privileges.
 func Test_BuildChatUserToken(t *testing.T) {
 	token, err := BuildChatUserToken(DataMockAppId, DataMockAppCertificate, DataMockUserUuid, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -26,6 +27,7 @@ func Test_BuildChatUserToken(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeChat)[0].(*accesstoken.ServiceChat).Privileges[accesstoken.PrivilegeChatUser])
 }
 
+// Test_BuildChatAppToken verifies Chat app token contents and privileges.
 func Test_BuildChatAppToken(t *testing.T) {
 	token, err := BuildChatAppToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accesstoken.AssertNil(t, err)

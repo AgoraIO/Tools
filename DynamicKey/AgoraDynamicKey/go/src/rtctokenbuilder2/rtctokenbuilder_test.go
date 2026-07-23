@@ -20,6 +20,7 @@ const (
 	DataMockUidStr                       = "2882341273"
 )
 
+// Test_BuildTokenWithUid_RolePublisher verifies publisher privileges for a numeric UID.
 func Test_BuildTokenWithUid_RolePublisher(t *testing.T) {
 	token, err := BuildTokenWithUid(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockUid, RolePublisher, DataMockExpire, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -39,6 +40,7 @@ func Test_BuildTokenWithUid_RolePublisher(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
 
+// Test_BuildTokenWithUid_RoleSubscriber verifies subscriber privileges for a numeric UID.
 func Test_BuildTokenWithUid_RoleSubscriber(t *testing.T) {
 	token, err := BuildTokenWithUid(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockUid, RoleSubscriber, DataMockExpire, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -58,6 +60,7 @@ func Test_BuildTokenWithUid_RoleSubscriber(t *testing.T) {
 	accesstoken.AssertEqual(t, uint32(0), accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
 
+// Test_BuildTokenWithUserAccount_RolePublisher verifies publisher privileges for a user account.
 func Test_BuildTokenWithUserAccount_RolePublisher(t *testing.T) {
 	token, err := BuildTokenWithUserAccount(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockAccount, RolePublisher, DataMockExpire, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -77,6 +80,7 @@ func Test_BuildTokenWithUserAccount_RolePublisher(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockExpire, accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
 
+// Test_BuildTokenWithUserAccount_RoleSubscriber verifies subscriber privileges for a user account.
 func Test_BuildTokenWithUserAccount_RoleSubscriber(t *testing.T) {
 	token, err := BuildTokenWithUserAccount(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockAccount, RoleSubscriber, DataMockExpire, DataMockExpire)
 	accesstoken.AssertNil(t, err)
@@ -96,6 +100,7 @@ func Test_BuildTokenWithUserAccount_RoleSubscriber(t *testing.T) {
 	accesstoken.AssertEqual(t, uint32(0), accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
 
+// Test_BuildTokenWithUidAndPrivilege verifies explicit privilege expirations for a numeric UID.
 func Test_BuildTokenWithUidAndPrivilege(t *testing.T) {
 	token, err := BuildTokenWithUidAndPrivilege(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockUid, DataMockExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire, DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire)
 	accesstoken.AssertNil(t, err)
@@ -115,6 +120,7 @@ func Test_BuildTokenWithUidAndPrivilege(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockPubDataStreamPrivilegeExpire, accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
 
+// Test_BuildTokenWithUserAccountAndPrivilege verifies explicit privilege expirations for a user account.
 func Test_BuildTokenWithUserAccountAndPrivilege(t *testing.T) {
 	token, err := BuildTokenWithUserAccountAndPrivilege(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockAccount, DataMockExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire, DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire)
 	accesstoken.AssertNil(t, err)

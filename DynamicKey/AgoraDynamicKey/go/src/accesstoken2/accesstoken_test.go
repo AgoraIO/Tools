@@ -17,6 +17,7 @@ const (
 	DataMockUserId              = "test_user"
 )
 
+// Test_AccessToken_Build verifies deterministic token generation without services.
 func Test_AccessToken_Build(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -34,6 +35,7 @@ func Test_AccessToken_Build(t *testing.T) {
 	AssertEqual(t, "007eJxSYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAgAA//+rZxiv", token)
 }
 
+// Test_AccessToken_Build_Error_AppId verifies rejection of invalid app IDs.
 func Test_AccessToken_Build_Error_AppId(t *testing.T) {
 	accessToken := NewAccessToken("", DataMockAppCertificate, DataMockExpire)
 	token, err := accessToken.Build()
@@ -51,6 +53,7 @@ func Test_AccessToken_Build_Error_AppId(t *testing.T) {
 	AssertEqual(t, "", token)
 }
 
+// Test_AccessToken_Build_Error_AppCertificate verifies rejection of invalid app certificates.
 func Test_AccessToken_Build_Error_AppCertificate(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, "", DataMockExpire)
 	token, err := accessToken.Build()
@@ -68,6 +71,7 @@ func Test_AccessToken_Build_Error_AppCertificate(t *testing.T) {
 	AssertEqual(t, "", token)
 }
 
+// Test_AccessToken_Build_ServiceRtc verifies deterministic RTC service token generation.
 func Test_AccessToken_Build_ServiceRtc(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -85,6 +89,7 @@ func Test_AccessToken_Build_ServiceRtc(t *testing.T) {
 	AssertEqual(t, "007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=", token)
 }
 
+// Test_AccessToken_Build_ServiceRtc_Uid0 verifies RTC service token generation for a zero UID.
 func Test_AccessToken_Build_ServiceRtc_Uid0(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -102,6 +107,7 @@ func Test_AccessToken_Build_ServiceRtc_Uid0(t *testing.T) {
 	AssertEqual(t, "007eJxSYLhzZP08Lxa1Pg57+TcXb/3cZ3wi4V6kbpbOog0G2dOYk20UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiQwMgAAAAP//Npwiag==", token)
 }
 
+// Test_AccessToken_Build_ServiceRtm verifies deterministic RTM service token generation.
 func Test_AccessToken_Build_ServiceRtm(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -118,6 +124,7 @@ func Test_AccessToken_Build_ServiceRtm(t *testing.T) {
 	AssertEqual(t, "007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A", token)
 }
 
+// Test_AccessToken_Build_ServiceChatUser verifies deterministic Chat user token generation.
 func Test_AccessToken_Build_ServiceChatUser(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -134,6 +141,7 @@ func Test_AccessToken_Build_ServiceChatUser(t *testing.T) {
 	AssertEqual(t, "007eJxSYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrAyMDIxgPheDkYWFkbGJoZG5MSAAAP//H6UeuA==", token)
 }
 
+// Test_AccessToken_Build_ServiceChatApp verifies deterministic Chat app token generation.
 func Test_AccessToken_Build_ServiceChatApp(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -150,6 +158,7 @@ func Test_AccessToken_Build_ServiceChatApp(t *testing.T) {
 	AssertEqual(t, "007eJxSYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZGRgZmMB8BgZAAAAA//+t8hhr", token)
 }
 
+// Test_AccessToken_Build_MultipleServices verifies deterministic generation with distinct service types.
 func Test_AccessToken_Build_MultipleServices(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -175,6 +184,7 @@ func Test_AccessToken_Build_MultipleServices(t *testing.T) {
 	AssertEqual(t, "007eJxSYJjqLJBlM239wwWvmBZ7tW619coNnPKSXaHayfKzZODswxMVGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwMDMwgiGIr8BgnmJuZGxmmppkaWFsYmFqbGmeapxqnGaZYmJmkJSSksjFYGRhYWRsYmhkbswE18fJUJJaXBJfWpxaxAoXRFYKCAAA///aoiqr", token)
 }
 
+// Test_AccessToken_BuildAndParse_RepeatedServiceType verifies preservation of repeated service types and signatures.
 func Test_AccessToken_BuildAndParse_RepeatedServiceType(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -219,6 +229,7 @@ func Test_AccessToken_BuildAndParse_RepeatedServiceType(t *testing.T) {
 	AssertEqual(t, false, verified)
 }
 
+// Test_AccessToken_Build_FromPublicServices verifies token generation from the public Services slice.
 func Test_AccessToken_Build_FromPublicServices(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -238,6 +249,7 @@ func Test_AccessToken_Build_FromPublicServices(t *testing.T) {
 	AssertEqual(t, 1, len(parsed.GetServices(ServiceTypeRtc)))
 }
 
+// Test_AccessToken_AddService_ZeroValue verifies service addition on a zero-value AccessToken.
 func Test_AccessToken_AddService_ZeroValue(t *testing.T) {
 	accessToken := &AccessToken{}
 	rtc := NewServiceRtc(DataMockChannelName, DataMockUidStr)
@@ -248,6 +260,7 @@ func Test_AccessToken_AddService_ZeroValue(t *testing.T) {
 	AssertEqual(t, 1, len(accessToken.GetServices(ServiceTypeRtc)))
 }
 
+// Test_AccessToken_Parse_TokenRtc verifies RTC token fields, privileges, and signature.
 func Test_AccessToken_Parse_TokenRtc(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxSYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxoAAAAD//8JqJOM=")
@@ -273,6 +286,7 @@ func Test_AccessToken_Parse_TokenRtc(t *testing.T) {
 	AssertEqual(t, true, verified)
 }
 
+// Test_AccessToken_Parse_UnknownServiceType verifies known services and signatures remain usable before an unknown service.
 func Test_AccessToken_Parse_UnknownServiceType(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -301,6 +315,7 @@ func Test_AccessToken_Parse_UnknownServiceType(t *testing.T) {
 	AssertEqual(t, true, verified)
 }
 
+// Test_AccessToken_Parse_UnknownServiceTypeOnly verifies signature validation for a token containing only an unknown service.
 func Test_AccessToken_Parse_UnknownServiceTypeOnly(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
@@ -324,6 +339,7 @@ func Test_AccessToken_Parse_UnknownServiceTypeOnly(t *testing.T) {
 	AssertEqual(t, true, verified)
 }
 
+// Test_AccessToken_VerifySignature_Errors verifies signature validation preconditions and certificate checks.
 func Test_AccessToken_VerifySignature_Errors(t *testing.T) {
 	accessToken := CreateAccessToken()
 
@@ -340,6 +356,7 @@ func Test_AccessToken_VerifySignature_Errors(t *testing.T) {
 	AssertEqual(t, "check appId or appCertificate", err.Error())
 }
 
+// Test_AccessToken_Parse_InvalidToken verifies malformed tokens return parsing errors.
 func Test_AccessToken_Parse_InvalidToken(t *testing.T) {
 	accessToken := CreateAccessToken()
 
@@ -356,6 +373,7 @@ func Test_AccessToken_Parse_InvalidToken(t *testing.T) {
 	AssertEqual(t, true, err != nil)
 }
 
+// Test_AccessToken_Parse_TokenRtc_FromPython verifies compatibility with RTC tokens generated by Python.
 func Test_AccessToken_Parse_TokenRtc_FromPython(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj")
@@ -377,6 +395,7 @@ func Test_AccessToken_Parse_TokenRtc_FromPython(t *testing.T) {
 	AssertEqual(t, uint32(0), accessToken.GetServices(ServiceTypeRtc)[0].(*ServiceRtc).Privileges[PrivilegePublishDataStream])
 }
 
+// Test_AccessToken_Parse_TokenRtc_Rtm_MultiService_FromPython verifies compatibility with Python multi-service tokens.
 func Test_AccessToken_Parse_TokenRtc_Rtm_MultiService_FromPython(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmIAkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzY5BZEJM4GUpSi0viS4tTiwAipyp4")
@@ -403,6 +422,7 @@ func Test_AccessToken_Parse_TokenRtc_Rtm_MultiService_FromPython(t *testing.T) {
 	AssertEqual(t, DataMockExpire, accessToken.GetServices(ServiceTypeRtm)[0].(*ServiceRtm).Privileges[PrivilegeLogin])
 }
 
+// Test_AccessToken_Parse_TokenRtm verifies RTM token fields and login privileges.
 func Test_AccessToken_Parse_TokenRtm(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxSYOCdJftjyTM2zxW6Xhm/5T0j5LdcUt/xYVt48fb5Mp3PX9coMFiaGzg7GpumpJoZJJuYmJmYJiUlplokGhmaGpgZJhkbu38RYIhgYmBgZABhJgZGBkYwn5OhJLW4JL60OLUIEAAA//9ZVh6A")
@@ -420,6 +440,7 @@ func Test_AccessToken_Parse_TokenRtm(t *testing.T) {
 	AssertEqual(t, DataMockExpire, accessToken.GetServices(ServiceTypeRtm)[0].(*ServiceRtm).Privileges[PrivilegeLogin])
 }
 
+// Test_AccessToken_Parse_TokenChatUser verifies Chat user token fields and privileges.
 func Test_AccessToken_Parse_TokenChatUser(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxTYNAIsnbS3v/A5t2TC6feR15r+6cq8bqAvfaW+tk/Vzz+p6xTYLA0N3B2NDZNSTUzSDYxMTMxTUpKTLVINDI0NTAzTDI2dv8iwBDBxMDAyADCrEDMCOZzMRhZWBgZmxgamRsDAB+lHrg=")
@@ -437,6 +458,7 @@ func Test_AccessToken_Parse_TokenChatUser(t *testing.T) {
 	AssertEqual(t, DataMockExpire, accessToken.GetServices(ServiceTypeChat)[0].(*ServiceChat).Privileges[PrivilegeChatUser])
 }
 
+// Test_AccessToken_Parse_TokenChatApp verifies Chat app token fields and privileges.
 func Test_AccessToken_Parse_TokenChatApp(t *testing.T) {
 	accessToken := CreateAccessToken()
 	res, err := accessToken.Parse("007eJxTYNDNaz3snC8huEfHWdz6s98qltq4zqy9fl99Uh0FDvy6F6DAYGlu4OxobJqSamaQbGJiZmKalJSYapFoZGhqYGaYZGzs/kWAIYKJgYGRAYRZgZgJzGdgAACt8hhr")
@@ -454,15 +476,18 @@ func Test_AccessToken_Parse_TokenChatApp(t *testing.T) {
 	AssertEqual(t, DataMockExpire, accessToken.GetServices(ServiceTypeChat)[0].(*ServiceChat).Privileges[PrivilegeChatApp])
 }
 
+// Test_GetUidStr verifies numeric UID conversion, including the wildcard zero value.
 func Test_GetUidStr(t *testing.T) {
 	AssertEqual(t, "", GetUidStr(0))
 	AssertEqual(t, DataMockUidStr, GetUidStr(DataMockUid))
 }
 
+// Test_getVersion verifies the AccessToken2 version prefix.
 func Test_getVersion(t *testing.T) {
 	AssertEqual(t, "007", getVersion())
 }
 
+// Test_isUuid verifies app identifier format validation.
 func Test_isUuid(t *testing.T) {
 	AssertEqual(t, true, isUuid(DataMockAppId))
 	AssertEqual(t, true, isUuid(DataMockAppCertificate))

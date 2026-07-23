@@ -12,6 +12,7 @@ const (
 	DataMockUserId         = "test_user"
 )
 
+// Test_BuildToken verifies RTM AccessToken2 contents and login privileges.
 func Test_BuildToken(t *testing.T) {
 	token, err := BuildToken(DataMockAppId, DataMockAppCertificate, DataMockUserId, DataMockExpire)
 	accesstoken.AssertNil(t, err)

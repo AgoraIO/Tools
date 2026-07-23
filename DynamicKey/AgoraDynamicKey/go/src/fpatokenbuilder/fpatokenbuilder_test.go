@@ -12,6 +12,7 @@ const (
 	DataMockPrivilegeLoginExpire = uint32(0)
 )
 
+// Test_BuildToken verifies FPA token contents and login privileges.
 func Test_BuildToken(t *testing.T) {
 	token, err := BuildToken(DataMockAppId, DataMockAppCertificate)
 	accesstoken.AssertNil(t, err)
