@@ -16,6 +16,7 @@ using namespace agora::tools;
 
 class RtcTokenBuilder2_test : public testing::Test {
  protected:
+  // Initializes deterministic Token007 RTC fields shared by the test cases.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_cert_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -27,6 +28,7 @@ class RtcTokenBuilder2_test : public testing::Test {
     account_ = std::to_string(uid_);
   }
 
+  // Tests Token007 RTC generation and parsing with an integer UID.
   void TestRtcTokenBuilderWithUid() {
     std::string token = RtcTokenBuilder2::BuildTokenWithUid(
         app_id_, app_cert_, channel_name_, uid_, UserRole::kRolePublisher,
@@ -56,6 +58,7 @@ class RtcTokenBuilder2_test : public testing::Test {
               expire_);
   }
 
+  // Tests Token007 RTC generation and parsing with a user account.
   void TestRtcTokenBuilderWithAccount() {
     std::string token = RtcTokenBuilder2::BuildTokenWithUserAccount(
         app_id_, app_cert_, channel_name_, account_, UserRole::kRolePublisher,
@@ -95,9 +98,11 @@ class RtcTokenBuilder2_test : public testing::Test {
   uint32_t expire_;
 };
 
+// Tests Token007 RTC token behavior with an integer UID.
 TEST_F(RtcTokenBuilder2_test, testRtcTokenBuilderWithUid) {
   TestRtcTokenBuilderWithUid();
 }
+// Tests Token007 RTC token behavior with a user account.
 TEST_F(RtcTokenBuilder2_test, testRtcTokenBuilderWithAccount) {
   TestRtcTokenBuilderWithAccount();
 }

@@ -16,6 +16,7 @@ using namespace agora::tools;
 
 class EducationTokenBuilder2_test : public testing::Test {
  protected:
+  // Initializes deterministic education token fields shared by the test cases.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_cert_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -27,6 +28,7 @@ class EducationTokenBuilder2_test : public testing::Test {
     chat_user_id_ = "6063383428a36fba3fb6030becf8094e";
   }
 
+  // Tests education room-user token generation and service contents.
   void TestRoomUserToken() {
     std::string token_str = EducationTokenBuilder2::BuildRoomUserToken(app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
     AccessToken2 token;
@@ -62,6 +64,7 @@ class EducationTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(expire_, chat_service.privileges_.at(ServiceChat::kPrivilegeUser));
   }
 
+  // Tests education user token generation and service contents.
   void TestUserToken() {
     std::string token_str = EducationTokenBuilder2::BuildUserToken(app_id_, app_cert_, user_id_, expire_);
     AccessToken2 token;
@@ -83,6 +86,7 @@ class EducationTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeUser));
   }
 
+  // Tests education app token generation and service contents.
   void TestAppToken() {
     std::string token_str = EducationTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
     AccessToken2 token;
@@ -115,6 +119,11 @@ class EducationTokenBuilder2_test : public testing::Test {
   std::string chat_user_id_;
 };
 
+// Tests education room-user token generation.
 TEST_F(EducationTokenBuilder2_test, TestRoomUserToken) { TestRoomUserToken(); }
+
+// Tests education user token generation.
 TEST_F(EducationTokenBuilder2_test, TestUserToken) { TestUserToken(); }
+
+// Tests education app token generation.
 TEST_F(EducationTokenBuilder2_test, TestAppToken) { TestAppToken(); }

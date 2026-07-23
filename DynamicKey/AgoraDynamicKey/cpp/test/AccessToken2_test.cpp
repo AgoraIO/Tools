@@ -13,8 +13,30 @@
 #include "../src/md5/md5.h"
 
 using namespace agora::tools;
+
+// Represents an unsupported service type for forward compatibility tests.
+class UnknownService : public Service {
+ public:
+  // Creates a service with a type unsupported by the current parser.
+  explicit UnknownService(uint16_t service_type) : Service(service_type) {}
+
+  // Packs the unknown service using the common service payload format.
+  std::string PackService() override { return Pack(dynamic_cast<const Service *>(this)); }
+
+  // Unpacks the unknown service using the common service payload format.
+  void UnpackService(Unpacker *unpacker) override { *unpacker >> dynamic_cast<Service *>(this); }
+
+  // Creates an independent copy of the unknown service.
+  std::unique_ptr<Service> Clone() const override {
+    std::unique_ptr<UnknownService> service(new UnknownService(type_));
+    service->privileges_ = privileges_;
+    return std::move(service);
+  }
+};
+
 class AccessToken2_test : public testing::Test {
  protected:
+  // Initializes deterministic token fields shared by the test cases.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_certificate_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -31,6 +53,7 @@ class AccessToken2_test : public testing::Test {
     role_ = 1;
   }
 
+  // Builds an RTC service with all RTC privileges enabled.
   std::unique_ptr<Service> BuildRtcService(std::string channelName, uint32_t uid, uint32_t expiredTs) {
     std::unique_ptr<Service> rtc(new ServiceRtc(channelName, uid));
     rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expiredTs);
@@ -40,12 +63,14 @@ class AccessToken2_test : public testing::Test {
     return rtc;
   }
 
+  // Builds an RTM service with the login privilege enabled.
   std::unique_ptr<Service> BuildRtmService(std::string uidStr, uint32_t expiredTs) {
     std::unique_ptr<Service> rtm(new ServiceRtm(uidStr));
     rtm->AddPrivilege(ServiceRtm::kPrivilegeLogin, expiredTs);
     return rtm;
   }
 
+  // Builds the RTC service used to authorize an RTM stream channel.
   std::unique_ptr<Service> BuildRtmStreamServiceAsRtc(std::string channelName, uint32_t uid, uint32_t expiredTs) {
     std::unique_ptr<Service> rtc(new ServiceRtc(channelName, uid));
     rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expiredTs);
@@ -53,6 +78,7 @@ class AccessToken2_test : public testing::Test {
     return rtc;
   }
 
+  // Verifies that two services contain the same privileges.
   void VerifyService(Service *l, Service *r) {
     EXPECT_EQ(l->privileges_.size(), r->privileges_.size());
 
@@ -64,6 +90,7 @@ class AccessToken2_test : public testing::Test {
     }
   }
 
+  // Verifies RTC-specific fields and privileges.
   void VerifyServiceRtc(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -74,6 +101,7 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->account_, r_rtc->account_);
   }
 
+  // Verifies RTM-specific fields and privileges.
   void VerifyServiceRtm(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -83,6 +111,7 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->user_id_, r_rtc->user_id_);
   }
 
+  // Verifies FPA service privileges and concrete service types.
   void VerifyServiceFpa(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -90,6 +119,7 @@ class AccessToken2_test : public testing::Test {
     (void)dynamic_cast<ServiceFpa *>(r);
   }
 
+  // Verifies Chat-specific fields and privileges.
   void VerifyServiceChat(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -99,6 +129,7 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
   }
 
+  // Verifies APaaS-specific fields and privileges.
   void VerifyServiceApaas(Service *l, Service *r) {
     VerifyService(l, r);
 
@@ -110,6 +141,7 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_apaas->role_, r_apaas->role_);
   }
 
+  // Verifies deterministic generation and round-trip parsing of a token.
   void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
     std::string result = key->Build();
     EXPECT_EQ(expected, result);
@@ -151,6 +183,7 @@ class AccessToken2_test : public testing::Test {
     }
   }
 
+  // Tests RTC token generation and parsing with an integer UID.
   void TestAccessToken2WithIntUid() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -168,6 +201,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests RTC token generation and parsing with the wildcard integer UID.
   void TestAccessToken2WithIntUidZero() {
     uint32_t uid_zero = 0;
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
@@ -186,6 +220,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests RTC token generation and parsing with a string UID.
   void TestAccessToken2WithStringUid() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -203,6 +238,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests RTM token generation and parsing.
   void TestAccessToken2Rtm() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -220,6 +256,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests a Chat token with user-level privileges.
   void TestAccessToken2ChatUser() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -238,6 +275,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests a Chat token with app-level privileges.
   void TestAccessToken2ChatApp() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -254,6 +292,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &key);
   }
 
+  // Tests an APaaS room-user token combined with RTM and Chat services.
   void TestAccessToken2ApaasRoomUser() {
     MD5 h{account_};
     std::string char_user_id = h.toStr();
@@ -283,6 +322,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &token);
   }
 
+  // Tests an APaaS token with user-level privileges.
   void TestAccessToken2ApaasUser() {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
@@ -299,6 +339,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &token);
   }
 
+  // Tests an APaaS token with app-level privileges.
   void TestAccessToken2ApaasApp() {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
@@ -315,6 +356,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(expected, &token);
   }
 
+  // Tests generation and parsing of a token containing different service types.
   void TestAccessToken2WithMultiService() {
     AccessToken2 key(app_id_, app_certificate_, issue_ts_, expire_);
     key.salt_ = 1;
@@ -347,6 +389,7 @@ class AccessToken2_test : public testing::Test {
 
     VerifyAccessToken2(expected, &key);
   }
+  // Tests generation, parsing, and verification with duplicate service types.
   void TestSameServiceMulti() {
     auto rtc_expire = expiredTs_;
     auto rtm_expire = expiredTs_ + 100;
@@ -405,6 +448,7 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(token_parsed.GenerateSignature(app_certificate_), token_parsed.signature_);
   }
 
+  // Tests parsing and verification of a token generated by the previous implementation.
   void TestOldTokenParse() {
     std::string token_str = "007eJxTYLjhFiNy2/+8zqRJj20tt73SKA2e3/"
         "joPVv4761qZnrOyqYKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKY"
@@ -417,6 +461,52 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(token_parsed.expire_, expire_);
     EXPECT_EQ(token_parsed.GenerateSignature(app_certificate_), token_parsed.signature_);
     VerifyAccessToken2(token_str, &token_parsed);
+  }
+
+  // Keeps known services parsed before an unknown ServiceType.
+  void TestUnknownServiceAfterKnownService() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> rtc(new ServiceRtc(channel_name_, uid_));
+    rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expire_);
+    token.AddService(std::move(rtc));
+
+    std::unique_ptr<Service> unknown(new UnknownService(999));
+    unknown->AddPrivilege(1, expire_);
+    token.AddService(std::move(unknown));
+
+    AccessToken2 parsed;
+    ASSERT_TRUE(parsed.FromString(token.Build()));
+    ASSERT_EQ(kTokenVerifySuccess, parsed.VerifySignature(app_certificate_));
+    ASSERT_EQ(1, parsed.services_.size());
+    ASSERT_EQ(1, parsed.services_.count(ServiceRtc::kServiceType));
+    ASSERT_EQ(0, parsed.services_.count(999));
+
+    auto *parsed_rtc = dynamic_cast<ServiceRtc *>(parsed.services_.begin()->second.get());
+    ASSERT_NE(nullptr, parsed_rtc);
+    EXPECT_EQ(channel_name_, parsed_rtc->channel_name_);
+    EXPECT_EQ(account_, parsed_rtc->account_);
+    EXPECT_EQ(expire_, parsed_rtc->privileges_[ServiceRtc::kPrivilegeJoinChannel]);
+  }
+
+  // Stops safely before known services that follow an unknown ServiceType payload.
+  void TestUnknownServiceBeforeKnownService() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> unknown(new UnknownService(0));
+    unknown->AddPrivilege(1, expire_);
+    token.AddService(std::move(unknown));
+
+    std::unique_ptr<Service> rtc(new ServiceRtc(channel_name_, uid_));
+    rtc->AddPrivilege(ServiceRtc::kPrivilegeJoinChannel, expire_);
+    token.AddService(std::move(rtc));
+
+    AccessToken2 parsed;
+    ASSERT_TRUE(parsed.FromString(token.Build()));
+    ASSERT_EQ(kTokenVerifySuccess, parsed.VerifySignature(app_certificate_));
+    EXPECT_TRUE(parsed.services_.empty());
   }
 
  private:
@@ -434,26 +524,44 @@ class AccessToken2_test : public testing::Test {
   int16_t role_;
 };
 
+// Tests RTC token behavior with an integer UID.
 TEST_F(AccessToken2_test, testAccessToken2WithIntUid) { TestAccessToken2WithIntUid(); }
 
+// Tests RTC token behavior with the wildcard integer UID.
 TEST_F(AccessToken2_test, testAccessToken2WithIntUidZero) { TestAccessToken2WithIntUidZero(); }
 
+// Tests RTC token behavior with a string UID.
 TEST_F(AccessToken2_test, testAccessToken2WithStringUid) { TestAccessToken2WithStringUid(); }
 
+// Tests RTM token generation and parsing.
 TEST_F(AccessToken2_test, testAccessToken2Rtm) { TestAccessToken2Rtm(); }
 
+// Tests a Chat token with user-level privileges.
 TEST_F(AccessToken2_test, testAccessToken2ChatUser) { TestAccessToken2ChatUser(); }
 
+// Tests a Chat token with app-level privileges.
 TEST_F(AccessToken2_test, testAccessToken2ChatApp) { TestAccessToken2ChatApp(); }
 
+// Tests an APaaS room-user token combined with RTM and Chat services.
 TEST_F(AccessToken2_test, testAccessToken2ApaasRoomUser) { TestAccessToken2ApaasRoomUser(); }
 
+// Tests an APaaS token with user-level privileges.
 TEST_F(AccessToken2_test, testAccessToken2ApaasUser) { TestAccessToken2ApaasUser(); }
 
+// Tests an APaaS token with app-level privileges.
 TEST_F(AccessToken2_test, testAccessToken2ApaasApp) { TestAccessToken2ApaasApp(); }
 
+// Tests a token containing different service types.
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) { TestAccessToken2WithMultiService(); }
 
+// Tests a token containing duplicate service types.
 TEST_F(AccessToken2_test, testSameServiceMulti) { TestSameServiceMulti(); }
 
+// Tests backward-compatible parsing of a token from the previous implementation.
 TEST_F(AccessToken2_test, testOldTokenParse) { TestOldTokenParse(); }
+
+// Tests parsing when an unknown service follows a known service.
+TEST_F(AccessToken2_test, testUnknownServiceAfterKnownService) { TestUnknownServiceAfterKnownService(); }
+
+// Tests parsing when an unknown service precedes a known service.
+TEST_F(AccessToken2_test, testUnknownServiceBeforeKnownService) { TestUnknownServiceBeforeKnownService(); }

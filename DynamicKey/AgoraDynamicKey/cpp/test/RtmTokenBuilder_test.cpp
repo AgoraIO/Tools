@@ -6,6 +6,7 @@ using namespace agora::tools;
 
 class RtmTokenBuilder_test : public testing::Test {
  protected:
+  // Initializes deterministic Token006 RTM fields and the expected user CRC.
   virtual void SetUp() {
     appID = "970CA35de60c44645bbae8a215061b33";
     appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -17,8 +18,10 @@ class RtmTokenBuilder_test : public testing::Test {
 
   }
 
+  // Releases resources allocated by the test fixture.
   virtual void TearDown() {}
 
+  // Tests Token006 RTM generation, parsing, and signature validation.
   void testRtmTokenBuilder() {
       std::string token = RtmTokenBuilder::buildToken(
           appID, appCertificate, userAccount,
@@ -47,7 +50,7 @@ class RtmTokenBuilder_test : public testing::Test {
 };
 
 
+// Tests Token006 RTM token generation.
 TEST_F(RtmTokenBuilder_test, testRtmTokenBuilder) {
   testRtmTokenBuilder();
 }
-

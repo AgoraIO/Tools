@@ -299,7 +299,7 @@ class AccessToken2 {
     if (raw_token_buffer_.empty()) {
       perror("invalid token, please unpack first by FromString()");
       return kTokenInvalid;
-    } else if (!BuildCheck()) {
+    } else if (!IsUUID(app_id_) || !IsUUID(app_cert_)) {
       return kTokenInvalidInfo;
     }
     try {

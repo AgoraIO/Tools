@@ -5,13 +5,18 @@
 class DynamicKey2_test : public testing::Test
 {
 protected:
+    // Initializes the test fixture.
     virtual void SetUp(){}
+
+    // Releases resources allocated by the test fixture.
     virtual void TearDown(){}
 
 public:
+    // Tests deterministic DynamicKey2 generation.
     void test_DynamicKey2();
 };
 
+// Verifies DynamicKey2 generation against the expected value.
 void DynamicKey2_test::test_DynamicKey2(){
     auto AppID  = "970ca35de60c44645bbae8a215061b33";
     auto  AppCertificate   = "5cfd2fd1755d40ecb72977518be15d3b";
@@ -24,6 +29,7 @@ void DynamicKey2_test::test_DynamicKey2(){
     EXPECT_EQ(result, "7666966591a93ee5a3f712e22633f31f0cbc8f13970ca35de60c44645bbae8a215061b3314464554720383bbf528823412731446455471");
 }
 
+// Tests deterministic DynamicKey2 generation.
 TEST_F(DynamicKey2_test, test_DynamicKey2)
 {
     test_DynamicKey2();

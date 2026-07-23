@@ -6,6 +6,7 @@ using namespace agora::tools;
 
 class AccessToken_test : public testing::Test {
  protected:
+  // Initializes deterministic Token006 fields shared by the test cases.
   virtual void SetUp() {
     appID = "970CA35de60c44645bbae8a215061b33";
     appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -15,8 +16,10 @@ class AccessToken_test : public testing::Test {
     expiredTs = 1446455471;
   }
 
+  // Releases resources allocated by the test fixture.
   virtual void TearDown() {}
 
+  // Verifies deterministic generation and round-trip parsing of a Token006 token.
   void testAccessToken(std::string expected, AccessToken key) {
     std::string result = key.Build();
     EXPECT_EQ(expected, result);
@@ -50,6 +53,7 @@ class AccessToken_test : public testing::Test {
         k6.message_raw_content_);
     EXPECT_EQ(k6.signature_, signature);
   }
+  // Tests Token006 generation and parsing with an integer UID.
   void testAccessTokenWithIntUid() {
     std::string expected =
         "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+"
@@ -61,6 +65,7 @@ class AccessToken_test : public testing::Test {
     testAccessToken(expected, key);
   }
 
+  // Tests Token006 generation and parsing with the wildcard integer UID.
   void testAccessTokenWithIntUidZero() {
     std::string expected =
         "006970CA35de60c44645bbae8a215061b33IACw1o7htY6ISdNRtku3p9tjTPi0jCKf9t49UHJhzCmL6bdIfRAAAAAAEAABAAAAR/QQAAEAAQCvKDdW";
@@ -72,6 +77,7 @@ class AccessToken_test : public testing::Test {
     testAccessToken(expected, key);
   }
 
+  // Tests Token006 generation and parsing with a string UID.
   void testAccessTokenWithStringUid() {
     std::string expected =
         "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+"
@@ -83,6 +89,7 @@ class AccessToken_test : public testing::Test {
     testAccessToken(expected, key);
   }
 
+  // Tests rejection of an invalid string UID.
   void testAccessTokenWithErrorUid() {
     std::string expected = "";
     AccessToken key(appID, appCertificate, channelName, "error");
@@ -105,12 +112,15 @@ class AccessToken_test : public testing::Test {
 // TEST_F(AccessToken_test, testAccessTokenWithErrorUid) {
   // testAccessTokenWithErrorUid();
 // }
+// Tests Token006 behavior with an integer UID.
 TEST_F(AccessToken_test, testAccessTokenWithIntUid) {
   testAccessTokenWithIntUid();
 }
+// Tests Token006 behavior with the wildcard integer UID.
 TEST_F(AccessToken_test, testAccessTokenWithIntUidZero) {
   testAccessTokenWithIntUidZero();
 }
+// Tests Token006 behavior with a string UID.
 TEST_F(AccessToken_test, testAccessTokenWithStringUid) {
   testAccessTokenWithStringUid();
 }

@@ -14,6 +14,7 @@ using namespace agora::tools;
 
 class ChatTokenBuilder2_test : public testing::Test {
  protected:
+  // Initializes deterministic Chat token fields shared by the test cases.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_cert_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -21,6 +22,7 @@ class ChatTokenBuilder2_test : public testing::Test {
     expire_ = 600;
   }
 
+  // Tests Chat user token generation, parsing, and signature validation.
   void TestChatTokenBuilderBuildUserToken() {
     std::string token = ChatTokenBuilder2::BuildUserToken(app_id_, app_cert_,
                                                           user_id_, expire_);
@@ -41,6 +43,7 @@ class ChatTokenBuilder2_test : public testing::Test {
     EXPECT_EQ(service->privileges_[ServiceChat::kPrivilegeUser], expire_);
   }
 
+  // Tests Chat app token generation, parsing, and signature validation.
   void TestChatTokenBuilderBuildAppToken() {
     std::string token =
         ChatTokenBuilder2::BuildAppToken(app_id_, app_cert_, expire_);
@@ -67,9 +70,11 @@ class ChatTokenBuilder2_test : public testing::Test {
   uint32_t expire_;
 };
 
+// Tests Chat user token generation.
 TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildUserToken) {
   TestChatTokenBuilderBuildUserToken();
 }
+// Tests Chat app token generation.
 TEST_F(ChatTokenBuilder2_test, testChatTokenBuilderBuildAppToken) {
   TestChatTokenBuilderBuildAppToken();
 }
