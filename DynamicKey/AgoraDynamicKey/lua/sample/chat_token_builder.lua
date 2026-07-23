@@ -5,7 +5,7 @@ local app_id = os.getenv("AGORA_APP_ID") or ""
 -- Need to set environment variable AGORA_APP_CERTIFICATE
 local app_certificate = os.getenv("AGORA_APP_CERTIFICATE") or ""
 
-local user_uuid = "a7180cb0-1d4a-11ed-9210-89ff47c9da5e"
+local user_uuid = "2882341273"
 local expire = 600
 
 print("App Id: " .. app_id)

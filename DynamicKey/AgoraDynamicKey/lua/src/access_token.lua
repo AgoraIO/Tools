@@ -35,6 +35,7 @@ local is_uuid
 local Service = {}
 Service.__index = Service
 
+-- Creates a generic service for a service type.
 local function new_service(service_type)
     local instance = {
         privileges = {},
@@ -44,26 +45,32 @@ local function new_service(service_type)
     return instance
 end
 
+-- Adds or replaces a privilege on the service.
 function Service:add_privilege(privilege, expire)
     self.privileges[privilege] = expire
 end
 
+-- Returns the numeric service type.
 function Service:get_service_type()
     return self.service_type
 end
 
+-- Packs the service privileges.
 function Service:pack_privileges()
     return utils.pack_map_uint32(self.privileges)
 end
 
+-- Packs the numeric service type.
 function Service:pack_type()
     return utils.pack_uint16(self.service_type)
 end
 
+-- Packs the generic service payload.
 function Service:pack()
     return self:pack_type() .. self:pack_privileges()
 end
 
+-- Unpacks the generic service payload and returns the remaining data.
 function Service:unpack(data)
     self.privileges, data = utils.unpack_map_uint32(data)
     return data
@@ -72,6 +79,7 @@ end
 local ServiceRtc = {}
 ServiceRtc.__index = ServiceRtc
 
+-- Creates an RTC service.
 local function new_service_rtc(channel_name, uid)
     local instance = {
         service = new_service(SERVICE_TYPE_RTC),
@@ -82,10 +90,12 @@ local function new_service_rtc(channel_name, uid)
     return instance
 end
 
+-- Packs an RTC service payload.
 function ServiceRtc:pack()
     return self.service:pack() .. utils.pack_string(self.channel_name) .. utils.pack_string(self.uid)
 end
 
+-- Unpacks an RTC service payload and returns the remaining data.
 function ServiceRtc:unpack(data)
     data = self.service:unpack(data)
     self.channel_name, data = utils.unpack_string(data)
@@ -96,6 +106,7 @@ end
 local ServiceRtm = {}
 ServiceRtm.__index = ServiceRtm
 
+-- Creates an RTM service.
 local function new_service_rtm(user_id)
     local instance = {
         service = new_service(SERVICE_TYPE_RTM),
@@ -105,10 +116,12 @@ local function new_service_rtm(user_id)
     return instance
 end
 
+-- Packs an RTM service payload.
 function ServiceRtm:pack()
     return self.service:pack() .. utils.pack_string(self.user_id)
 end
 
+-- Unpacks an RTM service payload and returns the remaining data.
 function ServiceRtm:unpack(data)
     data = self.service:unpack(data)
     self.user_id, data = utils.unpack_string(data)
@@ -118,6 +131,7 @@ end
 local ServiceFpa = {}
 ServiceFpa.__index = ServiceFpa
 
+-- Creates an FPA service.
 local function new_service_fpa()
     local instance = {
         service = new_service(SERVICE_TYPE_FPA),
@@ -126,10 +140,12 @@ local function new_service_fpa()
     return instance
 end
 
+-- Packs an FPA service payload.
 function ServiceFpa:pack()
     return self.service:pack()
 end
 
+-- Unpacks an FPA service payload and returns the remaining data.
 function ServiceFpa:unpack(data)
     data = self.service:unpack(data)
     return data
@@ -138,6 +154,7 @@ end
 local ServiceChat = {}
 ServiceChat.__index = ServiceChat
 
+-- Creates a Chat service.
 local function new_service_chat(user_id)
     local instance = {
         service = new_service(SERVICE_TYPE_CHAT),
@@ -147,10 +164,12 @@ local function new_service_chat(user_id)
     return instance
 end
 
+-- Packs a Chat service payload.
 function ServiceChat:pack()
     return self.service:pack() .. utils.pack_string(self.user_id)
 end
 
+-- Unpacks a Chat service payload and returns the remaining data.
 function ServiceChat:unpack(data)
     data = self.service:unpack(data)
     self.user_id, data = utils.unpack_string(data)
@@ -160,6 +179,7 @@ end
 local ServiceApaas = {}
 ServiceApaas.__index = ServiceApaas
 
+-- Creates an APaaS service.
 local function new_service_apaas(room_uuid, user_uuid, role)
     local instance = {
         service = new_service(SERVICE_TYPE_APAAS),
@@ -171,11 +191,13 @@ local function new_service_apaas(room_uuid, user_uuid, role)
     return instance
 end
 
+-- Packs an APaaS service payload.
 function ServiceApaas:pack()
     return self.service:pack() ..
         utils.pack_string(self.room_uuid) .. utils.pack_string(self.user_uuid) .. utils.pack_int16(self.role)
 end
 
+-- Unpacks an APaaS service payload and returns the remaining data.
 function ServiceApaas:unpack(data)
     data = self.service:unpack(data)
     self.room_uuid, data = utils.unpack_string(data)
@@ -187,6 +209,43 @@ end
 local AccessToken = {}
 AccessToken.__index = AccessToken
 
+-- Returns the numeric type for a generic or specialized service.
+local function get_service_type(service)
+    if service.service then
+        return service.service:get_service_type()
+    end
+
+    return service:get_service_type()
+end
+
+-- Returns services in stable numeric type order.
+local function services_for_packing(services)
+    local entries = {}
+    for index, service in ipairs(services) do
+        table.insert(entries, {
+            index = index,
+            service = service,
+            service_type = get_service_type(service),
+        })
+    end
+
+    table.sort(entries, function(left, right)
+        if left.service_type == right.service_type then
+            return left.index < right.index
+        end
+
+        return left.service_type < right.service_type
+    end)
+
+    local sorted_services = {}
+    for _, entry in ipairs(entries) do
+        table.insert(sorted_services, entry.service)
+    end
+
+    return sorted_services
+end
+
+-- Creates an AccessToken2 instance.
 local function new_access_token(app_id, app_cert, expire)
     local issue_ts = os.time()
     local salt = utils.get_rand(1, 99999999)
@@ -198,51 +257,67 @@ local function new_access_token(app_id, app_cert, expire)
         issue_ts = issue_ts,
         salt = salt,
         services = {},
+        signature = nil,
+        signing_info = nil,
     }
     setmetatable(instance, AccessToken)
     return instance
 end
 
+-- Creates an empty AccessToken2 instance for parsing.
 local function create_access_token()
     return new_access_token("", "", 900)
 end
 
+-- Adds a service without replacing services of the same type.
 function AccessToken:add_service(service)
-    self.services[service.service:get_service_type()] = service
+    table.insert(self.services, service)
 end
 
+-- Returns all services matching a numeric service type.
+function AccessToken:get_services(service_type)
+    local services = {}
+    for _, service in ipairs(self.services) do
+        if get_service_type(service) == service_type then
+            table.insert(services, service)
+        end
+    end
+
+    return services
+end
+
+-- Builds and signs a Token007 string.
 function AccessToken:build()
     if not is_uuid(self.app_id) or not is_uuid(self.app_cert) then
         error("check appId or appCertificate")
     end
 
+    local services = services_for_packing(self.services)
     local data = utils.pack_string(self.app_id) ..
         utils.pack_uint32(self.issue_ts) ..
         utils.pack_uint32(self.expire) ..
-        utils.pack_uint32(self.salt) .. utils.pack_uint16(utils.count_table_elements(self.services))
+        utils.pack_uint32(self.salt) .. utils.pack_uint16(#services)
 
     local sign = self:get_sign()
 
-    local service_types = {}
-    for service_type in pairs(self.services) do
-        table.insert(service_types, service_type)
-    end
-    table.sort(service_types)
-
-    for _, service_type in ipairs(service_types) do
-        local service = self.services[service_type]
-        if service then
-            data = data .. service:pack()
-        end
+    for _, service in ipairs(services) do
+        data = data .. service:pack()
     end
 
     local signature = utils.hmac_sha256(sign, data)
+    self.signature = signature
+    self.signing_info = data
 
     local res = get_version() .. utils.base64_encode_str(utils.compress_zlib(utils.pack_string(signature) .. data))
     return res
 end
 
-function AccessToken:parse(token)
+-- Parses a Token007 payload into local values before updating the instance.
+local function parse_token(access_token, token)
+    if type(token) ~= "string" then
+        return false
+    end
+
     local version = token:sub(1, VERSION_LENGTH)
     if version ~= get_version() then
         return false
@@ -254,31 +329,72 @@ function AccessToken:parse(token)
     local signature
     signature, buffer = utils.unpack_string(buffer)
 
-    self.app_id, buffer = utils.unpack_string(buffer)
-    self.issue_ts, buffer = utils.unpack_uint32(buffer)
-    self.expire, buffer = utils.unpack_uint32(buffer)
-    self.salt, buffer = utils.unpack_uint32(buffer)
+    local signing_info = buffer
+    local app_id
+    local issue_ts
+    local expire
+    local salt
+    app_id, buffer = utils.unpack_string(buffer)
+    issue_ts, buffer = utils.unpack_uint32(buffer)
+    expire, buffer = utils.unpack_uint32(buffer)
+    salt, buffer = utils.unpack_uint32(buffer)
 
     local service_count
-    local service_type
+    local services = {}
     service_count, buffer = utils.unpack_uint16(buffer)
     for _ = 1, service_count do
+        local service_type
         service_type, buffer = utils.unpack_uint16(buffer)
-        local service = self:new_service(service_type)
+        local service = access_token:new_service(service_type)
+        if not service then
+            break
+        end
+
         buffer = service:unpack(buffer)
-        self.services[service_type] = service
+        table.insert(services, service)
     end
+
+    access_token.app_id = app_id
+    access_token.issue_ts = issue_ts
+    access_token.expire = expire
+    access_token.salt = salt
+    access_token.services = services
+    access_token.signature = signature
+    access_token.signing_info = signing_info
 
     return true
 end
 
-function AccessToken:get_sign()
-    local h_issue_ts = utils.hmac_sha256(utils.pack_uint32(self.issue_ts), self.app_cert)
+-- Parses a Token007 string and returns false for malformed input.
+function AccessToken:parse(token)
+    local success, parsed = pcall(parse_token, self, token)
+    return success and parsed == true
+end
+
+-- Verifies the parsed or built token signature with an App Certificate.
+function AccessToken:verify_signature(app_certificate)
+    if not is_uuid(self.app_id) or not is_uuid(app_certificate) then
+        return false
+    end
+    if type(self.signature) ~= "string" or type(self.signing_info) ~= "string" then
+        return false
+    end
+
+    local sign = self:get_sign(app_certificate)
+    local expected_signature = utils.hmac_sha256(sign, self.signing_info)
+    return expected_signature == self.signature
+end
+
+-- Derives the signing key with the provided or configured App Certificate.
+function AccessToken:get_sign(app_certificate)
+    local certificate = app_certificate or self.app_cert
+    local h_issue_ts = utils.hmac_sha256(utils.pack_uint32(self.issue_ts), certificate)
     local h_salt = utils.hmac_sha256(utils.pack_uint32(self.salt), h_issue_ts)
 
     return h_salt
 end
 
+-- Creates a known specialized service or returns nil for an unknown type.
 function AccessToken:new_service(service_type)
     if service_type == SERVICE_TYPE_RTC then
         return new_service_rtc("", "")
@@ -290,11 +406,12 @@ function AccessToken:new_service(service_type)
         return new_service_chat("")
     elseif service_type == SERVICE_TYPE_APAAS then
         return new_service_apaas("", "", -1)
-    else
-        error("new service failed: unknown service type " .. service_type)
     end
+
+    return nil
 end
 
+-- Converts a numeric UID to its Token007 string representation.
 local function get_uid_str(uid)
     if uid == 0 then
         return ""
@@ -302,12 +419,14 @@ local function get_uid_str(uid)
     return tostring(uid)
 end
 
+-- Returns the Token007 version prefix.
 get_version = function()
     return VERSION
 end
 
+-- Returns whether a value is a 32-character hexadecimal identifier.
 is_uuid = function(s)
-    return #s == 32 and s:match("^[%x]+$") ~= nil
+    return type(s) == "string" and #s == 32 and s:match("^[%x]+$") ~= nil
 end
 
 return {

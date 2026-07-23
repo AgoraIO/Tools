@@ -351,7 +351,7 @@ run-sample-lua:
 		luarocks install lua-zlib; \
 		luarocks install md5; \
 		luarocks make --deps-mode=none agora-token-0.1.0-1.rockspec; \
-		for sample_file in examples/*.lua; do lua "$$sample_file"; done'
+		for sample_file in sample/*.lua; do lua "$$sample_file"; done'
 	$(SAMPLE_PASS)
 
 # Installs Node.js dependencies and runs all Node.js samples.
