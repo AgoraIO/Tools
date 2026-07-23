@@ -6,6 +6,7 @@ describe 'AgoraDynamicKey2::FpaTokenBuilder' do
   let(:app_certificate) { '5CFd2fd1755d40ecb72977518be15d3b' }
   let(:expire) { 24 * 3600 }
 
+  # Verifies FPA token generation and parsing.
   it 'test_build_token' do
     token = AgoraDynamicKey2::FpaTokenBuilder.build_token(app_id, app_certificate)
     access_token = AgoraDynamicKey2::AccessToken.new
@@ -15,7 +16,7 @@ describe 'AgoraDynamicKey2::FpaTokenBuilder' do
     expect(access_token.app_id).to eq(app_id)
     expect(access_token.expire).to eq(expire)
     expect(access_token.services.size).to eq(1)
-    expect(access_token.services[AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceFpa::PRIVILEGE_LOGIN]).to eq(0)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceFpa::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceFpa::PRIVILEGE_LOGIN]).to eq(0)
   end
 end

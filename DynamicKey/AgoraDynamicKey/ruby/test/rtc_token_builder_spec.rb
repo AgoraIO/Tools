@@ -14,16 +14,19 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       }
     end
 
+    # Verifies legacy RTC token generation returns a string.
     it 'return string' do
       expect(AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid(token_params).class).to be String
     end
 
+    # Rejects a nil RTC token parameter set.
     it 'invalid params' do
       expect {
         AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid(nil)
       }.to raise_error(AgoraDynamicKey::RTCTokenBuilder::InvalidParamsError, "invalid params")
     end
 
+    # Rejects an empty RTC token parameter set.
     it 'invalid params' do
       expect {
         AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid({})
@@ -41,6 +44,7 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       }
     end
 
+    # Rejects unsupported uppercase parameter names.
     it 'is not support sensitive' do
       expect {
         AgoraDynamicKey::RTCTokenBuilder.build_token_with_uid(sensitive_params)
@@ -61,10 +65,12 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       }
     end
 
+    # Verifies legacy RTC account token generation.
     it 'is correct case' do
       expect(AgoraDynamicKey::RTCTokenBuilder.build_token_with_account(token_params).class).to be String
     end
 
+    # Rejects missing RTC account token parameters.
     it 'is incorrect raise' do
       expect {
         AgoraDynamicKey::RTCTokenBuilder.build_token_with_account({})
@@ -80,6 +86,7 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       }
     end
 
+    # Rejects uppercase RTC account token parameter names.
     it 'is not support sensitive' do
       expect {
         AgoraDynamicKey::RTCTokenBuilder.build_token_with_account(sensitive_params)
@@ -101,6 +108,7 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       }
     end
 
+    # Verifies decoding a generated legacy RTC token.
     it 'decode return truthy' do
       access_token = AgoraDynamicKey::AccessToken.new(token_payload)
       access_token.add_privilege AgoraDynamicKey::Privilege::JOIN_CHANNEL, access_token.privilege_expired_ts
@@ -137,6 +145,7 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       "006970CA35de60c44645bbae8a215061b33IACMv3I+fsRSejxy6luEwzA/1t/zbEHWfJCJ5m8ssFP/fLdIfRBXoFHlIgABAAAAR/QQAAQAAQCvKDdWAgCvKDdWAwCvKDdWBACvKDdW"
     end
 
+    # Verifies deterministic legacy RTC privilege token generation.
     it 'generate with privilege equal rtc_token' do
       token = AgoraDynamicKey::AccessToken.generate!(payload) do |t|
         t.add_privilege AgoraDynamicKey::Privilege::JOIN_CHANNEL, t.privilege_expired_ts
@@ -149,6 +158,7 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       expect(token).to eq(rtc_token)
     end
 
+    # Verifies deterministic legacy RTC token generation.
     it 'build equal expected_result' do
       access_token = AgoraDynamicKey::AccessToken.new(token_payload)
       access_token.add_privilege AgoraDynamicKey::Privilege::JOIN_CHANNEL, access_token.privilege_expired_ts
