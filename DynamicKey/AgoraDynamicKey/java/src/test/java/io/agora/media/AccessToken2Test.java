@@ -6,6 +6,9 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+/**
+ * Tests Token007 generation, parsing, compatibility, and signature verification.
+ */
 public class AccessToken2Test {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -16,6 +19,9 @@ public class AccessToken2Test {
     private String uid = "2882341273";
     private String userId = "test_user";
 
+    /**
+     * Verifies deterministic token generation without services.
+     */
     @Test
     public void build() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -34,6 +40,9 @@ public class AccessToken2Test {
                 token);
     }
 
+    /**
+     * Verifies deterministic RTC token generation.
+     */
     @Test
     public void build_ServiceRtc() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -53,6 +62,9 @@ public class AccessToken2Test {
                 token);
     }
 
+    /**
+     * Verifies deterministic RTC token generation with an empty user ID.
+     */
     @Test
     public void build_ServiceRtc_uid_0() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -72,6 +84,9 @@ public class AccessToken2Test {
                 token);
     }
 
+    /**
+     * Verifies deterministic RTC token generation with a user account.
+     */
     @Test
     public void build_ServiceRtc_account() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -91,6 +106,9 @@ public class AccessToken2Test {
                 token);
     }
 
+    /**
+     * Verifies deterministic RTM token generation.
+     */
     @Test
     public void build_ServiceRtm() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -106,6 +124,9 @@ public class AccessToken2Test {
         assertEquals(expected, accessToken.build());
     }
 
+    /**
+     * Verifies deterministic Chat user token generation.
+     */
     @Test
     public void build_ServiceChat_userToken() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -121,6 +142,9 @@ public class AccessToken2Test {
         assertEquals(expected, accessToken.build());
     }
 
+    /**
+     * Verifies deterministic Chat application token generation.
+     */
     @Test
     public void build_ServiceChat_appToken() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -136,6 +160,9 @@ public class AccessToken2Test {
         assertEquals(expected, accessToken.build());
     }
 
+    /**
+     * Verifies deterministic token generation with distinct service types.
+     */
     @Test
     public void build_multi_service() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
@@ -166,6 +193,173 @@ public class AccessToken2Test {
         assertEquals(expected, token);
     }
 
+    /**
+     * Preserves repeated service types and their insertion order after parsing.
+     */
+    @Test
+    public void buildParseRepeatedServiceType() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN, expire + 50);
+        accessToken.addService(serviceRtm);
+
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
+        accessToken.addService(serviceRtc);
+
+        AccessToken2.ServiceRtc streamRtc = new AccessToken2.ServiceRtc("stream-channel", "stream-user");
+        streamRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire + 100);
+        streamRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM, expire + 100);
+        accessToken.addService(streamRtc);
+
+        String token = accessToken.build();
+        assertEquals(3, accessToken.services.size());
+        assertEquals(serviceRtm, accessToken.services.get(0));
+        assertEquals(2, accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).size());
+
+        AccessToken2 parser = new AccessToken2();
+        assertTrue(parser.parse(token));
+        assertEquals(2, parser.getServices(AccessToken2.SERVICE_TYPE_RTC).size());
+        assertEquals(channelName,
+                ((AccessToken2.ServiceRtc) parser.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)).getChannelName());
+        assertEquals("stream-channel",
+                ((AccessToken2.ServiceRtc) parser.getServices(AccessToken2.SERVICE_TYPE_RTC).get(1)).getChannelName());
+        assertEquals(expire + 100, (int) parser.getServices(AccessToken2.SERVICE_TYPE_RTC).get(1)
+                .getPrivileges().get(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_DATA_STREAM.intValue));
+        assertEquals(1, parser.getServices(AccessToken2.SERVICE_TYPE_RTM).size());
+        assertTrue(parser.verifySignature(appCertificate));
+        assertFalse(parser.verifySignature("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+
+    /**
+     * Sorts service types as unsigned 16-bit values before packing.
+     */
+    @Test
+    public void buildSortsServiceTypesAsUnsignedValues() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.Service highTypeService = new AccessToken2.Service((short) 0xFFFF);
+        highTypeService.privileges.put((short) 1, expire);
+        accessToken.addService(highTypeService);
+
+        AccessToken2.Service lowTypeService = new AccessToken2.Service((short) 1);
+        lowTypeService.privileges.put((short) 1, expire);
+        accessToken.addService(lowTypeService);
+
+        byte[] tokenData = Utils.decompress(Utils.base64Decode(accessToken.build().substring(Utils.VERSION_LENGTH)));
+        ByteBuf tokenBuffer = new ByteBuf(tokenData);
+        tokenBuffer.readBytes();
+        tokenBuffer.readString();
+        tokenBuffer.readInt();
+        tokenBuffer.readInt();
+        tokenBuffer.readInt();
+
+        assertEquals(2, tokenBuffer.readShort());
+        assertEquals(1, Short.toUnsignedInt(tokenBuffer.readShort()));
+        tokenBuffer.readIntMap();
+        assertEquals(0xFFFF, Short.toUnsignedInt(tokenBuffer.readShort()));
+    }
+
+    /**
+     * Keeps known services parsed before an unknown service type.
+     */
+    @Test
+    public void parseUnknownServiceType() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
+        accessToken.addService(serviceRtc);
+
+        AccessToken2.Service unknown = new AccessToken2.Service((short) 999);
+        unknown.privileges.put((short) 1, expire);
+        accessToken.addService(unknown);
+
+        AccessToken2 parser = new AccessToken2();
+        assertTrue(parser.parse(accessToken.build()));
+        assertEquals(1, parser.getServices(AccessToken2.SERVICE_TYPE_RTC).size());
+        assertEquals(0, parser.getServices((short) 999).size());
+        assertTrue(parser.verifySignature(appCertificate));
+    }
+
+    /**
+     * Stops before known services that follow an unknown service payload.
+     */
+    @Test
+    public void parseStopsAtUnknownServiceType() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
+        accessToken.addService(serviceRtc);
+
+        AccessToken2.Service unknown = new AccessToken2.Service((short) 0);
+        unknown.privileges.put((short) 1, expire);
+        accessToken.addService(unknown);
+
+        AccessToken2 parser = new AccessToken2();
+        assertTrue(parser.parse(accessToken.build()));
+        assertEquals(0, parser.getServices(AccessToken2.SERVICE_TYPE_RTC).size());
+        assertTrue(parser.verifySignature(appCertificate));
+    }
+
+    /**
+     * Parses an old token and replaces services from an earlier parse.
+     */
+    @Test
+    public void parseOldTokenAndClearPreviousServices() throws Exception {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+
+        AccessToken2.ServiceRtm serviceRtm = new AccessToken2.ServiceRtm(userId);
+        serviceRtm.addPrivilegeRtm(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN, expire);
+        accessToken.addService(serviceRtm);
+
+        AccessToken2 parser = new AccessToken2();
+        assertTrue(parser.parse(accessToken.build()));
+        assertEquals(1, parser.getServices(AccessToken2.SERVICE_TYPE_RTM).size());
+
+        String oldToken = "007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj";
+        assertTrue(parser.parse(oldToken));
+        assertEquals(1, parser.services.size());
+        assertEquals(1, parser.getServices(AccessToken2.SERVICE_TYPE_RTC).size());
+        assertEquals(0, parser.getServices(AccessToken2.SERVICE_TYPE_RTM).size());
+        assertTrue(parser.verifySignature(appCertificate));
+    }
+
+    /**
+     * Rejects signature verification before parsing or with invalid certificates.
+     */
+    @Test
+    public void verifySignaturePreconditions() throws Exception {
+        AccessToken2 parser = new AccessToken2();
+        assertFalse(parser.verifySignature(appCertificate));
+
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+        AccessToken2.ServiceRtc serviceRtc = new AccessToken2.ServiceRtc(channelName, uid);
+        serviceRtc.addPrivilegeRtc(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL, expire);
+        accessToken.addService(serviceRtc);
+
+        assertTrue(parser.parse(accessToken.build()));
+        assertFalse(parser.verifySignature("invalid"));
+        assertFalse(parser.verifySignature("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"));
+    }
+
+    /**
+     * Parses a legacy RTC token and verifies its fields and privileges.
+     */
     @Test
     public void parse_TokenRtc() {
         AccessToken2 accessToken = new AccessToken2();
@@ -177,19 +371,20 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        assertEquals(channelName, ((AccessToken2.ServiceRtc) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTC))
+        assertEquals(channelName, ((AccessToken2.ServiceRtc) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0))
                 .getChannelName());
-        assertEquals(uid, ((AccessToken2.ServiceRtc) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTC)).getUid());
-        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)
+        assertEquals(uid, ((AccessToken2.ServiceRtc) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)).getUid());
+        assertEquals(expire, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)
                 .getPrivileges()
                 .get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
-        assertEquals(0, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)
+        assertEquals(0, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)
                 .getPrivileges()
                 .getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
     }
 
+    /**
+     * Rejects a malformed RTC token.
+     */
     @Test
     public void parse_TokenRtc_error() {
         AccessToken2 accessToken = new AccessToken2();
@@ -203,6 +398,9 @@ public class AccessToken2Test {
         assertEquals(0, accessToken.services.size());
     }
 
+    /**
+     * Parses a legacy token containing RTC and RTM services.
+     */
     @Test
     public void parse_TokenRtc_Rtm_MultiService() {
         AccessToken2 accessToken = new AccessToken2();
@@ -214,24 +412,24 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(2, accessToken.services.size());
-        assertEquals(channelName, ((AccessToken2.ServiceRtc) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTC))
+        assertEquals(channelName, ((AccessToken2.ServiceRtc) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0))
                 .getChannelName());
-        assertEquals(uid, ((AccessToken2.ServiceRtc) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTC)).getUid());
-        assertEquals(userId, ((AccessToken2.ServiceRtm) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
-        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)
+        assertEquals(uid, ((AccessToken2.ServiceRtc) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)).getUid());
+        assertEquals(userId, ((AccessToken2.ServiceRtm) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0)).getUserId());
+        assertEquals(expire, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)
                 .getPrivileges()
                 .get(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue));
-        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTC)
+        assertEquals(expire, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTC).get(0)
                 .getPrivileges()
                 .getOrDefault(AccessToken2.PrivilegeRtc.PRIVILEGE_PUBLISH_AUDIO_STREAM.intValue, 0));
-        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)
+        assertEquals(expire, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0)
                 .getPrivileges()
                 .get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue));
     }
 
+    /**
+     * Parses a legacy RTM token and verifies its login privilege.
+     */
     @Test
     public void parse_TokenRtm() {
         AccessToken2 accessToken = new AccessToken2();
@@ -243,13 +441,15 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        assertEquals(userId, ((AccessToken2.ServiceRtm) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_RTM)).getUserId());
-        assertEquals(expire, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_RTM)
+        assertEquals(userId, ((AccessToken2.ServiceRtm) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0)).getUserId());
+        assertEquals(expire, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0)
                 .getPrivileges()
                 .get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue));
     }
 
+    /**
+     * Parses a Chat user token and verifies its user privilege.
+     */
     @Test
     public void parse_TokenChatUser() {
         AccessToken2 accessToken = new AccessToken2();
@@ -261,13 +461,16 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_CHAT);
+        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken
+                .getServices(AccessToken2.SERVICE_TYPE_CHAT).get(0);
         assertEquals(uid, serviceChat.getUserId());
         assertEquals(expire, (int) serviceChat.getPrivileges()
                 .get(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_USER.intValue));
     }
 
+    /**
+     * Parses a Chat application token and verifies its application privilege.
+     */
     @Test
     public void parse_TokenChatApp() {
         AccessToken2 accessToken = new AccessToken2();
@@ -279,13 +482,16 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
         assertEquals(1, accessToken.services.size());
-        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken.services
-                .get(AccessToken2.SERVICE_TYPE_CHAT);
+        AccessToken2.ServiceChat serviceChat = (AccessToken2.ServiceChat) accessToken
+                .getServices(AccessToken2.SERVICE_TYPE_CHAT).get(0);
         assertEquals("", serviceChat.getUserId());
         assertEquals(expire, (int) serviceChat.getPrivileges()
                 .get(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_APP.intValue));
     }
 
+    /**
+     * Converts numeric user IDs to their token representation.
+     */
     @Test
     public void getUidStr() {
         assertEquals("", AccessToken2.getUidStr(0));

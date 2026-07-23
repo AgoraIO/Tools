@@ -6,8 +6,14 @@ import java.security.NoSuchAlgorithmException;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests legacy signaling token generation.
+ */
 public class SignalingTokenTest {
 
+    /**
+     * Verifies deterministic signaling token generation.
+     */
     public void testSignalingToken() throws NoSuchAlgorithmException {
 
         String appId = "970ca35de60c44645bbae8a215061b33";

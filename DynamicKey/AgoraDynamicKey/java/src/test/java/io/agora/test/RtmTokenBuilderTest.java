@@ -8,12 +8,18 @@ import io.agora.media.Utils;
 
 import static org.junit.Assert.*;
 
+/**
+ * Tests legacy RTM token generation and parsing.
+ */
 public class RtmTokenBuilderTest {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
     private String userId = "test_user";
     private int expireTimestamp = 1446455471;
 
+    /**
+     * Verifies the default RTM login privilege.
+     */
     @Test
     public void testRtmTokenBuilderWithDefalutPriviledge() throws Exception {
     	RtmTokenBuilder builder = new RtmTokenBuilder();

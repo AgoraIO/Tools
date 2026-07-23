@@ -4,11 +4,17 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests FPA Token007 builder workflows.
+ */
 public class FpaTokenBuilderTest {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
     private int expire = 24 * 3600;
 
+    /**
+     * Verifies FPA token generation and parsing.
+     */
     @Test
     public void buildToken() {
         FpaTokenBuilder fpaTokenBuilder = new FpaTokenBuilder();
@@ -18,6 +24,6 @@ public class FpaTokenBuilderTest {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(0, (int) accessToken.services.get(AccessToken2.SERVICE_TYPE_FPA).getPrivileges().get(AccessToken2.PrivilegeFpa.PRIVILEGE_LOGIN.intValue));
+        assertEquals(0, (int) accessToken.getServices(AccessToken2.SERVICE_TYPE_FPA).get(0).getPrivileges().get(AccessToken2.PrivilegeFpa.PRIVILEGE_LOGIN.intValue));
     }
 }

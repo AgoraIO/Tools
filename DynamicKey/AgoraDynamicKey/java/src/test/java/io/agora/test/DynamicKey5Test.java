@@ -8,7 +8,7 @@ import io.agora.media.DynamicKey5;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Created by Li on 10/1/2016.
+ * Tests deterministic version 005 key generation.
  */
 public class DynamicKey5Test {
     private String appID   = "970ca35de60c44645bbae8a215061b33";
@@ -19,6 +19,9 @@ public class DynamicKey5Test {
     private long uid = 2882341273L;
     private int expiredTs=1446455471;
 
+    /**
+     * Verifies public sharing key generation.
+     */
     @Test
     public void testGeneratePublicSharingKey() throws Exception {
         String expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
@@ -26,6 +29,9 @@ public class DynamicKey5Test {
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies recording key generation.
+     */
     @Test
     public void testGenerateRecordingKey() throws Exception {
         String expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
@@ -33,6 +39,9 @@ public class DynamicKey5Test {
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies media channel key generation.
+     */
     @Test
     public void testGenerateMediaChannelKey() throws Exception {
         String expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
@@ -40,6 +49,9 @@ public class DynamicKey5Test {
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies in-channel permission key generation.
+     */
     @Test
     public void testInChannelPermission() throws Exception {
         String noUpload = "005BAAoADgyNEQxNDE4M0FGRDkyOEQ4REFFMUU1OTg5NTg2MzA3MTEyNjRGNzQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YBAAEAAQAw";
