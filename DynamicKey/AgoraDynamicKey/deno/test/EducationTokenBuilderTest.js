@@ -12,28 +12,33 @@ const roomUuid = '123'
 const userUuid = '2882341273'
 const role = 1
 
-Deno.test('BuildRoomUserToken_Test', (test) => {
+// Verifies Education room-user token generation and parsing.
+Deno.test('BuildRoomUserToken_Test', () => {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = EducationTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
     accessToken.from_string(token)
+    const service = accessToken.getServices(kApaasServiceType)[0]
     assert(appId === accessToken.appId)
     assert(expire === accessToken.expire)
-    assert(roomUuid === accessToken.services[kApaasServiceType].__room_uuid)
-    assert(userUuid === accessToken.services[kApaasServiceType].__user_uuid)
-    assert(role === accessToken.services[kApaasServiceType].__role)
+    assert(roomUuid === service.__room_uuid)
+    assert(userUuid === service.__user_uuid)
+    assert(role === service.__role)
 })
 
-Deno.test('BuildUserToken_Test', (test) => {
+// Verifies Education user token generation and parsing.
+Deno.test('BuildUserToken_Test', () => {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = EducationTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
     accessToken.from_string(token)
+    const service = accessToken.getServices(kApaasServiceType)[0]
 
     assert(appId === accessToken.appId)
     assert(expire === accessToken.expire)
-    assert(userUuid === accessToken.services[kApaasServiceType].__user_uuid)
+    assert(userUuid === service.__user_uuid)
 })
 
-Deno.test('BuildAppToken_Test', (test) => {
+// Verifies Education application token generation and parsing.
+Deno.test('BuildAppToken_Test', () => {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = EducationTokenBuilder.buildAppToken(appId, appCertificate, expire)
     accessToken.from_string(token)
