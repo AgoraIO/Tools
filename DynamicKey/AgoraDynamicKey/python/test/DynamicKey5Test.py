@@ -19,6 +19,7 @@ expiredts = 1446455471
 class DynamicKeyTest(unittest.TestCase):
 
     def test_publicsharing(self):
+        """Generate and validate a public sharing key."""
         expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
         actual = generatePublicSharingKey(
             appID,
@@ -31,6 +32,7 @@ class DynamicKeyTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_recording(self):
+        """Generate and validate a recording key."""
         expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
         actual = generateRecordingKey(
             appID,
@@ -43,6 +45,7 @@ class DynamicKeyTest(unittest.TestCase):
         # self.assertEqual(expected, actual)
 
     def test_mediachannel(self):
+        """Generate and validate a media channel key."""
         expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
         actual = generateMediaChannelKey(
             appID,
@@ -55,6 +58,7 @@ class DynamicKeyTest(unittest.TestCase):
         # self.assertEqual(expected, actual)
 
     def test_InChannelPermission(self):
+        """Generate and validate an in-channel permission key."""
         noUpload = "005BAAoADgyNEQxNDE4M0FGRDkyOEQ4REFFMUU1OTg5NTg2MzA3MTEyNjRGNzQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YBAAEAAQAw";
         actual = generateInChannelPermissionKey(
             appID,

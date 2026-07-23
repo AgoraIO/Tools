@@ -12,6 +12,7 @@ from src.DynamicKey5 import *
 
 class DynamicKeyTest(unittest.TestCase):
     def setUp(self) -> None:
+        """Create DynamicKey5 fixtures shared by each test."""
         self.appID = "970ca35de60c44645bbae8a215061b33"
         self.appCertificate = "5cfd2fd1755d40ecb72977518be15d3b"
         self.channelname = "7d72365eb983485397e3e3f9d460bdda"
@@ -21,6 +22,7 @@ class DynamicKeyTest(unittest.TestCase):
         self.expiredts = 1446455471
 
     def test_publicsharing(self):
+        """Generate and validate a public sharing key."""
         expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9bu" \
                    "DA68oN1YAAA=="
         actual = generatePublicSharingKey(self.appID, self.appCertificate, self.channelname, self.unixts,
@@ -28,6 +30,7 @@ class DynamicKeyTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_recording(self):
+        """Generate and validate a recording key."""
         expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9bu" \
                    "DA68oN1YAAA=="
         actual = generateRecordingKey(self.appID, self.appCertificate, self.channelname, self.unixts, self.randomint,
@@ -35,6 +38,7 @@ class DynamicKeyTest(unittest.TestCase):
         # self.assertEqual(expected, actual)
 
     def test_mediachannel(self):
+        """Generate and validate a media channel key."""
         expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9bu" \
                    "DA68oN1YAAA=="
         actual = generateMediaChannelKey(self.appID, self.appCertificate, self.channelname, self.unixts, self.randomint,
@@ -42,6 +46,7 @@ class DynamicKeyTest(unittest.TestCase):
         # self.assertEqual(expected, actual)
 
     def test_InChannelPermission(self):
+        """Generate and validate an in-channel permission key."""
         noUpload = "005BAAoADgyNEQxNDE4M0FGRDkyOEQ4REFFMUU1OTg5NTg2MzA3MTEyNjRGNzQQAJcMo13mDERkW7roohUGGzOwKDdW9bu" \
                    "DA68oN1YBAAEAAQAw"
         actual = generateInChannelPermissionKey(self.appID, self.appCertificate, self.channelname, self.unixts,
@@ -53,4 +58,3 @@ class DynamicKeyTest(unittest.TestCase):
         actual = generateInChannelPermissionKey(self.appID, self.appCertificate, self.channelname, self.unixts,
                                                 self.randomint, self.uid, self.expiredts, AudioVideoUpload)
         self.assertEqual(audioVideoUpload, actual)
-

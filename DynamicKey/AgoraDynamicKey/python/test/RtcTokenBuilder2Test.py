@@ -11,6 +11,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 class TestRtcTokenBuilder2(unittest.TestCase):
     def setUp(self):
+        """Create RTC token fixtures shared by each test."""
         self.__app_id = '970CA35de60c44645bbae8a215061b33'
         self.__app_cert = '5CFd2fd1755d40ecb72977518be15d3b'
         self.__channel_name = '7d72365eb983485397e3e3f9d460bdda'
@@ -23,6 +24,7 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.__pub_data_stream_privilege_expire = 600
 
     def test_build_token_with_uid(self):
+        """Build and parse an RTC subscriber token for a numeric user ID."""
         token = RtcTokenBuilder.build_token_with_uid(self.__app_id, self.__app_cert, self.__channel_name, self.__uid,
                                                      Role_Subscriber, self.__expire, self.__expire)
         parser = AccessToken()
@@ -30,9 +32,9 @@ class TestRtcTokenBuilder2(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+        services = parser.get_services(ServiceRtc.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
         self.assertEqual(parser_service._ServiceRtc__uid, str(self.__uid).encode('utf-8'))
@@ -43,6 +45,7 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
 
     def test_build_token_with_user_account(self):
+        """Build and parse an RTC subscriber token for a user account."""
         token = RtcTokenBuilder.build_token_with_user_account(self.__app_id, self.__app_cert, self.__channel_name,
                                                               self.__account, Role_Subscriber, self.__expire,
                                                               self.__expire)
@@ -51,9 +54,9 @@ class TestRtcTokenBuilder2(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+        services = parser.get_services(ServiceRtc.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
         self.assertEqual(parser_service._ServiceRtc__uid, self.__account.encode('utf-8'))
@@ -64,6 +67,7 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.assertNotIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
 
     def test_build_token_with_uid_and_privilege(self):
+        """Build and parse an RTC privilege token for a numeric user ID."""
         token = RtcTokenBuilder.build_token_with_uid_and_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__uid, self.__expire,
             self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
@@ -74,9 +78,9 @@ class TestRtcTokenBuilder2(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+        services = parser.get_services(ServiceRtc.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
         self.assertEqual(parser_service._ServiceRtc__uid, str(self.__uid).encode('utf-8'))
@@ -94,6 +98,7 @@ class TestRtcTokenBuilder2(unittest.TestCase):
         self.assertIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
 
     def test_build_token_with_user_account_and_privilege(self):
+        """Build and parse an RTC privilege token for a user account."""
         token = RtcTokenBuilder.build_token_with_user_account_and_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__account, self.__expire,
             self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
@@ -104,9 +109,9 @@ class TestRtcTokenBuilder2(unittest.TestCase):
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceRtc.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceRtc.kServiceType]
+        services = parser.get_services(ServiceRtc.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertEqual(parser_service._ServiceRtc__channel_name, self.__channel_name.encode('utf-8'))
         self.assertEqual(parser_service._ServiceRtc__uid, self.__account.encode('utf-8'))

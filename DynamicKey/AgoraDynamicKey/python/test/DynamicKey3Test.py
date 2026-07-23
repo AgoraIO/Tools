@@ -17,6 +17,7 @@ expiredts = 1446455471
 class DynamicKey3Test(unittest.TestCase):
 
     def test_generate(self):
+        """Generate the expected DynamicKey3 token."""
         expected = "0037666966591a93ee5a3f712e22633f31f0cbc8f13970ca35de60c44645bbae8a215061b3314464554720383bbf528823412731446455471"
         actual = DynamicKey3.generate(
             appID,

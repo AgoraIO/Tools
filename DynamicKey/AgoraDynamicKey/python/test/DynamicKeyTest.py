@@ -17,6 +17,7 @@ expiredts = 1446455471
 class DynamicKeyTest(unittest.TestCase):
 
     def test_generate(self):
+        """Generate the expected DynamicKey token."""
         expected = "870588aad271ff47094eb622617e89d6b5b5a615970ca35de60c44645bbae8a215061b3314464554720383bbf5"
         actual = DynamicKey.generate(
             appID, appCertificate, channelname, unixts, randomint)

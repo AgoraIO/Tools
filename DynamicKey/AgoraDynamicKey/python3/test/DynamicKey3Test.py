@@ -12,6 +12,7 @@ from src.DynamicKey3 import *
 
 class DynamicKey3Test(unittest.TestCase):
     def setUp(self) -> None:
+        """Create DynamicKey3 fixtures shared by each test."""
         self.appID = "970ca35de60c44645bbae8a215061b33"
         self.appCertificate = "5cfd2fd1755d40ecb72977518be15d3b"
         self.channelname = "7d72365eb983485397e3e3f9d460bdda"
@@ -21,8 +22,8 @@ class DynamicKey3Test(unittest.TestCase):
         self.expiredts = 1446455471
 
     def test_generate(self):
+        """Generate the expected DynamicKey3 token."""
         expected = "0037666966591a93ee5a3f712e22633f31f0cbc8f13970ca35de60c44645bbae8a215061b3314464554720383bbf528823412731446455471"
         actual = generate(self.appID, self.appCertificate, self.channelname, self.unixts, self.randomint, self.uid,
                           self.expiredts)
         self.assertEqual(expected, actual)
-

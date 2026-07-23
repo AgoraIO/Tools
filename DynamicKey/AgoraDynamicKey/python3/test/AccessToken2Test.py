@@ -12,8 +12,17 @@ from src.AccessToken2 import *
 from src.utils import *
 
 
+class UnknownService(Service):
+    """Represent an unsupported service type for forward compatibility tests."""
+
+    def __init__(self, service_type=999):
+        """Create a service whose type is not registered by AccessToken."""
+        super(UnknownService, self).__init__(service_type)
+
+
 class AccessToken2Test(unittest.TestCase):
     def setUp(self) -> None:
+        """Create deterministic token fixtures shared by each test."""
         self.__app_id = "970CA35de60c44645bbae8a215061b33"
         self.__app_cert = "5CFd2fd1755d40ecb72977518be15d3b"
         self.__channel_name = "7d72365eb983485397e3e3f9d460bdda"
@@ -30,6 +39,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__token._AccessToken__salt = self.__salt
 
     def test_service_rtc(self):
+        """Build the expected RTC token for a numeric user ID."""
         service = ServiceRtc(self.__channel_name, self.__uid)
         service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
 
@@ -40,6 +50,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_rtc_uid_0(self):
+        """Build the expected RTC token with an empty encoded user ID."""
         service = ServiceRtc(self.__channel_name, 0)
         service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
 
@@ -50,6 +61,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_rtc_account(self):
+        """Build the expected RTC token for a string user account."""
         service = ServiceRtc(self.__channel_name, str(self.__uid))
         service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
 
@@ -60,6 +72,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_chat_user(self):
+        """Build the expected Chat token with user privileges."""
         service = ServiceChat(self.__uid_str)
         service.add_privilege(ServiceChat.kPrivilegeUser, self.__expire)
 
@@ -71,6 +84,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_chat_app(self):
+        """Build the expected Chat token with application privileges."""
         service = ServiceChat()
         service.add_privilege(ServiceChat.kPrivilegeApp, self.__expire)
 
@@ -82,6 +96,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_apaas_room_user(self):
+        """Build the expected APaaS room-user token with RTM and Chat services."""
         chat_user_id = get_md5(self.__uid_str)
         apaas_service = ServiceApaas(
             self.__room_uuid, self.__uid_str, self.__role)
@@ -104,6 +119,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_apaas_user(self):
+        """Build the expected APaaS token with user privileges."""
         apaas_service = ServiceApaas(user_uuid=self.__uid_str)
         apaas_service.add_privilege(
             ServiceApaas.kPrivilegeUser, self.__expire)
@@ -115,6 +131,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_service_apaas_app(self):
+        """Build the expected APaaS token with application privileges."""
         apaas_service = ServiceApaas()
         apaas_service.add_privilege(
             ServiceApaas.kPrivilegeApp, self.__expire)
@@ -126,6 +143,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(expected, result)
 
     def test_multi_service(self):
+        """Build the expected token containing distinct service types."""
         rtc = ServiceRtc(self.__channel_name, self.__uid)
         rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
         rtc.add_privilege(
@@ -158,3 +176,123 @@ class AccessToken2Test(unittest.TestCase):
         expected = '007eJxTYHh8IPKzTvBdf9ce8bk7G61vs06oca1e815/ot4+x7rfjDIKDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYWIEkCxCD+ExgkhlMsoBJBQbzFHMjYzPT1CRLC2MTC1NjS/NU41TjNMsUEzODpJSURC4GIwsLI2MTQyNzYyagORCTkEVZ4KKsWOXZgWIQm1HF//8HAL01L5I='
 
         self.assertEqual(expected, result)
+
+    def test_repeated_service_type_build_parse_and_verify(self):
+        """Preserve repeated service types and their insertion order after parsing."""
+        rtm = ServiceRtm(self.__uid_str)
+        rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
+        rtc = ServiceRtc(self.__channel_name, self.__uid)
+        rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+        stream_rtc = ServiceRtc('stream-channel', 'stream-user')
+        stream_rtc.add_privilege(
+            ServiceRtc.kPrivilegePublishDataStream, self.__expire + 100)
+
+        self.__token.add_service(rtm)
+        self.__token.add_service(rtc)
+        self.__token.add_service(stream_rtc)
+
+        token = self.__token.build()
+        self.assertEqual([rtm, rtc, stream_rtc], self.__token.services)
+        self.assertEqual(2, len(self.__token.get_services(ServiceRtc.kServiceType)))
+
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(token))
+        rtc_services = parser.get_services(ServiceRtc.kServiceType)
+
+        self.assertEqual(2, len(rtc_services))
+        self.assertEqual(
+            self.__channel_name.encode('utf-8'),
+            rtc_services[0]._ServiceRtc__channel_name)
+        self.assertEqual(
+            'stream-channel'.encode('utf-8'),
+            rtc_services[1]._ServiceRtc__channel_name)
+        self.assertEqual(1, len(parser.get_services(ServiceRtm.kServiceType)))
+        self.assertEqual([], parser.get_services(ServiceChat.kServiceType))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+        self.assertFalse(parser.verify_signature('a' * 32))
+
+    def test_parse_unknown_service_type(self):
+        """Keep known services parsed before an unknown service type."""
+        rtc = ServiceRtc(self.__channel_name, self.__uid)
+        rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+        unknown = UnknownService()
+        unknown.add_privilege(1, self.__expire)
+
+        self.__token.add_service(rtc)
+        self.__token.add_service(unknown)
+        token = self.__token.build()
+
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(token))
+        self.assertEqual(1, len(parser.get_services(ServiceRtc.kServiceType)))
+        self.assertEqual([], parser.get_services(999))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+    def test_parse_stops_at_unknown_service_type(self):
+        """Stop before known services that follow an unknown service payload."""
+        unknown = UnknownService(0)
+        unknown.add_privilege(1, self.__expire)
+        rtc = ServiceRtc(self.__channel_name, self.__uid)
+        rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+
+        self.__token.add_service(rtc)
+        self.__token.add_service(unknown)
+
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(self.__token.build()))
+        self.assertEqual([], parser.get_services(ServiceRtc.kServiceType))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+    def test_parse_old_token_and_clear_previous_services(self):
+        """Parse an old token and replace services from an earlier parse."""
+        rtm = ServiceRtm(self.__uid_str)
+        rtm.add_privilege(ServiceRtm.kPrivilegeLogin, self.__expire)
+        self.__token.add_service(rtm)
+
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(self.__token.build()))
+        self.assertEqual(1, len(parser.get_services(ServiceRtm.kServiceType)))
+
+        old_token = '007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj'
+        self.assertTrue(parser.from_string(old_token))
+
+        self.assertEqual(1, len(parser.services))
+        self.assertEqual(1, len(parser.get_services(ServiceRtc.kServiceType)))
+        self.assertEqual([], parser.get_services(ServiceRtm.kServiceType))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+    def test_verify_signature_preconditions(self):
+        """Reject signature verification before parsing or with invalid certificates."""
+        parser = AccessToken()
+
+        self.assertFalse(parser.verify_signature(self.__app_cert))
+
+        rtc = ServiceRtc(self.__channel_name, self.__uid)
+        rtc.add_privilege(ServiceRtc.kPrivilegeJoinChannel, self.__expire)
+        self.__token.add_service(rtc)
+        self.assertTrue(parser.from_string(self.__token.build()))
+
+        self.assertFalse(parser.verify_signature('invalid'))
+        self.assertFalse(parser.verify_signature('z' * 32))
+
+    def test_invalid_build_and_parse_inputs(self):
+        """Reject invalid identifiers, empty services, versions, and payloads."""
+        self.assertEqual('', self.__token.build())
+
+        service = ServiceRtc(self.__channel_name, self.__uid)
+        invalid_length = AccessToken('invalid', self.__app_cert)
+        invalid_length.add_service(service)
+        self.assertEqual('', invalid_length.build())
+
+        invalid_hex = AccessToken('z' * 32, self.__app_cert)
+        invalid_hex.add_service(service)
+        self.assertEqual('', invalid_hex.build())
+
+        invalid_certificate = AccessToken(self.__app_id, 'invalid')
+        invalid_certificate.add_service(service)
+        self.assertEqual('', invalid_certificate.build())
+
+        parser = AccessToken()
+        self.assertFalse(parser.from_string('006invalid'))
+        with self.assertRaises(ValueError):
+            parser.from_string('007invalid')

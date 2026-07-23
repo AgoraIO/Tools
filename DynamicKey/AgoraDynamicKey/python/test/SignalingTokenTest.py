@@ -16,6 +16,7 @@ expiredTsInSeconds = now + validTimeInSeconds
 class DynamicKeyTest(unittest.TestCase):
 
     def test_generate(self):
+        """Generate the expected signaling token."""
         expected = "1:970CA35de60c44645bbae8a215061b33:1514219634:82539e1f3973bcfe3f0d0c8993e6c051"
         actual = SignalingToken.generateSignalingToken(
             account, appID, appCertificate, expiredTsInSeconds)
