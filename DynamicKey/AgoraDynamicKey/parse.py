@@ -10,14 +10,10 @@ from python3.src.AccessToken2 import AccessToken
 # Usage
 #     # python3 parse.py YOUR_TOKEN
 #     # make parse token=YOUR_TOKEN
-#
-# Test token with web page
-#     For RTC, https://webdemo.agora.io/agora-web-showcase/examples/Agora-Web-Tutorial-1to1-Web/
-#     For RTM, https://webdemo.agora.io/agora-web-showcase/examples/Agora-RTM-Tutorial-Web/
 
 service = {
     1: {
-        'name': 'Rtc',
+        'name': 'RTC',
         'privilege': {
             1: {'name': 'joinChannel'},
             2: {'name': 'publishAudioStream'},
@@ -26,13 +22,13 @@ service = {
         }
     },
     2: {
-        'name': 'Rtm',
+        'name': 'RTM',
         'privilege': {
             1: {'name': 'login'}
         }
     },
     4: {
-        'name': 'Fpa',
+        'name': 'FPA',
         'privilege': {
             1: {'name': 'login'}
         }
@@ -45,7 +41,7 @@ service = {
         }
     },
     7: {
-        'name': 'Apaas',
+        'name': 'APaaS',
         'privilege': {
             1: {'name': 'roomUser'},
             2: {'name': 'user'},
@@ -56,11 +52,13 @@ service = {
 
 
 def check_expire(expire):
+    """Return whether a timestamp has expired and its remaining seconds."""
     remain = expire - int(time.time())
     return remain < 0, remain
 
 
 def get_expire_msg(expire):
+    """Return a human-readable expiration status for a timestamp."""
     is_expired, remain = check_expire(expire)
     if is_expired:
         return 'expired'
@@ -68,40 +66,78 @@ def get_expire_msg(expire):
 
 
 def parse_token(token):
-    res = '\nToken is %s \n\n' % token
-
+    """Parse a Token007 token and return its known service information."""
     if token[:3] != '007':
-        return res + 'Not support, just for parsing token version 007!'
+        return ('\nToken007 parse result\n'
+                '=====================\n\n'
+                'Status : failed\n'
+                'Reason : only Token007 is supported\n')
 
     access_token = AccessToken()
     try:
-        access_token.from_string(token)
+        if not access_token.from_string(token):
+            return ('\nToken007 parse result\n'
+                    '=====================\n\n'
+                    'Status : failed\n'
+                    'Reason : invalid token\n')
     except Exception as e:
-        res += 'Parse token failed! %s \n' % e
-        return res
+        return ('\nToken007 parse result\n'
+                '=====================\n\n'
+                'Status : failed\n'
+                'Reason : %s\n' % e)
 
-    res += 'Parse token success! \n'
-    res += 'Token information, %s. \n    - app_id:%s, issue_ts:%d, expire:%d, salt:%d \n' % (
-        get_expire_msg(access_token._AccessToken__issue_ts + access_token._AccessToken__expire), access_token._AccessToken__app_id.decode(), access_token._AccessToken__issue_ts, access_token._AccessToken__expire, access_token._AccessToken__salt)
+    issue_ts = access_token._AccessToken__issue_ts
+    expire = access_token._AccessToken__expire
+    expire_ts = issue_ts + expire
+    lines = [
+        '',
+        'Token007 parse result',
+        '=====================',
+        '',
+        'Token',
+        '-----',
+        'Status          : success',
+        'App ID          : %s' % access_token._AccessToken__app_id.decode(),
+        'Issue timestamp : %d' % issue_ts,
+        'Lifetime        : %d seconds' % expire,
+        'Expire timestamp: %d (%s)' % (expire_ts, get_expire_msg(expire_ts)),
+        'Salt            : %d' % access_token._AccessToken__salt,
+        '',
+        'Services (%d)' % len(access_token.services),
+        '------------',
+    ]
 
-    for _, item in access_token._AccessToken__service.items():
+    for index, item in enumerate(access_token.services, start=1):
+        service_type = item.service_type()
+        service_info = service.get(service_type)
+        if service_info is None:
+            lines.append('[%d] Unknown (ServiceType: %d)' % (
+                index, service_type))
+            continue
+
+        lines.append('[%d] %s (ServiceType: %d)' % (
+            index, service_info['name'], service_type))
+
         for key, serviceItem in item.__dict__.items():
-            if key == '_Service__type':
-                if item._Service__type not in service:
-                    res += 'service type not existed, type:%d \n' % item._Service__type
-                    continue
-                res += '- Service information, type:%d (%s) \n' % (
-                    item._Service__type, service[item._Service__type]['name'])
-            elif key == '_Service__privileges':
-                for privilege, privilegeExpire in item._Service__privileges.items():
-                    res += '    - privilege:%d(%s), expire:%d (%s) \n' % (
-                        privilege, service[item._Service__type]['privilege'][privilege]['name'], privilegeExpire,
-                        get_expire_msg(access_token._AccessToken__issue_ts + privilegeExpire))
-            else:
-                res += '    - {}:{} \n'.format(key.replace('_Service%s__' % service[item._Service__type]['name'], ''),
-                                               serviceItem.decode() if type(serviceItem) == bytes else serviceItem)
+            if key in ('_Service__type', '_Service__privileges'):
+                continue
 
-    return res
+            field_name = key.split('__', 1)[-1]
+            field_value = serviceItem.decode('utf-8', errors='replace') \
+                if isinstance(serviceItem, bytes) else serviceItem
+            lines.append('    %-15s: %s' % (field_name, field_value))
+
+        lines.append('    privileges:')
+        for privilege, privilege_expire in item._Service__privileges.items():
+            privilege_info = service_info['privilege'].get(privilege)
+            privilege_name = privilege_info['name'] if privilege_info else 'unknown'
+            privilege_status = get_expire_msg(issue_ts + privilege_expire)
+            lines.append('      - %s (%d): %d seconds (%s)' % (
+                privilege_name, privilege, privilege_expire, privilege_status))
+
+        lines.append('')
+
+    return '\n'.join(lines).rstrip() + '\n'
 
 
 if __name__ == "__main__":
