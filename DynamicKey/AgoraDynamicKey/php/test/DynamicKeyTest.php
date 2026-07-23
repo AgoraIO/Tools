@@ -10,6 +10,9 @@
     $uid = 2882341273;
     $expiredTs = 1446455471;
 
+    /**
+     * Verify deterministic recording key generation.
+     */
     function testRecordingKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {   
         $expected = '004e0c24ac56aae05229a6d9389860a1a0e25e56da8970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471';
@@ -19,6 +22,9 @@
         assertEqual($expected, $actual);
     }
 
+    /**
+     * Verify deterministic media channel key generation.
+     */
     function testMediaChannelKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {   
         $expected = '004d0ec5ee3179c964fe7c0485c045541de6bff332b970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471';

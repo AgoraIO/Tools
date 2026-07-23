@@ -1,5 +1,8 @@
 <?php
 
+    /**
+     * Print whether two test values are equal.
+     */
     function assertEqual($expect, $actual)
     {
         if ($expect != $actual) {

@@ -13,6 +13,9 @@ class RtcTokenBuilder2Test
     public $uid = 2882341273;
     public $uidStr = "2882341273";
 
+    /**
+     * Run all RTC token builder test cases.
+     */
     public function run()
     {
         $this->test_buildTokenWithUid_ROLE_PUBLISHER();
@@ -22,91 +25,111 @@ class RtcTokenBuilder2Test
         $this->test_buildTokenWithUserAccountAndPrivilege();
     }
 
+    /**
+     * Verify publisher token generation with a numeric user ID.
+     */
     public function test_buildTokenWithUid_ROLE_PUBLISHER()
     {
         $token = RtcTokenBuilder2::buildTokenWithUid($this->appId, $this->appCertificate, $this->channelName, $this->uid, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
-        Util::assertEqual($this->uid, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
-        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+        Util::assertEqual($this->channelName, $serviceRtc->channelName);
+        Util::assertEqual($this->uid, $serviceRtc->uid);
+        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $serviceRtc->type);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
     }
 
+    /**
+     * Verify publisher token generation with a string user account.
+     */
     public function test_buildTokenWithUserAccount_ROLE_PUBLISHER()
     {
         $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_PUBLISHER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
-        Util::assertEqual($this->account, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
-        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+        Util::assertEqual($this->channelName, $serviceRtc->channelName);
+        Util::assertEqual($this->account, $serviceRtc->uid);
+        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $serviceRtc->type);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
     }
 
+    /**
+     * Verify subscriber token generation with a string user account.
+     */
     public function test_buildTokenWithUserAccount_ROLE_SUBSCRIBER()
     {
         $token = RtcTokenBuilder2::buildTokenWithUserAccount($this->appId, $this->appCertificate, $this->channelName, $this->account, RtcTokenBuilder2::ROLE_SUBSCRIBER, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
-        Util::assertEqual($this->account, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
-        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
-        Util::assertEqual(0, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
-        Util::assertEqual(0, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
-        Util::assertEqual(0, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+        Util::assertEqual($this->channelName, $serviceRtc->channelName);
+        Util::assertEqual($this->account, $serviceRtc->uid);
+        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $serviceRtc->type);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
+        Util::assertEqual(0, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM] ?? 0);
+        Util::assertEqual(0, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM] ?? 0);
+        Util::assertEqual(0, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM] ?? 0);
     }
 
+    /**
+     * Verify numeric user token generation with explicit privilege expirations.
+     */
     public function test_buildTokenWithUidAndPrivilege()
     {
         $token = RtcTokenBuilder2::buildTokenWithUidAndPrivilege($this->appId, $this->appCertificate, $this->channelName, $this->uid,
             $this->expire, $this->expire, $this->expire, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
-        Util::assertEqual($this->uid, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
-        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+        Util::assertEqual($this->channelName, $serviceRtc->channelName);
+        Util::assertEqual($this->uid, $serviceRtc->uid);
+        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $serviceRtc->type);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
     }
 
+    /**
+     * Verify account token generation with explicit privilege expirations.
+     */
     public function test_buildTokenWithUserAccountAndPrivilege()
     {
         $token = RtcTokenBuilder2::buildTokenWithUserAccountAndPrivilege($this->appId, $this->appCertificate, $this->channelName, $this->account,
             $this->expire, $this->expire, $this->expire, $this->expire, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->channelName, $accessToken->services[ServiceRtc::SERVICE_TYPE]->channelName);
-        Util::assertEqual($this->account, $accessToken->services[ServiceRtc::SERVICE_TYPE]->uid);
-        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $accessToken->services[ServiceRtc::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtc::SERVICE_TYPE]->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+        Util::assertEqual($this->channelName, $serviceRtc->channelName);
+        Util::assertEqual($this->account, $serviceRtc->uid);
+        Util::assertEqual(ServiceRtc::SERVICE_TYPE, $serviceRtc->type);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_JOIN_CHANNEL]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
+        Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
     }
 }
 

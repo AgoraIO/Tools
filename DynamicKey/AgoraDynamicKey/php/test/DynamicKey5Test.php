@@ -10,6 +10,9 @@ include "TestTool.php";
     $uid = 2882341273;
     $expiredTs = 1446455471;
 
+    /**
+     * Verify deterministic recording key generation.
+     */
     function testRecordingKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {   
         $expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
@@ -18,6 +21,9 @@ include "TestTool.php";
         assertEqual($expected, $actual);
     }
 
+    /**
+     * Verify deterministic media channel key generation.
+     */
     function testMediaChannelKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {   
         $expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
@@ -27,6 +33,9 @@ include "TestTool.php";
         assertEqual($expected, $actual);
     }
 
+    /**
+     * Verify in-channel permission key generation for upload roles.
+     */
     function testInChannelPermission($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {
         global $NO_UPLOAD;

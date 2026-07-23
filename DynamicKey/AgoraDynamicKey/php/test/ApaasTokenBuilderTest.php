@@ -12,6 +12,9 @@ class ApaasTokenBuilderTest
     public $userUuid = "2882341273";
     public $role = 1;
 
+    /**
+     * Run all APaaS token builder test cases.
+     */
     public function run()
     {
         $this->test_buildRoomUserToken();
@@ -19,47 +22,59 @@ class ApaasTokenBuilderTest
         $this->test_buildAppToken();
     }
 
+    /**
+     * Verify APaaS room user token generation and parsing.
+     */
     public function test_buildRoomUserToken()
     {
         $token = ApaasTokenBuilder::buildRoomUserToken($this->appId, $this->appCertificate, $this->roomUuid, $this->userUuid, $this->role, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceApaas = $accessToken->getServices(ServiceApaas::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->roomUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual($this->userUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
-        Util::assertEqual($this->role, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_ROOM_USER]);
+        Util::assertEqual($this->roomUuid, $serviceApaas->roomUuid);
+        Util::assertEqual($this->userUuid, $serviceApaas->userUuid);
+        Util::assertEqual($this->role, $serviceApaas->role);
+        Util::assertEqual($this->expire, $serviceApaas->privileges[ServiceApaas::PRIVILEGE_ROOM_USER]);
     }
 
+    /**
+     * Verify APaaS user token generation and parsing.
+     */
     public function test_buildUserToken()
     {
         $token = ApaasTokenBuilder::buildUserToken($this->appId, $this->appCertificate, $this->userUuid, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceApaas = $accessToken->getServices(ServiceApaas::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->userUuid, $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
-        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual(-1, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_USER]);
+        Util::assertEqual($this->userUuid, $serviceApaas->userUuid);
+        Util::assertEqual("", $serviceApaas->roomUuid);
+        Util::assertEqual(-1, $serviceApaas->role);
+        Util::assertEqual($this->expire, $serviceApaas->privileges[ServiceApaas::PRIVILEGE_USER]);
     }
 
+    /**
+     * Verify APaaS application token generation and parsing.
+     */
     public function test_buildAppToken()
     {
         $token = ApaasTokenBuilder::buildAppToken($this->appId, $this->appCertificate, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceApaas = $accessToken->getServices(ServiceApaas::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceApaas::SERVICE_TYPE]->privileges[ServiceApaas::PRIVILEGE_APP]);
+        Util::assertEqual($this->expire, $serviceApaas->privileges[ServiceApaas::PRIVILEGE_APP]);
 
-        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->roomUuid);
-        Util::assertEqual("", $accessToken->services[ServiceApaas::SERVICE_TYPE]->userUuid);
-        Util::assertEqual(-1, $accessToken->services[ServiceApaas::SERVICE_TYPE]->role);
+        Util::assertEqual("", $serviceApaas->roomUuid);
+        Util::assertEqual("", $serviceApaas->userUuid);
+        Util::assertEqual(-1, $serviceApaas->role);
     }
 }
 
