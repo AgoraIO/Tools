@@ -286,10 +286,14 @@ function AccessToken:get_services(service_type)
     return services
 end
 
--- Builds and signs a Token007 string.
+-- Builds and signs a Token007 string and requires at least one service.
 function AccessToken:build()
     if not is_uuid(self.app_id) or not is_uuid(self.app_cert) then
         error("check appId or appCertificate")
+    end
+
+    if #self.services == 0 then
+        return ""
     end
 
     local services = services_for_packing(self.services)

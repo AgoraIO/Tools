@@ -109,10 +109,10 @@ namespace AgoraIO.Media
             return DynamicKeyUtil.encodeHMAC(BitConverter.GetBytes(_salt), signing, "SHA256");
         }
 
-        // Builds a Token007 token containing all added services.
+        // Builds a Token007 token and requires at least one service.
         public string build()
         {
-            if (!Utils.isUUID(_appId) || !Utils.isUUID(_appCert))
+            if (!Utils.isUUID(_appId) || !Utils.isUUID(_appCert) || _services.Count == 0)
             {
                 return "";
             }

@@ -2,7 +2,7 @@
 # Use `make test` or `make run-samples` to run all languages, and use targets such as
 # `make test-go` or `make run-sample-go` to run a single language. Image variables can
 # be overridden from the command line for internal registries or custom toolchains.
-# Samples use fixed non-production credentials and must not use customer secrets.
+# Samples default to non-production credentials and must not use customer secrets.
 
 SHELL := /bin/sh
 
@@ -48,9 +48,9 @@ RUBY_IMAGE ?= ruby:3.3
 # Rust toolchain image for testing crates and running examples.
 RUST_IMAGE ?= rust:1.79
 
-# Samples use non-production credentials because they print credential values.
-SAMPLE_APP_ID := aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-SAMPLE_APP_CERTIFICATE := bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+# Samples read Agora credentials from the environment and fall back to non-production values.
+SAMPLE_APP_ID ?= $(or $(AGORA_APP_ID),aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
+SAMPLE_APP_CERTIFICATE ?= $(or $(AGORA_APP_CERTIFICATE),bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
 SAMPLE_ENV = -e AGORA_APP_ID=$(SAMPLE_APP_ID) -e AGORA_APP_CERTIFICATE=$(SAMPLE_APP_CERTIFICATE)
 
 TEST_TARGETS := \

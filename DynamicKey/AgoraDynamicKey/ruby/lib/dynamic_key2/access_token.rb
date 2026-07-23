@@ -203,9 +203,9 @@ module AgoraDynamicKey2
       @services.select { |service| service.type == service_type }
     end
 
-    # Builds a Token007 token containing all added services.
+    # Builds a Token007 token and requires at least one service.
     def build
-      return '' if !uuid?(@app_id) || !uuid?(@app_cert)
+      return '' if !uuid?(@app_id) || !uuid?(@app_cert) || @services.empty?
 
       signing = fetch_sign
       services = services_for_packing

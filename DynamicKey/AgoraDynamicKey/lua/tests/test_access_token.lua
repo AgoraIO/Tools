@@ -32,6 +32,11 @@ local function create_rtc_service(channel_name, uid, expire)
     return service
 end
 
+-- Verifies token generation rejects an empty service list.
+function test_build_rejects_empty_services()
+    luaunit.assertEquals("", create_token():build())
+end
+
 -- Verifies deterministic single-service generation remains compatible.
 function test_build_service_rtc()
     local token = create_token()

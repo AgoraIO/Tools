@@ -17,8 +17,8 @@ const (
 	DataMockUserId              = "test_user"
 )
 
-// Test_AccessToken_Build verifies deterministic token generation without services.
-func Test_AccessToken_Build(t *testing.T) {
+// Test_AccessToken_Build_Error_NoService verifies token generation rejects an empty service list.
+func Test_AccessToken_Build_Error_NoService(t *testing.T) {
 	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
 	accessToken.IssueTs = DataMockIssueTs
 	accessToken.Salt = DataMockSalt
@@ -31,8 +31,8 @@ func Test_AccessToken_Build(t *testing.T) {
 	AssertEqual(t, 0, len(accessToken.Services))
 
 	token, err := accessToken.Build()
-	AssertNil(t, err)
-	AssertEqual(t, "007eJxSYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAgAA//+rZxiv", token)
+	AssertEqual(t, "no service added", err.Error())
+	AssertEqual(t, "", token)
 }
 
 // Test_AccessToken_Build_Error_AppId verifies rejection of invalid app IDs.

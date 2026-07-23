@@ -308,12 +308,15 @@ func (accessToken *AccessToken) GetServices(serviceType uint16) []IService {
 	return services
 }
 
-// Build serializes all services, including repeated service types, into a Token007 token.
+// Build serializes all services into a Token007 token and requires at least one service.
 func (accessToken *AccessToken) Build() (res string, err error) {
 	recoverException()
 
 	if !isUuid(accessToken.AppId) || !isUuid(accessToken.AppCert) {
 		return "", errors.New("check appId or appCertificate")
+	}
+	if len(accessToken.Services) == 0 {
+		return "", errors.New("no service added")
 	}
 
 	buf := new(bytes.Buffer)

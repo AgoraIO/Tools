@@ -146,10 +146,10 @@ public class AccessToken2 {
     }
 
     /**
-     * Builds a Token007 token containing all added services.
+     * Builds a Token007 token and requires at least one service.
      */
     public String build() throws Exception {
-        if (!Utils.isUUID(this.appId) || !Utils.isUUID(this.appCert)) {
+        if (!Utils.isUUID(this.appId) || !Utils.isUUID(this.appCert) || this.services.isEmpty()) {
             return "";
         }
 

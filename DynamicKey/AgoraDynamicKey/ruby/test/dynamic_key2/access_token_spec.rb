@@ -20,6 +20,13 @@ describe 'AgoraDynamicKey2::AccessToken' do
   let(:uid_s) { '2882341273' }
   let(:user_id) { 'test_user' }
 
+  # Verifies token generation rejects an empty service list.
+  it 'test_build_rejects_empty_services' do
+    access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
+
+    expect(access_token.build).to eq('')
+  end
+
   # Verifies deterministic RTC token generation with a numeric user ID.
   it 'test_build_ServiceRtc' do
     access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)

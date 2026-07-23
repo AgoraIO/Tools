@@ -20,10 +20,10 @@ public class AccessToken2Test {
     private String userId = "test_user";
 
     /**
-     * Verifies deterministic token generation without services.
+     * Verifies token generation rejects an empty service list.
      */
     @Test
-    public void build() throws Exception {
+    public void buildRejectsEmptyServices() throws Exception {
         AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
         accessToken.issueTs = issueTs;
         accessToken.salt = salt;
@@ -34,10 +34,7 @@ public class AccessToken2Test {
         assertEquals(issueTs, accessToken.issueTs);
         assertEquals(salt, accessToken.salt);
 
-        String token = accessToken.build();
-        assertEquals(
-                "007eJxTYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAKtnGK8=",
-                token);
+        assertEquals("", accessToken.build());
     }
 
     /**

@@ -291,11 +291,11 @@ class AccessToken2
     }
 
     /**
-     * Build a Token007 token containing all added services.
+     * Build a Token007 token and require at least one service.
      */
     public function build()
     {
-        if (!self::isUUid($this->appId) || !self::isUUid($this->appCert)) {
+        if (!self::isUUid($this->appId) || !self::isUUid($this->appCert) || count($this->services) === 0) {
             return "";
         }
 

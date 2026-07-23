@@ -26,9 +26,9 @@ namespace AgoraIO.Tests
             Output = tempOutput;
         }
 
-        // Verifies deterministic token generation without services.
+        // Verifies token generation rejects an empty service list.
         [Fact]
-        public void build()
+        public void buildRejectsEmptyServices()
         {
             AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
             accessToken._issueTs = issueTs;
@@ -40,8 +40,7 @@ namespace AgoraIO.Tests
             Assert.Equal(issueTs, accessToken._issueTs);
             Assert.Equal(salt, accessToken._salt);
 
-            string token = accessToken.build();
-            Assert.Equal("007eJxTYEiJ9+zw7Gb1viNuGtMfy3JriuZNp+1h1iLu/rOePHlS91WBwdLcwNnR2DQl1cwg2cTEzMQ0KSkx1SLRyNDUwMwwydjY/YsAQwQTAwMjAwgAAKtnGK8=", token);
+            Assert.Equal("", accessToken.build());
         }
 
         // Verifies deterministic RTC token generation.

@@ -31,6 +31,7 @@ class AccessToken2Test
      */
     public function run()
     {
+        $this->test_build_rejects_empty_services();
         $this->test_build_ServiceRtc();
         $this->test_build_ServiceRtc_uid_0();
         $this->test_build_ServiceRtc_account();
@@ -47,6 +48,15 @@ class AccessToken2Test
         $this->test_parse_TokenRtm();
         $this->test_parse_TokenChat_user();
         $this->test_parse_TokenChat_app();
+    }
+
+    /**
+     * Verify token generation rejects an empty service list.
+     */
+    public function test_build_rejects_empty_services()
+    {
+        $accessToken = new AccessToken2($this->appId, $this->appCertificate, $this->expire);
+        Util::assertEqual("", $accessToken->build());
     }
 
     /**

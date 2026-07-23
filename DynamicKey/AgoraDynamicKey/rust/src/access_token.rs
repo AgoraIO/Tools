@@ -333,10 +333,13 @@ impl AccessToken {
         self.services.iter().filter(|service| service.get_service_type() == service_type).map(|service| service.as_ref()).collect()
     }
 
-    /// Builds a Token007 token containing all added services.
+    /// Builds a Token007 token and requires at least one service.
     pub fn build(&self) -> Result<String, Box<dyn std::error::Error>> {
         if !is_uuid(&self.app_id) || !is_uuid(&self.app_cert) {
             return Err("check appId or appCertificate".to_string().into());
+        }
+        if self.services.is_empty() {
+            return Err("no service added".to_string().into());
         }
 
         let mut buf = Vec::new();
@@ -511,6 +514,14 @@ mod tests {
         let mut service = new_service_rtc(channel_name, uid);
         service.service.add_privilege(PRIVILEGE_JOIN_CHANNEL, expire);
         token.add_service(Box::new(service));
+    }
+
+    /// Verifies token generation rejects an empty service list.
+    #[test]
+    fn test_build_rejects_empty_services() {
+        let error = deterministic_token().build().unwrap_err();
+
+        assert_eq!("no service added", error.to_string());
     }
 
     /// Verifies deterministic RTC token generation remains unchanged.
