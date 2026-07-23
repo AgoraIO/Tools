@@ -7,7 +7,7 @@ import (
 const (
 	DataMockAppId               = "970CA35de60c44645bbae8a215061b33"
 	DataMockAppCertificate      = "5CFd2fd1755d40ecb72977518be15d3b"
-	DataMockWrongAppCertificate = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+	DataMockWrongAppCertificate = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 	DataMockChannelName         = "7d72365eb983485397e3e3f9d460bdda"
 	DataMockExpire              = uint32(600)
 	DataMockIssueTs             = uint32(1111111)

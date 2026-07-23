@@ -1,4 +1,4 @@
-# Runs unit tests and samples for every supported language in isolated Docker containers.
+# Runs unit tests with coverage and samples for every supported language in isolated Docker containers.
 # Use `make test` or `make run-samples` to run all languages, and use targets such as
 # `make test-go` or `make run-sample-go` to run a single language. Image variables can
 # be overridden from the command line for internal registries or custom toolchains.
@@ -10,12 +10,21 @@ ROOT_DIR := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 DOCKER ?= docker
 DOCKER_RUN = $(DOCKER) run --rm --init -v "$(ROOT_DIR):/workspace:ro"
 
+# Prints the current test target before execution.
+TEST_START = @printf '\n========== [START] %s ==========\n' "$@"
+# Prints the current test target after successful execution.
+TEST_PASS = @printf '========== [PASS]  %s ==========\n\n' "$@"
+# Prints the current sample target before execution.
+SAMPLE_START = @printf '\n========== [START] %s ==========\n' "$@"
+# Prints the current sample target after successful execution.
+SAMPLE_PASS = @printf '========== [PASS]  %s ==========\n\n' "$@"
+
 # Base image for building and testing C++ code.
 CPP_IMAGE ?= ubuntu:22.04
 # .NET SDK image for building and testing C# code.
 CSHARP_IMAGE ?= mcr.microsoft.com/dotnet/sdk:8.0
 # Flutter SDK image for running Dart tests and examples.
-DART_IMAGE ?= ghcr.io/cirruslabs/flutter:3.27.1
+DART_IMAGE ?= ghcr.io/cirruslabs/flutter:3.27.2
 # Deno runtime image for testing and running JavaScript modules.
 DENO_IMAGE ?= denoland/deno:1.45.3
 # Go toolchain image for testing and running Go packages.
@@ -40,8 +49,8 @@ RUBY_IMAGE ?= ruby:3.3
 RUST_IMAGE ?= rust:1.79
 
 # Samples use non-production credentials because they print credential values.
-SAMPLE_APP_ID := AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-SAMPLE_APP_CERTIFICATE := BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+SAMPLE_APP_ID := aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+SAMPLE_APP_CERTIFICATE := bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
 SAMPLE_ENV = -e AGORA_APP_ID=$(SAMPLE_APP_ID) -e AGORA_APP_CERTIFICATE=$(SAMPLE_APP_CERTIFICATE)
 
 TEST_TARGETS := \
@@ -83,8 +92,8 @@ RUN_SAMPLE_TARGETS := \
 # Lists the available Make commands.
 help:
 	@printf '%s\n' \
-		'make test                   Run all language unit tests in Docker' \
-		'make test-<language>        Run one language unit test suite in Docker' \
+		'make test                   Run all language unit tests with coverage in Docker' \
+		'make test-<language>        Run one language unit test suite with coverage in Docker' \
 		'make run-samples            Run all language samples with test credentials' \
 		'make run-sample-<language>  Run one language sample suite with test credentials' \
 		'make parse token=...        Parse a token locally'
@@ -100,7 +109,7 @@ check-docker:
 	@command -v $(DOCKER) >/dev/null 2>&1 || { echo "docker is required"; exit 1; }
 	@$(DOCKER) info >/dev/null 2>&1 || { echo "docker daemon is not available"; exit 1; }
 
-# Runs unit tests for all supported languages.
+# Runs unit tests with coverage for all supported languages.
 test: $(TEST_TARGETS)
 
 # Runs samples for all supported languages.
@@ -109,103 +118,184 @@ run-samples: $(RUN_SAMPLE_TARGETS)
 # Requires Docker before running any language-specific target.
 $(TEST_TARGETS) $(RUN_SAMPLE_TARGETS): check-docker
 
-# Builds and runs the C++ unit tests.
+# Builds and runs the C++ unit tests with gcovr coverage.
 test-cpp:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/cpp $(CPP_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ libgtest-dev libssl-dev zlib1g-dev >/dev/null; \
-		cmake -S . -B /tmp/agora-cpp-build; \
-		cmake --build /tmp/agora-cpp-build --parallel; \
-		/tmp/agora-cpp-build/test/test.exe'
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends clang cmake gcovr libgtest-dev libssl-dev llvm make zlib1g-dev >/dev/null; \
+		cmake -S . -B /tmp/agora-cpp-build -DCMAKE_CXX_FLAGS=--coverage -DCMAKE_EXE_LINKER_FLAGS=--coverage; \
+		cmake --build /tmp/agora-cpp-build --target test.exe --parallel; \
+		/tmp/agora-cpp-build/test/test.exe; \
+		gcovr --root /workspace/cpp --filter /workspace/cpp/src/ --object-directory /tmp/agora-cpp-build --gcov-executable "llvm-cov gcov" --txt --print-summary'
+	$(TEST_PASS)
 
-# Runs the C# unit tests.
+# Runs the C# unit tests with Coverlet coverage.
 test-csharp:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/csharp $(CSHARP_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-csharp; \
 		cd /tmp/agora-csharp; \
-		dotnet test test/AgoraIO.Tests/AgoraIO.Tests.csproj'
+		dotnet add test/AgoraIO.Tests/AgoraIO.Tests.csproj package coverlet.msbuild --version 6.0.4; \
+		dotnet test test/AgoraIO.Tests/AgoraIO.Tests.csproj \
+			/p:CollectCoverage=true \
+			/p:CoverletOutput=/tmp/csharp-coverage/ \
+			/p:CoverletOutputFormat=cobertura'
+	$(TEST_PASS)
 
-# Runs the Dart and Flutter unit tests.
+# Runs the Dart and Flutter unit tests with line coverage.
 test-dart:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/dart $(DART_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-dart; \
 		cd /tmp/agora-dart; \
-		flutter test'
+		flutter test --coverage; \
+		awk -F: '\''/^LF:/{lines += $$2} /^LH:/{covered += $$2} END { if (lines == 0) exit 1; printf "Dart line coverage: %.2f%% (%d/%d)\n", covered * 100 / lines, covered, lines }'\'' coverage/lcov.info'
+	$(TEST_PASS)
 
-# Runs the Deno unit tests.
+# Runs the Deno unit tests with native coverage.
 test-deno:
-	$(DOCKER_RUN) --entrypoint deno -w /workspace/deno $(DENO_IMAGE) \
-		test --allow-net test
+	$(TEST_START)
+	$(DOCKER_RUN) --entrypoint sh -w /workspace/deno $(DENO_IMAGE) -ec '\
+		deno test --allow-net --coverage=/tmp/deno-coverage test/*.js; \
+		deno coverage --include="/src/" /tmp/deno-coverage'
+	$(TEST_PASS)
 
-# Runs all Go unit tests.
+# Runs all Go unit tests and reports total statement coverage.
 test-go:
-	$(DOCKER_RUN) -w /workspace/go/src $(GO_IMAGE) \
-		go test ./...
+	$(TEST_START)
+	$(DOCKER_RUN) -w /workspace/go/src $(GO_IMAGE) sh -ec '\
+		go test -covermode=atomic -coverprofile=/tmp/go-coverage.out ./...; \
+		coverage=$$(go tool cover -func=/tmp/go-coverage.out); \
+		total=$$(printf "%s\n" "$$coverage" | awk '\''/^total:/ { print $$NF }'\''); \
+		test -n "$$total"; \
+		printf "Total statement coverage: %s\n" "$$total"'
+	$(TEST_PASS)
 
-# Runs the Java unit tests with Maven.
+# Runs the Java unit tests with JaCoCo coverage.
 test-java:
-	$(DOCKER_RUN) -v /workspace/java/target -w /workspace/java $(JAVA_IMAGE) \
-		mvn -B test
+	$(TEST_START)
+	$(DOCKER_RUN) -w /workspace/java $(JAVA_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-java; \
+		cd /tmp/agora-java; \
+		mvn -B org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.12:report; \
+		awk -F, '\''NR > 1 { missed += $$8; covered += $$9 } END { total = missed + covered; if (total == 0) exit 1; printf "Java line coverage: %.2f%% (%d/%d)\n", covered * 100 / total, covered, total }'\'' target/site/jacoco/jacoco.csv'
+	$(TEST_PASS)
 
-# Installs Lua dependencies and runs the Lua unit tests.
+# Installs Lua dependencies and runs the Lua unit tests with LuaCov coverage.
 test-lua:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/lua $(LUA_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential libssl-dev zlib1g-dev >/dev/null; \
-		luarocks make agora-token-0.1.0-1.rockspec; \
-		for test_file in tests/*.lua; do lua "$$test_file"; done'
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential git libssl-dev lua-unit zlib1g-dev >/dev/null; \
+		cp -R . /tmp/agora-lua; \
+		cd /tmp/agora-lua; \
+		export LUA_PATH="/usr/share/lua/5.4/?.lua;/usr/share/lua/5.4/?/init.lua;;"; \
+		luarocks install base64; \
+		luarocks install luaossl; \
+		luarocks install lua-zlib; \
+		luarocks install md5; \
+		luarocks make --deps-mode=none agora-token-0.1.0-1.rockspec; \
+		luarocks install luafilesystem 1.8.0-1; \
+		luarocks install luacov 0.15.0-1; \
+		for test_file in tests/*.lua; do lua -lluacov "$$test_file"; done; \
+		luacov; \
+		tail -n 20 luacov.report.out'
+	$(TEST_PASS)
 
-# Installs Node.js dependencies and runs the Node.js unit tests.
+# Installs Node.js dependencies and runs the Node.js unit tests with c8 coverage.
 test-nodejs:
-	$(DOCKER_RUN) -v /workspace/nodejs/node_modules -w /workspace/nodejs $(NODEJS_IMAGE) sh -ec '\
+	$(TEST_START)
+	$(DOCKER_RUN) -w /workspace/nodejs $(NODEJS_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-nodejs; \
+		cd /tmp/agora-nodejs; \
 		npm ci; \
-		npm test'
+		npx --yes c8@10.1.3 \
+			--all \
+			--include="src/**/*.js" \
+			--include=index.js \
+			--temp-directory=/tmp/nodejs-c8 \
+			--reports-dir=/tmp/nodejs-coverage \
+			--reporter=text \
+			npm test'
+	$(TEST_PASS)
 
-# Installs Perl dependencies and runs the Perl unit tests.
+# Installs Perl dependencies and runs the Perl unit tests with Devel::Cover coverage.
 test-perl:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/perl $(PERL_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-perl; \
+		cd /tmp/agora-perl; \
 		cpanm --quiet --notest --installdeps .; \
-		prove -I src test/*.t'
+		cpanm --quiet --notest Devel::Cover; \
+		HARNESS_PERL_SWITCHES=-MDevel::Cover prove -I src test/*.t; \
+		cover -select_re "^src/"'
+	$(TEST_PASS)
 
-# Runs the PHP tests and fails when a custom assertion reports an error.
+# Runs the PHP tests with Xdebug line coverage.
 test-php:
+	$(TEST_START)
 	$(DOCKER_RUN) -w /workspace/php/test $(PHP_IMAGE) sh -ec '\
-		output=$$(mktemp); \
-		for test_file in *Test.php; do php "$$test_file"; done | tee "$$output"; \
-		if grep -q "assert failed" "$$output"; then exit 1; fi'
+		apt-get update >/dev/null; \
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends $${PHPIZE_DEPS} >/dev/null; \
+		pecl install xdebug-3.3.2 >/dev/null; \
+		docker-php-ext-enable xdebug >/dev/null; \
+		php -d xdebug.mode=coverage CoverageRunner.php'
+	$(TEST_PASS)
 
-# Runs the legacy Python 2 unit tests.
+# Runs the legacy Python 2 unit tests with coverage.py.
 test-python:
-	$(DOCKER_RUN) -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python $(PYTHON_IMAGE) \
-		python -m unittest discover -v -s test -p '*[tT]est*.py'
+	$(TEST_START)
+	$(DOCKER_RUN) -e COVERAGE_FILE=/tmp/python-coverage -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python $(PYTHON_IMAGE) sh -ec '\
+		pip install --quiet coverage==5.5; \
+		coverage run --source=src -m unittest discover -v -s test -p "*[tT]est*.py"; \
+		coverage report --show-missing'
+	$(TEST_PASS)
 
-# Runs the Python 3 unit tests.
+# Runs the Python 3 unit tests with coverage.py.
 test-python3:
-	$(DOCKER_RUN) -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python3 $(PYTHON3_IMAGE) \
-		python3 -m unittest discover -v -s test -p '*[tT]est*.py'
+	$(TEST_START)
+	$(DOCKER_RUN) -e COVERAGE_FILE=/tmp/python3-coverage -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python3 $(PYTHON3_IMAGE) sh -ec '\
+		python3 -m pip install --quiet coverage==7.6.1; \
+		python3 -m coverage run --source=src -m unittest discover -v -s test -p "*[tT]est*.py"; \
+		python3 -m coverage report --show-missing'
+	$(TEST_PASS)
 
-# Installs Ruby dependencies and runs the Ruby unit tests.
+# Installs Ruby dependencies and runs the Ruby unit tests with SimpleCov coverage.
 test-ruby:
+	$(TEST_START)
 	$(DOCKER_RUN) -v /usr/local/bundle -w /workspace/ruby $(RUBY_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-ruby; \
+		cd /tmp/agora-ruby; \
 		bundle install --quiet; \
-		bundle exec rspec test'
+		gem install simplecov --version 0.22.0 --no-document; \
+		ruby -rsimplecov -e "SimpleCov.start { add_filter \"/test/\" }; load Gem.bin_path(\"rspec-core\", \"rspec\")" -- test'
+	$(TEST_PASS)
 
-# Runs the Rust unit tests with the locked dependency versions.
+# Runs the Rust unit tests with cargo-llvm-cov coverage.
 test-rust:
+	$(TEST_START)
 	$(DOCKER_RUN) -e CARGO_TARGET_DIR=/tmp/agora-rust-target -w /workspace/rust $(RUST_IMAGE) \
-		cargo test --locked
+		sh -ec '\
+			rustup component add llvm-tools-preview; \
+			cargo install cargo-llvm-cov --version 0.6.10 --locked; \
+			cargo llvm-cov --locked --summary-only'
+	$(TEST_PASS)
 
 # Builds and runs all configured C++ samples.
 run-sample-cpp:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/cpp $(CPP_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
 		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ libssl-dev zlib1g-dev >/dev/null; \
 		cmake -S sample -B /tmp/agora-cpp-samples; \
 		cmake --build /tmp/agora-cpp-samples --parallel; \
 		for sample_file in /tmp/agora-cpp-samples/*.exe; do "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Builds and runs the executable C# samples.
 run-sample-csharp:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/csharp $(CSHARP_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-csharp; \
 		for sample_file in RtcTokenBuilderSample.cs RtmTokenBuilderSample.cs; do \
@@ -215,76 +305,101 @@ run-sample-csharp:
 			cp "/tmp/agora-csharp/sample/$$sample_file" /tmp/agora-csharp-runner/Program.cs; \
 			dotnet run --project /tmp/agora-csharp-runner; \
 		done'
+	$(SAMPLE_PASS)
 
 # Runs the Dart example application.
 run-sample-dart:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) -w /workspace/dart $(DART_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-dart; \
 		cd /tmp/agora-dart; \
 		flutter pub get; \
 		dart run example/example.dart'
+	$(SAMPLE_PASS)
 
 # Runs all Deno samples.
 run-sample-deno:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) --entrypoint sh -w /workspace/deno $(DENO_IMAGE) -ec '\
 		for sample_file in sample/*.js; do deno run --allow-env "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Runs all Go samples.
 run-sample-go:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/go/sample $(GO_IMAGE) sh -ec '\
 		for sample_dir in */; do go run "./$$sample_dir"; done'
+	$(SAMPLE_PASS)
 
 # Runs the Java RTC Token Builder 2 sample.
 run-sample-java:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -v /workspace/java/target -w /workspace/java $(JAVA_IMAGE) \
 		mvn -B -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java \
 		-Dexec.mainClass=io.agora.sample.RtcTokenBuilder2Sample
+	$(SAMPLE_PASS)
 
 # Installs Lua dependencies and runs all Lua samples.
 run-sample-lua:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/lua $(LUA_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
 		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential libssl-dev zlib1g-dev >/dev/null; \
 		luarocks make agora-token-0.1.0-1.rockspec; \
 		for sample_file in examples/*.lua; do lua "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Installs Node.js dependencies and runs all Node.js samples.
 run-sample-nodejs:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -v /workspace/nodejs/node_modules -w /workspace/nodejs $(NODEJS_IMAGE) sh -ec '\
 		npm ci; \
 		for sample_file in sample/*.js; do node "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Installs Perl dependencies and runs all Perl samples.
 run-sample-perl:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/perl $(PERL_IMAGE) sh -ec '\
 		cpanm --quiet --notest --installdeps .; \
 		for sample_file in sample/*.pl; do perl -I src "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Runs all PHP samples.
 run-sample-php:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/php $(PHP_IMAGE) sh -ec '\
 		for sample_file in sample/*.php; do php "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Runs all legacy Python 2 samples.
 run-sample-python:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python $(PYTHON_IMAGE) sh -ec '\
 		for sample_file in sample/*.py; do python "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Runs all Python 3 samples.
 run-sample-python3:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -e PYTHONDONTWRITEBYTECODE=1 -w /workspace/python3 $(PYTHON3_IMAGE) sh -ec '\
 		for sample_file in sample/*.py; do python3 "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Installs Ruby dependencies and runs all Ruby samples.
 run-sample-ruby:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -v /usr/local/bundle -w /workspace/ruby $(RUBY_IMAGE) sh -ec '\
 		bundle install --quiet; \
 		for sample_file in sample/*.rb; do bundle exec ruby "$$sample_file"; done'
+	$(SAMPLE_PASS)
 
 # Runs all Rust examples with the locked dependency versions.
 run-sample-rust:
+	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -e CARGO_TARGET_DIR=/tmp/agora-rust-target -w /workspace/rust $(RUST_IMAGE) sh -ec '\
 		for sample_file in examples/*.rs; do \
 			sample_name=$$(basename "$$sample_file" .rs); \
 			cargo run --locked --example "$$sample_name"; \
 		done'
+	$(SAMPLE_PASS)
