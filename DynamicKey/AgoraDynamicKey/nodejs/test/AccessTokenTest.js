@@ -14,6 +14,7 @@ const salt = 1;
 const ts = 1111111;
 const expireTimestamp = 1446455471;
 
+// Verifies deterministic legacy AccessToken generation.
 exports.AccessToken_Test = function (test) {
     const expected = "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW";
 
@@ -27,7 +28,7 @@ exports.AccessToken_Test = function (test) {
     test.done();
 };
 
-// test uid = 0
+// Verifies deterministic legacy AccessToken generation with an empty user ID.
 exports.AccessToken_Test2 = function (test) {
     const expected = "006970CA35de60c44645bbae8a215061b33IACw1o7htY6ISdNRtku3p9tjTPi0jCKf9t49UHJhzCmL6bdIfRAAAAAAEAABAAAAR/QQAAEAAQCvKDdW";
 
@@ -44,6 +45,7 @@ exports.AccessToken_Test2 = function (test) {
 
 const RtcRole = require("../src/RtcTokenBuilder").Role;
 
+// Verifies deterministic legacy RTC token generation.
 exports.RtcTokenBuilder_Test = function (test) {
     const appID = "970CA35de60c44645bbae8a215061b33";
     const certificate = "5CFd2fd1755d40ecb72977518be15d3b";

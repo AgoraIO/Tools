@@ -12,18 +12,21 @@ const roomUuid = '123'
 const userUuid = '2882341273'
 const role = 1
 
+// Verifies APaaS room-user token generation and parsing.
 exports.BuildRoomUserToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = ApaasTokenBuilder.buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire)
     accessToken.from_string(token)
+    const service = accessToken.getServices(kApaasServiceType)[0]
     test.equal(appId, accessToken.appId)
     test.equal(expire, accessToken.expire)
-    test.equal(roomUuid, accessToken.services[kApaasServiceType].__room_uuid)
-    test.equal(userUuid, accessToken.services[kApaasServiceType].__user_uuid)
-    test.equal(role, accessToken.services[kApaasServiceType].__role)
+    test.equal(roomUuid, service.__room_uuid)
+    test.equal(userUuid, service.__user_uuid)
+    test.equal(role, service.__role)
     test.done()
 }
 
+// Verifies APaaS user token generation and parsing.
 exports.BuildUserToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = ApaasTokenBuilder.buildUserToken(appId, appCertificate, userUuid, expire)
@@ -31,10 +34,11 @@ exports.BuildUserToken_Test = function (test) {
 
     test.equal(appId, accessToken.appId)
     test.equal(expire, accessToken.expire)
-    test.equal(userUuid, accessToken.services[kApaasServiceType].__user_uuid)
+    test.equal(userUuid, accessToken.getServices(kApaasServiceType)[0].__user_uuid)
     test.done()
 }
 
+// Verifies APaaS application token generation and parsing.
 exports.BuildAppToken_Test = function (test) {
     let accessToken = new AccessToken2('', '', 0, 0)
     let token = ApaasTokenBuilder.buildAppToken(appId, appCertificate, expire)

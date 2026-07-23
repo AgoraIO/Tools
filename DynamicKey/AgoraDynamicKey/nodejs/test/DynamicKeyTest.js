@@ -14,6 +14,7 @@ var r = 58964981;
 var uid=2882341273;
 var expiredTs=1446455471;
 
+// Verifies deterministic public sharing key generation.
 exports.PublicSharingKey5_Test = function(test) {
   var expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
   var actual = DynamicKey5.generatePublicSharingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
@@ -21,6 +22,7 @@ exports.PublicSharingKey5_Test = function(test) {
   test.done();
 };
 
+// Verifies deterministic recording key generation.
 exports.RecordingKey5_Test = function(test) {
   var expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
   var result = DynamicKey5.generateRecordingKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
@@ -28,6 +30,7 @@ exports.RecordingKey5_Test = function(test) {
   test.done();
 };
 
+// Verifies deterministic media channel key generation.
 exports.MediaChannelKey5_Test = function(test) {
   var expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA==";
   var result = DynamicKey5.generateMediaChannelKey(appID, appCertificate, channel, ts, r, uid, expiredTs);
@@ -35,6 +38,7 @@ exports.MediaChannelKey5_Test = function(test) {
   test.done();
 };
 
+// Verifies deterministic in-channel permission key generation.
 exports.InChannelPermission5_Test = function(test) {
   var noUpload = "005BAAoADgyNEQxNDE4M0FGRDkyOEQ4REFFMUU1OTg5NTg2MzA3MTEyNjRGNzQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YBAAEAAQAw";
   var generatedNoUpload = DynamicKey5.generateInChannelPermissionKey(appID, appCertificate, channel, ts, r, uid, expiredTs, DynamicKey5.noUpload);
