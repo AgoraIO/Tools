@@ -15,24 +15,15 @@ class RtmTokenBuilder {
     required String userId,
     required int tokenExpireSeconds,
   }) {
-    AccessToken token = AccessToken(
+    final token = AccessToken.create(
       appId,
       appCertificate,
-      '', // channelName is not used for RTM
-      userId,
+      expire: tokenExpireSeconds,
     );
-
-    int expireTimestamp = _getExpireTimestamp(tokenExpireSeconds);
-
-    // Add RTM privilege
-    token.addPrivilege(Service.RTM, Privileges.LOGIN, expireTimestamp);
+    final service = ServiceRtm(userId)
+      ..addPrivilege(ServiceRtm.privilegeLogin, tokenExpireSeconds);
+    token.addService(service);
 
     return token.build();
-  }
-
-  static int _getExpireTimestamp(int tokenExpireSeconds) {
-    int currentTimestamp =
-        (DateTime.now().millisecondsSinceEpoch / 1000).floor();
-    return currentTimestamp + tokenExpireSeconds;
   }
 }

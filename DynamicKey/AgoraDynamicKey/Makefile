@@ -303,14 +303,14 @@ run-sample-csharp:
 			--filter "FullyQualifiedName~RtcTokenBuilderTest|FullyQualifiedName~RtmTokenBuilderTest|FullyQualifiedName~AccessToken2Test"'
 	$(SAMPLE_PASS)
 
-# Runs the Dart example application.
+# Runs all Dart sample applications.
 run-sample-dart:
 	$(SAMPLE_START)
-	$(DOCKER_RUN) -w /workspace/dart $(DART_IMAGE) sh -ec '\
+	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/dart $(DART_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-dart; \
 		cd /tmp/agora-dart; \
 		flutter pub get; \
-		dart run example/example.dart'
+		for sample_file in sample/*_sample.dart; do dart run "$$sample_file"; done'
 	$(SAMPLE_PASS)
 
 # Runs all Deno samples.

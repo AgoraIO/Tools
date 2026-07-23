@@ -22,7 +22,7 @@ class RtcTokenBuilder {
       appId: appId,
       appCertificate: appCertificate,
       channelName: channelName,
-      account: uid.toString(),
+      account: uid == 0 ? '' : uid.toString(),
       tokenExpireSeconds: tokenExpireSeconds,
     );
   }
@@ -43,30 +43,18 @@ class RtcTokenBuilder {
     required String account,
     required int tokenExpireSeconds,
   }) {
-    AccessToken token = AccessToken(
+    final token = AccessToken.create(
       appId,
       appCertificate,
-      channelName,
-      account,
+      expire: tokenExpireSeconds,
     );
-
-    int expireTimestamp = _getExpireTimestamp(tokenExpireSeconds);
-
-    // Add privileges
-    token.addPrivilege(Service.RTC, Privileges.JOIN_CHANNEL, expireTimestamp);
-    token.addPrivilege(
-        Service.RTC, Privileges.PUBLISH_AUDIO_STREAM, expireTimestamp);
-    token.addPrivilege(
-        Service.RTC, Privileges.PUBLISH_VIDEO_STREAM, expireTimestamp);
-    token.addPrivilege(
-        Service.RTC, Privileges.PUBLISH_DATA_STREAM, expireTimestamp);
+    final service = ServiceRtc(channelName, account)
+      ..addPrivilege(ServiceRtc.privilegeJoinChannel, tokenExpireSeconds)
+      ..addPrivilege(ServiceRtc.privilegePublishAudioStream, tokenExpireSeconds)
+      ..addPrivilege(ServiceRtc.privilegePublishVideoStream, tokenExpireSeconds)
+      ..addPrivilege(ServiceRtc.privilegePublishDataStream, tokenExpireSeconds);
+    token.addService(service);
 
     return token.build();
-  }
-
-  static int _getExpireTimestamp(int tokenExpireSeconds) {
-    int currentTimestamp =
-        (DateTime.now().millisecondsSinceEpoch / 1000).floor();
-    return currentTimestamp + tokenExpireSeconds;
   }
 }
