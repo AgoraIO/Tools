@@ -287,24 +287,20 @@ run-sample-cpp:
 	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/cpp $(CPP_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ libssl-dev zlib1g-dev >/dev/null; \
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends clang cmake g++ libssl-dev make zlib1g-dev >/dev/null; \
 		cmake -S sample -B /tmp/agora-cpp-samples; \
 		cmake --build /tmp/agora-cpp-samples --parallel; \
 		for sample_file in /tmp/agora-cpp-samples/*.exe; do "$$sample_file"; done'
 	$(SAMPLE_PASS)
 
-# Builds and runs the executable C# samples.
+# Runs the C# sample scenarios maintained in the referenced test classes.
 run-sample-csharp:
 	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/csharp $(CSHARP_IMAGE) sh -ec '\
 		cp -R . /tmp/agora-csharp; \
-		for sample_file in RtcTokenBuilderSample.cs RtmTokenBuilderSample.cs; do \
-			rm -rf /tmp/agora-csharp-runner; \
-			dotnet new console --output /tmp/agora-csharp-runner --force >/dev/null; \
-			dotnet add /tmp/agora-csharp-runner reference /tmp/agora-csharp/src/AgoraIO/AgoraIO.csproj >/dev/null; \
-			cp "/tmp/agora-csharp/sample/$$sample_file" /tmp/agora-csharp-runner/Program.cs; \
-			dotnet run --project /tmp/agora-csharp-runner; \
-		done'
+		cd /tmp/agora-csharp; \
+		dotnet test test/AgoraIO.Tests/AgoraIO.Tests.csproj \
+			--filter "FullyQualifiedName~RtcTokenBuilderTest|FullyQualifiedName~RtmTokenBuilderTest|FullyQualifiedName~AccessToken2Test"'
 	$(SAMPLE_PASS)
 
 # Runs the Dart example application.
@@ -334,9 +330,11 @@ run-sample-go:
 # Runs the Java RTC Token Builder 2 sample.
 run-sample-java:
 	$(SAMPLE_START)
-	$(DOCKER_RUN) $(SAMPLE_ENV) -v /workspace/java/target -w /workspace/java $(JAVA_IMAGE) \
+	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/java $(JAVA_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-java; \
+		cd /tmp/agora-java; \
 		mvn -B -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java \
-		-Dexec.mainClass=io.agora.sample.RtcTokenBuilder2Sample
+			-Dexec.mainClass=io.agora.sample.RtcTokenBuilder2Sample'
 	$(SAMPLE_PASS)
 
 # Installs Lua dependencies and runs all Lua samples.
@@ -344,15 +342,24 @@ run-sample-lua:
 	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/lua $(LUA_IMAGE) sh -ec '\
 		apt-get update >/dev/null; \
-		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential libssl-dev zlib1g-dev >/dev/null; \
-		luarocks make agora-token-0.1.0-1.rockspec; \
+		DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends build-essential git libssl-dev lua-unit zlib1g-dev >/dev/null; \
+		cp -R . /tmp/agora-lua; \
+		cd /tmp/agora-lua; \
+		export LUA_PATH="/usr/share/lua/5.4/?.lua;/usr/share/lua/5.4/?/init.lua;;"; \
+		luarocks install base64; \
+		luarocks install luaossl; \
+		luarocks install lua-zlib; \
+		luarocks install md5; \
+		luarocks make --deps-mode=none agora-token-0.1.0-1.rockspec; \
 		for sample_file in examples/*.lua; do lua "$$sample_file"; done'
 	$(SAMPLE_PASS)
 
 # Installs Node.js dependencies and runs all Node.js samples.
 run-sample-nodejs:
 	$(SAMPLE_START)
-	$(DOCKER_RUN) $(SAMPLE_ENV) -v /workspace/nodejs/node_modules -w /workspace/nodejs $(NODEJS_IMAGE) sh -ec '\
+	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/nodejs $(NODEJS_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-nodejs; \
+		cd /tmp/agora-nodejs; \
 		npm ci; \
 		for sample_file in sample/*.js; do node "$$sample_file"; done'
 	$(SAMPLE_PASS)
@@ -368,8 +375,8 @@ run-sample-perl:
 # Runs all PHP samples.
 run-sample-php:
 	$(SAMPLE_START)
-	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/php $(PHP_IMAGE) sh -ec '\
-		for sample_file in sample/*.php; do php "$$sample_file"; done'
+	$(DOCKER_RUN) $(SAMPLE_ENV) -w /workspace/php/sample $(PHP_IMAGE) sh -ec '\
+		for sample_file in *.php; do php "$$sample_file"; done'
 	$(SAMPLE_PASS)
 
 # Runs all legacy Python 2 samples.
@@ -390,6 +397,8 @@ run-sample-python3:
 run-sample-ruby:
 	$(SAMPLE_START)
 	$(DOCKER_RUN) $(SAMPLE_ENV) -v /usr/local/bundle -w /workspace/ruby $(RUBY_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-ruby; \
+		cd /tmp/agora-ruby; \
 		bundle install --quiet; \
 		for sample_file in sample/*.rb; do bundle exec ruby "$$sample_file"; done'
 	$(SAMPLE_PASS)
