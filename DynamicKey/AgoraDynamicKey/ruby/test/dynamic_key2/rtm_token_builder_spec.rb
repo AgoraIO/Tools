@@ -7,6 +7,7 @@ describe 'AgoraDynamicKey2::RtmTokenBuilder' do
   let(:expire) { 600 }
   let(:user_id) { 'test_user' }
 
+  # Verifies RTM Token007 generation and parsing.
   it 'test_build_token' do
     token = AgoraDynamicKey2::RtmTokenBuilder.build_token(app_id, app_certificate, user_id, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
@@ -16,8 +17,8 @@ describe 'AgoraDynamicKey2::RtmTokenBuilder' do
     expect(access_token.app_id).to eq(app_id)
     expect(access_token.expire).to eq(expire)
     expect(access_token.services.size).to eq(1)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].user_id).to eq(user_id)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.user_id).to eq(user_id)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
   end
 end

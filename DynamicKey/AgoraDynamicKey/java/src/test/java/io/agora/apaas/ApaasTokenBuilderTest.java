@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import io.agora.media.AccessToken2;
 
+/**
+ * Tests APaaS Token007 builder workflows.
+ */
 public class ApaasTokenBuilderTest {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -16,6 +19,9 @@ public class ApaasTokenBuilderTest {
     private static String defaultRoomUuid = "";
     private static String defaultUserUuid = "";
 
+    /**
+     * Verifies APaaS room user token generation and parsing.
+     */
     @Test
     public void testBuildRoomUserToken() {
         ApaasTokenBuilder apaasTokenBuilder = new ApaasTokenBuilder();
@@ -25,11 +31,14 @@ public class ApaasTokenBuilderTest {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(roomUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRoomUuid());
-        assertEquals(userUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getUserUuid());
-        assertEquals(role, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRole());
+        assertEquals(roomUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRoomUuid());
+        assertEquals(userUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getUserUuid());
+        assertEquals(role, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRole());
     }
 
+    /**
+     * Verifies APaaS user token generation and parsing.
+     */
     @Test
     public void testBuildUserToken() {
         ApaasTokenBuilder apaasTokenBuilder = new ApaasTokenBuilder();
@@ -39,11 +48,14 @@ public class ApaasTokenBuilderTest {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRoomUuid());
-        assertEquals(userUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getUserUuid());
-        assertEquals(defaultRole, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRole());
+        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRoomUuid());
+        assertEquals(userUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getUserUuid());
+        assertEquals(defaultRole, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRole());
     }
 
+    /**
+     * Verifies APaaS application token generation and parsing.
+     */
     @Test
     public void testBuildAppToken() {
         ApaasTokenBuilder apaasTokenBuilder = new ApaasTokenBuilder();
@@ -53,8 +65,8 @@ public class ApaasTokenBuilderTest {
 
         assertEquals(appId, accessToken.appId);
         assertEquals(expire, accessToken.expire);
-        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRoomUuid());
-        assertEquals(defaultUserUuid, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getUserUuid());
-        assertEquals(defaultRole, ((AccessToken2.ServiceApaas) accessToken.services.get(AccessToken2.SERVICE_TYPE_APAAS)).getRole());
+        assertEquals(defaultRoomUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRoomUuid());
+        assertEquals(defaultUserUuid, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getUserUuid());
+        assertEquals(defaultRole, ((AccessToken2.ServiceApaas) accessToken.getServices(AccessToken2.SERVICE_TYPE_APAAS).get(0)).getRole());
     }
 }

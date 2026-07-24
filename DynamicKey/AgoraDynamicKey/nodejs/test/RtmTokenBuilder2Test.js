@@ -11,14 +11,16 @@ const appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
 const userId = "test_user";
 const expire = 600;
 
+// Verifies RTM Token007 generation and parsing.
 exports.buildToken = function (test) {
     let token = RtmTokenBuilder.buildToken(appId, appCertificate, userId, expire);
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtmServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(userId, accessToken.services[kRtmServiceType].__user_id);
-    test.equal(expire, accessToken.services[kRtmServiceType].__privileges[ServiceRtm.kPrivilegeLogin]);
+    test.equal(userId, service.__user_id);
+    test.equal(expire, service.__privileges[ServiceRtm.kPrivilegeLogin]);
     test.done();
 };

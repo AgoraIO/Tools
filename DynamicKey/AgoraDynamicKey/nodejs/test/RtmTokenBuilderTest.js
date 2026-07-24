@@ -13,6 +13,7 @@ const appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
 const account = "test_user";
 const expireTimestamp = 1446455471;
 
+// Verifies legacy RTM token generation and parsing.
 exports.RtmToken_Test = function (test) {
     const token = RtmTokenBuilder.buildToken(appID, appCertificate, account, Role.Rtm_User, expireTimestamp);
     let accessToken = new AccessToken("", "", 0, 0);

@@ -17,6 +17,7 @@ ts = 1111111
 class RtmTokenBuilderTest(unittest.TestCase):
 
     def test_(self):
+        """Build the expected legacy RTM token."""
         token = RtmTokenBuilder.buildToken(appID, appCertificate, userAccount, Role_Rtm_User, expireTimestamp)
         parser = AccessToken()
         parser.fromString(token)

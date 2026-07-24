@@ -4,6 +4,7 @@ import (
 	"testing"
 )
 
+// Test_AccessToken verifies deterministic AccessToken generation for regular and zero UIDs.
 func Test_AccessToken(t *testing.T) {
 	expected :=
 		"006970CA35de60c44645bbae8a215061b33IACV0fZUBw+72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW"

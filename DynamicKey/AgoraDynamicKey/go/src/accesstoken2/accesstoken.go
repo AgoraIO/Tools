@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sort"
 	"time"
 )
 
@@ -53,19 +54,23 @@ type Service struct {
 	Type       uint16
 }
 
+// NewService creates a service with the specified type and an empty privilege map.
 func NewService(serviceType uint16) (service *Service) {
 	service = &Service{Privileges: make(map[uint16]uint32), Type: serviceType}
 	return
 }
 
+// AddPrivilege sets the expiration time for a service privilege.
 func (service *Service) AddPrivilege(privilege uint16, expire uint32) {
 	service.Privileges[privilege] = expire
 }
 
+// getServiceType returns the numeric service type.
 func (service *Service) getServiceType() uint16 {
 	return service.Type
 }
 
+// Pack writes the service type and privileges.
 func (service *Service) Pack(w io.Writer) (err error) {
 	err = service.packType(w)
 	if err != nil {
@@ -75,15 +80,18 @@ func (service *Service) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the service privileges after the type has been consumed.
 func (service *Service) UnPack(r io.Reader) (err error) {
 	service.Privileges, err = unPackMapUint32(r)
 	return
 }
 
+// packPrivileges writes the service privilege map.
 func (service *Service) packPrivileges(w io.Writer) error {
 	return packMapUint32(w, service.Privileges)
 }
 
+// packType writes the numeric service type.
 func (service *Service) packType(w io.Writer) error {
 	return packUint16(w, service.Type)
 }
@@ -94,11 +102,13 @@ type ServiceRtc struct {
 	Uid         string
 }
 
+// NewServiceRtc creates an RTC service for a channel and user ID.
 func NewServiceRtc(channelName string, uid string) (serviceRtc *ServiceRtc) {
 	serviceRtc = &ServiceRtc{ChannelName: channelName, Service: NewService(ServiceTypeRtc), Uid: uid}
 	return
 }
 
+// Pack writes the RTC service, channel name, and user ID.
 func (serviceRtc *ServiceRtc) Pack(w io.Writer) (err error) {
 	err = serviceRtc.Service.Pack(w)
 	if err != nil {
@@ -112,6 +122,7 @@ func (serviceRtc *ServiceRtc) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the RTC privileges, channel name, and user ID.
 func (serviceRtc *ServiceRtc) UnPack(r io.Reader) (err error) {
 	err = serviceRtc.Service.UnPack(r)
 	if err != nil {
@@ -127,11 +138,13 @@ type ServiceRtm struct {
 	UserId string
 }
 
+// NewServiceRtm creates an RTM service for a user ID.
 func NewServiceRtm(userId string) (serviceRtm *ServiceRtm) {
 	serviceRtm = &ServiceRtm{UserId: userId, Service: NewService(ServiceTypeRtm)}
 	return
 }
 
+// Pack writes the RTM service and user ID.
 func (serviceRtm *ServiceRtm) Pack(w io.Writer) (err error) {
 	err = serviceRtm.Service.Pack(w)
 	if err != nil {
@@ -141,6 +154,7 @@ func (serviceRtm *ServiceRtm) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the RTM privileges and user ID.
 func (serviceRtm *ServiceRtm) UnPack(r io.Reader) (err error) {
 	err = serviceRtm.Service.UnPack(r)
 	if err != nil {
@@ -154,11 +168,13 @@ type ServiceFpa struct {
 	*Service
 }
 
+// NewServiceFpa creates an FPA service.
 func NewServiceFpa() (serviceFpa *ServiceFpa) {
 	serviceFpa = &ServiceFpa{Service: NewService(ServiceTypeFpa)}
 	return
 }
 
+// Pack writes the FPA service and privileges.
 func (serviceFpa *ServiceFpa) Pack(w io.Writer) (err error) {
 	err = serviceFpa.Service.Pack(w)
 	if err != nil {
@@ -167,6 +183,7 @@ func (serviceFpa *ServiceFpa) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the FPA privileges.
 func (serviceFpa *ServiceFpa) UnPack(r io.Reader) (err error) {
 	err = serviceFpa.Service.UnPack(r)
 	if err != nil {
@@ -180,11 +197,13 @@ type ServiceChat struct {
 	UserId string
 }
 
+// NewServiceChat creates a Chat service for a user ID.
 func NewServiceChat(userId string) (serviceChat *ServiceChat) {
 	serviceChat = &ServiceChat{Service: NewService(ServiceTypeChat), UserId: userId}
 	return
 }
 
+// Pack writes the Chat service and user ID.
 func (serviceChat *ServiceChat) Pack(w io.Writer) (err error) {
 	err = serviceChat.Service.Pack(w)
 	if err != nil {
@@ -194,6 +213,7 @@ func (serviceChat *ServiceChat) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the Chat privileges and user ID.
 func (serviceChat *ServiceChat) UnPack(r io.Reader) (err error) {
 	err = serviceChat.Service.UnPack(r)
 	if err != nil {
@@ -210,11 +230,13 @@ type ServiceApaas struct {
 	Role     int16
 }
 
+// NewServiceApaas creates an APaaS service for a room, user, and role.
 func NewServiceApaas(roomUuid string, userUuid string, role int16) (serviceApaas *ServiceApaas) {
 	serviceApaas = &ServiceApaas{Service: NewService(ServiceTypeApaas), RoomUuid: roomUuid, UserUuid: userUuid, Role: role}
 	return
 }
 
+// Pack writes the APaaS service, room, user, and role.
 func (serviceApaas *ServiceApaas) Pack(w io.Writer) (err error) {
 	err = serviceApaas.Service.Pack(w)
 	if err != nil {
@@ -232,6 +254,7 @@ func (serviceApaas *ServiceApaas) Pack(w io.Writer) (err error) {
 	return
 }
 
+// UnPack reads the APaaS privileges, room, user, and role.
 func (serviceApaas *ServiceApaas) UnPack(r io.Reader) (err error) {
 	err = serviceApaas.Service.UnPack(r)
 	if err != nil {
@@ -244,34 +267,57 @@ func (serviceApaas *ServiceApaas) UnPack(r io.Reader) (err error) {
 }
 
 type AccessToken struct {
-	AppCert  string
-	AppId    string
-	Expire   uint32
-	IssueTs  uint32
-	Salt     uint32
-	Services map[uint16]IService
+	AppCert string
+	AppId   string
+	Expire  uint32
+	IssueTs uint32
+	Salt    uint32
+
+	Services    []IService
+	signature   []byte
+	signingInfo []byte
+	parsed      bool
 }
 
+// NewAccessToken creates an access token with the current timestamp and a random salt.
 func NewAccessToken(appId string, appCert string, expire uint32) (accessToken *AccessToken) {
 	issueTs := uint32(time.Now().Unix())
 	salt := uint32(getRand(1, 99999999))
-	accessToken = &AccessToken{AppCert: appCert, AppId: appId, Expire: expire, IssueTs: issueTs, Salt: salt, Services: make(map[uint16]IService)}
+	accessToken = &AccessToken{AppCert: appCert, AppId: appId, Expire: expire, IssueTs: issueTs, Salt: salt}
 	return
 }
 
+// CreateAccessToken creates an empty access token for parsing.
 func CreateAccessToken() (accessToken *AccessToken) {
 	return NewAccessToken("", "", 900)
 }
 
+// AddService adds a service without replacing an existing service of the same type.
 func (accessToken *AccessToken) AddService(service IService) {
-	accessToken.Services[service.getServiceType()] = service
+	accessToken.Services = append(accessToken.Services, service)
 }
 
+// GetServices returns all services of the requested type in insertion or token order.
+func (accessToken *AccessToken) GetServices(serviceType uint16) []IService {
+	services := make([]IService, 0)
+	for _, service := range accessToken.Services {
+		if service.getServiceType() == serviceType {
+			services = append(services, service)
+		}
+	}
+
+	return services
+}
+
+// Build serializes all services into a Token007 token and requires at least one service.
 func (accessToken *AccessToken) Build() (res string, err error) {
 	recoverException()
 
 	if !isUuid(accessToken.AppId) || !isUuid(accessToken.AppCert) {
 		return "", errors.New("check appId or appCertificate")
+	}
+	if len(accessToken.Services) == 0 {
+		return "", errors.New("no service added")
 	}
 
 	buf := new(bytes.Buffer)
@@ -287,26 +333,24 @@ func (accessToken *AccessToken) Build() (res string, err error) {
 	if err = packUint32(buf, accessToken.Salt); err != nil {
 		return
 	}
-	if err = packUint16(buf, uint16(len(accessToken.Services))); err != nil {
+	services := accessToken.servicesForPacking()
+	if err = packUint16(buf, uint16(len(services))); err != nil {
 		return
 	}
 
 	// Sign
 	var sign []byte
-	sign, err = accessToken.getSign()
+	sign, err = accessToken.getSign(accessToken.AppCert)
 
 	if err != nil {
 		return
 	}
 
-	// Pack services in definite order
-	serviceTypes := []uint16{ServiceTypeRtc, ServiceTypeRtm, ServiceTypeFpa, ServiceTypeChat, ServiceTypeApaas}
-	for _, serviceType := range serviceTypes {
-		if service, ok := accessToken.Services[serviceType]; ok {
-			err = service.Pack(buf)
-			if err != nil {
-				return
-			}
+	// Pack services in stable service type order.
+	for _, service := range services {
+		err = service.Pack(buf)
+		if err != nil {
+			return
 		}
 	}
 
@@ -325,21 +369,48 @@ func (accessToken *AccessToken) Build() (res string, err error) {
 	return
 }
 
+// Parse parses known services and keeps the original signing bytes for independent verification.
 func (accessToken *AccessToken) Parse(token string) (res bool, err error) {
 	recoverException()
 
+	// Clear the previous token state so a failed parse cannot reuse its signature or services.
+	accessToken.AppId = ""
+	accessToken.IssueTs = 0
+	accessToken.Expire = 0
+	accessToken.Salt = 0
+	accessToken.Services = nil
+	accessToken.signature = nil
+	accessToken.signingInfo = nil
+	accessToken.parsed = false
+
+	if len(token) < VersionLength {
+		return false, errors.New("invalid token length")
+	}
+
 	version := token[:VersionLength]
 	if version != getVersion() {
-		return
+		return false, errors.New("invalid token version")
 	}
 
 	var decodeByte []byte
 	if decodeByte, err = base64DecodeStr(token[VersionLength:]); err != nil {
 		return
 	}
-	buffer := bytes.NewReader(decompressZlib(decodeByte))
+	var rawTokenBuffer []byte
+	if rawTokenBuffer, err = decompressZlibWithError(decodeByte); err != nil {
+		return false, err
+	}
+
+	buffer := bytes.NewReader(rawTokenBuffer)
 	// signature
-	_, err = unPackString(buffer)
+	var signature string
+	if signature, err = unPackString(buffer); err != nil {
+		return false, err
+	}
+	accessToken.signature = []byte(signature)
+	accessToken.signingInfo = append(accessToken.signingInfo[:0], rawTokenBuffer[len(rawTokenBuffer)-buffer.Len():]...)
+	accessToken.Services = nil
+
 	if accessToken.AppId, err = unPackString(buffer); err != nil {
 		return
 	}
@@ -363,16 +434,55 @@ func (accessToken *AccessToken) Parse(token string) (res bool, err error) {
 			return
 		}
 		service := accessToken.newService(serviceType)
+		if service == nil {
+			accessToken.parsed = true
+			return true, nil
+		}
 		if err = service.UnPack(buffer); err != nil {
 			return
 		}
-		accessToken.Services[serviceType] = service
+		accessToken.AddService(service)
 	}
 
+	accessToken.parsed = true
 	return true, nil
 }
 
-func (accessToken *AccessToken) getSign() (sign []byte, err error) {
+// VerifySignature verifies the parsed token without rebuilding its service payload.
+func (accessToken *AccessToken) VerifySignature(appCertificate string) (bool, error) {
+	if !accessToken.parsed || len(accessToken.signature) == 0 || len(accessToken.signingInfo) == 0 {
+		return false, errors.New("parse token before verifying signature")
+	}
+	if !isUuid(accessToken.AppId) || !isUuid(appCertificate) {
+		return false, errors.New("check appId or appCertificate")
+	}
+
+	sign, err := accessToken.getSign(appCertificate)
+	if err != nil {
+		return false, err
+	}
+
+	hSign := hmac.New(sha256.New, sign)
+	if _, err = hSign.Write(accessToken.signingInfo); err != nil {
+		return false, err
+	}
+
+	return hmac.Equal(accessToken.signature, hSign.Sum(nil)), nil
+}
+
+// servicesForPacking returns services in stable type order while preserving duplicate insertion order.
+func (accessToken *AccessToken) servicesForPacking() []IService {
+	services := append([]IService(nil), accessToken.Services...)
+
+	sort.SliceStable(services, func(i, j int) bool {
+		return services[i].getServiceType() < services[j].getServiceType()
+	})
+
+	return services
+}
+
+// getSign derives the signing key from the token timestamp, salt, and supplied certificate.
+func (accessToken *AccessToken) getSign(appCertificate string) (sign []byte, err error) {
 	// IssueTs
 	bufIssueTs := new(bytes.Buffer)
 	err = packUint32(bufIssueTs, accessToken.IssueTs)
@@ -380,7 +490,7 @@ func (accessToken *AccessToken) getSign() (sign []byte, err error) {
 		return
 	}
 	hIssueTs := hmac.New(sha256.New, bufIssueTs.Bytes())
-	hIssueTs.Write([]byte(accessToken.AppCert))
+	hIssueTs.Write([]byte(appCertificate))
 
 	// Salt
 	bufSalt := new(bytes.Buffer)
@@ -394,6 +504,7 @@ func (accessToken *AccessToken) getSign() (sign []byte, err error) {
 	return
 }
 
+// newService creates a parser for a known service type and returns nil for unknown types.
 func (accessToken *AccessToken) newService(serviceType uint16) (service IService) {
 	switch serviceType {
 	case ServiceTypeRtc:
@@ -407,11 +518,12 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 	case ServiceTypeApaas:
 		service = NewServiceApaas("", "", -1)
 	default:
-		panic(fmt.Sprintf("new service failed: unknown service type `%v`", serviceType))
+		service = nil
 	}
 	return
 }
 
+// GetUidStr converts a numeric user ID to its token representation.
 func GetUidStr(uid uint32) string {
 	if uid == 0 {
 		return ""
@@ -419,10 +531,12 @@ func GetUidStr(uid uint32) string {
 	return fmt.Sprintf("%d", uid)
 }
 
+// getVersion returns the AccessToken2 version prefix.
 func getVersion() string {
 	return Version
 }
 
+// isUuid reports whether a string is a 32-character hexadecimal identifier.
 func isUuid(s string) (res bool) {
 	if len(s) != 32 {
 		return

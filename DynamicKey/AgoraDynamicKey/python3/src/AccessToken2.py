@@ -16,32 +16,40 @@ VERSION_LENGTH = 3
 
 
 def get_version():
+    """Return the AccessToken2 version prefix."""
     return '007'
 
 
 class Service:
     def __init__(self, service_type):
+        """Create a service with its numeric type and an empty privilege map."""
         self.__type = service_type
         self.__privileges = {}
 
     def __pack_type(self):
+        """Serialize the numeric service type."""
         return pack_uint16(self.__type)
 
     def __pack_privileges(self):
+        """Serialize privileges in stable privilege ID order."""
         privileges = OrderedDict(
             sorted(iter(self.__privileges.items()), key=lambda x: int(x[0])))
         return pack_map_uint32(privileges)
 
     def add_privilege(self, privilege, expire):
+        """Set the expiration timestamp for a service privilege."""
         self.__privileges[privilege] = expire
 
     def service_type(self):
+        """Return the numeric service type."""
         return self.__type
 
     def pack(self):
+        """Serialize the service type and privileges."""
         return self.__pack_type() + self.__pack_privileges()
 
     def unpack(self, buffer):
+        """Deserialize service privileges and return the remaining buffer."""
         self.__privileges, buffer = unpack_map_uint32(buffer)
         return buffer
 
@@ -55,14 +63,17 @@ class ServiceRtc(Service):
     kPrivilegePublishDataStream = 4
 
     def __init__(self, channel_name='', uid=0):
+        """Create an RTC service for a channel and user ID."""
         super(ServiceRtc, self).__init__(ServiceRtc.kServiceType)
         self.__channel_name = channel_name.encode('utf-8')
         self.__uid = b'' if uid == 0 else str(uid).encode('utf-8')
 
     def pack(self):
+        """Serialize the RTC service, channel name, and user ID."""
         return super(ServiceRtc, self).pack() + pack_string(self.__channel_name) + pack_string(self.__uid)
 
     def unpack(self, buffer):
+        """Deserialize RTC privileges, channel name, and user ID."""
         buffer = super(ServiceRtc, self).unpack(buffer)
         self.__channel_name, buffer = unpack_string(buffer)
         self.__uid, buffer = unpack_string(buffer)
@@ -75,13 +86,16 @@ class ServiceRtm(Service):
     kPrivilegeLogin = 1
 
     def __init__(self, user_id=''):
+        """Create an RTM service for a user ID."""
         super(ServiceRtm, self).__init__(ServiceRtm.kServiceType)
         self.__user_id = user_id.encode('utf-8')
 
     def pack(self):
+        """Serialize the RTM service and user ID."""
         return super(ServiceRtm, self).pack() + pack_string(self.__user_id)
 
     def unpack(self, buffer):
+        """Deserialize RTM privileges and the user ID."""
         buffer = super(ServiceRtm, self).unpack(buffer)
         self.__user_id, buffer = unpack_string(buffer)
         return buffer
@@ -93,12 +107,15 @@ class ServiceFpa(Service):
     kPrivilegeLogin = 1
 
     def __init__(self):
+        """Create an FPA service with an empty privilege map."""
         super(ServiceFpa, self).__init__(ServiceFpa.kServiceType)
 
     def pack(self):
+        """Serialize the FPA service and privileges."""
         return super(ServiceFpa, self).pack()
 
     def unpack(self, buffer):
+        """Deserialize FPA privileges and return the remaining buffer."""
         buffer = super(ServiceFpa, self).unpack(buffer)
         return buffer
 
@@ -110,13 +127,16 @@ class ServiceChat(Service):
     kPrivilegeApp = 2
 
     def __init__(self, user_id=''):
+        """Create a Chat service for a user ID."""
         super(ServiceChat, self).__init__(ServiceChat.kServiceType)
         self.__user_id = user_id.encode('utf-8')
 
     def pack(self):
+        """Serialize the Chat service and user ID."""
         return super(ServiceChat, self).pack() + pack_string(self.__user_id)
 
     def unpack(self, buffer):
+        """Deserialize Chat privileges and the user ID."""
         buffer = super(ServiceChat, self).unpack(buffer)
         self.__user_id, buffer = unpack_string(buffer)
         return buffer
@@ -130,16 +150,19 @@ class ServiceApaas(Service):
     kPrivilegeApp = 3
 
     def __init__(self, room_uuid='', user_uuid='', role=-1):
+        """Create an APaaS service for a room, user, and role."""
         super(ServiceApaas, self).__init__(ServiceApaas.kServiceType)
         self.__room_uuid = room_uuid.encode('utf-8')
         self.__user_uuid = user_uuid.encode('utf-8')
         self.__role = role
 
     def pack(self):
+        """Serialize the APaaS service, room, user, and role."""
         return super(ServiceApaas, self).pack() + pack_string(self.__room_uuid) + pack_string(
             self.__user_uuid) + pack_int16(self.__role)
 
     def unpack(self, buffer):
+        """Deserialize APaaS privileges, room, user, and role."""
         buffer = super(ServiceApaas, self).unpack(buffer)
         self.__room_uuid, buffer = unpack_string(buffer)
         self.__user_uuid, buffer = unpack_string(buffer)
@@ -157,6 +180,7 @@ class AccessToken:
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
+        """Create an AccessToken2 builder or an empty token parser."""
         self.__app_id = app_id
         self.__app_cert = app_certificate
 
@@ -164,16 +188,22 @@ class AccessToken:
         self.__expire = expire
         self.__salt = secrets.SystemRandom().randint(1, 99999999)
 
-        self.__service = {}
+        self.services = []
+        self.__signature = b''
+        self.__signing_info = b''
+        self.__parsed = False
 
-    def __signing(self):
+    def __signing(self, app_certificate):
+        """Derive the signing key from the timestamp, salt, and certificate."""
         signing = hmac.new(pack_uint32(self.__issue_ts),
-                           self.__app_cert, sha256).digest()
+                           app_certificate, sha256).digest()
         signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
         return signing
 
     def __build_check(self):
+        """Validate token identifiers and ensure at least one service exists."""
         def is_uuid(data):
+            """Return whether data is a 32-character hexadecimal identifier."""
             if len(data) != 32:
                 return False
             try:
@@ -184,31 +214,50 @@ class AccessToken:
 
         if not is_uuid(self.__app_id) or not is_uuid(self.__app_cert):
             return False
-        if not self.__service:
+        if not self.services:
             return False
         return True
 
     def add_service(self, service):
-        self.__service[service.service_type()] = service
+        """Add a service without replacing services of the same type."""
+        self.services.append(service)
+
+    def get_services(self, service_type):
+        """Return all services of the requested type in insertion or token order."""
+        return [service for service in self.services
+                if service.service_type() == service_type]
 
     def build(self):
+        """Build a Token007 token containing all added services."""
         if not self.__build_check():
             return ''
 
         self.__app_id = self.__app_id.encode('utf-8')
         self.__app_cert = self.__app_cert.encode('utf-8')
-        signing = self.__signing()
+        signing = self.__signing(self.__app_cert)
+        services = sorted(self.services, key=lambda service: service.service_type())
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-            pack_uint32(self.__salt) + pack_uint16(len(self.__service))
+            pack_uint32(self.__salt) + pack_uint16(len(services))
 
-        for service_type in sorted(self.__service.keys()):
-            signing_info += self.__service[service_type].pack()
+        for service in services:
+            signing_info += service.pack()
 
         signature = hmac.new(signing, signing_info, sha256).digest()
 
         return get_version() + base64.b64encode(zlib.compress(pack_string(signature) + signing_info)).decode('utf-8')
 
     def from_string(self, origin_token):
+        """Parse known services and retain the original bytes for signature verification."""
+        # Clear the previous token state so a failed parse cannot reuse its signature or services.
+        self.__app_id = ''
+        self.__issue_ts = 0
+        self.__expire = 0
+        self.__salt = 0
+        self.services = []
+        self.__signature = b''
+        self.__signing_info = b''
+        self.__parsed = False
+
         try:
             origin_version = origin_token[:VERSION_LENGTH]
             if origin_version != get_version():
@@ -216,7 +265,9 @@ class AccessToken:
 
             buffer = zlib.decompress(
                 base64.b64decode(origin_token[VERSION_LENGTH:]))
-            signature, buffer = unpack_string(buffer)
+            self.__signature, buffer = unpack_string(buffer)
+            self.__signing_info = buffer
+            self.services = []
             self.__app_id, buffer = unpack_string(buffer)
             self.__issue_ts, buffer = unpack_uint32(buffer)
             self.__expire, buffer = unpack_uint32(buffer)
@@ -225,10 +276,31 @@ class AccessToken:
 
             for i in range(service_count):
                 service_type, buffer = unpack_uint16(buffer)
-                service = AccessToken.kServices[service_type]()
+                service_class = AccessToken.kServices.get(service_type)
+                if service_class is None:
+                    self.__parsed = True
+                    return True
+                service = service_class()
                 buffer = service.unpack(buffer)
-                self.__service[service_type] = service
+                self.services.append(service)
         except Exception as e:
             print('Error: {}'.format(repr(e)))
             raise ValueError('Error: parse origin token failed')
+        self.__parsed = True
         return True
+
+    def verify_signature(self, app_certificate):
+        """Verify the signature of a successfully parsed token."""
+        if not self.__parsed or not self.__signature or not self.__signing_info:
+            return False
+        if len(app_certificate) != 32:
+            return False
+        try:
+            bytes.fromhex(app_certificate)
+        except (TypeError, ValueError):
+            return False
+
+        app_certificate = app_certificate.encode('utf-8')
+        signing = self.__signing(app_certificate)
+        signature = hmac.new(signing, self.__signing_info, sha256).digest()
+        return hmac.compare_digest(self.__signature, signature)

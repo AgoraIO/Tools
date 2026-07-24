@@ -6,14 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+/**
+ * Prints the fields and known services contained in a Token007 token.
+ */
 public class AccessTokenInspector {
     private static String token = "007eJxTYBBbsMMnKq7p9Hf/HcIX5kce9b518kCiQgSr5Zrp4X1Tu6UUGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMoAwBIL4CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxgDCaiTj";
 
+    /**
+     * Parses and prints the configured sample token.
+     */
     public static void main(String[] args) {
         AccessTokenInspector inspector = new AccessTokenInspector();
         inspector.inspect(token);
     }
 
+    /**
+     * Parses and prints a Token007 token.
+     */
     void inspect(String input) {
         AccessToken2 token = new AccessToken2();
         System.out.printf("parsing token: %s\n\n", input);
@@ -25,11 +34,14 @@ public class AccessTokenInspector {
         System.out.printf("expire:%d\n", token.expire);
         System.out.printf("services:\n");
 
-        for (AccessToken2.Service service : token.services.values()) {
+        for (AccessToken2.Service service : token.services) {
             System.out.printf("\t{%s}\n", toServiceStr(service));
         }
     }
 
+    /**
+     * Formats one parsed service.
+     */
     String toServiceStr(AccessToken2.Service service) {
         if (service.getServiceType() == AccessToken2.SERVICE_TYPE_RTC) {
             AccessToken2.ServiceRtc serviceRtc = (AccessToken2.ServiceRtc) service;
@@ -47,6 +59,9 @@ public class AccessTokenInspector {
         return "unknown";
     }
 
+    /**
+     * Formats RTC privileges.
+     */
     private String toRtcPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
         if (privileges.containsKey(AccessToken2.PrivilegeRtc.PRIVILEGE_JOIN_CHANNEL.intValue)) {
@@ -68,6 +83,9 @@ public class AccessTokenInspector {
         return String.join(",", privilegeStrList);
     }
 
+    /**
+     * Formats RTM privileges.
+     */
     private String toRtmPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
         if (privileges.containsKey(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue)) {
@@ -77,6 +95,9 @@ public class AccessTokenInspector {
         return String.join(",", privilegeStrList);
     }
 
+    /**
+     * Formats Chat privileges.
+     */
     private String toChatPrivileges(TreeMap<Short, Integer> privileges) {
         List<String> privilegeStrList = new ArrayList<>(privileges.size());
         if (privileges.containsKey(AccessToken2.PrivilegeChat.PRIVILEGE_CHAT_USER.intValue)) {

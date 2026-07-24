@@ -12,22 +12,34 @@ $RECORDING_SERVICE = 2;
 $PUBLIC_SHARING_SERVICE = 3;
 $IN_CHANNEL_PERMISSION = 4;
 
+    /**
+     * Generate a version 005 recording key.
+     */
     function generateRecordingKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {
         return generateDynamicKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs, $GLOBALS["RECORDING_SERVICE"], array());
     }
 
+    /**
+     * Generate a version 005 media channel key.
+     */
     function generateMediaChannelKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs)
     {
         return generateDynamicKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs, $GLOBALS["MEDIA_CHANNEL_SERVICE"], array());
     }
 
+    /**
+     * Generate a version 005 in-channel permission key.
+     */
     function generateInChannelPermissionKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs, $permission)
     {
         $extra[$GLOBALS["ALLOW_UPLOAD_IN_CHANNEL"]] = $permission;
         return generateDynamicKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs, $GLOBALS["IN_CHANNEL_PERMISSION"], $extra);
     }
 
+    /**
+     * Generate a version 005 dynamic key for a service type.
+     */
     function generateDynamicKey($appID, $appCertificate, $channelName, $ts, $randomInt, $uid, $expiredTs, $serviceType, $extra)
     {
         $signature = generateSignature($serviceType, $appID, $appCertificate, $channelName, $uid, $ts, $randomInt, $expiredTs, $extra);
@@ -36,6 +48,9 @@ $IN_CHANNEL_PERMISSION = 4;
         return $GLOBALS["version"] . base64_encode($content);
     }
 
+    /**
+     * Generate the HMAC-SHA1 signature for a version 005 key.
+     */
     function generateSignature($serviceType, $appID, $appCertificate, $channelName, $uid, $ts, $salt, $expiredTs, $extra)
     {
         $rawAppID = hex2bin($appID);
@@ -58,11 +73,17 @@ $IN_CHANNEL_PERMISSION = 4;
         return strtoupper(hash_hmac('sha1', $buffer, $rawAppCertificate));
     }
 
+    /**
+     * Pack a string with an unsigned 16-bit length prefix.
+     */
     function packString($value)
     {
         return pack("S", strlen($value)) . $value;
     }
 
+    /**
+     * Serialize a complete version 005 key payload.
+     */
     function packContent($serviceType, $signature, $appID, $ts, $salt, $expiredTs, $extra)
     {
         $buffer = pack("S", $serviceType);

@@ -6,6 +6,9 @@ import io.agora.media.AccessToken;
 
 import static org.junit.Assert.assertEquals;
 
+/**
+ * Tests legacy Token006 generation.
+ */
 public class AccessTokenTest {
     private String appId = "970CA35de60c44645bbae8a215061b33";
     private String appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -15,6 +18,9 @@ public class AccessTokenTest {
     private int salt = 1;
     private int expireTimestamp = 1446455471;
 
+    /**
+     * Verifies deterministic Token006 generation.
+     */
     @Test
     public void testGenerateDynamicKey() throws Exception {
         String expected = "006970CA35de60c44645bbae8a215061b33IACV0fZUBw+72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW";
@@ -26,6 +32,9 @@ public class AccessTokenTest {
         assertEquals(expected, result);
     }
 
+    /**
+     * Verifies Token006 generation with an integer-compatible user ID.
+     */
     @Test
     public void testAccessTokenWithIntUid() throws Exception {
         String expected =

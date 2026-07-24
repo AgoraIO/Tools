@@ -7,22 +7,27 @@ namespace AgoraIO.Media
 {
     public class Utils
     {
+        // Returns the current Unix timestamp in seconds.
         public static int getTimestamp()
         {
             return (int)new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
         }
 
+        // Returns a non-negative pseudo-random integer.
         public static int randomInt()
         {
             return new Random().Next();
         }
 
+        // Serializes a privilege message into bytes.
         public static byte[] pack(PrivilegeMessage packableEx)
         {
             ByteBuf buffer = new ByteBuf();
             packableEx.marshal(buffer);
             return buffer.asBytes();
         }
+
+        // Serializes an IPackable value into bytes.
         public static byte[] pack(IPackable packableEx)
         {
             ByteBuf buffer = new ByteBuf();
@@ -30,19 +35,22 @@ namespace AgoraIO.Media
             return buffer.asBytes();
         }
 
+        // Encodes bytes as a Base64 string.
         public static string base64Encode(byte[] data)
         {
             return Convert.ToBase64String(data);
         }
 
+        // Decodes a Base64 string into bytes.
         public static byte[] base64Decode(string data)
         {
             return Convert.FromBase64String(data);
         }
 
+        // Reports whether a value is a 32-character hexadecimal identifier.
         public static bool isUUID(string uuid)
         {
-            if (uuid.Length != 32)
+            if (string.IsNullOrEmpty(uuid) || uuid.Length != 32)
             {
                 return false;
             }
@@ -51,6 +59,7 @@ namespace AgoraIO.Media
             return regex.IsMatch(uuid);
         }
 
+        // Compresses bytes with zlib.
         public static byte[] compress(byte[] data)
         {
             byte[] output;
@@ -66,6 +75,7 @@ namespace AgoraIO.Media
             return output;
         }
 
+        // Decompresses zlib-compressed bytes.
         public static byte[] decompress(byte[] data)
         {
             byte[] output;

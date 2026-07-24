@@ -14,6 +14,7 @@ using namespace agora::tools;
 
 class RtmTokenBuilder2_test : public testing::Test {
  protected:
+  // Initializes deterministic Token007 RTM fields shared by the test case.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_cert_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -21,6 +22,7 @@ class RtmTokenBuilder2_test : public testing::Test {
     expire_ = 900;
   }
 
+  // Tests Token007 RTM generation, parsing, and signature validation.
   void TestRtmTokenBuilder() {
     std::string token =
         RtmTokenBuilder2::BuildToken(app_id_, app_cert_, user_id_, expire_);
@@ -48,4 +50,5 @@ class RtmTokenBuilder2_test : public testing::Test {
   uint32_t expire_;
 };
 
+// Tests Token007 RTM token generation.
 TEST_F(RtmTokenBuilder2_test, testRtmTokenBuilder) { TestRtmTokenBuilder(); }

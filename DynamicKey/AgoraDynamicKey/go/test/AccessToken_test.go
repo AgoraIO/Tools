@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// Test_AccessToken verifies deterministic legacy AccessToken generation for regular and zero UIDs.
 func Test_AccessToken(t *testing.T) {
 	expected :=
 		"006970CA35de60c44645bbae8a215061b33IACV0fZUBw+72cVoL9eyGGh3Q6Poi8bgjwVLnyKSJyOXR7dIfRBXoFHlEAABAAAAR/QQAAEAAQCvKDdW"
@@ -56,6 +57,7 @@ func Test_AccessToken(t *testing.T) {
 	}
 }
 
+// Test_RtcTokenBuilder verifies legacy subscriber RTC token privileges.
 func Test_RtcTokenBuilder(t *testing.T) {
 	appID := "970CA35de60c44645bbae8a215061b33"
 	appCertificate := "5CFd2fd1755d40ecb72977518be15d3b"
@@ -79,6 +81,7 @@ func Test_RtcTokenBuilder(t *testing.T) {
 	}
 }
 
+// Test_RtmTokenBuilder verifies legacy RTM login token privileges.
 func Test_RtmTokenBuilder(t *testing.T) {
 	appID := "970CA35de60c44645bbae8a215061b33"
 	appCertificate := "5CFd2fd1755d40ecb72977518be15d3b"

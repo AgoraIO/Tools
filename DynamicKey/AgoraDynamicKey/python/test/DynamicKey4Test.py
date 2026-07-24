@@ -22,6 +22,7 @@ expiredts = 1446455471
 class DynamicKeyTest(unittest.TestCase):
 
     def test_publicsharing(self):
+        """Generate and validate a public sharing key."""
         expected = "004ec32c0d528e58ef90e8ff437a9706124137dc795970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471"
         actual = generatePublicSharingKey(
             appID,
@@ -35,6 +36,7 @@ class DynamicKeyTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_recording(self):
+        """Generate and validate a recording key."""
         expected = "004e0c24ac56aae05229a6d9389860a1a0e25e56da8970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471"
         actual = generateRecordingKey(
             appID,
@@ -48,6 +50,7 @@ class DynamicKeyTest(unittest.TestCase):
         self.assertEqual(expected, actual)
 
     def test_mediachannel(self):
+        """Generate and validate a media channel key."""
         expected = "004d0ec5ee3179c964fe7c0485c045541de6bff332b970ca35de60c44645bbae8a215061b3314464554720383bbf51446455471"
         actual = generateMediaChannelKey(
             appID,

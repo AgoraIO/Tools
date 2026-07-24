@@ -164,10 +164,14 @@ class AccessToken:
         self.__expire = expire
         self.__salt = random.randint(1, 99999999)
 
-        self.__service = {}
+        self.services = []
+        self.__signature = b''
+        self.__signing_info = b''
+        self.__parsed = False
 
-    def __signing(self):
-        signing = hmac.new(pack_uint32(self.__issue_ts), self.__app_cert, sha256).digest()
+    def __signing(self, app_certificate):
+        """Derive the signing key from the timestamp, salt, and certificate."""
+        signing = hmac.new(pack_uint32(self.__issue_ts), app_certificate, sha256).digest()
         signing = hmac.new(pack_uint32(self.__salt), signing, sha256).digest()
         return signing
 
@@ -183,38 +187,59 @@ class AccessToken:
 
         if not is_uuid(self.__app_id) or not is_uuid(self.__app_cert):
             return False
-        if not self.__service:
+        if not self.services:
             return False
         return True
 
     def add_service(self, service):
-        self.__service[service.service_type()] = service
+        """Add a service without replacing services of the same type."""
+        self.services.append(service)
+
+    def get_services(self, service_type):
+        """Return all services of the requested type in insertion or token order."""
+        return [service for service in self.services
+                if service.service_type() == service_type]
 
     def build(self):
+        """Build a Token007 token containing all added services."""
         if not self.__build_check():
             return ''
 
         self.__app_id = self.__app_id.encode('utf-8')
         self.__app_cert = self.__app_cert.encode('utf-8')
-        signing = self.__signing()
+        signing = self.__signing(self.__app_cert)
+        services = sorted(self.services, key=lambda service: service.service_type())
         signing_info = pack_string(self.__app_id) + pack_uint32(self.__issue_ts) + pack_uint32(self.__expire) + \
-                       pack_uint32(self.__salt) + pack_uint16(len(self.__service))
+                       pack_uint32(self.__salt) + pack_uint16(len(services))
 
-        for service_type in sorted(self.__service.keys()):
-            signing_info += self.__service[service_type].pack()
+        for service in services:
+            signing_info += service.pack()
 
         signature = hmac.new(signing, signing_info, sha256).digest()
 
         return get_version() + base64.b64encode(zlib.compress(pack_string(signature) + signing_info)).decode('utf-8')
 
     def from_string(self, origin_token):
+        """Parse known services and retain the original bytes for signature verification."""
+        # Clear the previous token state so a failed parse cannot reuse its signature or services.
+        self.__app_id = ''
+        self.__issue_ts = 0
+        self.__expire = 0
+        self.__salt = 0
+        self.services = []
+        self.__signature = b''
+        self.__signing_info = b''
+        self.__parsed = False
+
         try:
             origin_version = origin_token[:VERSION_LENGTH]
             if origin_version != get_version():
                 return False
 
             buffer = zlib.decompress(base64.b64decode(origin_token[VERSION_LENGTH:]))
-            signature, buffer = unpack_string(buffer)
+            self.__signature, buffer = unpack_string(buffer)
+            self.__signing_info = buffer
+            self.services = []
             self.__app_id, buffer = unpack_string(buffer)
             self.__issue_ts, buffer = unpack_uint32(buffer)
             self.__expire, buffer = unpack_uint32(buffer)
@@ -223,10 +248,31 @@ class AccessToken:
 
             for i in range(service_count):
                 service_type, buffer = unpack_uint16(buffer)
-                service = AccessToken.kServices[service_type]()
+                service_class = AccessToken.kServices.get(service_type)
+                if service_class is None:
+                    self.__parsed = True
+                    return True
+                service = service_class()
                 buffer = service.unpack(buffer)
-                self.__service[service_type] = service
+                self.services.append(service)
         except Exception as e:
             print('Error: {}'.format(repr(e)))
             raise ValueError('Error: parse origin token failed')
+        self.__parsed = True
         return True
+
+    def verify_signature(self, app_certificate):
+        """Verify the signature of a successfully parsed token."""
+        if not self.__parsed or not self.__signature or not self.__signing_info:
+            return False
+        if len(app_certificate) != 32:
+            return False
+        try:
+            bytearray.fromhex(app_certificate)
+        except Exception:
+            return False
+
+        app_certificate = app_certificate.encode('utf-8')
+        signing = self.__signing(app_certificate)
+        signature = hmac.new(signing, self.__signing_info, sha256).digest()
+        return hmac.compare_digest(self.__signature, signature)

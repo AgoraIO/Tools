@@ -1,38 +1,30 @@
 import 'access_token.dart';
 
-/// RtmTokenBuilder class provides static methods to build tokens for RTM services.
+/// Builds Token007 tokens for RTM services.
 class RtmTokenBuilder {
-  /// Build a token for Agora RTM service
+  /// Builds an RTM token for a user account.
   ///
-  /// @param appId The App ID issued by Agora
-  /// @param appCertificate The App Certificate issued by Agora
-  /// @param userId The user ID for RTM service
-  /// @param tokenExpireSeconds Expiration time of the token in seconds
-  /// @returns The generated token
+  /// [appId] is the App ID issued by Agora; create one in Agora Dashboard if needed.
+  /// [appCertificate] is the certificate of the application registered in Agora Dashboard.
+  /// [userId] is the user's account and must not exceed 64 bytes.
+  /// [tokenExpireSeconds] is the expiration time in seconds from now; use `600` for 10 minutes.
+  ///
+  /// Returns the generated RTM token.
   static String buildToken({
     required String appId,
     required String appCertificate,
     required String userId,
     required int tokenExpireSeconds,
   }) {
-    AccessToken token = AccessToken(
+    final token = AccessToken.create(
       appId,
       appCertificate,
-      '', // channelName is not used for RTM
-      userId,
+      expire: tokenExpireSeconds,
     );
-
-    int expireTimestamp = _getExpireTimestamp(tokenExpireSeconds);
-
-    // Add RTM privilege
-    token.addPrivilege(Service.RTM, Privileges.LOGIN, expireTimestamp);
+    final service = ServiceRtm(userId)
+      ..addPrivilege(ServiceRtm.privilegeLogin, tokenExpireSeconds);
+    token.addService(service);
 
     return token.build();
-  }
-
-  static int _getExpireTimestamp(int tokenExpireSeconds) {
-    int currentTimestamp =
-        (DateTime.now().millisecondsSinceEpoch / 1000).floor();
-    return currentTimestamp + tokenExpireSeconds;
   }
 }

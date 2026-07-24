@@ -1,7 +1,7 @@
 name: agora_token_generator
 description: "Flutter package for generating Agora Dynamic Keys and Access Tokens"
 version: 0.0.1
-homepage: https://github.com/MohamedAbd0/Tools-Agora
+homepage: https://github.com/AgoraIO/Tools
 environment:
   sdk: ^3.6.1
   flutter: ">=1.17.0"
@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  archive: ^3.6.1
   crypto: ^3.0.3
   convert: ^3.1.1
   pointycastle: ^3.7.3

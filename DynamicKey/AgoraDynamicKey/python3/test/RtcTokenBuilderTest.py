@@ -21,6 +21,7 @@ ts = 1111111
 
 class RtcTokenBuilderTest(unittest.TestCase):
     def setUp(self) -> None:
+        """Create legacy RTC token fixtures shared by each test."""
         self.appID = "970CA35de60c44645bbae8a215061b33"
         self.appCertificate = "5CFd2fd1755d40ecb72977518be15d3b"
         self.channelName = "7d72365eb983485397e3e3f9d460bdda"
@@ -30,6 +31,7 @@ class RtcTokenBuilderTest(unittest.TestCase):
         self.ts = 1111111
 
     def test_token(self):
+        """Build and validate a legacy RTC token."""
         token = RtcTokenBuilder.buildTokenWithUid(self.appID, self.appCertificate, self.channelName, self.uid,
                                                   Role_Subscriber, self.expireTimestamp)
         parser = AccessToken()
@@ -39,4 +41,3 @@ class RtcTokenBuilderTest(unittest.TestCase):
         self.assertNotIn(kPublishVideoStream, parser.messages)
         self.assertNotIn(kPublishAudioStream, parser.messages)
         self.assertNotIn(kPublishDataStream, parser.messages)
-

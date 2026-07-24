@@ -6,6 +6,7 @@ import (
 	"../src/DynamicKey5"
 )
 
+// Test_PublicSharingKey5 verifies deterministic public sharing key generation.
 func Test_PublicSharingKey5(t *testing.T) {
 	appID := "970ca35de60c44645bbae8a215061b33"
 	appCertificate := "5cfd2fd1755d40ecb72977518be15d3b"
@@ -24,6 +25,8 @@ func Test_PublicSharingKey5(t *testing.T) {
 		t.Error(key)
 	}
 }
+
+// Test_RecordingKey5 verifies deterministic recording key generation.
 func Test_RecordingKey5(t *testing.T) {
 	appID := "970ca35de60c44645bbae8a215061b33"
 	appCertificate := "5cfd2fd1755d40ecb72977518be15d3b"
@@ -42,6 +45,8 @@ func Test_RecordingKey5(t *testing.T) {
 		t.Error(key)
 	}
 }
+
+// Test_MediaChannelKey5 verifies deterministic media channel key generation.
 func Test_MediaChannelKey5(t *testing.T) {
 	appID := "970ca35de60c44645bbae8a215061b33"
 	appCertificate := "5cfd2fd1755d40ecb72977518be15d3b"
@@ -61,6 +66,7 @@ func Test_MediaChannelKey5(t *testing.T) {
 	}
 }
 
+// Test_InChannelPermission verifies in-channel keys for different upload permissions.
 func Test_InChannelPermission(t *testing.T) {
 	appID := "970ca35de60c44645bbae8a215061b33"
 	appCertificate := "5cfd2fd1755d40ecb72977518be15d3b"

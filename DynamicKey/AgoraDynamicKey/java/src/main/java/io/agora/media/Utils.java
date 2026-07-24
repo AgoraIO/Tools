@@ -16,11 +16,17 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * Provides cryptographic, encoding, compression, and token utility functions.
+ */
 public class Utils {
     public static final long HMAC_SHA256_LENGTH = 32;
     public static final int VERSION_LENGTH = 3;
     public static final int APP_ID_LENGTH = 32;
 
+    /**
+     * Computes an HMAC-SHA256 signature with a string key.
+     */
     public static byte[] hmacSign(String keyString, byte[] msg) throws InvalidKeyException, NoSuchAlgorithmException {
         SecretKeySpec keySpec = new SecretKeySpec(keyString.getBytes(), "HmacSHA256");
         Mac mac = Mac.getInstance("HmacSHA256");
@@ -28,46 +34,72 @@ public class Utils {
         return mac.doFinal(msg);
     }
 
+    /**
+     * Serializes a packable value into bytes.
+     */
     public static byte[] pack(PackableEx packableEx) {
         ByteBuf buffer = new ByteBuf();
         packableEx.marshal(buffer);
         return buffer.asBytes();
     }
 
+    /**
+     * Deserializes bytes into a packable value.
+     */
     public static void unpack(byte[] data, PackableEx packableEx) {
         ByteBuf buffer = new ByteBuf(data);
         packableEx.unmarshal(buffer);
     }
 
+    /**
+     * Encodes bytes as a Base64 string.
+     */
     public static String base64Encode(byte[] data) {
         byte[] encodedBytes = Base64.encodeBase64(data);
         return new String(encodedBytes);
     }
 
+    /**
+     * Decodes a Base64 string into bytes.
+     */
     public static byte[] base64Decode(String data) {
         return Base64.decodeBase64(data.getBytes());
     }
 
+    /**
+     * Computes the CRC32 checksum of a string.
+     */
     public static int crc32(String data) {
-        // get bytes from string
         byte[] bytes = data.getBytes();
         return crc32(bytes);
     }
 
+    /**
+     * Computes the CRC32 checksum of a byte array.
+     */
     public static int crc32(byte[] bytes) {
         CRC32 checksum = new CRC32();
         checksum.update(bytes);
         return (int) checksum.getValue();
     }
 
+    /**
+     * Returns the current Unix timestamp in seconds.
+     */
     public static int getTimestamp() {
         return (int) ((new Date().getTime()) / 1000);
     }
 
+    /**
+     * Returns a cryptographically strong random integer.
+     */
     public static int randomInt() {
         return new SecureRandom().nextInt();
     }
 
+    /**
+     * Returns whether a string is a 32-character hexadecimal identifier.
+     */
     public static boolean isUUID(String uuid) {
         if (uuid.length() != 32) {
             return false;
@@ -76,6 +108,9 @@ public class Utils {
         return uuid.matches("\\p{XDigit}+");
     }
 
+    /**
+     * Compresses bytes using zlib.
+     */
     public static byte[] compress(byte[] data) {
         byte[] output;
         Deflater deflater = new Deflater();
@@ -102,6 +137,9 @@ public class Utils {
         return output;
     }
 
+    /**
+     * Decompresses zlib-compressed bytes.
+     */
     public static byte[] decompress(byte[] data) {
         Inflater inflater = new Inflater();
         ByteArrayOutputStream bos = new ByteArrayOutputStream(data.length);
@@ -123,6 +161,9 @@ public class Utils {
         return bos.toByteArray();
     }
 
+    /**
+     * Computes the lowercase hexadecimal MD5 digest of a string.
+     */
     public static String md5(String plainText) {
         byte[] secretBytes = null;
         try {

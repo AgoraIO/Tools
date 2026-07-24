@@ -6,6 +6,7 @@ import (
 	"testing"
 )
 
+// Test_base64EncodeStr verifies Base64 encoding and decoding round trips.
 func Test_base64EncodeStr(t *testing.T) {
 	encodeStr := base64EncodeStr([]byte("hello"))
 	AssertEqual(t, "aGVsbG8=", encodeStr)
@@ -13,12 +14,22 @@ func Test_base64EncodeStr(t *testing.T) {
 	AssertEqual(t, "hello", string(decodeStr))
 }
 
+// Test_compressZlib verifies zlib compression, decompression, and malformed input handling.
 func Test_compressZlib(t *testing.T) {
 	compressed := compressZlib([]byte("hello"))
 	AssertEqual(t, "789cca48cdc9c907040000ffff062c0215", fmt.Sprintf("%x", compressed))
 	AssertEqual(t, "hello", string(decompressZlib(compressed)))
+
+	decompressed, err := decompressZlibWithError(compressed)
+	AssertNil(t, err)
+	AssertEqual(t, "hello", string(decompressed))
+
+	decompressed, err = decompressZlibWithError([]byte("invalid"))
+	AssertEqual(t, 0, len(decompressed))
+	AssertEqual(t, true, err != nil)
 }
 
+// Test_packUint16 verifies little-endian uint16 packing and unpacking.
 func Test_packUint16(t *testing.T) {
 	buf := new(bytes.Buffer)
 	err := packUint16(buf, 600)
@@ -29,6 +40,7 @@ func Test_packUint16(t *testing.T) {
 	AssertEqual(t, uint16(600), i)
 }
 
+// Test_packUint32 verifies little-endian uint32 packing and unpacking.
 func Test_packUint32(t *testing.T) {
 	buf := new(bytes.Buffer)
 	err := packUint32(buf, 600)
@@ -39,6 +51,7 @@ func Test_packUint32(t *testing.T) {
 	AssertEqual(t, uint32(600), i)
 }
 
+// Test_packInt16 verifies little-endian int16 packing and unpacking.
 func Test_packInt16(t *testing.T) {
 	buf := new(bytes.Buffer)
 	err := packInt16(buf, int16(-1))
@@ -48,6 +61,7 @@ func Test_packInt16(t *testing.T) {
 	AssertEqual(t, int16(-1), i)
 }
 
+// Test_packString verifies length-prefixed string packing and unpacking.
 func Test_packString(t *testing.T) {
 	buf := new(bytes.Buffer)
 	err := packString(buf, "hello")
@@ -58,6 +72,7 @@ func Test_packString(t *testing.T) {
 	AssertEqual(t, "hello", s)
 }
 
+// Test_packMapUint32 verifies deterministic map packing and unpacking.
 func Test_packMapUint32(t *testing.T) {
 	buf := new(bytes.Buffer)
 	err := packMapUint32(buf, map[uint16]uint32{uint16(1): uint32(2)})

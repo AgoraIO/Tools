@@ -20,6 +20,7 @@ describe 'AgoraDynamicKey::RTMTokenBuilder' do
 
   context 'build_token' do
 
+    # Verifies deterministic legacy RTM token generation.
     it 'should equal valid token' do
       # token = AgoraDynamicKey::RTMTokenBuilder.build_token rtm_token_params
       token = AgoraDynamicKey::AccessToken.new rtm_token_params.merge(:channel_name => rtm_token_params[:account])

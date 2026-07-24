@@ -4,9 +4,11 @@ A Flutter package for generating Agora Dynamic Keys and Access Tokens to use wit
 
 ## Features
 
-- Generate RTC tokens for Agora Real-Time Communications
-- Generate RTM tokens for Agora Real-Time Messaging
-- Support for the latest token format (AccessToken2 - 007)
+- Generate RTC tokens with roles and independent privilege expiration values
+- Generate RTM, Chat, FPA, APaaS, and Education tokens
+- Generate combined RTC and RTM tokens
+- Build, parse, and verify multi-service Token007 tokens
+- Preserve repeated ServiceTypes and safely handle unknown ServiceTypes
 - No native dependencies
 
 ## Installation
@@ -112,6 +114,11 @@ To use this token generator, you need to get an App ID and App Certificate from 
 ## About Agora Token Authentication
 
 Agora uses token-based authentication to secure connections to their services. This package implements the latest token format (AccessToken2 - 007).
+
+The exported Token007 builders are `RtcTokenBuilder`, `RtmTokenBuilder`,
+`ChatTokenBuilder`, `FpaTokenBuilder`, `ApaasTokenBuilder`, and
+`EducationTokenBuilder`. Use `AccessToken` directly when one token must contain
+multiple services or repeated ServiceTypes.
 
 ## License
 

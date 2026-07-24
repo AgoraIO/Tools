@@ -16,6 +16,7 @@ using namespace agora::tools;
 
 class ApaasTokenBuilder_test : public testing::Test {
  protected:
+  // Initializes deterministic APaaS token fields shared by the test cases.
   virtual void SetUp() override {
     app_id_ = "970CA35de60c44645bbae8a215061b33";
     app_cert_ = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -27,6 +28,7 @@ class ApaasTokenBuilder_test : public testing::Test {
     chat_user_id_ = "6063383428a36fba3fb6030becf8094e";
   }
 
+  // Tests APaaS room-user token generation and service contents.
   void TestRoomUserToken() {
     std::string token_str = ApaasTokenBuilder::BuildRoomUserToken(app_id_, app_cert_, room_uuid_, user_id_, role_, expire_);
     AccessToken2 token;
@@ -40,7 +42,7 @@ class ApaasTokenBuilder_test : public testing::Test {
     ASSERT_TRUE(token.services_.count(ServiceRtm::kServiceType));
     ASSERT_TRUE(token.services_.count(ServiceChat::kServiceType));
 
-    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_.find(ServiceApaas::kServiceType)->second);
 
     EXPECT_EQ(room_uuid_, apaas_service.room_uuid_);
     EXPECT_EQ(user_id_, apaas_service.user_uuid_);
@@ -49,19 +51,20 @@ class ApaasTokenBuilder_test : public testing::Test {
     ASSERT_TRUE(apaas_service.privileges_.count(ServiceApaas::kPrivilegeRoomUser));
     EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeRoomUser));
 
-    const auto &rtm_service = dynamic_cast<const ServiceRtm &>(*token.services_[ServiceRtm::kServiceType]);
+    const auto &rtm_service = dynamic_cast<const ServiceRtm &>(*token.services_.find(ServiceRtm::kServiceType)->second);
     EXPECT_EQ(user_id_, rtm_service.user_id_);
     ASSERT_EQ(1, rtm_service.privileges_.size());
     ASSERT_TRUE(rtm_service.privileges_.count(ServiceRtm::kPrivilegeLogin));
     EXPECT_EQ(expire_, rtm_service.privileges_.at(ServiceRtm::kPrivilegeLogin));
 
-    const auto &chat_service = dynamic_cast<const ServiceChat &>(*token.services_[ServiceChat::kServiceType]);
+    const auto &chat_service = dynamic_cast<const ServiceChat &>(*token.services_.find(ServiceChat::kServiceType)->second);
     EXPECT_EQ(chat_user_id_, chat_service.user_id_);
     ASSERT_EQ(1, chat_service.privileges_.size());
     ASSERT_TRUE(chat_service.privileges_.count(ServiceChat::kPrivilegeUser));
     EXPECT_EQ(expire_, chat_service.privileges_.at(ServiceChat::kPrivilegeUser));
   }
 
+  // Tests APaaS user token generation and service contents.
   void TestUserToken() {
     std::string token_str = ApaasTokenBuilder::BuildUserToken(app_id_, app_cert_, user_id_, expire_);
     AccessToken2 token;
@@ -73,7 +76,7 @@ class ApaasTokenBuilder_test : public testing::Test {
     ASSERT_EQ(1, token.services_.size());
     ASSERT_TRUE(token.services_.count(ServiceApaas::kServiceType));
 
-    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_.find(ServiceApaas::kServiceType)->second);
 
     EXPECT_EQ("", apaas_service.room_uuid_);
     EXPECT_EQ(user_id_, apaas_service.user_uuid_);
@@ -83,6 +86,7 @@ class ApaasTokenBuilder_test : public testing::Test {
     EXPECT_EQ(expire_, apaas_service.privileges_.at(ServiceApaas::kPrivilegeUser));
   }
 
+  // Tests APaaS app token generation and service contents.
   void TestAppToken() {
     std::string token_str = ApaasTokenBuilder::BuildAppToken(app_id_, app_cert_, expire_);
     AccessToken2 token;
@@ -94,7 +98,7 @@ class ApaasTokenBuilder_test : public testing::Test {
     ASSERT_EQ(1, token.services_.size());
     ASSERT_TRUE(token.services_.count(ServiceApaas::kServiceType));
 
-    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_[ServiceApaas::kServiceType]);
+    const auto &apaas_service = dynamic_cast<const ServiceApaas &>(*token.services_.find(ServiceApaas::kServiceType)->second);
 
     EXPECT_EQ("", apaas_service.room_uuid_);
     EXPECT_EQ("", apaas_service.user_uuid_);
@@ -115,6 +119,11 @@ class ApaasTokenBuilder_test : public testing::Test {
   std::string chat_user_id_;
 };
 
+// Tests APaaS room-user token generation.
 TEST_F(ApaasTokenBuilder_test, TestRoomUserToken) { TestRoomUserToken(); }
+
+// Tests APaaS user token generation.
 TEST_F(ApaasTokenBuilder_test, TestUserToken) { TestUserToken(); }
+
+// Tests APaaS app token generation.
 TEST_F(ApaasTokenBuilder_test, TestAppToken) { TestAppToken(); }

@@ -12,21 +12,23 @@ from src.ChatTokenBuilder2 import *
 
 class ChatTokenBuilder2Test(unittest.TestCase):
     def setUp(self):
+        """Create Chat token fixtures shared by each test."""
         self.__app_id = '970CA35de60c44645bbae8a215061b33'
         self.__app_cert = '5CFd2fd1755d40ecb72977518be15d3b'
         self.__user_id = '2882341273'
         self.__expire = 600
 
     def test_user_token(self):
+        """Build and parse a Chat token with user privileges."""
         token = ChatTokenBuilder.build_user_token(self.__app_id, self.__app_cert, self.__user_id, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceChat.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceChat.kServiceType]
+        services = parser.get_services(ServiceChat.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertEqual(parser_service._ServiceChat__user_id, self.__user_id.encode('utf-8'))
         self.assertIn(ServiceChat.kPrivilegeUser, parser_service._Service__privileges)
@@ -34,15 +36,16 @@ class ChatTokenBuilder2Test(unittest.TestCase):
         self.assertNotIn(ServiceChat.kPrivilegeApp, parser_service._Service__privileges)
 
     def test_app_token(self):
+        """Build and parse a Chat token with application privileges."""
         token = ChatTokenBuilder.build_app_token(self.__app_id, self.__app_cert, self.__expire)
         parser = AccessToken()
         parser.from_string(token)
 
         self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
         self.assertEqual(parser._AccessToken__expire, self.__expire)
-        self.assertIn(ServiceChat.kServiceType, parser._AccessToken__service)
-
-        parser_service = parser._AccessToken__service[ServiceChat.kServiceType]
+        services = parser.get_services(ServiceChat.kServiceType)
+        self.assertEqual(len(services), 1)
+        parser_service = services[0]
 
         self.assertIn(ServiceChat.kPrivilegeApp, parser_service._Service__privileges)
         self.assertEqual(parser_service._Service__privileges[ServiceChat.kPrivilegeApp], self.__expire)

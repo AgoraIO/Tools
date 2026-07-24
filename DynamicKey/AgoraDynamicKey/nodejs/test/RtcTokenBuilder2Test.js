@@ -17,6 +17,7 @@ const expire = 600;
 const tokenExpirationInSecond = 600;
 const privilegeExpirationInSecond = 600;
 
+// Verifies subscriber RTC token generation with a numeric user ID.
 exports.buildTokenWithUid_SUBSCRIBER_Test = function (test) {
     let token = RtcTokenBuilder.buildTokenWithUid(
         appId,
@@ -29,15 +30,17 @@ exports.buildTokenWithUid_SUBSCRIBER_Test = function (test) {
     );
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
     test.done();
 };
 
+// Verifies publisher RTC token generation with a numeric user ID.
 exports.buildTokenWithUid_PUBLISHER_Test = function (test) {
     let token = RtcTokenBuilder.buildTokenWithUid(
         appId,
@@ -50,18 +53,20 @@ exports.buildTokenWithUid_PUBLISHER_Test = function (test) {
     );
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishDataStream]);
     test.done();
 };
 
+// Verifies subscriber RTC token generation with a user account.
 exports.buildTokenWithUserAccount_SUBSCRIBER_Test = function (test) {
     let token = RtcTokenBuilder.buildTokenWithUserAccount(
         appId,
@@ -74,15 +79,17 @@ exports.buildTokenWithUserAccount_SUBSCRIBER_Test = function (test) {
     );
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
     test.done();
 };
 
+// Verifies publisher RTC token generation with a user account.
 exports.buildTokenWithUserAccount_PUBLISHER_Test = function (test) {
     let token = RtcTokenBuilder.buildTokenWithUserAccount(
         appId,
@@ -95,46 +102,51 @@ exports.buildTokenWithUserAccount_PUBLISHER_Test = function (test) {
     );
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishDataStream]);
     test.done();
 };
 
+// Verifies RTC token generation with explicit numeric-user privileges.
 exports.buildTokenWithUidAndPrivilege_Test = function (test) {
     let token = RtcTokenBuilder.buildTokenWithUidAndPrivilege(appId, appCertificate, channelName, uid, expire, expire, expire, expire, expire);
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishDataStream]);
     test.done();
 };
 
+// Verifies RTC token generation with explicit user-account privileges.
 exports.BuildTokenWithUserAccountAndPrivilege_Test = function (test) {
     let token = RtcTokenBuilder.BuildTokenWithUserAccountAndPrivilege(appId, appCertificate, channelName, uidStr, expire, expire, expire, expire, expire);
     let accessToken = new AccessToken2("", "", 0, 0);
     accessToken.from_string(token);
+    const service = accessToken.getServices(kRtcServiceType)[0];
 
     test.equal(appId, accessToken.appId);
     test.equal(expire, accessToken.expire);
-    test.equal(channelName, accessToken.services[kRtcServiceType].__channel_name);
-    test.equal(uidStr, accessToken.services[kRtcServiceType].__uid);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegeJoinChannel]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
-    test.equal(expire, accessToken.services[kRtcServiceType].__privileges[ServiceRtc.kPrivilegePublishDataStream]);
+    test.equal(channelName, service.__channel_name);
+    test.equal(uidStr, service.__uid);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegeJoinChannel]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishAudioStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishVideoStream]);
+    test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishDataStream]);
     test.done();
 };

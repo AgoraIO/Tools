@@ -9,6 +9,7 @@ describe 'AgoraDynamicKey2::ApaasTokenBuilder' do
   let(:role) { 1 }
   let(:expire) { 600 }
 
+  # Verifies APaaS room-user token generation and parsing.
   it 'test_build_room_user_token' do
     token = AgoraDynamicKey2::ApaasTokenBuilder.build_room_user_token(app_id, app_certificate, room_uuid, user_uuid, role,
                                                                       expire)
@@ -18,16 +19,17 @@ describe 'AgoraDynamicKey2::ApaasTokenBuilder' do
     expect(res).to eq(true)
     expect(access_token.app_id).to eq(app_id)
     expect(access_token.expire).to eq(expire)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].room_uuid).to eq(room_uuid)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].user_uuid).to eq(user_uuid)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].role).to eq(role)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.room_uuid).to eq(room_uuid)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.user_uuid).to eq(user_uuid)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.role).to eq(role)
     expect(access_token.services.size).to eq(3)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(600)
-    expect(access_token.services[AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(600)
-    expect(access_token.services[AgoraDynamicKey2::ServiceChat::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceChat::PRIVILEGE_USER]).to eq(600)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(600)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(600)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceChat::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceChat::PRIVILEGE_USER]).to eq(600)
   end
 
+  # Verifies APaaS user token generation and parsing.
   it 'test_build_user_token' do
     token = AgoraDynamicKey2::ApaasTokenBuilder.build_user_token(app_id, app_certificate, user_uuid, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
@@ -36,15 +38,16 @@ describe 'AgoraDynamicKey2::ApaasTokenBuilder' do
     expect(res).to eq(true)
     expect(access_token.app_id).to eq(app_id)
     expect(access_token.expire).to eq(expire)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].room_uuid).to eq('')
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].user_uuid).to eq(user_uuid)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].role).to eq(-1)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.room_uuid).to eq('')
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.user_uuid).to eq(user_uuid)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.role).to eq(-1)
     expect(access_token.services.size).to eq(1)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(nil)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_USER]).to eq(600)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(nil)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_USER]).to eq(600)
   end
 
+  # Verifies APaaS application token generation and parsing.
   it 'test_build_app_token' do
     token = AgoraDynamicKey2::ApaasTokenBuilder.build_app_token(app_id, app_certificate, expire)
     access_token = AgoraDynamicKey2::AccessToken.new
@@ -53,13 +56,13 @@ describe 'AgoraDynamicKey2::ApaasTokenBuilder' do
     expect(res).to eq(true)
     expect(access_token.app_id).to eq(app_id)
     expect(access_token.expire).to eq(expire)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].room_uuid).to eq('')
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].user_uuid).to eq('')
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].role).to eq(-1)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.room_uuid).to eq('')
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.user_uuid).to eq('')
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.role).to eq(-1)
     expect(access_token.services.size).to eq(1)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(nil)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_USER]).to eq(nil)
-    expect(access_token.services[AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE].privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_APP]).to eq(600)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_ROOM_USER]).to eq(nil)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_USER]).to eq(nil)
+    expect(access_token.get_services(AgoraDynamicKey2::ServiceApaas::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceApaas::PRIVILEGE_APP]).to eq(600)
   end
 end

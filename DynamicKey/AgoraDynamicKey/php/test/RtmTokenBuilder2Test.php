@@ -10,22 +10,29 @@ class RtmTokenBuilder2Test
     public $expire = 600;
     public $userId = "test_user";
 
+    /**
+     * Run all RTM token builder test cases.
+     */
     public function run()
     {
         $this->test_buildToken();
     }
 
+    /**
+     * Verify RTM token generation and parsing.
+     */
     public function test_buildToken()
     {
         $token = RtmTokenBuilder2::buildToken($this->appId, $this->appCertificate, $this->userId, $this->expire);
         $accessToken = new AccessToken2();
         $accessToken->parse($token);
+        $serviceRtm = $accessToken->getServices(ServiceRtm::SERVICE_TYPE)[0];
 
         Util::assertEqual($this->appId, $accessToken->appId);
         Util::assertEqual($this->expire, $accessToken->expire);
-        Util::assertEqual($this->userId, $accessToken->services[ServiceRtm::SERVICE_TYPE]->userId);
-        Util::assertEqual(ServiceRtm::SERVICE_TYPE, $accessToken->services[ServiceRtm::SERVICE_TYPE]->type);
-        Util::assertEqual($this->expire, $accessToken->services[ServiceRtm::SERVICE_TYPE]->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
+        Util::assertEqual($this->userId, $serviceRtm->userId);
+        Util::assertEqual(ServiceRtm::SERVICE_TYPE, $serviceRtm->type);
+        Util::assertEqual($this->expire, $serviceRtm->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
     }
 }
 

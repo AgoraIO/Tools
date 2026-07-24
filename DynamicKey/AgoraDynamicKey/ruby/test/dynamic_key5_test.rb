@@ -10,6 +10,7 @@ describe 'Test DynamicKey5' do
   uid = 2882341273
   expired_ts = 1446455471
 
+  # Verifies DynamicKey5 signature generation.
   it "test signature" do
     signature = DynamicKey5.gen_signature(
         DynamicKey5::RECORDING_SERVICE,
@@ -25,6 +26,7 @@ describe 'Test DynamicKey5' do
     expect(signature).equal? '929c9e46187a022baab26b7bf018438c675cfe1a'
   end
 
+  # Verifies DynamicKey5 public sharing key generation.
   it 'test_public sharing' do
     expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
     actual = DynamicKey5.gen_public_sharing_key(
@@ -39,6 +41,7 @@ describe 'Test DynamicKey5' do
     expect(actual).equal? expected
   end
 
+  # Verifies DynamicKey5 recording key generation.
   it 'test_recording' do
     expected = "005AgAoADkyOUM5RTQ2MTg3QTAyMkJBQUIyNkI3QkYwMTg0MzhDNjc1Q0ZFMUEQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
     actual = DynamicKey5.gen_recording_key(
@@ -53,6 +56,7 @@ describe 'Test DynamicKey5' do
     expect(actual).equal? expected
   end
 
+  # Verifies DynamicKey5 media channel key generation.
   it 'test media channel key' do
     expected = "005AQAoAEJERTJDRDdFNkZDNkU0ODYxNkYxQTYwOUVFNTM1M0U5ODNCQjFDNDQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="
     actual = DynamicKey5.gen_media_channel_key(
@@ -67,6 +71,7 @@ describe 'Test DynamicKey5' do
     expect(actual).equal? expected
   end
 
+  # Verifies DynamicKey5 channel permission key generation.
   it 'test inChannelPermission key' do
     no_upload = "005BAAoADgyNEQxNDE4M0FGRDkyOEQ4REFFMUU1OTg5NTg2MzA3MTEyNjRGNzQQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YBAAEAAQAw"
     actual = DynamicKey5.gen_in_channel_permission_key(
