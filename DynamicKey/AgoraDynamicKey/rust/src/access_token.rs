@@ -292,6 +292,7 @@ pub struct AccessToken {
     pub services: Vec<Box<dyn IService>>,
     signature: Vec<u8>,
     signing_info: Vec<u8>,
+    parsed: bool,
 }
 
 /// Creates a Token007 builder with the current timestamp and a random salt.
@@ -308,6 +309,7 @@ pub fn new_access_token(app_id: &str, app_cert: &str, expire: u32) -> AccessToke
         services: Vec::new(),
         signature: Vec::new(),
         signing_info: Vec::new(),
+        parsed: false,
     };
 }
 
@@ -375,6 +377,16 @@ impl AccessToken {
 
     /// Parses known services and retains the original bytes for signature verification.
     pub fn parse(&mut self, token: &str) -> Result<bool, Error> {
+        // Clear the previous token state so a failed parse cannot reuse its signature or services.
+        self.app_id.clear();
+        self.issue_ts = 0;
+        self.expire = 0;
+        self.salt = 0;
+        self.services.clear();
+        self.signature.clear();
+        self.signing_info.clear();
+        self.parsed = false;
+
         if token.as_bytes().get(..VERSION_LENGTH) != Some(VERSION.as_bytes()) {
             return Ok(false);
         }
@@ -400,6 +412,7 @@ impl AccessToken {
         for _ in 0..service_num {
             let service_type = utils::unpack_uint16(&mut buffer)?;
             let Some(mut service) = create_service(service_type) else {
+                self.parsed = true;
                 return Ok(true);
             };
 
@@ -407,6 +420,7 @@ impl AccessToken {
             self.add_service(service);
         }
 
+        self.parsed = true;
         Ok(true)
     }
 
@@ -417,7 +431,7 @@ impl AccessToken {
 
     /// Verifies the signature of a successfully parsed token.
     pub fn verify_signature(&self, app_certificate: &str) -> bool {
-        if self.signature.is_empty() || self.signing_info.is_empty() || !is_uuid(&self.app_id) || !is_uuid(app_certificate) {
+        if !self.parsed || self.signature.is_empty() || self.signing_info.is_empty() || !is_uuid(&self.app_id) || !is_uuid(app_certificate) {
             return false;
         }
 
@@ -677,5 +691,10 @@ mod tests {
         assert!(parsed.parse(&generated.build().unwrap()).unwrap());
         assert!(!parsed.verify_signature("invalid"));
         assert!(!parsed.verify_signature("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"));
+        assert!(parsed.verify_signature(APP_CERT));
+
+        assert!(!parsed.parse("006invalid").unwrap());
+        assert!(!parsed.verify_signature(APP_CERT));
+        assert!(parsed.services.is_empty());
     }
 }

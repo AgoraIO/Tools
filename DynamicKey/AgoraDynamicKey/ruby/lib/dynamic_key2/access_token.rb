@@ -191,6 +191,7 @@ module AgoraDynamicKey2
       @services = []
       @signature = ''.b
       @signing_info = ''.b
+      @parsed = false
     end
 
     # Adds a service without replacing services of the same type.
@@ -238,6 +239,16 @@ module AgoraDynamicKey2
 
     # Parses known services and retains the original bytes for signature verification.
     def parse(token)
+      # Clear the previous token state so a failed parse cannot reuse its signature or services.
+      @app_id = ''
+      @issue_ts = 0
+      @expire = 0
+      @salt = 0
+      @services = []
+      @signature = ''.b
+      @signing_info = ''.b
+      @parsed = false
+
       return false unless token.is_a?(String) && token.bytesize >= VERSION_LENGTH
       return false if token[0, VERSION_LENGTH] != fetch_version
 
@@ -254,12 +265,16 @@ module AgoraDynamicKey2
       service_num.times do
         service_type, data = Util.unpack_uint16(data)
         service_class = SERVICES[service_type]
-        return true unless service_class
+        unless service_class
+          @parsed = true
+          return true
+        end
 
         service = service_class.new
         _, data = service.unpack(data)
         add_service(service)
       end
+      @parsed = true
       true
     rescue StandardError
       false
@@ -267,7 +282,7 @@ module AgoraDynamicKey2
 
     # Verifies the signature of a successfully parsed token.
     def verify_signature(app_certificate)
-      return false if @signature.empty? || @signing_info.empty?
+      return false if !@parsed || @signature.empty? || @signing_info.empty?
       return false if !uuid?(@app_id) || !uuid?(app_certificate)
 
       signature = OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha256'), fetch_sign(app_certificate), @signing_info)

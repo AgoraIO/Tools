@@ -191,6 +191,7 @@ class AccessToken:
         self.services = []
         self.__signature = b''
         self.__signing_info = b''
+        self.__parsed = False
 
     def __signing(self, app_certificate):
         """Derive the signing key from the timestamp, salt, and certificate."""
@@ -247,6 +248,16 @@ class AccessToken:
 
     def from_string(self, origin_token):
         """Parse known services and retain the original bytes for signature verification."""
+        # Clear the previous token state so a failed parse cannot reuse its signature or services.
+        self.__app_id = ''
+        self.__issue_ts = 0
+        self.__expire = 0
+        self.__salt = 0
+        self.services = []
+        self.__signature = b''
+        self.__signing_info = b''
+        self.__parsed = False
+
         try:
             origin_version = origin_token[:VERSION_LENGTH]
             if origin_version != get_version():
@@ -267,6 +278,7 @@ class AccessToken:
                 service_type, buffer = unpack_uint16(buffer)
                 service_class = AccessToken.kServices.get(service_type)
                 if service_class is None:
+                    self.__parsed = True
                     return True
                 service = service_class()
                 buffer = service.unpack(buffer)
@@ -274,11 +286,12 @@ class AccessToken:
         except Exception as e:
             print('Error: {}'.format(repr(e)))
             raise ValueError('Error: parse origin token failed')
+        self.__parsed = True
         return True
 
     def verify_signature(self, app_certificate):
         """Verify the signature of a successfully parsed token."""
-        if not self.__signature or not self.__signing_info:
+        if not self.__parsed or not self.__signature or not self.__signing_info:
             return False
         if len(app_certificate) != 32:
             return False

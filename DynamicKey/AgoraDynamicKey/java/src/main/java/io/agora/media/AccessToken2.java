@@ -108,6 +108,7 @@ public class AccessToken2 {
     public List<Service> services = new ArrayList<>();
     private byte[] signature = new byte[0];
     private byte[] signingInfo = new byte[0];
+    private boolean parsed;
 
     /**
      * Creates an empty token parser.
@@ -233,6 +234,16 @@ public class AccessToken2 {
      * Parses known services and retains the original bytes for signature verification.
      */
     public boolean parse(String token) {
+        // Clear the previous token state so a failed parse cannot reuse its signature or services.
+        this.parsed = false;
+        this.appId = "";
+        this.issueTs = 0;
+        this.expire = 0;
+        this.salt = 0;
+        this.services.clear();
+        this.signature = new byte[0];
+        this.signingInfo = new byte[0];
+
         if (token == null || token.length() < Utils.VERSION_LENGTH
                 || !getVersion().equals(token.substring(0, Utils.VERSION_LENGTH))) {
             return false;
@@ -254,6 +265,7 @@ public class AccessToken2 {
                 short serviceType = buff.readShort();
                 Service service = getService(serviceType);
                 if (service == null) {
+                    this.parsed = true;
                     return true;
                 }
                 service.unpack(buff);
@@ -263,6 +275,7 @@ public class AccessToken2 {
             return false;
         }
 
+        this.parsed = true;
         return true;
     }
 
@@ -270,7 +283,7 @@ public class AccessToken2 {
      * Verifies the signature of a successfully parsed token.
      */
     public boolean verifySignature(String appCertificate) {
-        if (this.signature.length == 0 || this.signingInfo.length == 0
+        if (!this.parsed || this.signature.length == 0 || this.signingInfo.length == 0
                 || appCertificate == null || !Utils.isUUID(this.appId) || !Utils.isUUID(appCertificate)) {
             return false;
         }

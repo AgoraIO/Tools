@@ -301,6 +301,11 @@ class AccessToken2Test
         Util::assertEqual(true, $parser->parse($accessToken->build()));
         Util::assertEqual(false, $parser->verifySignature("invalid"));
         Util::assertEqual(false, $parser->verifySignature(str_repeat("z", 32)));
+        Util::assertEqual(true, $parser->verifySignature($this->appCertificate));
+
+        Util::assertEqual(false, $parser->parse("006invalid"));
+        Util::assertEqual(false, $parser->verifySignature($this->appCertificate));
+        Util::assertEqual(0, count($parser->services));
     }
 
     /**

@@ -188,6 +188,11 @@ function test_invalid_token_inputs_and_signatures()
     luaunit.assertTrue(parsed:parse(token:build()))
     luaunit.assertFalse(parsed:verify_signature(WRONG_APP_CERTIFICATE))
     luaunit.assertFalse(parsed:verify_signature("invalid"))
+    luaunit.assertTrue(parsed:verify_signature(APP_CERTIFICATE))
+
+    luaunit.assertFalse(parsed:parse("006invalid"))
+    luaunit.assertFalse(parsed:verify_signature(APP_CERTIFICATE))
+    luaunit.assertEquals(0, #parsed.services)
 end
 
 -- Verifies UID conversion and identifier validation helpers.

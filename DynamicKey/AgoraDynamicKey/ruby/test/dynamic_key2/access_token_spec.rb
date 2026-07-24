@@ -286,5 +286,10 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(parsed.verify_signature(nil)).to eq(false)
     expect(parsed.verify_signature('invalid')).to eq(false)
     expect(parsed.verify_signature('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz')).to eq(false)
+    expect(parsed.verify_signature(app_certificate)).to eq(true)
+
+    expect(parsed.parse('006invalid')).to eq(false)
+    expect(parsed.verify_signature(app_certificate)).to eq(false)
+    expect(parsed.services).to be_empty
   end
 end

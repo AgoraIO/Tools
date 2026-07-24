@@ -352,6 +352,11 @@ public class AccessToken2Test {
         assertTrue(parser.parse(accessToken.build()));
         assertFalse(parser.verifySignature("invalid"));
         assertFalse(parser.verifySignature("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"));
+        assertTrue(parser.verifySignature(appCertificate));
+
+        assertFalse(parser.parse("006invalid"));
+        assertFalse(parser.verifySignature(appCertificate));
+        assertTrue(parser.services.isEmpty());
     }
 
     /**

@@ -268,6 +268,11 @@ class AccessToken2Test(unittest.TestCase):
 
         self.assertFalse(parser.verify_signature('invalid'))
         self.assertFalse(parser.verify_signature('z' * 32))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+        self.assertFalse(parser.from_string('006invalid'))
+        self.assertFalse(parser.verify_signature(self.__app_cert))
+        self.assertEqual([], parser.services)
 
     def test_invalid_build_and_parse_inputs(self):
         """Reject invalid identifiers, empty services, versions, and payloads."""

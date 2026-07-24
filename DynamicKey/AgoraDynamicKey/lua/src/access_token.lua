@@ -259,6 +259,7 @@ local function new_access_token(app_id, app_cert, expire)
         services = {},
         signature = nil,
         signing_info = nil,
+        verification_ready = false,
     }
     setmetatable(instance, AccessToken)
     return instance
@@ -311,6 +312,7 @@ function AccessToken:build()
     local signature = utils.hmac_sha256(sign, data)
     self.signature = signature
     self.signing_info = data
+    self.verification_ready = true
 
     local res = get_version() .. utils.base64_encode_str(utils.compress_zlib(utils.pack_string(signature) .. data))
     return res
@@ -371,12 +373,30 @@ end
 
 -- Parses a Token007 string and returns false for malformed input.
 function AccessToken:parse(token)
+    -- Clear the previous token state so a failed parse cannot reuse its signature or services.
+    self.app_id = ""
+    self.issue_ts = 0
+    self.expire = 0
+    self.salt = 0
+    self.services = {}
+    self.signature = nil
+    self.signing_info = nil
+    self.verification_ready = false
+
     local success, parsed = pcall(parse_token, self, token)
-    return success and parsed == true
+    if success and parsed == true then
+        self.verification_ready = true
+        return true
+    end
+
+    return false
 end
 
 -- Verifies the parsed or built token signature with an App Certificate.
 function AccessToken:verify_signature(app_certificate)
+    if not self.verification_ready then
+        return false
+    end
     if not is_uuid(self.app_id) or not is_uuid(app_certificate) then
         return false
     end

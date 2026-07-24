@@ -195,6 +195,11 @@ Deno.test('AccessToken_Test_verifySignaturePreconditions', () => {
     assertFalse(parsed.verifySignature(null))
     assertFalse(parsed.verifySignature('invalid'))
     assertFalse(parsed.verifySignature('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'))
+    assert(parsed.verifySignature(appCertificate))
+
+    assertFalse(parsed.from_string('006invalid'))
+    assertFalse(parsed.verifySignature(appCertificate))
+    assertEquals(parsed.services.length, 0)
 })
 
 // Sorts distinct service types before packing without changing insertion order.

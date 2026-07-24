@@ -216,6 +216,7 @@ class AccessToken2 {
         this.services = []
         this.__signature = Buffer.alloc(0)
         this.__signing_info = Buffer.alloc(0)
+        this.__parsed = false
     }
 
     // Derives the signing key with the stored or supplied App Certificate.
@@ -286,6 +287,16 @@ class AccessToken2 {
 
     // Parses known services and retains the original bytes for signature verification.
     from_string(origin_token) {
+        // Clear the previous token state so a failed parse cannot reuse its signature or services.
+        this.appId = ''
+        this.issueTs = 0
+        this.expire = 0
+        this.salt = 0
+        this.services = []
+        this.__signature = Buffer.alloc(0)
+        this.__signing_info = Buffer.alloc(0)
+        this.__parsed = false
+
         if (typeof origin_token !== 'string' || origin_token.length < VERSION_LENGTH) {
             return false
         }
@@ -315,6 +326,7 @@ class AccessToken2 {
                 const service_type = bufferReaderService.getUint16()
                 const ServiceClass = AccessToken2.kServices[service_type]
                 if (!ServiceClass) {
+                    this.__parsed = true
                     return true
                 }
 
@@ -326,13 +338,14 @@ class AccessToken2 {
             return false
         }
 
+        this.__parsed = true
         return true
     }
 
     // Verifies the signature of a successfully parsed token.
     verifySignature(appCertificate) {
         if (
-            this.__signature.length === 0 || this.__signing_info.length === 0 ||
+            !this.__parsed || this.__signature.length === 0 || this.__signing_info.length === 0 ||
             !isUuid(this.appId) || !isUuid(appCertificate)
         ) {
             return false

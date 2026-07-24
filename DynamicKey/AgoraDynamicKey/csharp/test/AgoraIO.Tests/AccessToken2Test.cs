@@ -578,6 +578,11 @@ namespace AgoraIO.Tests
             Assert.False(parsed.verifySignature(null));
             Assert.False(parsed.verifySignature("invalid"));
             Assert.False(parsed.verifySignature("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz"));
+            Assert.True(parsed.verifySignature(appCertificate));
+
+            Assert.False(parsed.parse("006invalid"));
+            Assert.False(parsed.verifySignature(appCertificate));
+            Assert.Empty(parsed._services);
         }
 
         // Creates a deterministic token builder for compatibility tests.

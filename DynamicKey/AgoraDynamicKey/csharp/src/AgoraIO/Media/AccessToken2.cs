@@ -20,6 +20,7 @@ namespace AgoraIO.Media
 
         private byte[] _signature = Array.Empty<byte>();
         private byte[] _signingInfo = Array.Empty<byte>();
+        private bool _parsed;
 
         // Creates an empty token parser.
         public AccessToken2()
@@ -138,6 +139,16 @@ namespace AgoraIO.Media
         // Parses known services and retains the original bytes for signature verification.
         public bool parse(string token)
         {
+            // Clear the previous token state so a failed parse cannot reuse its signature or services.
+            _parsed = false;
+            _appId = "";
+            _issueTs = 0;
+            _expire = 0;
+            _salt = 0;
+            _services.Clear();
+            _signature = Array.Empty<byte>();
+            _signingInfo = Array.Empty<byte>();
+
             if (string.IsNullOrEmpty(token) || token.Length < VERSION_LENGTH ||
                 getVersion().CompareTo(token.Substring(0, VERSION_LENGTH)) != 0)
             {
@@ -164,6 +175,7 @@ namespace AgoraIO.Media
                     Service service = tryCreateService(serviceType);
                     if (service == null)
                     {
+                        _parsed = true;
                         return true;
                     }
                     service.unpack(buff);
@@ -175,13 +187,14 @@ namespace AgoraIO.Media
                 return false;
             }
 
+            _parsed = true;
             return true;
         }
 
         // Verifies the signature of a successfully parsed token.
         public bool verifySignature(string appCertificate)
         {
-            if (_signature.Length == 0 || _signingInfo.Length == 0 ||
+            if (!_parsed || _signature.Length == 0 || _signingInfo.Length == 0 ||
                 string.IsNullOrEmpty(_appId) || string.IsNullOrEmpty(appCertificate) ||
                 !Utils.isUUID(_appId) || !Utils.isUUID(appCertificate))
             {

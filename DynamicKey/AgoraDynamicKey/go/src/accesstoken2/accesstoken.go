@@ -276,6 +276,7 @@ type AccessToken struct {
 	Services    []IService
 	signature   []byte
 	signingInfo []byte
+	parsed      bool
 }
 
 // NewAccessToken creates an access token with the current timestamp and a random salt.
@@ -372,6 +373,16 @@ func (accessToken *AccessToken) Build() (res string, err error) {
 func (accessToken *AccessToken) Parse(token string) (res bool, err error) {
 	recoverException()
 
+	// Clear the previous token state so a failed parse cannot reuse its signature or services.
+	accessToken.AppId = ""
+	accessToken.IssueTs = 0
+	accessToken.Expire = 0
+	accessToken.Salt = 0
+	accessToken.Services = nil
+	accessToken.signature = nil
+	accessToken.signingInfo = nil
+	accessToken.parsed = false
+
 	if len(token) < VersionLength {
 		return false, errors.New("invalid token length")
 	}
@@ -424,6 +435,7 @@ func (accessToken *AccessToken) Parse(token string) (res bool, err error) {
 		}
 		service := accessToken.newService(serviceType)
 		if service == nil {
+			accessToken.parsed = true
 			return true, nil
 		}
 		if err = service.UnPack(buffer); err != nil {
@@ -432,12 +444,13 @@ func (accessToken *AccessToken) Parse(token string) (res bool, err error) {
 		accessToken.AddService(service)
 	}
 
+	accessToken.parsed = true
 	return true, nil
 }
 
 // VerifySignature verifies the parsed token without rebuilding its service payload.
 func (accessToken *AccessToken) VerifySignature(appCertificate string) (bool, error) {
-	if len(accessToken.signature) == 0 || len(accessToken.signingInfo) == 0 {
+	if !accessToken.parsed || len(accessToken.signature) == 0 || len(accessToken.signingInfo) == 0 {
 		return false, errors.New("parse token before verifying signature")
 	}
 	if !isUuid(accessToken.AppId) || !isUuid(appCertificate) {

@@ -259,6 +259,7 @@ class AccessToken2
     public $services = [];
     private $signature = "";
     private $signingInfo = "";
+    private $parsed = false;
 
     /**
      * Create a token builder or an empty token parser.
@@ -347,6 +348,16 @@ class AccessToken2
      */
     public function parse($token)
     {
+        // Clear the previous token state so a failed parse cannot reuse its signature or services.
+        $this->parsed = false;
+        $this->appId = "";
+        $this->issueTs = 0;
+        $this->expire = 0;
+        $this->salt = 0;
+        $this->services = [];
+        $this->signature = "";
+        $this->signingInfo = "";
+
         if (substr($token, 0, self::VERSION_LENGTH) != self::getVersion()) {
             return false;
         }
@@ -371,6 +382,7 @@ class AccessToken2
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceType = Util::unpackUint16($data);
             if (!isset($serviceClasses[$serviceType])) {
+                $this->parsed = true;
                 return true;
             }
 
@@ -379,6 +391,7 @@ class AccessToken2
             $service->unpack($data);
             $this->addService($service);
         }
+        $this->parsed = true;
         return true;
     }
 
@@ -387,7 +400,7 @@ class AccessToken2
      */
     public function verifySignature($appCertificate)
     {
-        if ($this->signature === "" || $this->signingInfo === "") {
+        if (!$this->parsed || $this->signature === "" || $this->signingInfo === "") {
             return false;
         }
         if (!self::isUUid($this->appId) || !self::isUUid($appCertificate)) {

@@ -210,6 +210,11 @@ void main() {
         isFalse,
       );
       expect(parsed.verifySignature('invalid'), isFalse);
+      expect(parsed.verifySignature(appCertificate), isTrue);
+
+      expect(parsed.parse('006invalid'), isFalse);
+      expect(parsed.verifySignature(appCertificate), isFalse);
+      expect(parsed.services, isEmpty);
     });
   });
 }

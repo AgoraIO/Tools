@@ -509,6 +509,21 @@ class AccessToken2_test : public testing::Test {
     EXPECT_TRUE(parsed.services_.empty());
   }
 
+  // Rejects signature verification after a later token parse fails.
+  void TestFailedParseClearsVerificationState() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+    token.AddService(std::move(BuildRtcService(channel_name_, uid_, expire_)));
+
+    AccessToken2 parsed;
+    ASSERT_TRUE(parsed.FromString(token.Build()));
+    ASSERT_EQ(kTokenVerifySuccess, parsed.VerifySignature(app_certificate_));
+
+    ASSERT_FALSE(parsed.FromString("006invalid"));
+    EXPECT_EQ(kTokenInvalid, parsed.VerifySignature(app_certificate_));
+    EXPECT_TRUE(parsed.services_.empty());
+  }
+
  private:
   std::string app_id_;
   std::string app_certificate_;
@@ -565,3 +580,6 @@ TEST_F(AccessToken2_test, testUnknownServiceAfterKnownService) { TestUnknownServ
 
 // Tests parsing when an unknown service precedes a known service.
 TEST_F(AccessToken2_test, testUnknownServiceBeforeKnownService) { TestUnknownServiceBeforeKnownService(); }
+
+// Tests that a failed parse invalidates an earlier successful parse.
+TEST_F(AccessToken2_test, testFailedParseClearsVerificationState) { TestFailedParseClearsVerificationState(); }

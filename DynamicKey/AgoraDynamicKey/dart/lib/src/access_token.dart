@@ -197,6 +197,7 @@ class AccessToken {
   final String _legacyUid;
   Uint8List _signature = Uint8List(0);
   Uint8List _signingInfo = Uint8List(0);
+  bool _parsed = false;
 
   /// Creates a token using the legacy low-level constructor.
   AccessToken(
@@ -282,6 +283,16 @@ class AccessToken {
 
   /// Parses known services and retains original bytes for signature verification.
   bool parse(String? token) {
+    // Clear the previous token state so a failed parse cannot reuse its signature or services.
+    appId = '';
+    issueTs = 0;
+    expire = 0;
+    salt = 0;
+    services.clear();
+    _signature = Uint8List(0);
+    _signingInfo = Uint8List(0);
+    _parsed = false;
+
     if (token == null ||
         token.length < _versionLength ||
         !token.startsWith(VERSION_STRING)) {
@@ -337,7 +348,8 @@ class AccessToken {
 
   /// Verifies the signature of a successfully parsed token.
   bool verifySignature(String appCertificate) {
-    if (_signature.isEmpty ||
+    if (!_parsed ||
+        _signature.isEmpty ||
         _signingInfo.isEmpty ||
         !_isUuid(appId) ||
         !_isUuid(appCertificate)) {
@@ -403,6 +415,7 @@ class AccessToken {
     salt = parsedSalt;
     _signature = signature;
     _signingInfo = signingInfo;
+    _parsed = true;
     services
       ..clear()
       ..addAll(parsedServices);

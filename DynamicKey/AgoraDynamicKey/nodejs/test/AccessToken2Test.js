@@ -250,6 +250,11 @@ exports.AccessToken_Test_verifySignaturePreconditions = function (test) {
     test.equal(false, parsed.verifySignature(null))
     test.equal(false, parsed.verifySignature('invalid'))
     test.equal(false, parsed.verifySignature('zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz'))
+    test.equal(true, parsed.verifySignature(appCertificate))
+
+    test.equal(false, parsed.from_string('006invalid'))
+    test.equal(false, parsed.verifySignature(appCertificate))
+    test.equal(0, parsed.services.length)
     test.done()
 }
 

@@ -354,6 +354,19 @@ func Test_AccessToken_VerifySignature_Errors(t *testing.T) {
 	verified, err = accessToken.VerifySignature("invalid")
 	AssertEqual(t, false, verified)
 	AssertEqual(t, "check appId or appCertificate", err.Error())
+
+	verified, err = accessToken.VerifySignature(DataMockAppCertificate)
+	AssertNil(t, err)
+	AssertEqual(t, true, verified)
+
+	res, err = accessToken.Parse("006invalid")
+	AssertEqual(t, false, res)
+	AssertEqual(t, "invalid token version", err.Error())
+	AssertEqual(t, 0, len(accessToken.Services))
+
+	verified, err = accessToken.VerifySignature(DataMockAppCertificate)
+	AssertEqual(t, false, verified)
+	AssertEqual(t, "parse token before verifying signature", err.Error())
 }
 
 // Test_AccessToken_Parse_InvalidToken verifies malformed tokens return parsing errors.
