@@ -98,6 +98,7 @@ uiDesigner.xml
 # Python #
 ######################
 venv/
+__pycache__/
 *.pyc
 logs/
 
