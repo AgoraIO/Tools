@@ -6,9 +6,12 @@ local VERSION_LENGTH = 3
 -- Service type
 local SERVICE_TYPE_RTC = 1
 local SERVICE_TYPE_RTM = 2
+local SERVICE_TYPE_STREAMING = 3
 local SERVICE_TYPE_FPA = 4
 local SERVICE_TYPE_CHAT = 5
+local SERVICE_TYPE_FCDN = 6
 local SERVICE_TYPE_APAAS = 7
+local SERVICE_TYPE_RTM2 = 8
 
 -- Rtc
 local PRIVILEGE_JOIN_CHANNEL = 1
@@ -20,6 +23,14 @@ local PRIVILEGE_PUBLISH_DATA_STREAM = 4
 -- Fpa
 local PRIVILEGE_LOGIN = 1
 
+-- Streaming
+local PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM = 1
+local PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM = 2
+
+-- FCDN
+local PRIVILEGE_FCDN_PUBLISH = 1
+local PRIVILEGE_FCDN_PLAY = 2
+
 -- Chat
 local PRIVILEGE_CHAT_USER = 1
 local PRIVILEGE_CHAT_APP = 2
@@ -28,6 +39,17 @@ local PRIVILEGE_CHAT_APP = 2
 local PRIVILEGE_APAAS_ROOM_USER = 1
 local PRIVILEGE_APAAS_USER = 2
 local PRIVILEGE_APAAS_APP = 3
+
+-- RTM2 resource types
+local RTM2_RESOURCE_MESSAGE_CHANNELS = 0
+local RTM2_RESOURCE_STREAM_CHANNELS = 1
+local RTM2_RESOURCE_GROUP_CHANNELS = 2
+local RTM2_RESOURCE_SERVER_GROUPS = 3
+local RTM2_RESOURCE_USERS = 4
+
+-- RTM2 permission types
+local RTM2_PERMISSION_READ = 0
+local RTM2_PERMISSION_WRITE = 1
 
 local get_version
 local is_uuid
@@ -128,6 +150,40 @@ function ServiceRtm:unpack(data)
     return data
 end
 
+local ServiceStreaming = {}
+ServiceStreaming.__index = ServiceStreaming
+
+-- Creates a Streaming service for a channel and numeric user ID or string account.
+local function new_service_streaming(channel_name, account)
+    if account == nil then
+        account = ""
+    elseif account == 0 then
+        account = ""
+    elseif type(account) ~= "string" then
+        account = tostring(account)
+    end
+    local instance = {
+        service = new_service(SERVICE_TYPE_STREAMING),
+        channel_name = channel_name or "",
+        account = account,
+    }
+    setmetatable(instance, ServiceStreaming)
+    return instance
+end
+
+-- Packs a Streaming service payload.
+function ServiceStreaming:pack()
+    return self.service:pack() .. utils.pack_string(self.channel_name) .. utils.pack_string(self.account)
+end
+
+-- Unpacks a Streaming service payload and returns the remaining data.
+function ServiceStreaming:unpack(data)
+    data = self.service:unpack(data)
+    self.channel_name, data = utils.unpack_string(data)
+    self.account, data = utils.unpack_string(data)
+    return data
+end
+
 local ServiceFpa = {}
 ServiceFpa.__index = ServiceFpa
 
@@ -176,6 +232,40 @@ function ServiceChat:unpack(data)
     return data
 end
 
+local ServiceFCdn = {}
+ServiceFCdn.__index = ServiceFCdn
+
+-- Creates an FCDN service for a channel and numeric user ID or string account.
+local function new_service_fcdn(channel_name, account)
+    if account == nil then
+        account = ""
+    elseif account == 0 then
+        account = ""
+    elseif type(account) ~= "string" then
+        account = tostring(account)
+    end
+    local instance = {
+        service = new_service(SERVICE_TYPE_FCDN),
+        channel_name = channel_name or "",
+        account = account,
+    }
+    setmetatable(instance, ServiceFCdn)
+    return instance
+end
+
+-- Packs an FCDN service payload.
+function ServiceFCdn:pack()
+    return self.service:pack() .. utils.pack_string(self.channel_name) .. utils.pack_string(self.account)
+end
+
+-- Unpacks an FCDN service payload and returns the remaining data.
+function ServiceFCdn:unpack(data)
+    data = self.service:unpack(data)
+    self.channel_name, data = utils.unpack_string(data)
+    self.account, data = utils.unpack_string(data)
+    return data
+end
+
 local ServiceApaas = {}
 ServiceApaas.__index = ServiceApaas
 
@@ -204,6 +294,118 @@ function ServiceApaas:unpack(data)
     self.user_uuid, data = utils.unpack_string(data)
     self.role, data = utils.unpack_int16(data)
     return data
+end
+
+local Rtm2Permissions = {}
+Rtm2Permissions.__index = Rtm2Permissions
+
+-- Creates an empty RTM2 resource permission set.
+local function new_rtm2_permissions()
+    local instance = { details = {} }
+    setmetatable(instance, Rtm2Permissions)
+    return instance
+end
+
+-- Adds or replaces resources for an RTM2 resource and permission type.
+function Rtm2Permissions:add(resource_type, permission_type, resources)
+    if not self.details[resource_type] then
+        self.details[resource_type] = {}
+    end
+
+    local copied_resources = {}
+    for _, resource in ipairs(resources) do
+        table.insert(copied_resources, resource)
+    end
+    self.details[resource_type][permission_type] = copied_resources
+end
+
+-- Packs RTM2 resource permissions in stable numeric key order.
+function Rtm2Permissions:pack()
+    local resource_types = {}
+    for resource_type in pairs(self.details) do
+        table.insert(resource_types, resource_type)
+    end
+    table.sort(resource_types)
+
+    local data = utils.pack_uint16(#resource_types)
+    for _, resource_type in ipairs(resource_types) do
+        local permission_map = self.details[resource_type]
+        local permission_types = {}
+        for permission_type in pairs(permission_map) do
+            table.insert(permission_types, permission_type)
+        end
+        table.sort(permission_types)
+
+        data = data .. utils.pack_uint16(resource_type) .. utils.pack_uint16(#permission_types)
+        for _, permission_type in ipairs(permission_types) do
+            local resources = permission_map[permission_type]
+            data = data .. utils.pack_uint16(permission_type) .. utils.pack_uint16(#resources)
+            for _, resource in ipairs(resources) do
+                data = data .. utils.pack_string(resource)
+            end
+        end
+    end
+
+    return data
+end
+
+
+-- Unpacks RTM2 resource permissions and returns the remaining data.
+function Rtm2Permissions:unpack(data)
+    self.details = {}
+    local resource_count
+    resource_count, data = utils.unpack_uint16(data)
+
+    for _ = 1, resource_count do
+        local resource_type
+        local permission_count
+        resource_type, data = utils.unpack_uint16(data)
+        permission_count, data = utils.unpack_uint16(data)
+
+        for _ = 1, permission_count do
+            local permission_type
+            local resource_list_count
+            permission_type, data = utils.unpack_uint16(data)
+            resource_list_count, data = utils.unpack_uint16(data)
+
+            local resources = {}
+            for _ = 1, resource_list_count do
+                local resource
+                resource, data = utils.unpack_string(data)
+                table.insert(resources, resource)
+            end
+            self:add(resource_type, permission_type, resources)
+        end
+    end
+
+    return data
+end
+
+local ServiceRtm2 = {}
+ServiceRtm2.__index = ServiceRtm2
+
+-- Creates an RTM2 service with resource-level permissions.
+local function new_service_rtm2(user_id, permissions)
+    local instance = {
+        service = new_service(SERVICE_TYPE_RTM2),
+        user_id = user_id,
+        permissions = permissions or new_rtm2_permissions(),
+    }
+    setmetatable(instance, ServiceRtm2)
+    return instance
+end
+
+-- Packs an RTM2 service payload.
+function ServiceRtm2:pack()
+    return self.service:pack() .. utils.pack_string(self.user_id) .. self.permissions:pack()
+end
+
+-- Unpacks an RTM2 service payload and returns the remaining data.
+function ServiceRtm2:unpack(data)
+    data = self.service:unpack(data)
+    self.user_id, data = utils.unpack_string(data)
+    self.permissions = new_rtm2_permissions()
+    return self.permissions:unpack(data)
 end
 
 local AccessToken = {}
@@ -424,12 +626,18 @@ function AccessToken:new_service(service_type)
         return new_service_rtc("", "")
     elseif service_type == SERVICE_TYPE_RTM then
         return new_service_rtm("")
+    elseif service_type == SERVICE_TYPE_STREAMING then
+        return new_service_streaming("", "")
     elseif service_type == SERVICE_TYPE_FPA then
         return new_service_fpa()
     elseif service_type == SERVICE_TYPE_CHAT then
         return new_service_chat("")
+    elseif service_type == SERVICE_TYPE_FCDN then
+        return new_service_fcdn("", "")
     elseif service_type == SERVICE_TYPE_APAAS then
         return new_service_apaas("", "", -1)
+    elseif service_type == SERVICE_TYPE_RTM2 then
+        return new_service_rtm2("")
     end
 
     return nil
@@ -463,27 +671,49 @@ return {
     new_service = new_service,
     new_service_rtc = new_service_rtc,
     new_service_rtm = new_service_rtm,
+    new_service_streaming = new_service_streaming,
     new_service_fpa = new_service_fpa,
     new_service_chat = new_service_chat,
+    new_service_fcdn = new_service_fcdn,
     new_service_apaas = new_service_apaas,
+    new_rtm2_permissions = new_rtm2_permissions,
+    new_service_rtm2 = new_service_rtm2,
     PRIVILEGE_JOIN_CHANNEL = PRIVILEGE_JOIN_CHANNEL,
     PRIVILEGE_PUBLISH_AUDIO_STREAM = PRIVILEGE_PUBLISH_AUDIO_STREAM,
     PRIVILEGE_PUBLISH_VIDEO_STREAM = PRIVILEGE_PUBLISH_VIDEO_STREAM,
     PRIVILEGE_PUBLISH_DATA_STREAM = PRIVILEGE_PUBLISH_DATA_STREAM,
     PRIVILEGE_LOGIN = PRIVILEGE_LOGIN,
+    PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM = PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM,
+    PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM = PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM,
+    PRIVILEGE_FCDN_PUBLISH = PRIVILEGE_FCDN_PUBLISH,
+    PRIVILEGE_FCDN_PLAY = PRIVILEGE_FCDN_PLAY,
     PRIVILEGE_CHAT_USER = PRIVILEGE_CHAT_USER,
     PRIVILEGE_CHAT_APP = PRIVILEGE_CHAT_APP,
     PRIVILEGE_APAAS_ROOM_USER = PRIVILEGE_APAAS_ROOM_USER,
     PRIVILEGE_APAAS_USER = PRIVILEGE_APAAS_USER,
     PRIVILEGE_APAAS_APP = PRIVILEGE_APAAS_APP,
+    RTM2_RESOURCE_MESSAGE_CHANNELS = RTM2_RESOURCE_MESSAGE_CHANNELS,
+    RTM2_RESOURCE_STREAM_CHANNELS = RTM2_RESOURCE_STREAM_CHANNELS,
+    RTM2_RESOURCE_GROUP_CHANNELS = RTM2_RESOURCE_GROUP_CHANNELS,
+    RTM2_RESOURCE_SERVER_GROUPS = RTM2_RESOURCE_SERVER_GROUPS,
+    RTM2_RESOURCE_USERS = RTM2_RESOURCE_USERS,
+    RTM2_PERMISSION_READ = RTM2_PERMISSION_READ,
+    RTM2_PERMISSION_WRITE = RTM2_PERMISSION_WRITE,
     SERVICE_TYPE_RTC = SERVICE_TYPE_RTC,
     SERVICE_TYPE_RTM = SERVICE_TYPE_RTM,
+    SERVICE_TYPE_STREAMING = SERVICE_TYPE_STREAMING,
     SERVICE_TYPE_FPA = SERVICE_TYPE_FPA,
     SERVICE_TYPE_CHAT = SERVICE_TYPE_CHAT,
+    SERVICE_TYPE_FCDN = SERVICE_TYPE_FCDN,
     SERVICE_TYPE_APAAS = SERVICE_TYPE_APAAS,
+    SERVICE_TYPE_RTM2 = SERVICE_TYPE_RTM2,
     ServiceRtc = ServiceRtc,
     ServiceRtm = ServiceRtm,
+    ServiceStreaming = ServiceStreaming,
     ServiceFpa = ServiceFpa,
     ServiceChat = ServiceChat,
+    ServiceFCdn = ServiceFCdn,
     ServiceApaas = ServiceApaas,
+    Rtm2Permissions = Rtm2Permissions,
+    ServiceRtm2 = ServiceRtm2,
 }

@@ -1,6 +1,7 @@
 package io.agora.rtm;
 
 import io.agora.media.AccessToken2;
+import java.util.Arrays;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -28,5 +29,29 @@ public class RtmTokenBuilder2Test {
         assertEquals(expire, accessToken.expire);
         assertEquals(userId, ((AccessToken2.ServiceRtm)accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0)).getUserId());
         assertEquals(expire, (int)accessToken.getServices(AccessToken2.SERVICE_TYPE_RTM).get(0).getPrivileges().get(AccessToken2.PrivilegeRtm.PRIVILEGE_LOGIN.intValue));
+    }
+
+    /**
+     * Verifies RTM2 permission token generation, parsing, and signature validation.
+     */
+    @Test
+    public void buildTokenWithPermissions() {
+        AccessToken2.ServiceRtm2.Permissions permissions = new AccessToken2.ServiceRtm2.Permissions();
+        permissions.add(AccessToken2.ServiceRtm2.Permissions.MESSAGE_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.READ, Arrays.asList("message-a", "message-b"));
+        permissions.add(AccessToken2.ServiceRtm2.Permissions.STREAM_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.WRITE, Arrays.asList("stream-a"));
+
+        RtmTokenBuilder2 builder = new RtmTokenBuilder2();
+        String token = builder.buildTokenWithPermissions(appId, appCertificate, userId, permissions, expire);
+        AccessToken2 parser = new AccessToken2();
+
+        assertTrue(parser.parse(token));
+        assertTrue(parser.verifySignature(appCertificate));
+        AccessToken2.ServiceRtm2 service = (AccessToken2.ServiceRtm2)
+                parser.getServices(AccessToken2.SERVICE_TYPE_RTM2).get(0);
+        assertEquals(userId, service.userId);
+        assertEquals(permissions.details, service.permissions.details);
+        assertEquals(expire, (int) service.privileges.get(AccessToken2.PrivilegeRtm2.PRIVILEGE_LOGIN.intValue));
     }
 }

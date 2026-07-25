@@ -30,4 +30,31 @@ public class RtmTokenBuilder2 {
             return "";
         }
     }
+
+    /**
+     * Builds an RTM2 token with resource-level permissions.
+     *
+     * <p>This special interface requires Agora assistance for proper usage.</p>
+     *
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param userId The user's account, max length is 64 bytes.
+     * @param permissions The RTM2 resource-level permissions.
+     * @param expire The number of seconds from now before the token expires.
+     * @return The RTM2 token.
+     */
+    public String buildTokenWithPermissions(String appId, String appCertificate, String userId,
+                                            AccessToken2.ServiceRtm2.Permissions permissions, int expire) {
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        AccessToken2.Service serviceRtm2 = new AccessToken2.ServiceRtm2(userId, permissions);
+        serviceRtm2.addPrivilegeRtm2(AccessToken2.PrivilegeRtm2.PRIVILEGE_LOGIN, expire);
+        accessToken.addService(serviceRtm2);
+
+        try {
+            return accessToken.build();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
 }

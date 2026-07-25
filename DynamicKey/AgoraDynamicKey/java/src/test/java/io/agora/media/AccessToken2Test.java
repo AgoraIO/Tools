@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.Test;
 
 /**
@@ -229,6 +232,125 @@ public class AccessToken2Test {
         assertEquals(1, parser.getServices(AccessToken2.SERVICE_TYPE_RTM).size());
         assertTrue(parser.verifySignature(appCertificate));
         assertFalse(parser.verifySignature("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+
+    /**
+     * Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+     */
+    @Test
+    public void parseExtendedServicesFromCpp() {
+        String token = "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ==";
+        AccessToken2 parser = new AccessToken2();
+
+        assertTrue(parser.parse(token));
+        assertTrue(parser.verifySignature(appCertificate));
+
+        AccessToken2.ServiceStreaming streaming = (AccessToken2.ServiceStreaming)
+                parser.getServices(AccessToken2.SERVICE_TYPE_STREAMING).get(0);
+        assertEquals(channelName, streaming.channelName);
+        assertEquals(uid, streaming.account);
+        assertEquals(expire, (int) streaming.privileges.get(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_MIX_STREAM.intValue));
+        assertEquals(expire, (int) streaming.privileges.get(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_RAW_STREAM.intValue));
+
+        AccessToken2.ServiceFCdn fcdn = (AccessToken2.ServiceFCdn)
+                parser.getServices(AccessToken2.SERVICE_TYPE_FCDN).get(0);
+        assertEquals(channelName, fcdn.channelName);
+        assertEquals(uid, fcdn.account);
+        assertEquals(expire, (int) fcdn.privileges.get(AccessToken2.PrivilegeFCdn.PRIVILEGE_PUBLISH.intValue));
+        assertEquals(expire, (int) fcdn.privileges.get(AccessToken2.PrivilegeFCdn.PRIVILEGE_PLAY.intValue));
+
+        AccessToken2.ServiceRtm2 rtm2 = (AccessToken2.ServiceRtm2)
+                parser.getServices(AccessToken2.SERVICE_TYPE_RTM2).get(0);
+        AccessToken2.ServiceRtm2.Permissions expected = new AccessToken2.ServiceRtm2.Permissions();
+        expected.add(AccessToken2.ServiceRtm2.Permissions.MESSAGE_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.READ, Arrays.asList("message-a", "message-b"));
+        expected.add(AccessToken2.ServiceRtm2.Permissions.STREAM_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.WRITE, Arrays.asList("stream-a"));
+        expected.add(AccessToken2.ServiceRtm2.Permissions.USERS,
+                AccessToken2.ServiceRtm2.Permissions.READ, Arrays.asList("user-a"));
+        assertEquals(userId, rtm2.userId);
+        assertEquals(expected.details, rtm2.permissions.details);
+    }
+
+    /**
+     * Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+     */
+    @Test
+    public void extendedServiceNumericUidConversion() throws Exception {
+        AccessToken2 token = new AccessToken2(appId, appCertificate, expire);
+        token.issueTs = issueTs;
+        token.salt = salt;
+        AccessToken2.ServiceStreaming streamingUid = new AccessToken2.ServiceStreaming(channelName, 2882341273L);
+        streamingUid.addPrivilegeStreaming(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_MIX_STREAM, expire);
+        token.addService(streamingUid);
+        AccessToken2.ServiceStreaming streamingWildcard = new AccessToken2.ServiceStreaming(channelName, 0L);
+        streamingWildcard.addPrivilegeStreaming(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_RAW_STREAM, expire);
+        token.addService(streamingWildcard);
+        AccessToken2.ServiceStreaming streamingAccount = new AccessToken2.ServiceStreaming(channelName, "stream-account");
+        streamingAccount.addPrivilegeStreaming(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_MIX_STREAM, expire);
+        streamingAccount.addPrivilegeStreaming(AccessToken2.PrivilegeStreaming.PRIVILEGE_PUBLISH_RAW_STREAM, expire);
+        token.addService(streamingAccount);
+        AccessToken2.ServiceFCdn fcdnUid = new AccessToken2.ServiceFCdn(channelName, 2882341273L);
+        fcdnUid.addPrivilegeFCdn(AccessToken2.PrivilegeFCdn.PRIVILEGE_PUBLISH, expire);
+        token.addService(fcdnUid);
+        AccessToken2.ServiceFCdn fcdnWildcard = new AccessToken2.ServiceFCdn(channelName, 0L);
+        fcdnWildcard.addPrivilegeFCdn(AccessToken2.PrivilegeFCdn.PRIVILEGE_PLAY, expire);
+        token.addService(fcdnWildcard);
+        AccessToken2.ServiceFCdn fcdnAccount = new AccessToken2.ServiceFCdn(channelName, "fcdn-account");
+        fcdnAccount.addPrivilegeFCdn(AccessToken2.PrivilegeFCdn.PRIVILEGE_PUBLISH, expire);
+        fcdnAccount.addPrivilegeFCdn(AccessToken2.PrivilegeFCdn.PRIVILEGE_PLAY, expire);
+        token.addService(fcdnAccount);
+
+        String encoded = token.build();
+        assertEquals(
+                "007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X",
+                encoded);
+        AccessToken2 parsed = new AccessToken2();
+        assertTrue(parsed.parse(encoded));
+        assertEquals("2882341273", ((AccessToken2.ServiceStreaming)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_STREAMING).get(0)).account);
+        assertEquals("", ((AccessToken2.ServiceStreaming)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_STREAMING).get(1)).account);
+        assertEquals("stream-account", ((AccessToken2.ServiceStreaming)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_STREAMING).get(2)).account);
+        assertEquals("2882341273", ((AccessToken2.ServiceFCdn)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_FCDN).get(0)).account);
+        assertEquals("", ((AccessToken2.ServiceFCdn)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_FCDN).get(1)).account);
+        assertEquals("fcdn-account", ((AccessToken2.ServiceFCdn)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_FCDN).get(2)).account);
+
+    }
+
+    /**
+     * Generates and parses an RTM2 token whose uncompressed payload exceeds the initial buffer capacity.
+     */
+    @Test
+    public void largeRtm2PermissionPayload() throws Exception {
+        List<String> resources = new ArrayList<>();
+        for (int i = 0; i < 160; i++) {
+            resources.add(String.format("resource-%04d", i));
+        }
+
+        AccessToken2.ServiceRtm2.Permissions permissions = new AccessToken2.ServiceRtm2.Permissions();
+        permissions.add(AccessToken2.ServiceRtm2.Permissions.USERS,
+                AccessToken2.ServiceRtm2.Permissions.READ, resources);
+        AccessToken2.ServiceRtm2 service = new AccessToken2.ServiceRtm2(userId, permissions);
+        service.addPrivilegeRtm2(AccessToken2.PrivilegeRtm2.PRIVILEGE_LOGIN, expire);
+
+        AccessToken2 accessToken = new AccessToken2(appId, appCertificate, expire);
+        accessToken.issueTs = issueTs;
+        accessToken.salt = salt;
+        accessToken.addService(service);
+
+        AccessToken2 parsed = new AccessToken2();
+        assertTrue(parsed.parse(accessToken.build()));
+        assertTrue(parsed.verifySignature(appCertificate));
+        AccessToken2.ServiceRtm2 parsedService = (AccessToken2.ServiceRtm2)
+                parsed.getServices(AccessToken2.SERVICE_TYPE_RTM2).get(0);
+        assertEquals(resources, parsedService.permissions.details
+                .get(AccessToken2.ServiceRtm2.Permissions.USERS)
+                .get(AccessToken2.ServiceRtm2.Permissions.READ));
     }
 
     /**

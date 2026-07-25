@@ -18,6 +18,23 @@ module AgoraDynamicKey2
       access_token.add_service(service_rtm)
       access_token.build
     end
+
+    # Builds an RTM2 token with resource-level permissions.
+    #
+    # This special interface requires Agora assistance for proper usage.
+    # @param app_id [String] The App ID issued to you by Agora.
+    # @param app_certificate [String] The application certificate registered in the Agora Dashboard.
+    # @param user_id [String] The user's account, max length is 64 bytes.
+    # @param permissions [ServiceRtm2::Permissions] The RTM2 resource-level permissions.
+    # @param expire [Integer] The number of seconds from now before the token expires.
+    # @return [String] The RTM2 token.
+    def self.build_token_with_permissions(app_id, app_certificate, user_id, permissions, expire = 0)
+      access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
+      service_rtm2 = AgoraDynamicKey2::ServiceRtm2.new(user_id, permissions)
+
+      service_rtm2.add_privilege(AgoraDynamicKey2::ServiceRtm2::PRIVILEGE_LOGIN, expire)
+      access_token.add_service(service_rtm2)
+      access_token.build
+    end
   end
 end
-

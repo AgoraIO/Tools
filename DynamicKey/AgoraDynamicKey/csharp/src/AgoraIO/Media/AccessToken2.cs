@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -51,9 +52,18 @@ namespace AgoraIO.Media
 
         public static short SERVICE_TYPE_RTC = 1;
         public static short SERVICE_TYPE_RTM = 2;
+        public static short SERVICE_TYPE_STREAMING = 3;
         public static short SERVICE_TYPE_FPA = 4;
         public static short SERVICE_TYPE_CHAT = 5;
+        public static short SERVICE_TYPE_FCDN = 6;
         public static short SERVICE_TYPE_APAAS = 7;
+        public static short SERVICE_TYPE_RTM2 = 8;
+
+        // Converts a numeric user ID to the account representation used by Token007.
+        private static string getAccountFromUid(uint uid)
+        {
+            return uid == 0 ? "" : uid.ToString(CultureInfo.InvariantCulture);
+        }
 
         // Creates a known service for token parsing.
         public Service getService(short serviceType)
@@ -66,6 +76,10 @@ namespace AgoraIO.Media
             {
                 return new ServiceRtm();
             }
+            if (serviceType == SERVICE_TYPE_STREAMING)
+            {
+                return new ServiceStreaming();
+            }
             if (serviceType == SERVICE_TYPE_FPA)
             {
                 return new ServiceFpa();
@@ -74,9 +88,17 @@ namespace AgoraIO.Media
             {
                 return new ServiceChat();
             }
+            if (serviceType == SERVICE_TYPE_FCDN)
+            {
+                return new ServiceFCdn();
+            }
             if (serviceType == SERVICE_TYPE_APAAS)
             {
                 return new ServiceApaas();
+            }
+            if (serviceType == SERVICE_TYPE_RTM2)
+            {
+                return new ServiceRtm2();
             }
             throw new ArgumentException("unknown service type:", serviceType.ToString());
         }
@@ -227,6 +249,10 @@ namespace AgoraIO.Media
             {
                 return new ServiceRtm();
             }
+            if (serviceType == SERVICE_TYPE_STREAMING)
+            {
+                return new ServiceStreaming();
+            }
             if (serviceType == SERVICE_TYPE_FPA)
             {
                 return new ServiceFpa();
@@ -235,9 +261,17 @@ namespace AgoraIO.Media
             {
                 return new ServiceChat();
             }
+            if (serviceType == SERVICE_TYPE_FCDN)
+            {
+                return new ServiceFCdn();
+            }
             if (serviceType == SERVICE_TYPE_APAAS)
             {
                 return new ServiceApaas();
+            }
+            if (serviceType == SERVICE_TYPE_RTM2)
+            {
+                return new ServiceRtm2();
             }
             return null;
         }
@@ -255,6 +289,12 @@ namespace AgoraIO.Media
             PRIVILEGE_LOGIN = 1
         }
 
+        public enum PrivilegeStreamingEnum
+        {
+            PRIVILEGE_PUBLISH_MIX_STREAM = 1,
+            PRIVILEGE_PUBLISH_RAW_STREAM = 2
+        }
+
         public enum PrivilegeFpaEnum
         {
             PRIVILEGE_LOGIN = 1
@@ -265,11 +305,22 @@ namespace AgoraIO.Media
             PRIVILEGE_CHAT_USER = 1,
             PRIVILEGE_CHAT_APP = 2
         }
+
+        public enum PrivilegeFCdnEnum
+        {
+            PRIVILEGE_PUBLISH = 1,
+            PRIVILEGE_PLAY = 2
+        }
         public enum PrivilegeApaasEnum
         {
             PRIVILEGE_ROOM_USER = 1,
             PRIVILEGE_USER = 2,
             PRIVILEGE_APP = 3
+        }
+
+        public enum PrivilegeRtm2Enum
+        {
+            PRIVILEGE_LOGIN = 1
         }
 
         public class Service
@@ -301,6 +352,12 @@ namespace AgoraIO.Media
                 _privileges.Add((ushort)privilege, expire);
             }
 
+            // Adds a Streaming privilege and its expiration timestamp.
+            public void addPrivilegeStreaming(PrivilegeStreamingEnum privilege, uint expire)
+            {
+                _privileges.Add((ushort)privilege, expire);
+            }
+
             // Adds an FPA privilege and its expiration timestamp.
             public void addPrivilegeFpa(PrivilegeFpaEnum privilege, uint expire)
             {
@@ -313,8 +370,20 @@ namespace AgoraIO.Media
                 _privileges.Add((ushort)privilege, expire);
             }
 
+            // Adds an FCDN privilege and its expiration timestamp.
+            public void addPrivilegeFCdn(PrivilegeFCdnEnum privilege, uint expire)
+            {
+                _privileges.Add((ushort)privilege, expire);
+            }
+
             // Adds an APaaS privilege and its expiration timestamp.
             public void addPrivilegeApaas(PrivilegeApaasEnum privilege, uint expire)
+            {
+                _privileges.Add((ushort)privilege, expire);
+            }
+
+            // Adds an RTM2 privilege and its expiration timestamp.
+            public void addPrivilegeRtm2(PrivilegeRtm2Enum privilege, uint expire)
             {
                 _privileges.Add((ushort)privilege, expire);
             }
@@ -433,6 +502,44 @@ namespace AgoraIO.Media
             }
         }
 
+        public class ServiceStreaming : Service
+        {
+            public string _channelName;
+            public string _account;
+
+            // Creates an empty Streaming service for token parsing.
+            public ServiceStreaming() : this("", "")
+            {
+            }
+
+            // Creates a Streaming service for a channel and user account.
+            public ServiceStreaming(string channelName, string account)
+            {
+                setServiceType(SERVICE_TYPE_STREAMING);
+                _channelName = channelName;
+                _account = account;
+            }
+
+            // Creates a Streaming service with a numeric user ID.
+            public ServiceStreaming(string channelName, uint uid) : this(channelName, getAccountFromUid(uid))
+            {
+            }
+
+            // Packs the Streaming service payload into the token buffer.
+            public override ByteBuf pack(ByteBuf buf)
+            {
+                return base.pack(buf).put(_channelName.getBytes()).put(_account.getBytes());
+            }
+
+            // Unpacks the Streaming service payload from the token buffer.
+            public override void unpack(ByteBuf byteBuf)
+            {
+                base.unpack(byteBuf);
+                _channelName = byteBuf.readBytes().getString();
+                _account = byteBuf.readBytes().getString();
+            }
+        }
+
         public class ServiceFpa : Service
         {
             // Creates an FPA service.
@@ -489,6 +596,44 @@ namespace AgoraIO.Media
             {
                 base.unpack(byteBuf);
                 _userId = byteBuf.readBytes().getString();
+            }
+        }
+
+        public class ServiceFCdn : Service
+        {
+            public string _channelName;
+            public string _account;
+
+            // Creates an empty FCDN service for token parsing.
+            public ServiceFCdn() : this("", "")
+            {
+            }
+
+            // Creates an FCDN service for a channel and user account.
+            public ServiceFCdn(string channelName, string account)
+            {
+                setServiceType(SERVICE_TYPE_FCDN);
+                _channelName = channelName;
+                _account = account;
+            }
+
+            // Creates an FCDN service with a numeric user ID.
+            public ServiceFCdn(string channelName, uint uid) : this(channelName, getAccountFromUid(uid))
+            {
+            }
+
+            // Packs the FCDN service payload into the token buffer.
+            public override ByteBuf pack(ByteBuf buf)
+            {
+                return base.pack(buf).put(_channelName.getBytes()).put(_account.getBytes());
+            }
+
+            // Unpacks the FCDN service payload from the token buffer.
+            public override void unpack(ByteBuf byteBuf)
+            {
+                base.unpack(byteBuf);
+                _channelName = byteBuf.readBytes().getString();
+                _account = byteBuf.readBytes().getString();
             }
         }
 
@@ -556,6 +701,94 @@ namespace AgoraIO.Media
                 _roomUuid = byteBuf.readBytes().getString();
                 _userUuid = byteBuf.readBytes().getString();
                 _role = (short)byteBuf.readShort();
+            }
+        }
+
+        public class ServiceRtm2 : Service
+        {
+            public string _userId;
+            public Permissions _permissions;
+
+            public class Permissions
+            {
+                public const ushort MESSAGE_CHANNELS = 0;
+                public const ushort STREAM_CHANNELS = 1;
+                public const ushort GROUP_CHANNELS = 2;
+                public const ushort SERVER_GROUPS = 3;
+                public const ushort USERS = 4;
+
+                public const ushort READ = 0;
+                public const ushort WRITE = 1;
+
+                public SortedDictionary<ushort, SortedDictionary<ushort, List<string>>> details =
+                    new SortedDictionary<ushort, SortedDictionary<ushort, List<string>>>();
+
+                // Adds or replaces resources for a resource and permission type.
+                public void add(ushort resourceType, ushort permissionType, IEnumerable<string> resources)
+                {
+                    if (!details.ContainsKey(resourceType))
+                    {
+                        details[resourceType] = new SortedDictionary<ushort, List<string>>();
+                    }
+                    details[resourceType][permissionType] = new List<string>(resources);
+                }
+            }
+
+            // Creates an empty RTM2 service for token parsing.
+            public ServiceRtm2() : this("", new Permissions())
+            {
+            }
+
+            // Creates an RTM2 service for a user and permission set.
+            public ServiceRtm2(string userId, Permissions permissions)
+            {
+                setServiceType(SERVICE_TYPE_RTM2);
+                _userId = userId;
+                _permissions = permissions ?? new Permissions();
+            }
+
+            // Packs the RTM2 service payload into the token buffer.
+            public override ByteBuf pack(ByteBuf buf)
+            {
+                base.pack(buf).put(_userId.getBytes()).put((ushort)_permissions.details.Count);
+                foreach (var resourceEntry in _permissions.details)
+                {
+                    buf.put(resourceEntry.Key).put((ushort)resourceEntry.Value.Count);
+                    foreach (var permissionEntry in resourceEntry.Value)
+                    {
+                        buf.put(permissionEntry.Key).put((ushort)permissionEntry.Value.Count);
+                        foreach (string resource in permissionEntry.Value)
+                        {
+                            buf.put(resource.getBytes());
+                        }
+                    }
+                }
+                return buf;
+            }
+
+            // Unpacks the RTM2 service payload from the token buffer.
+            public override void unpack(ByteBuf byteBuf)
+            {
+                base.unpack(byteBuf);
+                _userId = byteBuf.readBytes().getString();
+                _permissions = new Permissions();
+                ushort resourceTypeCount = byteBuf.readShort();
+                for (ushort i = 0; i < resourceTypeCount; i++)
+                {
+                    ushort resourceType = byteBuf.readShort();
+                    ushort permissionCount = byteBuf.readShort();
+                    for (ushort j = 0; j < permissionCount; j++)
+                    {
+                        ushort permissionType = byteBuf.readShort();
+                        ushort resourceCount = byteBuf.readShort();
+                        List<string> resources = new List<string>();
+                        for (ushort k = 0; k < resourceCount; k++)
+                        {
+                            resources.Add(byteBuf.readBytes().getString());
+                        }
+                        _permissions.add(resourceType, permissionType, resources);
+                    }
+                }
             }
         }
     }

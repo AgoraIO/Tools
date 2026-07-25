@@ -21,4 +21,32 @@ describe 'AgoraDynamicKey2::RtmTokenBuilder' do
     expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.type).to eq(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE)
     expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
   end
+
+
+  # Builds, parses, and verifies an RTM2 resource permission token.
+  it 'test_build_token_with_permissions' do
+    permissions = AgoraDynamicKey2::ServiceRtm2::Permissions.new
+    permissions.add(
+      AgoraDynamicKey2::ServiceRtm2::Permissions::MESSAGE_CHANNELS,
+      AgoraDynamicKey2::ServiceRtm2::Permissions::READ,
+      %w[message-a message-b]
+    )
+    permissions.add(
+      AgoraDynamicKey2::ServiceRtm2::Permissions::STREAM_CHANNELS,
+      AgoraDynamicKey2::ServiceRtm2::Permissions::WRITE,
+      ['stream-a']
+    )
+
+    token = AgoraDynamicKey2::RtmTokenBuilder.build_token_with_permissions(
+      app_id, app_certificate, user_id, permissions, expire
+    )
+    access_token = AgoraDynamicKey2::AccessToken.new
+
+    expect(access_token.parse(token)).to eq(true)
+    expect(access_token.verify_signature(app_certificate)).to eq(true)
+    service = access_token.get_services(AgoraDynamicKey2::ServiceRtm2::SERVICE_TYPE).first
+    expect(service.user_id).to eq(user_id)
+    expect(service.permissions.details).to eq(permissions.details)
+    expect(service.privileges[AgoraDynamicKey2::ServiceRtm2::PRIVILEGE_LOGIN]).to eq(expire)
+  end
 end

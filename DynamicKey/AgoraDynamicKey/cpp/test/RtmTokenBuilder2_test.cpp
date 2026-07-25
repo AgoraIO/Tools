@@ -48,7 +48,7 @@ class RtmTokenBuilder2_test : public testing::Test {
     ServiceRtm2::Permissions permissions;
     permissions.Add(ServiceRtm2::Permissions::kMessageChannels, ServiceRtm2::Permissions::kRead, {"message-a", "message-b"});
     permissions.Add(ServiceRtm2::Permissions::kStreamChannels, ServiceRtm2::Permissions::kWrite, {"stream-a"});
-    permissions.Add(ServiceRtm2::Permissions::kGourpChannels, ServiceRtm2::Permissions::kRead, {"group-a"});
+    permissions.Add(ServiceRtm2::Permissions::kGroupChannels, ServiceRtm2::Permissions::kRead, {"group-a"});
     permissions.Add(ServiceRtm2::Permissions::kServerGroups, ServiceRtm2::Permissions::kWrite, {"server-group-a"});
     permissions.Add(ServiceRtm2::Permissions::kUsers, ServiceRtm2::Permissions::kRead, {"user-a"});
 

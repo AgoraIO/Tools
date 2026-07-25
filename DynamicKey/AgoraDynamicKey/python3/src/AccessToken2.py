@@ -101,6 +101,34 @@ class ServiceRtm(Service):
         return buffer
 
 
+class ServiceStreaming(Service):
+    kServiceType = 3
+
+    kPrivilegePublishMixStream = 1
+    kPrivilegePublishRawStream = 2
+
+    def __init__(self, channel_name='', account=''):
+        """Create a Streaming service for a channel and numeric user ID or string account."""
+        if account == 0:
+            account = ''
+        elif not isinstance(account, str):
+            account = str(account)
+        super(ServiceStreaming, self).__init__(ServiceStreaming.kServiceType)
+        self.__channel_name = channel_name.encode('utf-8')
+        self.__account = account.encode('utf-8')
+
+    def pack(self):
+        """Serialize the Streaming service, channel name, and user account."""
+        return super(ServiceStreaming, self).pack() + pack_string(self.__channel_name) + pack_string(self.__account)
+
+    def unpack(self, buffer):
+        """Deserialize Streaming privileges, channel name, and user account."""
+        buffer = super(ServiceStreaming, self).unpack(buffer)
+        self.__channel_name, buffer = unpack_string(buffer)
+        self.__account, buffer = unpack_string(buffer)
+        return buffer
+
+
 class ServiceFpa(Service):
     kServiceType = 4
 
@@ -142,6 +170,34 @@ class ServiceChat(Service):
         return buffer
 
 
+class ServiceFCdn(Service):
+    kServiceType = 6
+
+    kPrivilegePublish = 1
+    kPrivilegePlay = 2
+
+    def __init__(self, channel_name='', account=''):
+        """Create an FCDN service for a channel and numeric user ID or string account."""
+        if account == 0:
+            account = ''
+        elif not isinstance(account, str):
+            account = str(account)
+        super(ServiceFCdn, self).__init__(ServiceFCdn.kServiceType)
+        self.__channel_name = channel_name.encode('utf-8')
+        self.__account = account.encode('utf-8')
+
+    def pack(self):
+        """Serialize the FCDN service, channel name, and user account."""
+        return super(ServiceFCdn, self).pack() + pack_string(self.__channel_name) + pack_string(self.__account)
+
+    def unpack(self, buffer):
+        """Deserialize FCDN privileges, channel name, and user account."""
+        buffer = super(ServiceFCdn, self).unpack(buffer)
+        self.__channel_name, buffer = unpack_string(buffer)
+        self.__account, buffer = unpack_string(buffer)
+        return buffer
+
+
 class ServiceApaas(Service):
     kServiceType = 7
 
@@ -170,13 +226,91 @@ class ServiceApaas(Service):
         return buffer
 
 
+class ServiceRtm2(Service):
+    kServiceType = 8
+
+    kPrivilegeLogin = 1
+
+    class Permissions:
+        kMessageChannels = 0
+        kStreamChannels = 1
+        kGroupChannels = 2
+        kServerGroups = 3
+        kUsers = 4
+
+        kRead = 0
+        kWrite = 1
+
+        def __init__(self):
+            """Create an empty RTM2 permission set."""
+            self.details = {}
+
+        def add(self, resource_type, permission_type, resources):
+            """Add or replace resources for a resource and permission type."""
+            if resource_type not in self.details:
+                self.details[resource_type] = {}
+            self.details[resource_type][permission_type] = list(resources)
+
+    def __init__(self, user_id='', permissions=None):
+        """Create an RTM2 service with resource-level permissions."""
+        super(ServiceRtm2, self).__init__(ServiceRtm2.kServiceType)
+        self.__user_id = user_id.encode('utf-8')
+        self.__permissions = permissions if permissions is not None else ServiceRtm2.Permissions()
+
+    def pack(self):
+        """Serialize the RTM2 service, user ID, and resource permissions."""
+        permissions = pack_uint16(len(self.__permissions.details))
+        for resource_type in sorted(self.__permissions.details):
+            permission_map = self.__permissions.details[resource_type]
+            permissions += pack_uint16(resource_type) + pack_uint16(len(permission_map))
+            for permission_type in sorted(permission_map):
+                resources = permission_map[permission_type]
+                permissions += pack_uint16(permission_type) + pack_uint16(len(resources))
+                for resource in resources:
+                    permissions += pack_string(resource.encode('utf-8'))
+
+        return super(ServiceRtm2, self).pack() + pack_string(self.__user_id) + permissions
+
+    def unpack(self, buffer):
+        """Deserialize RTM2 privileges, user ID, and resource permissions."""
+        buffer = super(ServiceRtm2, self).unpack(buffer)
+        self.__user_id, buffer = unpack_string(buffer)
+        self.__permissions = ServiceRtm2.Permissions()
+        resource_count, buffer = unpack_uint16(buffer)
+
+        for _ in range(resource_count):
+            resource_type, buffer = unpack_uint16(buffer)
+            permission_count, buffer = unpack_uint16(buffer)
+            for _ in range(permission_count):
+                permission_type, buffer = unpack_uint16(buffer)
+                resource_count, buffer = unpack_uint16(buffer)
+                resources = []
+                for _ in range(resource_count):
+                    resource, buffer = unpack_string(buffer)
+                    resources.append(resource.decode('utf-8'))
+                self.__permissions.add(resource_type, permission_type, resources)
+
+        return buffer
+
+    def get_user_id(self):
+        """Return the RTM2 user ID."""
+        return self.__user_id.decode('utf-8')
+
+    def get_permissions(self):
+        """Return the RTM2 resource permissions."""
+        return self.__permissions
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
         ServiceRtm.kServiceType: ServiceRtm,
+        ServiceStreaming.kServiceType: ServiceStreaming,
         ServiceFpa.kServiceType: ServiceFpa,
         ServiceChat.kServiceType: ServiceChat,
+        ServiceFCdn.kServiceType: ServiceFCdn,
         ServiceApaas.kServiceType: ServiceApaas,
+        ServiceRtm2.kServiceType: ServiceRtm2,
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):

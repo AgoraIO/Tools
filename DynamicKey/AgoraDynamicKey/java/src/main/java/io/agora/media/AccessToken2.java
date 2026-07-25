@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -46,6 +47,22 @@ public class AccessToken2 {
     }
 
     /**
+     * Streaming privilege identifiers.
+     */
+    public enum PrivilegeStreaming {
+        PRIVILEGE_PUBLISH_MIX_STREAM(1), PRIVILEGE_PUBLISH_RAW_STREAM(2),;
+
+        public short intValue;
+
+        /**
+         * Creates a Streaming privilege identifier.
+         */
+        PrivilegeStreaming(int value) {
+            intValue = (short) value;
+        }
+    }
+
+    /**
      * FPA privilege identifiers.
      */
     public enum PrivilegeFpa {
@@ -78,6 +95,22 @@ public class AccessToken2 {
     }
 
     /**
+     * FCDN privilege identifiers.
+     */
+    public enum PrivilegeFCdn {
+        PRIVILEGE_PUBLISH(1), PRIVILEGE_PLAY(2),;
+
+        public short intValue;
+
+        /**
+         * Creates an FCDN privilege identifier.
+         */
+        PrivilegeFCdn(int value) {
+            intValue = (short) value;
+        }
+    }
+
+    /**
      * APaaS privilege identifiers.
      */
     public enum PrivilegeApaas {
@@ -93,12 +126,31 @@ public class AccessToken2 {
         }
     }
 
+    /**
+     * RTM2 privilege identifiers.
+     */
+    public enum PrivilegeRtm2 {
+        PRIVILEGE_LOGIN(1),;
+
+        public short intValue;
+
+        /**
+         * Creates an RTM2 privilege identifier.
+         */
+        PrivilegeRtm2(int value) {
+            intValue = (short) value;
+        }
+    }
+
     private static final String VERSION = "007";
     public static final short SERVICE_TYPE_RTC = 1;
     public static final short SERVICE_TYPE_RTM = 2;
+    public static final short SERVICE_TYPE_STREAMING = 3;
     public static final short SERVICE_TYPE_FPA = 4;
     public static final short SERVICE_TYPE_CHAT = 5;
+    public static final short SERVICE_TYPE_FCDN = 6;
     public static final short SERVICE_TYPE_APAAS = 7;
+    public static final short SERVICE_TYPE_RTM2 = 8;
 
     public String appCert = "";
     public String appId = "";
@@ -168,7 +220,7 @@ public class AccessToken2 {
 
         ByteBuf bufferContent = new ByteBuf();
         bufferContent.put(signature);
-        bufferContent.buffer.put(buf.asBytes());
+        bufferContent.copy(buf.asBytes());
 
         return getVersion() + Utils.base64Encode(Utils.compress(bufferContent.asBytes()));
     }
@@ -183,14 +235,23 @@ public class AccessToken2 {
         if (serviceType == SERVICE_TYPE_RTM) {
             return new ServiceRtm();
         }
+        if (serviceType == SERVICE_TYPE_STREAMING) {
+            return new ServiceStreaming();
+        }
         if (serviceType == SERVICE_TYPE_FPA) {
             return new ServiceFpa();
         }
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
         }
+        if (serviceType == SERVICE_TYPE_FCDN) {
+            return new ServiceFCdn();
+        }
         if (serviceType == SERVICE_TYPE_APAAS) {
             return new ServiceApaas();
+        }
+        if (serviceType == SERVICE_TYPE_RTM2) {
+            return new ServiceRtm2();
         }
         return null;
     }
@@ -340,6 +401,13 @@ public class AccessToken2 {
         }
 
         /**
+         * Adds or updates a Streaming privilege expiration timestamp.
+         */
+        public void addPrivilegeStreaming(PrivilegeStreaming privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        /**
          * Adds or updates an FPA privilege expiration timestamp.
          */
         public void addPrivilegeFpa(PrivilegeFpa privilege, int expire) {
@@ -354,9 +422,23 @@ public class AccessToken2 {
         }
 
         /**
+         * Adds or updates an FCDN privilege expiration timestamp.
+         */
+        public void addPrivilegeFCdn(PrivilegeFCdn privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        /**
          * Adds or updates an APaaS privilege expiration timestamp.
          */
         public void addPrivilegeApaas(PrivilegeApaas privilege, int expire) {
+            this.privileges.put(privilege.intValue, expire);
+        }
+
+        /**
+         * Adds or updates an RTM2 privilege expiration timestamp.
+         */
+        public void addPrivilegeRtm2(PrivilegeRtm2 privilege, int expire) {
             this.privileges.put(privilege.intValue, expire);
         }
 
@@ -488,6 +570,53 @@ public class AccessToken2 {
     }
 
     /**
+     * Represents Streaming channel and account privileges.
+     */
+    public static class ServiceStreaming extends Service {
+        public String channelName;
+        public String account;
+
+        /**
+         * Creates an empty Streaming service parser.
+         */
+        public ServiceStreaming() {
+            this("", "");
+        }
+
+        /**
+         * Creates a Streaming service for a channel and user account.
+         */
+        public ServiceStreaming(String channelName, String account) {
+            this.type = SERVICE_TYPE_STREAMING;
+            this.channelName = channelName;
+            this.account = account;
+        }
+
+        /**
+         * Creates a Streaming service with a numeric user ID.
+         */
+        public ServiceStreaming(String channelName, long uid) {
+            this(channelName, uid == 0 ? "" : Long.toString(uid));
+        }
+
+        /**
+         * Serializes the Streaming service payload.
+         */
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf).put(this.channelName).put(this.account);
+        }
+
+        /**
+         * Deserializes the Streaming service payload.
+         */
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+            this.channelName = byteBuf.readString();
+            this.account = byteBuf.readString();
+        }
+    }
+
+    /**
      * Represents FPA login privileges.
      */
     public static class ServiceFpa extends Service {
@@ -555,6 +684,53 @@ public class AccessToken2 {
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
             this.userId = byteBuf.readString();
+        }
+    }
+
+    /**
+     * Represents FCDN channel and account privileges.
+     */
+    public static class ServiceFCdn extends Service {
+        public String channelName;
+        public String account;
+
+        /**
+         * Creates an empty FCDN service parser.
+         */
+        public ServiceFCdn() {
+            this("", "");
+        }
+
+        /**
+         * Creates an FCDN service for a channel and user account.
+         */
+        public ServiceFCdn(String channelName, String account) {
+            this.type = SERVICE_TYPE_FCDN;
+            this.channelName = channelName;
+            this.account = account;
+        }
+
+        /**
+         * Creates an FCDN service with a numeric user ID.
+         */
+        public ServiceFCdn(String channelName, long uid) {
+            this(channelName, uid == 0 ? "" : Long.toString(uid));
+        }
+
+        /**
+         * Serializes the FCDN service payload.
+         */
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf).put(this.channelName).put(this.account);
+        }
+
+        /**
+         * Deserializes the FCDN service payload.
+         */
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+            this.channelName = byteBuf.readString();
+            this.account = byteBuf.readString();
         }
     }
 
@@ -632,6 +808,94 @@ public class AccessToken2 {
             this.roomUuid = byteBuf.readString();
             this.userUuid = byteBuf.readString();
             this.role = byteBuf.readShort();
+        }
+    }
+
+    /**
+     * Represents RTM2 login and resource-level permissions.
+     */
+    public static class ServiceRtm2 extends Service {
+        public String userId;
+        public Permissions permissions;
+
+        /**
+         * Stores RTM2 resource-level permissions in stable numeric key order.
+         */
+        public static class Permissions {
+            public static final short MESSAGE_CHANNELS = 0;
+            public static final short STREAM_CHANNELS = 1;
+            public static final short GROUP_CHANNELS = 2;
+            public static final short SERVER_GROUPS = 3;
+            public static final short USERS = 4;
+
+            public static final short READ = 0;
+            public static final short WRITE = 1;
+
+            public TreeMap<Short, TreeMap<Short, List<String>>> details = new TreeMap<>();
+
+            /**
+             * Adds or replaces resources for a resource and permission type.
+             */
+            public void add(short resourceType, short permissionType, List<String> resources) {
+                this.details.computeIfAbsent(resourceType, key -> new TreeMap<>())
+                        .put(permissionType, new ArrayList<>(resources));
+            }
+        }
+
+        /**
+         * Creates an empty RTM2 service parser.
+         */
+        public ServiceRtm2() {
+            this("", new Permissions());
+        }
+
+        /**
+         * Creates an RTM2 service for a user and permission set.
+         */
+        public ServiceRtm2(String userId, Permissions permissions) {
+            this.type = SERVICE_TYPE_RTM2;
+            this.userId = userId;
+            this.permissions = permissions == null ? new Permissions() : permissions;
+        }
+
+        /**
+         * Serializes the RTM2 service payload.
+         */
+        public ByteBuf pack(ByteBuf buf) {
+            super.pack(buf).put(this.userId).put((short) this.permissions.details.size());
+            for (Map.Entry<Short, TreeMap<Short, List<String>>> resourceEntry : this.permissions.details.entrySet()) {
+                buf.put(resourceEntry.getKey()).put((short) resourceEntry.getValue().size());
+                for (Map.Entry<Short, List<String>> permissionEntry : resourceEntry.getValue().entrySet()) {
+                    buf.put(permissionEntry.getKey()).put((short) permissionEntry.getValue().size());
+                    for (String resource : permissionEntry.getValue()) {
+                        buf.put(resource);
+                    }
+                }
+            }
+            return buf;
+        }
+
+        /**
+         * Deserializes the RTM2 service payload.
+         */
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+            this.userId = byteBuf.readString();
+            this.permissions = new Permissions();
+            int resourceTypeCount = Short.toUnsignedInt(byteBuf.readShort());
+            for (int i = 0; i < resourceTypeCount; i++) {
+                short resourceType = byteBuf.readShort();
+                int permissionCount = Short.toUnsignedInt(byteBuf.readShort());
+                for (int j = 0; j < permissionCount; j++) {
+                    short permissionType = byteBuf.readShort();
+                    int resourceCount = Short.toUnsignedInt(byteBuf.readShort());
+                    List<String> resources = new ArrayList<>();
+                    for (int k = 0; k < resourceCount; k++) {
+                        resources.add(byteBuf.readString());
+                    }
+                    this.permissions.add(resourceType, permissionType, resources);
+                }
+            }
         }
     }
 }

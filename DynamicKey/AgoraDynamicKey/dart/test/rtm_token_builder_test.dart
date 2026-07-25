@@ -30,5 +30,39 @@ void main() {
         tokenExpireSeconds,
       );
     });
+
+    // Verifies RTM2 permission token generation, parsing, and signature validation.
+    test('buildTokenWithPermissions round trips permissions', () {
+      final permissions = Rtm2Permissions()
+        ..add(
+          Rtm2Permissions.messageChannels,
+          Rtm2Permissions.read,
+          ['message-a', 'message-b'],
+        )
+        ..add(
+          Rtm2Permissions.streamChannels,
+          Rtm2Permissions.write,
+          ['stream-a'],
+        );
+
+      final token = RtmTokenBuilder.buildTokenWithPermissions(
+        appId: appId,
+        appCertificate: appCertificate,
+        userId: userId,
+        permissions: permissions,
+        tokenExpireSeconds: tokenExpireSeconds,
+      );
+      final parsed = AccessToken.empty();
+
+      expect(parsed.parse(token), isTrue);
+      expect(parsed.verifySignature(appCertificate), isTrue);
+      final service = parsed.getServices(Service.RTM2).single as ServiceRtm2;
+      expect(service.userId, userId);
+      expect(service.permissions.details, permissions.details);
+      expect(
+        service.privileges[ServiceRtm2.privilegeLogin],
+        tokenExpireSeconds,
+      );
+    });
   });
 }

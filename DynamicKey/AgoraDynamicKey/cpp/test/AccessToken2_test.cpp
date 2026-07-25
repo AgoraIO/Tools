@@ -9,6 +9,7 @@
 #include <gtest/gtest.h>
 
 #include <string>
+#include <vector>
 
 #include "../src/md5/md5.h"
 
@@ -180,17 +181,10 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtm2->permissions_.details_, r_rtm2->permissions_.details_);
   }
 
-  // Verifies deterministic generation and round-trip parsing of a token.
-  void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
-    std::string result = key->Build();
-    EXPECT_EQ(expected, result);
-
-    if (expected.empty()) {
-      return;
-    }
-
+  // Verifies an externally generated token against the expected service state.
+  void VerifyParsedAccessToken2(const std::string &token, AccessToken2 *key) {
     AccessToken2 k7;
-    bool parsed = k7.FromString(result);
+    bool parsed = k7.FromString(token);
     ASSERT_TRUE(parsed);
 
     auto signature = k7.GenerateSignature(app_certificate_);
@@ -225,6 +219,18 @@ class AccessToken2_test : public testing::Test {
 
       (this->*(kVerifyServices.at(k7_it->first)))(k7_s, key_s);
     }
+  }
+
+  // Verifies deterministic generation and round-trip parsing of a token.
+  void VerifyAccessToken2(const std::string &expected, AccessToken2 *key) {
+    std::string result = key->Build();
+    EXPECT_EQ(expected, result);
+
+    if (expected.empty()) {
+      return;
+    }
+
+    VerifyParsedAccessToken2(result, key);
   }
 
   // Tests RTC token generation and parsing with an integer UID.
@@ -466,7 +472,7 @@ class AccessToken2_test : public testing::Test {
     VerifyAccessToken2(xuyang_token, &token);
   }
 
-  // Tests numeric and wildcard user IDs for Streaming and FCDN services.
+  // Tests deterministic generation and UID conversion for Streaming and FCDN services.
   void TestExtendedServiceUidConversion() {
     AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
     token.salt_ = 1;
@@ -479,6 +485,11 @@ class AccessToken2_test : public testing::Test {
     streaming_wildcard->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream, expire_);
     token.AddService(std::move(streaming_wildcard));
 
+    std::unique_ptr<Service> streaming_account(new ServiceStreaming(channel_name_, "stream-account"));
+    streaming_account->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream, expire_);
+    streaming_account->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream, expire_);
+    token.AddService(std::move(streaming_account));
+
     std::unique_ptr<Service> fcdn_uid(new ServiceFCdn(channel_name_, uid_));
     fcdn_uid->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
     token.AddService(std::move(fcdn_uid));
@@ -487,37 +498,75 @@ class AccessToken2_test : public testing::Test {
     fcdn_wildcard->AddPrivilege(ServiceFCdn::kPrivilegePlay, expire_);
     token.AddService(std::move(fcdn_wildcard));
 
+    std::unique_ptr<Service> fcdn_account(new ServiceFCdn(channel_name_, "fcdn-account"));
+    fcdn_account->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+    fcdn_account->AddPrivilege(ServiceFCdn::kPrivilegePlay, expire_);
+    token.AddService(std::move(fcdn_account));
+
+    const std::string expected_token =
+        "007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X";
+    const std::string generated_token = token.Build();
+    EXPECT_EQ(expected_token, generated_token);
+
     AccessToken2 parsed;
-    ASSERT_TRUE(parsed.FromString(token.Build()));
+    ASSERT_TRUE(parsed.FromString(generated_token));
     ASSERT_EQ(kTokenVerifySuccess, parsed.VerifySignature(app_certificate_));
-    ASSERT_EQ(2, parsed.services_.count(ServiceStreaming::kServiceType));
-    ASSERT_EQ(2, parsed.services_.count(ServiceFCdn::kServiceType));
+    ASSERT_EQ(3, parsed.services_.count(ServiceStreaming::kServiceType));
+    ASSERT_EQ(3, parsed.services_.count(ServiceFCdn::kServiceType));
 
     auto streaming_range = parsed.services_.equal_range(ServiceStreaming::kServiceType);
     auto streaming_it = streaming_range.first;
     auto *parsed_streaming_uid = dynamic_cast<ServiceStreaming *>(streaming_it->second.get());
     auto *parsed_streaming_wildcard = dynamic_cast<ServiceStreaming *>((++streaming_it)->second.get());
+    auto *parsed_streaming_account = dynamic_cast<ServiceStreaming *>((++streaming_it)->second.get());
     ASSERT_NE(nullptr, parsed_streaming_uid);
     ASSERT_NE(nullptr, parsed_streaming_wildcard);
+    ASSERT_NE(nullptr, parsed_streaming_account);
     EXPECT_EQ(channel_name_, parsed_streaming_uid->channel_name_);
     EXPECT_EQ(account_, parsed_streaming_uid->account_);
     EXPECT_EQ(expire_, parsed_streaming_uid->privileges_.at(ServiceStreaming::kPrivilegePublishMixStream));
     EXPECT_EQ(channel_name_, parsed_streaming_wildcard->channel_name_);
     EXPECT_EQ("", parsed_streaming_wildcard->account_);
     EXPECT_EQ(expire_, parsed_streaming_wildcard->privileges_.at(ServiceStreaming::kPrivilegePublishRawStream));
+    EXPECT_EQ(channel_name_, parsed_streaming_account->channel_name_);
+    EXPECT_EQ("stream-account", parsed_streaming_account->account_);
+    EXPECT_EQ(expire_, parsed_streaming_account->privileges_.at(ServiceStreaming::kPrivilegePublishMixStream));
+    EXPECT_EQ(expire_, parsed_streaming_account->privileges_.at(ServiceStreaming::kPrivilegePublishRawStream));
 
     auto fcdn_range = parsed.services_.equal_range(ServiceFCdn::kServiceType);
     auto fcdn_it = fcdn_range.first;
     auto *parsed_fcdn_uid = dynamic_cast<ServiceFCdn *>(fcdn_it->second.get());
     auto *parsed_fcdn_wildcard = dynamic_cast<ServiceFCdn *>((++fcdn_it)->second.get());
+    auto *parsed_fcdn_account = dynamic_cast<ServiceFCdn *>((++fcdn_it)->second.get());
     ASSERT_NE(nullptr, parsed_fcdn_uid);
     ASSERT_NE(nullptr, parsed_fcdn_wildcard);
+    ASSERT_NE(nullptr, parsed_fcdn_account);
     EXPECT_EQ(channel_name_, parsed_fcdn_uid->channel_name_);
     EXPECT_EQ(account_, parsed_fcdn_uid->account_);
     EXPECT_EQ(expire_, parsed_fcdn_uid->privileges_.at(ServiceFCdn::kPrivilegePublish));
     EXPECT_EQ(channel_name_, parsed_fcdn_wildcard->channel_name_);
     EXPECT_EQ("", parsed_fcdn_wildcard->account_);
     EXPECT_EQ(expire_, parsed_fcdn_wildcard->privileges_.at(ServiceFCdn::kPrivilegePlay));
+    EXPECT_EQ(channel_name_, parsed_fcdn_account->channel_name_);
+    EXPECT_EQ("fcdn-account", parsed_fcdn_account->account_);
+    EXPECT_EQ(expire_, parsed_fcdn_account->privileges_.at(ServiceFCdn::kPrivilegePublish));
+    EXPECT_EQ(expire_, parsed_fcdn_account->privileges_.at(ServiceFCdn::kPrivilegePlay));
+
+    const std::vector<std::string> cross_language_tokens = {
+        // Go compress/flate.
+        "007eJxSYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwMzAyMIL5CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxiB9TETqY2BgZmCC2kKsHj6G4pKi1MRc3cTk5PzSvBI2Mt3JRpI72Uh2Jw9DWnJKHsyVgAAAAP//SW9fVw==",
+        // Node.js zlib.
+        "007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwMzAyMIL5CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxiB9TETqY2BgZmCC2kKsHj6G4pKi1MRc3cTk5PzSvBI2Mt3JRpI72Uh2Jw9DWnJKHsyVAElvX1c=",
+        // C# SharpZipLib.
+        "007eJydjjsKwkAURZ8RUogEEdE2ha2QzJtfKhELwQ1oYTOTGW38gJ/SNYhFsLJTXIilS8gKbKxcgB+0N1aXWxzO8SE9dffl0Xi3btqjrl966aF6TWrbwc07V7qbhPgQiaDdQmYsD2JKOWVaKysVCVnAQ43YuZeg7wDkAMCF/HNz7++DMIIgZ1ZHEqlkGAmLFoeRoTzQxqgCECkJ0pAIfHHOjxw8Lc7H8ivjwWI5t2rSUHE8W02X7p+dbqZON3NnEYaxmX4rH0lvX1c=",
+        // Dart archive.
+        "007eAFTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X",
+        // Rust flate2.
+        "007eJydjjsOAVEYRn8jmUJERIR2Cq1k5v73NZWIQmIDFJp7514aj8SjtAZRiEpHLERpCbMCjcoCDKGfUX35ipNzPIgvvWNlPDlsWvasG7d+fKrd9/Xd8FG6VnvbPfEgFH6njcxY7keUcsq0VlYqEjCfBxqx+yzDwAHIAYAL+WRzn++BMIIgZ1aHEqlkGAqLFkehodzXxqgCECkJ0oAIfHNOSg4Si/O1pGVKsFwtrJo2VRTN17OV+2enm6nTzdxZhFFkZr/KF0lvX1c=",
+    };
+    for (const auto &cross_language_token : cross_language_tokens) {
+      VerifyParsedAccessToken2(cross_language_token, &token);
+    }
   }
 
   // Tests generation, parsing, and verification with duplicate service types.

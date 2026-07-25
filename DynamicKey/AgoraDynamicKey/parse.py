@@ -27,6 +27,13 @@ service = {
             1: {'name': 'login'}
         }
     },
+    3: {
+        'name': 'Streaming',
+        'privilege': {
+            1: {'name': 'publishMixStream'},
+            2: {'name': 'publishRawStream'}
+        }
+    },
     4: {
         'name': 'FPA',
         'privilege': {
@@ -40,12 +47,36 @@ service = {
             2: {'name': 'app'}
         }
     },
+    6: {
+        'name': 'FCDN',
+        'privilege': {
+            1: {'name': 'publish'},
+            2: {'name': 'play'}
+        }
+    },
     7: {
         'name': 'APaaS',
         'privilege': {
             1: {'name': 'roomUser'},
             2: {'name': 'user'},
             3: {'name': 'app'}
+        }
+    },
+    8: {
+        'name': 'RTM2',
+        'privilege': {
+            1: {'name': 'login'}
+        },
+        'resource': {
+            0: {'name': 'messageChannels'},
+            1: {'name': 'streamChannels'},
+            2: {'name': 'groupChannels'},
+            3: {'name': 'serverGroups'},
+            4: {'name': 'users'}
+        },
+        'permission': {
+            0: {'name': 'read'},
+            1: {'name': 'write'}
         }
     }
 }
@@ -63,6 +94,28 @@ def get_expire_msg(expire):
     if is_expired:
         return 'expired'
     return 'will expire in %d seconds' % remain
+
+
+def append_rtm2_permissions(lines, permissions, service_info):
+    """Append formatted RTM2 resource-level permissions to the output lines."""
+    lines.append('    permissions:')
+    if not permissions.details:
+        lines.append('      (none)')
+        return
+
+    for resource_type in sorted(permissions.details):
+        resource_info = service_info['resource'].get(resource_type)
+        resource_name = resource_info['name'] if resource_info else 'unknown'
+        lines.append('      - %s (%d):' % (resource_name, resource_type))
+
+        permission_map = permissions.details[resource_type]
+        for permission_type in sorted(permission_map):
+            permission_info = service_info['permission'].get(permission_type)
+            permission_name = permission_info['name'] if permission_info else 'unknown'
+            resources = permission_map[permission_type]
+            resource_list = ', '.join(resources) if resources else '(none)'
+            lines.append('        - %s (%d): %s' % (
+                permission_name, permission_type, resource_list))
 
 
 def parse_token(token):
@@ -123,6 +176,10 @@ def parse_token(token):
                 continue
 
             field_name = key.split('__', 1)[-1]
+            if service_type == 8 and field_name == 'permissions':
+                append_rtm2_permissions(lines, serviceItem, service_info)
+                continue
+
             field_value = serviceItem.decode('utf-8', errors='replace') \
                 if isinstance(serviceItem, bytes) else serviceItem
             lines.append('    %-15s: %s' % (field_name, field_value))

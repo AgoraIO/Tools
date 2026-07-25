@@ -39,6 +39,8 @@ class AccessToken2Test
         $this->test_build_ServiceChat_app();
         $this->test_build_multi_service();
         $this->test_build_parse_repeated_service_type();
+        $this->test_parse_extended_services_from_cpp();
+        $this->test_extended_service_numeric_uid_conversion();
         $this->test_parse_unknown_service_type();
         $this->test_parse_stops_at_unknown_service_type();
         $this->test_parse_old_token_and_clear_previous_services();
@@ -209,6 +211,84 @@ class AccessToken2Test
         Util::assertEqual(0, count($parser->getServices(ServiceChat::SERVICE_TYPE)));
         Util::assertEqual(true, $parser->verifySignature($this->appCertificate));
         Util::assertEqual(false, $parser->verifySignature("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+    }
+
+    /**
+     * Parse and verify C++ Streaming, FCDN, and RTM2 services.
+     */
+    public function test_parse_extended_services_from_cpp()
+    {
+        $token = "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ==";
+        $parser = new AccessToken2();
+
+        Util::assertEqual(true, $parser->parse($token));
+        Util::assertEqual(true, $parser->verifySignature($this->appCertificate));
+
+        $streaming = $parser->getServices(ServiceStreaming::SERVICE_TYPE)[0];
+        Util::assertEqual($this->channelName, $streaming->channelName);
+        Util::assertEqual($this->uidStr, $streaming->account);
+        Util::assertEqual($this->expire, $streaming->privileges[ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM]);
+        Util::assertEqual($this->expire, $streaming->privileges[ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM]);
+
+        $fcdn = $parser->getServices(ServiceFCdn::SERVICE_TYPE)[0];
+        Util::assertEqual($this->channelName, $fcdn->channelName);
+        Util::assertEqual($this->uidStr, $fcdn->account);
+        Util::assertEqual($this->expire, $fcdn->privileges[ServiceFCdn::PRIVILEGE_PUBLISH]);
+        Util::assertEqual($this->expire, $fcdn->privileges[ServiceFCdn::PRIVILEGE_PLAY]);
+
+        $rtm2 = $parser->getServices(ServiceRtm2::SERVICE_TYPE)[0];
+        Util::assertEqual($this->userId, $rtm2->userId);
+        Util::assertEqual(
+            json_encode([0 => [0 => ["message-a", "message-b"]], 1 => [1 => ["stream-a"]], 4 => [0 => ["user-a"]]]),
+            json_encode($rtm2->permissions->details)
+        );
+    }
+
+    /**
+     * Verify deterministic Streaming and FCDN generation and UID conversion against C++.
+     */
+    public function test_extended_service_numeric_uid_conversion()
+    {
+        $token = new AccessToken2($this->appId, $this->appCertificate, $this->expire);
+        $token->issueTs = $this->issueTs;
+        $token->salt = $this->salt;
+        $streamingServices = [
+            new ServiceStreaming($this->channelName, $this->uid),
+            new ServiceStreaming($this->channelName, 0),
+            new ServiceStreaming($this->channelName, "stream-account"),
+        ];
+        $streamingServices[0]->addPrivilege(ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM, $this->expire);
+        $streamingServices[1]->addPrivilege(ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM, $this->expire);
+        $streamingServices[2]->addPrivilege(ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM, $this->expire);
+        $streamingServices[2]->addPrivilege(ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM, $this->expire);
+        $fcdnServices = [
+            new ServiceFCdn($this->channelName, $this->uid),
+            new ServiceFCdn($this->channelName, 0),
+            new ServiceFCdn($this->channelName, "fcdn-account"),
+        ];
+        $fcdnServices[0]->addPrivilege(ServiceFCdn::PRIVILEGE_PUBLISH, $this->expire);
+        $fcdnServices[1]->addPrivilege(ServiceFCdn::PRIVILEGE_PLAY, $this->expire);
+        $fcdnServices[2]->addPrivilege(ServiceFCdn::PRIVILEGE_PUBLISH, $this->expire);
+        $fcdnServices[2]->addPrivilege(ServiceFCdn::PRIVILEGE_PLAY, $this->expire);
+        foreach (array_merge($streamingServices, $fcdnServices) as $service) {
+            $token->addService($service);
+        }
+
+        $encoded = $token->build();
+        Util::assertEqual(
+            "007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X",
+            $encoded
+        );
+        $parsed = new AccessToken2();
+        Util::assertEqual(true, $parsed->parse($encoded));
+        Util::assertEqual(
+            [$this->uidStr, "", "stream-account"],
+            array_map(function ($service) { return $service->account; }, $parsed->getServices(ServiceStreaming::SERVICE_TYPE))
+        );
+        Util::assertEqual(
+            [$this->uidStr, "", "fcdn-account"],
+            array_map(function ($service) { return $service->account; }, $parsed->getServices(ServiceFCdn::SERVICE_TYPE))
+        );
     }
 
     /**

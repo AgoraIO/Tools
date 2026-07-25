@@ -16,6 +16,7 @@ class RtmTokenBuilder2Test
     public function run()
     {
         $this->test_buildToken();
+        $this->test_buildTokenWithPermissions();
     }
 
     /**
@@ -33,6 +34,28 @@ class RtmTokenBuilder2Test
         Util::assertEqual($this->userId, $serviceRtm->userId);
         Util::assertEqual(ServiceRtm::SERVICE_TYPE, $serviceRtm->type);
         Util::assertEqual($this->expire, $serviceRtm->privileges[ServiceRtm::PRIVILEGE_LOGIN]);
+    }
+
+    /**
+     * Verify RTM2 permission token generation, parsing, and signature validation.
+     */
+    public function test_buildTokenWithPermissions()
+    {
+        $permissions = new Rtm2Permissions();
+        $permissions->add(Rtm2Permissions::MESSAGE_CHANNELS, Rtm2Permissions::READ, ["message-a", "message-b"]);
+        $permissions->add(Rtm2Permissions::STREAM_CHANNELS, Rtm2Permissions::WRITE, ["stream-a"]);
+
+        $token = RtmTokenBuilder2::buildTokenWithPermissions(
+            $this->appId, $this->appCertificate, $this->userId, $permissions, $this->expire
+        );
+        $accessToken = new AccessToken2();
+
+        Util::assertEqual(true, $accessToken->parse($token));
+        Util::assertEqual(true, $accessToken->verifySignature($this->appCertificate));
+        $service = $accessToken->getServices(ServiceRtm2::SERVICE_TYPE)[0];
+        Util::assertEqual($this->userId, $service->userId);
+        Util::assertEqual(json_encode($permissions->details), json_encode($service->permissions->details));
+        Util::assertEqual($this->expire, $service->privileges[ServiceRtm2::PRIVILEGE_LOGIN]);
     }
 }
 

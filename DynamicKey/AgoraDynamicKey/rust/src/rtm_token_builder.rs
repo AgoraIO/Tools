@@ -16,3 +16,18 @@ pub fn build_token(app_id: &str, app_certificate: &str, user_id: &str, expire: u
 
     return token.build();
 }
+
+/// Builds an RTM2 token with resource-level permissions.
+///
+/// This special interface requires Agora assistance for proper usage.
+pub fn build_token_with_permissions(
+    app_id: &str, app_certificate: &str, user_id: &str, permissions: &access_token::Rtm2Permissions, expire: u32,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let mut token = access_token::new_access_token(app_id, app_certificate, expire);
+
+    let mut service_rtm2 = access_token::new_service_rtm2(user_id, Some(permissions.clone()));
+    service_rtm2.service.add_privilege(access_token::PRIVILEGE_LOGIN, expire);
+    token.add_service(Box::new(service_rtm2));
+
+    token.build()
+}

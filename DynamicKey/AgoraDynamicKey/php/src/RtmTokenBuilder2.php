@@ -26,4 +26,25 @@ class RtmTokenBuilder2
 
         return $accessToken->build();
     }
+
+    /**
+     * Build an RTM2 token with resource-level permissions.
+     *
+     * This special interface requires Agora assistance for proper usage.
+     *
+     * @param $appId The App ID issued to you by Agora.
+     * @param $appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param $userId The user's account, max length is 64 bytes.
+     * @param $permissions The RTM2 resource-level permissions.
+     * @param $expire The number of seconds from now before the token expires.
+     * @return The RTM2 token.
+     */
+    public static function buildTokenWithPermissions($appId, $appCertificate, $userId, $permissions, $expire)
+    {
+        $accessToken = new AccessToken2($appId, $appCertificate, $expire);
+        $serviceRtm2 = new ServiceRtm2($userId, $permissions);
+        $serviceRtm2->addPrivilege(ServiceRtm2::PRIVILEGE_LOGIN, $expire);
+        $accessToken->addService($serviceRtm2);
+        return $accessToken->build();
+    }
 }

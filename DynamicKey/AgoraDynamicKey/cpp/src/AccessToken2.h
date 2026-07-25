@@ -419,7 +419,7 @@ class ServiceRtm2 : public Service {
     enum {
       kMessageChannels = 0,
       kStreamChannels = 1,
-      kGourpChannels = 2,
+      kGroupChannels = 2,
       kServerGroups = 3,
       kUsers = 4,
     };

@@ -488,6 +488,125 @@ namespace AgoraIO.Tests
             Assert.False(parsed.verifySignature("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
         }
 
+        // Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+        [Fact]
+        public void extendedServicesFromCpp()
+        {
+            const string token = "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ==";
+            AccessToken2 parsed = new AccessToken2();
+
+            Assert.True(parsed.parse(token));
+            Assert.True(parsed.verifySignature(appCertificate));
+
+            AccessToken2.ServiceStreaming streaming = (AccessToken2.ServiceStreaming)parsed.getServices(AccessToken2.SERVICE_TYPE_STREAMING)[0];
+            Assert.Equal(channelName, streaming._channelName);
+            Assert.Equal(uidStr, streaming._account);
+            Assert.Equal(expire, streaming.getPrivileges()[(ushort)AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_MIX_STREAM]);
+            Assert.Equal(expire, streaming.getPrivileges()[(ushort)AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_RAW_STREAM]);
+
+            AccessToken2.ServiceFCdn fcdn = (AccessToken2.ServiceFCdn)parsed.getServices(AccessToken2.SERVICE_TYPE_FCDN)[0];
+            Assert.Equal(channelName, fcdn._channelName);
+            Assert.Equal(uidStr, fcdn._account);
+            Assert.Equal(expire, fcdn.getPrivileges()[(ushort)AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PUBLISH]);
+            Assert.Equal(expire, fcdn.getPrivileges()[(ushort)AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PLAY]);
+
+            AccessToken2.ServiceRtm2 rtm2 = (AccessToken2.ServiceRtm2)parsed.getServices(AccessToken2.SERVICE_TYPE_RTM2)[0];
+            Assert.Equal(userId, rtm2._userId);
+            Assert.Equal(new List<string> { "message-a", "message-b" },
+                rtm2._permissions.details[AccessToken2.ServiceRtm2.Permissions.MESSAGE_CHANNELS][AccessToken2.ServiceRtm2.Permissions.READ]);
+            Assert.Equal(new List<string> { "stream-a" },
+                rtm2._permissions.details[AccessToken2.ServiceRtm2.Permissions.STREAM_CHANNELS][AccessToken2.ServiceRtm2.Permissions.WRITE]);
+            Assert.Equal(new List<string> { "user-a" },
+                rtm2._permissions.details[AccessToken2.ServiceRtm2.Permissions.USERS][AccessToken2.ServiceRtm2.Permissions.READ]);
+        }
+
+        // Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+        [Fact]
+        public void extendedServiceNumericUidConversion()
+        {
+            AccessToken2 token = createToken();
+            AccessToken2.ServiceStreaming streamingUid = new AccessToken2.ServiceStreaming(channelName, uid);
+            streamingUid.addPrivilegeStreaming(AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_MIX_STREAM, expire);
+            token.addService(streamingUid);
+            AccessToken2.ServiceStreaming streamingWildcard = new AccessToken2.ServiceStreaming(channelName, 0U);
+            streamingWildcard.addPrivilegeStreaming(AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_RAW_STREAM, expire);
+            token.addService(streamingWildcard);
+            AccessToken2.ServiceStreaming streamingAccount = new AccessToken2.ServiceStreaming(channelName, "stream-account");
+            streamingAccount.addPrivilegeStreaming(AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_MIX_STREAM, expire);
+            streamingAccount.addPrivilegeStreaming(AccessToken2.PrivilegeStreamingEnum.PRIVILEGE_PUBLISH_RAW_STREAM, expire);
+            token.addService(streamingAccount);
+            AccessToken2.ServiceFCdn fcdnUid = new AccessToken2.ServiceFCdn(channelName, uid);
+            fcdnUid.addPrivilegeFCdn(AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PUBLISH, expire);
+            token.addService(fcdnUid);
+            AccessToken2.ServiceFCdn fcdnWildcard = new AccessToken2.ServiceFCdn(channelName, 0U);
+            fcdnWildcard.addPrivilegeFCdn(AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PLAY, expire);
+            token.addService(fcdnWildcard);
+            AccessToken2.ServiceFCdn fcdnAccount = new AccessToken2.ServiceFCdn(channelName, "fcdn-account");
+            fcdnAccount.addPrivilegeFCdn(AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PUBLISH, expire);
+            fcdnAccount.addPrivilegeFCdn(AccessToken2.PrivilegeFCdnEnum.PRIVILEGE_PLAY, expire);
+            token.addService(fcdnAccount);
+
+            string encoded = token.build();
+            Assert.Equal("007eJydjjsKwkAURZ8RUogEEdE2ha2QzJtfKhELwQ1oYTOTGW38gJ/SNYhFsLJTXIilS8gKbKxcgB+0N1aXWxzO8SE9dffl0Xi3btqjrl966aF6TWrbwc07V7qbhPgQiaDdQmYsD2JKOWVaKysVCVnAQ43YuZeg7wDkAMCF/HNz7++DMIIgZ1ZHEqlkGAmLFoeRoTzQxqgCECkJ0pAIfHHOjxw8Lc7H8ivjwWI5t2rSUHE8W02X7p+dbqZON3NnEYaxmX4rH0lvX1c=", encoded);
+            AccessToken2 parsed = new AccessToken2();
+            Assert.True(parsed.parse(encoded));
+
+            List<AccessToken2.Service> streaming = parsed.getServices(AccessToken2.SERVICE_TYPE_STREAMING);
+            Assert.Equal(new[] { uidStr, "", "stream-account" },
+                streaming.ConvertAll(service => ((AccessToken2.ServiceStreaming)service)._account));
+            List<AccessToken2.Service> fcdn = parsed.getServices(AccessToken2.SERVICE_TYPE_FCDN);
+            Assert.Equal(new[] { uidStr, "", "fcdn-account" },
+                fcdn.ConvertAll(service => ((AccessToken2.ServiceFCdn)service)._account));
+        }
+
+        // Verifies RTM2 permission token generation, parsing, and signature validation.
+        [Fact]
+        public void buildRtm2TokenWithPermissions()
+        {
+            AccessToken2.ServiceRtm2.Permissions permissions = new AccessToken2.ServiceRtm2.Permissions();
+            permissions.add(AccessToken2.ServiceRtm2.Permissions.MESSAGE_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.READ, new List<string> { "message-a", "message-b" });
+            permissions.add(AccessToken2.ServiceRtm2.Permissions.STREAM_CHANNELS,
+                AccessToken2.ServiceRtm2.Permissions.WRITE, new List<string> { "stream-a" });
+
+            string token = RtmTokenBuilder2.buildTokenWithPermissions(appId, appCertificate, userId, permissions, expire);
+            AccessToken2 parsed = new AccessToken2();
+
+            Assert.True(parsed.parse(token));
+            Assert.True(parsed.verifySignature(appCertificate));
+            AccessToken2.ServiceRtm2 service = (AccessToken2.ServiceRtm2)parsed.getServices(AccessToken2.SERVICE_TYPE_RTM2)[0];
+            Assert.Equal(userId, service._userId);
+            Assert.Equal(new List<string> { "message-a", "message-b" },
+                service._permissions.details[AccessToken2.ServiceRtm2.Permissions.MESSAGE_CHANNELS][AccessToken2.ServiceRtm2.Permissions.READ]);
+            Assert.Equal(new List<string> { "stream-a" },
+                service._permissions.details[AccessToken2.ServiceRtm2.Permissions.STREAM_CHANNELS][AccessToken2.ServiceRtm2.Permissions.WRITE]);
+            Assert.Equal(expire, service.getPrivileges()[(ushort)AccessToken2.PrivilegeRtm2Enum.PRIVILEGE_LOGIN]);
+        }
+
+        // Generates and parses an RTM2 token whose uncompressed payload exceeds the initial buffer capacity.
+        [Fact]
+        public void largeRtm2PermissionPayload()
+        {
+            List<string> resources = new List<string>();
+            for (int i = 0; i < 160; i++)
+            {
+                resources.Add($"resource-{i:D4}");
+            }
+
+            AccessToken2.ServiceRtm2.Permissions permissions = new AccessToken2.ServiceRtm2.Permissions();
+            permissions.add(AccessToken2.ServiceRtm2.Permissions.USERS,
+                AccessToken2.ServiceRtm2.Permissions.READ, resources);
+
+            string token = RtmTokenBuilder2.buildTokenWithPermissions(appId, appCertificate, userId, permissions, expire);
+            AccessToken2 parsed = new AccessToken2();
+
+            Assert.True(parsed.parse(token));
+            Assert.True(parsed.verifySignature(appCertificate));
+            AccessToken2.ServiceRtm2 service = (AccessToken2.ServiceRtm2)parsed.getServices(AccessToken2.SERVICE_TYPE_RTM2)[0];
+            Assert.Equal(resources,
+                service._permissions.details[AccessToken2.ServiceRtm2.Permissions.USERS][AccessToken2.ServiceRtm2.Permissions.READ]);
+        }
+
         // Verifies that known services before an unknown type remain available.
         [Fact]
         public void unknownServiceAfterKnownService()

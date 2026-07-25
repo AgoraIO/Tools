@@ -5,12 +5,19 @@
  */
 const {
     AccessToken2,
+    Rtm2Permissions,
     Service,
     ServiceRtc,
     ServiceRtm,
+    ServiceStreaming,
+    ServiceFCdn,
+    ServiceRtm2,
     ServiceChat,
     kRtcServiceType,
     kRtmServiceType,
+    kStreamingServiceType,
+    kFCdnServiceType,
+    kRtm2ServiceType,
     kChatServiceType
 } = require('../src/AccessToken2')
 
@@ -169,6 +176,99 @@ exports.AccessToken_Test_repeatedServiceTypes = function (test) {
     test.equal(0, parsed.getServices(kChatServiceType).length)
     test.equal(true, parsed.verifySignature(appCertificate))
     test.equal(false, parsed.verifySignature('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'))
+    test.done()
+}
+
+// Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+exports.AccessToken_Test_extendedServicesFromCpp = function (test) {
+    const encoded = '007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=='
+    const parsed = new AccessToken2('', '', 0, 0)
+
+    test.equal(true, parsed.from_string(encoded))
+    test.equal(true, parsed.verifySignature(appCertificate))
+
+    const streaming = parsed.getServices(kStreamingServiceType)[0]
+    test.equal(channel, streaming.__channel_name.toString())
+    test.equal(uidStr, streaming.__account.toString())
+    test.equal(expire, streaming.__privileges[ServiceStreaming.kPrivilegePublishMixStream])
+    test.equal(expire, streaming.__privileges[ServiceStreaming.kPrivilegePublishRawStream])
+
+    const fcdn = parsed.getServices(kFCdnServiceType)[0]
+    test.equal(channel, fcdn.__channel_name.toString())
+    test.equal(uidStr, fcdn.__account.toString())
+    test.equal(expire, fcdn.__privileges[ServiceFCdn.kPrivilegePublish])
+    test.equal(expire, fcdn.__privileges[ServiceFCdn.kPrivilegePlay])
+
+    const rtm2 = parsed.getServices(kRtm2ServiceType)[0]
+    test.equal(user_id, rtm2.__user_id.toString())
+    test.deepEqual({
+        0: { 0: ['message-a', 'message-b'] },
+        1: { 1: ['stream-a'] },
+        4: { 0: ['user-a'] }
+    }, rtm2.__permissions.details)
+    test.equal(expire, rtm2.__privileges[ServiceRtm2.kPrivilegeLogin])
+    test.done()
+}
+
+// Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+exports.AccessToken_Test_extendedServiceNumericUidConversion = function (test) {
+    const token = new AccessToken2(appID, appCertificate, ts, expire)
+    token.salt = salt
+    const streamingUid = new ServiceStreaming(channel, uid)
+    streamingUid.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, expire)
+    token.add_service(streamingUid)
+    const streamingWildcard = new ServiceStreaming(channel, 0)
+    streamingWildcard.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, expire)
+    token.add_service(streamingWildcard)
+    const streamingAccount = new ServiceStreaming(channel, 'stream-account')
+    streamingAccount.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, expire)
+    streamingAccount.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, expire)
+    token.add_service(streamingAccount)
+    const fcdnUid = new ServiceFCdn(channel, uid)
+    fcdnUid.add_privilege(ServiceFCdn.kPrivilegePublish, expire)
+    token.add_service(fcdnUid)
+    const fcdnWildcard = new ServiceFCdn(channel, 0)
+    fcdnWildcard.add_privilege(ServiceFCdn.kPrivilegePlay, expire)
+    token.add_service(fcdnWildcard)
+    const fcdnAccount = new ServiceFCdn(channel, 'fcdn-account')
+    fcdnAccount.add_privilege(ServiceFCdn.kPrivilegePublish, expire)
+    fcdnAccount.add_privilege(ServiceFCdn.kPrivilegePlay, expire)
+    token.add_service(fcdnAccount)
+
+    const encoded = token.build()
+    test.equal(
+        encoded,
+        '007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwMzAyMIL5CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxiB9TETqY2BgZmCC2kKsHj6G4pKi1MRc3cTk5PzSvBI2Mt3JRpI72Uh2Jw9DWnJKHsyVAElvX1c='
+    )
+    const parsed = new AccessToken2('', '', 0, 0)
+    test.equal(true, parsed.from_string(encoded))
+    test.deepEqual(
+        parsed.getServices(kStreamingServiceType).map(service => service.__account.toString()),
+        [uidStr, '', 'stream-account']
+    )
+    test.deepEqual(
+        parsed.getServices(kFCdnServiceType).map(service => service.__account.toString()),
+        [uidStr, '', 'fcdn-account']
+    )
+    test.done()
+}
+
+// Generates and parses an RTM2 token whose uncompressed payload exceeds the initial buffer capacity.
+exports.AccessToken_Test_largeRtm2PermissionPayload = function (test) {
+    const resources = Array.from({ length: 160 }, (_, index) => `resource-${index.toString().padStart(4, '0')}`)
+    const permissions = new Rtm2Permissions()
+    permissions.add(Rtm2Permissions.kUsers, Rtm2Permissions.kRead, resources)
+
+    const token = new AccessToken2(appID, appCertificate, ts, expire)
+    token.salt = salt
+    const rtm2Service = new ServiceRtm2(user_id, permissions)
+    rtm2Service.add_privilege(ServiceRtm2.kPrivilegeLogin, expire)
+    token.add_service(rtm2Service)
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    test.equal(true, parsed.from_string(token.build()))
+    test.equal(true, parsed.verifySignature(appCertificate))
+    test.deepEqual(resources, parsed.getServices(kRtm2ServiceType)[0].__permissions.details[Rtm2Permissions.kUsers][Rtm2Permissions.kRead])
     test.done()
 }
 

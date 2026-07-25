@@ -5,5 +5,6 @@ module.exports = {
     FpaTokenBuilder: require('./src/FpaTokenBuilder').FpaTokenBuilder,
     RtcRole: require('./src/RtcTokenBuilder2').Role,
     RtcTokenBuilder: require('./src/RtcTokenBuilder2').RtcTokenBuilder,
-    RtmTokenBuilder: require('./src/RtmTokenBuilder2').RtmTokenBuilder
+    RtmTokenBuilder: require('./src/RtmTokenBuilder2').RtmTokenBuilder,
+    Rtm2Permissions: require('./src/AccessToken2').Rtm2Permissions
 }

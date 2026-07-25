@@ -91,6 +91,34 @@ module AgoraDynamicKey2
     end
   end
 
+  # Stores a Streaming service payload.
+  class ServiceStreaming < Service
+    attr_accessor :channel_name, :account
+
+    SERVICE_TYPE = 3
+    PRIVILEGE_PUBLISH_MIX_STREAM = 1
+    PRIVILEGE_PUBLISH_RAW_STREAM = 2
+
+    # Creates a Streaming service for a channel and numeric user ID or string account.
+    def initialize(channel_name = '', account = '')
+      super(SERVICE_TYPE)
+      @channel_name = channel_name
+      @account = account.eql?(0) ? '' : account.to_s
+    end
+
+    # Serializes the Streaming service payload.
+    def pack
+      super() + Util.pack_string(@channel_name) + Util.pack_string(@account)
+    end
+
+    # Deserializes the Streaming service payload.
+    def unpack(data)
+      _, data = super(data)
+      @channel_name, data = Util.unpack_string(data)
+      @account, data = Util.unpack_string(data)
+    end
+  end
+
   # Stores an FPA service payload.
   class ServiceFpa < Service
     SERVICE_TYPE = 4
@@ -138,6 +166,34 @@ module AgoraDynamicKey2
     end
   end
 
+  # Stores an FCDN service payload.
+  class ServiceFCdn < Service
+    attr_accessor :channel_name, :account
+
+    SERVICE_TYPE = 6
+    PRIVILEGE_PUBLISH = 1
+    PRIVILEGE_PLAY = 2
+
+    # Creates an FCDN service for a channel and numeric user ID or string account.
+    def initialize(channel_name = '', account = '')
+      super(SERVICE_TYPE)
+      @channel_name = channel_name
+      @account = account.eql?(0) ? '' : account.to_s
+    end
+
+    # Serializes the FCDN service payload.
+    def pack
+      super() + Util.pack_string(@channel_name) + Util.pack_string(@account)
+    end
+
+    # Deserializes the FCDN service payload.
+    def unpack(data)
+      _, data = super(data)
+      @channel_name, data = Util.unpack_string(data)
+      @account, data = Util.unpack_string(data)
+    end
+  end
+
   # Stores an APaaS service payload.
   class ServiceApaas < Service
     attr_accessor :room_uuid, :user_uuid, :role
@@ -169,6 +225,96 @@ module AgoraDynamicKey2
     end
   end
 
+  # Stores an RTM2 service payload and resource-level permissions.
+  class ServiceRtm2 < Service
+    # Stores RTM2 resources by resource type and permission type.
+    class Permissions
+      attr_accessor :details
+
+      MESSAGE_CHANNELS = 0
+      STREAM_CHANNELS = 1
+      GROUP_CHANNELS = 2
+      SERVER_GROUPS = 3
+      USERS = 4
+
+      READ = 0
+      WRITE = 1
+
+      # Creates an empty RTM2 permission set.
+      def initialize
+        @details = {}
+      end
+
+      # Adds or replaces resources for a resource and permission type.
+      def add(resource_type, permission_type, resources)
+        @details[resource_type] ||= {}
+        @details[resource_type][permission_type] = resources.dup
+      end
+
+      # Serializes permission keys in numeric order and preserves resource order.
+      def pack
+        data = Util.pack_uint16(@details.size)
+        @details.keys.sort.each do |resource_type|
+          permission_map = @details[resource_type]
+          data += Util.pack_uint16(resource_type) + Util.pack_uint16(permission_map.size)
+          permission_map.keys.sort.each do |permission_type|
+            resources = permission_map[permission_type]
+            data += Util.pack_uint16(permission_type) + Util.pack_uint16(resources.size)
+            resources.each { |resource| data += Util.pack_string(resource) }
+          end
+        end
+        data
+      end
+
+      # Deserializes RTM2 permissions and returns the remaining data.
+      def unpack(data)
+        @details = {}
+        resource_count, data = Util.unpack_uint16(data)
+        resource_count.times do
+          resource_type, data = Util.unpack_uint16(data)
+          permission_count, data = Util.unpack_uint16(data)
+          permission_count.times do
+            permission_type, data = Util.unpack_uint16(data)
+            resource_count, data = Util.unpack_uint16(data)
+            resources = []
+            resource_count.times do
+              resource, data = Util.unpack_string(data)
+              resources << resource
+            end
+            add(resource_type, permission_type, resources)
+          end
+        end
+        data
+      end
+    end
+
+    attr_accessor :user_id, :permissions
+
+    SERVICE_TYPE = 8
+    PRIVILEGE_LOGIN = 1
+
+    # Creates an RTM2 service with resource-level permissions.
+    def initialize(user_id = '', permissions = nil)
+      super(SERVICE_TYPE)
+      @user_id = user_id
+      @permissions = permissions || Permissions.new
+    end
+
+    # Serializes the RTM2 service payload.
+    def pack
+      super() + Util.pack_string(@user_id) + @permissions.pack
+    end
+
+    # Deserializes the RTM2 service payload.
+    def unpack(data)
+      _, data = super(data)
+      @user_id, data = Util.unpack_string(data)
+      @permissions = Permissions.new
+      data = @permissions.unpack(data)
+      [@permissions, data]
+    end
+  end
+
   # Builds, parses, and verifies Token007 tokens containing one or more services.
   class AccessToken
     attr_accessor :app_cert, :app_id, :expire, :issue_ts, :salt, :services
@@ -177,9 +323,12 @@ module AgoraDynamicKey2
     VERSION_LENGTH = 3
     SERVICES = { ServiceRtc::SERVICE_TYPE => ServiceRtc,
                  ServiceRtm::SERVICE_TYPE => ServiceRtm,
+                 ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
                  ServiceFpa::SERVICE_TYPE => ServiceFpa,
                  ServiceChat::SERVICE_TYPE => ServiceChat,
-                 ServiceApaas::SERVICE_TYPE => ServiceApaas }.freeze
+                 ServiceFCdn::SERVICE_TYPE => ServiceFCdn,
+                 ServiceApaas::SERVICE_TYPE => ServiceApaas,
+                 ServiceRtm2::SERVICE_TYPE => ServiceRtm2 }.freeze
 
     # Creates a token builder or an empty token parser.
     def initialize(app_id = '', app_cert = '', expire = 900)

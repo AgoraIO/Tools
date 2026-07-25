@@ -116,6 +116,35 @@ class ServiceRtm extends Service {
 
 ServiceRtm.kPrivilegeLogin = 1
 
+const kStreamingServiceType = 3
+
+// Represents a Streaming service payload.
+class ServiceStreaming extends Service {
+    // Creates a Streaming service for a channel and numeric user ID or string account.
+    constructor(channelName = '', account = '') {
+        super(kStreamingServiceType)
+        this.__channel_name = channelName
+        this.__account = account === 0 ? '' : `${account}`
+    }
+
+    // Serializes the Streaming service payload.
+    pack() {
+        const buffer = new ByteBuf().putString(this.__channel_name).putString(this.__account)
+        return Buffer.concat([super.pack(), buffer.pack()])
+    }
+
+    // Deserializes the Streaming service payload.
+    unpack(buffer) {
+        const reader = super.unpack(buffer)
+        this.__channel_name = reader.getString()
+        this.__account = reader.getString()
+        return reader
+    }
+}
+
+ServiceStreaming.kPrivilegePublishMixStream = 1
+ServiceStreaming.kPrivilegePublishRawStream = 2
+
 const kFpaServiceType = 4
 
 // Represents an FPA service payload.
@@ -167,6 +196,35 @@ class ServiceChat extends Service {
 ServiceChat.kPrivilegeUser = 1
 ServiceChat.kPrivilegeApp = 2
 
+const kFCdnServiceType = 6
+
+// Represents an FCDN service payload.
+class ServiceFCdn extends Service {
+    // Creates an FCDN service for a channel and numeric user ID or string account.
+    constructor(channelName = '', account = '') {
+        super(kFCdnServiceType)
+        this.__channel_name = channelName
+        this.__account = account === 0 ? '' : `${account}`
+    }
+
+    // Serializes the FCDN service payload.
+    pack() {
+        const buffer = new ByteBuf().putString(this.__channel_name).putString(this.__account)
+        return Buffer.concat([super.pack(), buffer.pack()])
+    }
+
+    // Deserializes the FCDN service payload.
+    unpack(buffer) {
+        const reader = super.unpack(buffer)
+        this.__channel_name = reader.getString()
+        this.__account = reader.getString()
+        return reader
+    }
+}
+
+ServiceFCdn.kPrivilegePublish = 1
+ServiceFCdn.kPrivilegePlay = 2
+
 const kApaasServiceType = 7
 
 // Represents an APaaS service payload.
@@ -201,6 +259,84 @@ class ServiceApaas extends Service {
 ServiceApaas.PRIVILEGE_ROOM_USER = 1
 ServiceApaas.PRIVILEGE_USER = 2
 ServiceApaas.PRIVILEGE_APP = 3
+
+// Stores RTM2 resource-level permissions.
+class Rtm2Permissions {
+    // Creates an empty RTM2 permission set.
+    constructor() {
+        this.details = {}
+    }
+
+    // Adds or replaces resources for a resource and permission type.
+    add(resourceType, permissionType, resources) {
+        if (!this.details[resourceType]) {
+            this.details[resourceType] = {}
+        }
+        this.details[resourceType][permissionType] = Array.from(resources)
+    }
+}
+
+Rtm2Permissions.kMessageChannels = 0
+Rtm2Permissions.kStreamChannels = 1
+Rtm2Permissions.kGroupChannels = 2
+Rtm2Permissions.kServerGroups = 3
+Rtm2Permissions.kUsers = 4
+Rtm2Permissions.kRead = 0
+Rtm2Permissions.kWrite = 1
+
+const kRtm2ServiceType = 8
+
+// Represents an RTM2 service payload.
+class ServiceRtm2 extends Service {
+    // Creates an RTM2 service for a user and permission set.
+    constructor(userId, permissions) {
+        super(kRtm2ServiceType)
+        this.__user_id = userId || ''
+        this.__permissions = permissions || new Rtm2Permissions()
+    }
+
+    // Serializes the RTM2 service payload.
+    pack() {
+        const buffer = new ByteBuf().putString(this.__user_id)
+        const resourceTypes = Object.keys(this.__permissions.details).map(Number).sort((left, right) => left - right)
+        buffer.putUint16(resourceTypes.length)
+        resourceTypes.forEach(resourceType => {
+            const permissionMap = this.__permissions.details[resourceType]
+            const permissionTypes = Object.keys(permissionMap).map(Number).sort((left, right) => left - right)
+            buffer.putUint16(resourceType).putUint16(permissionTypes.length)
+            permissionTypes.forEach(permissionType => {
+                const resources = permissionMap[permissionType]
+                buffer.putUint16(permissionType).putUint16(resources.length)
+                resources.forEach(resource => buffer.putString(resource))
+            })
+        })
+        return Buffer.concat([super.pack(), buffer.pack()])
+    }
+
+    // Deserializes the RTM2 service payload.
+    unpack(buffer) {
+        const reader = super.unpack(buffer)
+        this.__user_id = reader.getString()
+        this.__permissions = new Rtm2Permissions()
+        const resourceTypeCount = reader.getUint16()
+        for (let i = 0; i < resourceTypeCount; i++) {
+            const resourceType = reader.getUint16()
+            const permissionCount = reader.getUint16()
+            for (let j = 0; j < permissionCount; j++) {
+                const permissionType = reader.getUint16()
+                const resourceCount = reader.getUint16()
+                const resources = []
+                for (let k = 0; k < resourceCount; k++) {
+                    resources.push(reader.getString().toString())
+                }
+                this.__permissions.add(resourceType, permissionType, resources)
+            }
+        }
+        return reader
+    }
+}
+
+ServiceRtm2.kPrivilegeLogin = 1
 
 // Builds, parses, and verifies Token007 tokens containing one or more services.
 class AccessToken2 {
@@ -368,6 +504,23 @@ var ByteBuf = function () {
 
     that.buffer.fill(0)
 
+    // Grows the backing buffer when the next value does not fit.
+    var ensureCapacity = function (additionalLength) {
+        const requiredLength = that.position + additionalLength
+        if (requiredLength <= that.buffer.length) {
+            return
+        }
+
+        let capacity = that.buffer.length
+        while (capacity < requiredLength) {
+            capacity *= 2
+        }
+
+        const expanded = Buffer.alloc(capacity)
+        that.buffer.copy(expanded, 0, 0, that.position)
+        that.buffer = expanded
+    }
+
     // Returns the bytes written to the buffer.
     that.pack = function () {
         var out = Buffer.alloc(that.position)
@@ -377,6 +530,7 @@ var ByteBuf = function () {
 
     // Appends an unsigned 16-bit integer.
     that.putUint16 = function (v) {
+        ensureCapacity(2)
         that.buffer.writeUInt16LE(v, that.position)
         that.position += 2
         return that
@@ -384,12 +538,14 @@ var ByteBuf = function () {
 
     // Appends an unsigned 32-bit integer.
     that.putUint32 = function (v) {
+        ensureCapacity(4)
         that.buffer.writeUInt32LE(v, that.position)
         that.position += 4
         return that
     }
     // Appends a signed 32-bit integer.
     that.putInt32 = function (v) {
+        ensureCapacity(4)
         that.buffer.writeInt32LE(v, that.position)
         that.position += 4
         return that
@@ -397,6 +553,7 @@ var ByteBuf = function () {
 
     // Appends a signed 16-bit integer.
     that.putInt16 = function (v) {
+        ensureCapacity(2)
         that.buffer.writeInt16LE(v, that.position)
         that.position += 2
         return that
@@ -405,6 +562,7 @@ var ByteBuf = function () {
     // Appends length-prefixed bytes.
     that.putBytes = function (bytes) {
         that.putUint16(bytes.length)
+        ensureCapacity(bytes.length)
         bytes.copy(that.buffer, that.position)
         that.position += bytes.length
         return that
@@ -514,21 +672,31 @@ var ReadByteBuf = function (bytes) {
 AccessToken2.kServices = {}
 AccessToken2.kServices[kApaasServiceType] = ServiceApaas
 AccessToken2.kServices[kChatServiceType] = ServiceChat
+AccessToken2.kServices[kFCdnServiceType] = ServiceFCdn
 AccessToken2.kServices[kFpaServiceType] = ServiceFpa
 AccessToken2.kServices[kRtcServiceType] = ServiceRtc
 AccessToken2.kServices[kRtmServiceType] = ServiceRtm
+AccessToken2.kServices[kRtm2ServiceType] = ServiceRtm2
+AccessToken2.kServices[kStreamingServiceType] = ServiceStreaming
 
 module.exports = {
     AccessToken2,
     kApaasServiceType,
     kChatServiceType,
+    kFCdnServiceType,
     kFpaServiceType,
     kRtcServiceType,
     kRtmServiceType,
+    kRtm2ServiceType,
+    kStreamingServiceType,
+    Rtm2Permissions,
     Service,
     ServiceApaas,
     ServiceChat,
+    ServiceFCdn,
     ServiceFpa,
     ServiceRtc,
-    ServiceRtm
+    ServiceRtm,
+    ServiceRtm2,
+    ServiceStreaming
 }
