@@ -25,19 +25,19 @@ class RtcTokenBuilder2 {
     /**
      * Build the RTC token with uid.
      *
-     * @param appId:            The App ID issued to you by Agora. Apply for a new App ID from
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
      *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param appCertificate:   Certificate of the application that you registered in
+     * @param appCertificate    Certificate of the application that you registered in
      *                          the Agora Dashboard. See Get an App Certificate.
-     * @param channelName:      Unique channel name for the AgoraRTC session in the string format
-     * @param uid:              User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
+     * @param channelName       Unique channel name for the AgoraRTC session in the string format
+     * @param uid               User ID. A 32-bit unsigned integer with a value ranging from 1 to (2^32-1).
      *                          uid must be unique.
-     * @param role:             ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     * @param role              ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param tokenExpire:      represented by the number of seconds elapsed since now. If, for example,
+     * @param tokenExpire       represented by the number of seconds elapsed since now. If, for example,
      *                          you want to access the Agora Service within 10 minutes after the token is generated,
      *                          set tokenExpire as 600(seconds).
-     * @param privilegeExpire:  represented by the number of seconds elapsed since now. If, for example,
+     * @param privilegeExpire   represented by the number of seconds elapsed since now. If, for example,
      *                          you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
      * @return The RTC token.
      */
@@ -64,18 +64,18 @@ class RtcTokenBuilder2 {
     /**
      * Build the RTC token with account.
      *
-     * @param appId:            The App ID issued to you by Agora. Apply for a new App ID from
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
      *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param appCertificate:   Certificate of the application that you registered in
+     * @param appCertificate    Certificate of the application that you registered in
      *                          the Agora Dashboard. See Get an App Certificate.
-     * @param channelName:      Unique channel name for the AgoraRTC session in the string format
-     * @param account:          The user's account, max length is 255 Bytes.
-     * @param role:             ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     * @param channelName       Unique channel name for the AgoraRTC session in the string format
+     * @param account           The user's account, max length is 255 Bytes.
+     * @param role              ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param tokenExpire:      represented by the number of seconds elapsed since now. If, for example,
+     * @param tokenExpire       represented by the number of seconds elapsed since now. If, for example,
      *                          you want to access the Agora Service within 10 minutes after the token is generated,
      *                          set tokenExpire as 600(seconds).
-     * @param privilegeExpire:  represented by the number of seconds elapsed since now. If, for example,
+     * @param privilegeExpire   represented by the number of seconds elapsed since now. If, for example,
      *                          you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
      * @return The RTC token.
      */
@@ -109,16 +109,16 @@ class RtcTokenBuilder2 {
 
     /**
      * Generates an RTC token with the specified privilege.
-     * <p>
+     *
      * This method supports generating a token with the following privileges:
      * - Joining an RTC channel.
      * - Publishing audio in an RTC channel.
      * - Publishing video in an RTC channel.
      * - Publishing data streams in an RTC channel.
-     * <p>
+     *
      * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
      * enabled co-host authentication.
-     * <p>
+     *
      * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
      * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
      * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
@@ -178,16 +178,16 @@ class RtcTokenBuilder2 {
 
     /**
      * Generates an RTC token with the specified privilege.
-     * <p>
+     *
      * This method supports generating a token with the following privileges:
      * - Joining an RTC channel.
      * - Publishing audio in an RTC channel.
      * - Publishing video in an RTC channel.
      * - Publishing data streams in an RTC channel.
-     * <p>
+     *
      * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
      * enabled co-host authentication.
-     * <p>
+     *
      * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
      * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
      * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
@@ -252,18 +252,18 @@ class RtcTokenBuilder2 {
     /**
      * Build the RTC and RTM token with account.
      *
-     * @param appId:            The App ID issued to you by Agora. Apply for a new App ID from
+     * @param appId             The App ID issued to you by Agora. Apply for a new App ID from
      *                          Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param appCertificate:   Certificate of the application that you registered in
+     * @param appCertificate    Certificate of the application that you registered in
      *                          the Agora Dashboard. See Get an App Certificate.
-     * @param channelName:      Unique channel name for the AgoraRTC session in the string format
-     * @param account:          The user's account, max length is 255 Bytes.
-     * @param role:             ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     * @param channelName       Unique channel name for the AgoraRTC session in the string format
+     * @param account           The user's account, max length is 255 Bytes.
+     * @param role              ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param tokenExpire:      represented by the number of seconds elapsed since now. If, for example,
+     * @param tokenExpire       represented by the number of seconds elapsed since now. If, for example,
      *                          you want to access the Agora Service within 10 minutes after the token is generated,
      *                          set tokenExpire as 600(seconds).
-     * @param privilegeExpire:  represented by the number of seconds elapsed since now. If, for example,
+     * @param privilegeExpire   represented by the number of seconds elapsed since now. If, for example,
      *                          you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
      * @return The RTC and RTM token.
      */
@@ -302,15 +302,15 @@ class RtcTokenBuilder2 {
     /**
      * Build the RTC and RTM token with account.
      *
-     * @param appId:                       The App ID issued to you by Agora. Apply for a new App ID from
+     * @param appId                        The App ID issued to you by Agora. Apply for a new App ID from
      *                                     Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param appCertificate:              Certificate of the application that you registered in
+     * @param appCertificate               Certificate of the application that you registered in
      *                                     the Agora Dashboard. See Get an App Certificate.
-     * @param channelName:                 Unique channel name for the AgoraRTC session in the string format
-     * @param rtcAccount:                  The RTC user's account, max length is 255 Bytes.
-     * @param rtcRole:                     ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
+     * @param channelName                  Unique channel name for the AgoraRTC session in the string format
+     * @param rtcAccount                   The RTC user's account, max length is 255 Bytes.
+     * @param rtcRole                      ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                                     ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param rtcTokenExpire:              represented by the number of seconds elapsed since now. If, for example,
+     * @param rtcTokenExpire               represented by the number of seconds elapsed since now. If, for example,
      *                                     you want to access the Agora Service within 10 minutes after the token is generated,
      *                                     set rtcTokenExpire as 600(seconds).
      * @param joinChannelPrivilegeExpire   represented by the number of seconds elapsed since now.
@@ -321,8 +321,8 @@ class RtcTokenBuilder2 {
      *                                     If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
      * @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
      *                                     If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
-     * @param rtmUserId:                   The RTM user's account, max length is 64 Bytes.
-     * @param rtmTokenExpire:              represented by the number of seconds elapsed since now. If, for example,
+     * @param rtmUserId                    The RTM user's account, max length is 64 Bytes.
+     * @param rtmTokenExpire               represented by the number of seconds elapsed since now. If, for example,
      *                                     you want to access the Agora Service within 10 minutes after the token is generated,
      *                                     set rtmTokenExpire as 600(seconds).
      * @return The RTC and RTM token.

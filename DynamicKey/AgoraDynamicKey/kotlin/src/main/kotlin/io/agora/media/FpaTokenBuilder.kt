@@ -5,9 +5,9 @@ class FpaTokenBuilder {
     /**
      * Build the FPA token.
      *
-     * @param appId:          The App ID issued to you by Agora. Apply for a new App ID from
+     * @param appId           The App ID issued to you by Agora. Apply for a new App ID from
      *                        Agora Dashboard if it is missing from your kit. See Get an App ID.
-     * @param appCertificate: Certificate of the application that you registered in
+     * @param appCertificate  Certificate of the application that you registered in
      *                        the Agora Dashboard. See Get an App Certificate.
      * @return The FPA token.
      */
