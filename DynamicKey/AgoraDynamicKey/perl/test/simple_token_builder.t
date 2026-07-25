@@ -26,5 +26,27 @@ my $expired_ts      = 1446455471;
     is $builder2->build_token, $expected, "build after init_token_builder";
 }
 
-done_testing;
+{
+    # Exercise every role, privilege removal, and constructor validation.
+    for my $role (
+        Agora::SimpleTokenBuilder::Role_Attendee(),
+        Agora::SimpleTokenBuilder::Role_Publisher(),
+        Agora::SimpleTokenBuilder::Role_Subscriber(),
+        Agora::SimpleTokenBuilder::Role_Admin(),
+    ) {
+        my $builder = Agora::SimpleTokenBuilder::create_simple_token_builder($app_id, $app_certificate, $channel_name, $uid);
+        $builder->init_privileges($role);
+        ok scalar(keys %{ $builder->{token}{messages} }) > 0, "role $role adds privileges";
+        $builder->remove_privilege(Agora::AccessToken::KJoinChannel());
+        ok !exists $builder->{token}{messages}{Agora::AccessToken::KJoinChannel()}, "remove privilege for role $role";
+    }
 
+    eval { Agora::SimpleTokenBuilder->new() };
+    like $@, qr/invalide paramaters/, "reject missing token";
+
+    my $builder = Agora::SimpleTokenBuilder::create_simple_token_builder($app_id, $app_certificate, $channel_name, $uid);
+    eval { $builder->init_privileges(999) };
+    like $@, qr/not defined role/, "reject unknown role";
+}
+
+done_testing;

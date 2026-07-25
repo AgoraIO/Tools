@@ -258,6 +258,25 @@ function test_extended_service_numeric_uid_conversion()
     luaunit.assertEquals("fcdn-account", fcdn[3].account)
 end
 
+-- Verifies omitted Streaming and FCDN accounts use wildcard account encoding.
+function test_extended_service_default_accounts()
+    local streaming = access_token.new_service_streaming(CHANNEL_NAME)
+    local fcdn = access_token.new_service_fcdn(CHANNEL_NAME)
+
+    luaunit.assertEquals("", streaming.account)
+    luaunit.assertEquals("", fcdn.account)
+end
+
+-- Verifies build rejects malformed application credentials.
+function test_build_rejects_invalid_credentials()
+    local token = access_token.new_access_token("invalid", APP_CERTIFICATE, EXPIRE)
+    token:add_service(create_rtc_service())
+
+    luaunit.assertErrorMsgContains("check appId or appCertificate", function()
+        token:build()
+    end)
+end
+
 -- Verifies malformed tokens and invalid signatures are rejected.
 function test_invalid_token_inputs_and_signatures()
     local parsed = access_token.create_access_token()
@@ -272,6 +291,9 @@ function test_invalid_token_inputs_and_signatures()
     luaunit.assertFalse(parsed:verify_signature(WRONG_APP_CERTIFICATE))
     luaunit.assertFalse(parsed:verify_signature("invalid"))
     luaunit.assertTrue(parsed:verify_signature(APP_CERTIFICATE))
+
+    parsed.signature = 1
+    luaunit.assertFalse(parsed:verify_signature(APP_CERTIFICATE))
 
     luaunit.assertFalse(parsed:parse("006invalid"))
     luaunit.assertFalse(parsed:verify_signature(APP_CERTIFICATE))

@@ -150,3 +150,35 @@ exports.BuildTokenWithUserAccountAndPrivilege_Test = function (test) {
     test.equal(expire, service.__privileges[ServiceRtc.kPrivilegePublishDataStream]);
     test.done();
 };
+
+// Verifies combined RTC and RTM token generation for both role branches.
+exports.buildTokenWithRtm_Test = function (test) {
+    const publisher = RtcTokenBuilder.buildTokenWithRtm(
+        appId, appCertificate, channelName, uidStr, Role.PUBLISHER, expire, expire)
+    const subscriber = RtcTokenBuilder.buildTokenWithRtm(
+        appId, appCertificate, channelName, uidStr, Role.SUBSCRIBER, expire, expire)
+
+    for (const token of [publisher, subscriber]) {
+        const parsed = new AccessToken2('', '', 0, 0)
+        test.equal(true, parsed.from_string(token))
+        test.equal(2, parsed.services.length)
+    }
+    test.done()
+};
+
+// Verifies combined RTC and RTM token generation with independent privileges.
+exports.buildTokenWithRtm2_Test = function (test) {
+    const publisher = RtcTokenBuilder.buildTokenWithRtm2(
+        appId, appCertificate, channelName, uidStr, Role.PUBLISHER, expire,
+        1, 2, 3, 4, uidStr, expire)
+    const subscriber = RtcTokenBuilder.buildTokenWithRtm2(
+        appId, appCertificate, channelName, uidStr, Role.SUBSCRIBER, expire,
+        1, 2, 3, 4, uidStr, expire)
+
+    for (const token of [publisher, subscriber]) {
+        const parsed = new AccessToken2('', '', 0, 0)
+        test.equal(true, parsed.from_string(token))
+        test.equal(2, parsed.services.length)
+    }
+    test.done()
+};

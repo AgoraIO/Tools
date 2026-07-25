@@ -48,4 +48,16 @@ class ByteBufTest {
         assertTrue(packed.size > 1024)
         assertArrayEquals(payload, packed)
     }
+
+    /** Exercises the generic service privilege unpacking implementation. */
+    @Test
+    fun unpacksGenericServicePrivileges() {
+        val privileges = TreeMap<Short, Int>().apply { put(1, 600) }
+        val service = AccessToken2.Service(999)
+
+        val packed = ByteBuf().putIntMap(privileges).asBytes()
+        service.unpack(ByteBuf(packed))
+
+        assertEquals(privileges, service.privileges)
+    }
 }

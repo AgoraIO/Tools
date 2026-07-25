@@ -20,6 +20,9 @@ const {
     kRtm2ServiceType,
     kChatServiceType
 } = require('../src/AccessToken2')
+const fs = require('fs')
+const path = require('path')
+const Module = require('module')
 
 var appID = '970CA35de60c44645bbae8a215061b33'
 var appCertificate = '5CFd2fd1755d40ecb72977518be15d3b'
@@ -378,5 +381,63 @@ exports.AccessToken_Test_stableServiceTypeOrdering = function (test) {
         '007eJxTYOAQsrQ5s3TfH+1tvy8zZZ46EpCc0V43JXdGd2jS8porKo4KDJbmBs6OxqYpqWYGySYmZiamSUmJqRaJRoamBmaGScbG7l8EGCKYGBgYGRgYmBgYGVgYGMF8JjDJDCZZwKQCg3mKuZGxmWlqkqWFsYmFqbGleapxqnGaZYqJmUFSSkoiF4ORhYWRsYmhkbkxyCyISZwMJanFJfGlxalFACKnKng='
     test.equal(expected, token.build())
     test.strictEqual(rtmService, token.services[0])
+    test.done()
+}
+
+// Rejects invalid build fields, non-string tokens, and malformed Token007 payloads.
+exports.AccessToken_Test_invalidBuildAndParseInputs = function (test) {
+    const empty = new AccessToken2(appID, appCertificate, ts, expire)
+    test.equal('', empty.build())
+
+    const invalid = new AccessToken2('invalid', appCertificate, ts, expire)
+    const service = new ServiceRtc(channel, uid)
+    service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expire)
+    invalid.add_service(service)
+    test.equal('', invalid.build())
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    test.equal(false, parsed.from_string(null))
+    test.equal(false, parsed.from_string('00'))
+    test.equal(false, parsed.from_string('007invalid'))
+    test.done()
+}
+
+// Rejects verification when the parsed signature length is altered.
+exports.AccessToken_Test_signatureLengthMismatch = function (test) {
+    const token = new AccessToken2(appID, appCertificate, ts, expire)
+    token.salt = salt
+    const service = new ServiceRtc(channel, uid)
+    service.add_privilege(ServiceRtc.kPrivilegeJoinChannel, expire)
+    token.add_service(service)
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    test.equal(true, parsed.from_string(token.build()))
+    parsed.__signature = Buffer.alloc(1)
+    test.equal(false, parsed.verifySignature(appCertificate))
+    test.done()
+}
+
+// Exercises private buffer helpers that are retained for wire-format compatibility.
+exports.AccessToken_Test_bufferHelpers = function (test) {
+    const filename = path.resolve(__dirname, '../src/AccessToken2.js')
+    const source = fs.readFileSync(filename, 'utf8') +
+        '\nmodule.exports.__ByteBuf = ByteBuf; module.exports.__ReadByteBuf = ReadByteBuf;'
+    const internalModule = new Module(filename, module)
+    internalModule.filename = filename
+    internalModule.paths = Module._nodeModulePaths(path.dirname(filename))
+    internalModule._compile(source, filename)
+    const ByteBuf = internalModule.exports.__ByteBuf
+    const ReadByteBuf = internalModule.exports.__ReadByteBuf
+
+    const signed = new ByteBuf().putInt32(-7).putInt16(-2).pack()
+    test.equal(-7, signed.readInt32LE(0))
+    test.equal(-2, signed.readInt16LE(4))
+    test.equal(2, new ByteBuf().putTreeMap(null).pack().length)
+    test.equal(2, new ByteBuf().putTreeMapUInt32(null).pack().length)
+    test.ok(new ByteBuf().putTreeMap({ 1: 'value' }).pack().length > 2)
+
+    const reader = new ReadByteBuf(Buffer.from([1, 0, 2, 0, 0, 0]))
+    test.equal(1, reader.getUint16())
+    test.equal(2, reader.getUint32())
     test.done()
 }

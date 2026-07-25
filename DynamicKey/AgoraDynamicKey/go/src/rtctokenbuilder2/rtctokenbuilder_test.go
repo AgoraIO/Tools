@@ -139,3 +139,27 @@ func Test_BuildTokenWithUserAccountAndPrivilege(t *testing.T) {
 	accesstoken.AssertEqual(t, DataMockPubVideoPrivilegeExpire, accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishVideoStream])
 	accesstoken.AssertEqual(t, DataMockPubDataStreamPrivilegeExpire, accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc).Privileges[accesstoken.PrivilegePublishDataStream])
 }
+
+// TestBuildCombinedRtcRtmTokens verifies both combined-token builders and role branches.
+func TestBuildCombinedRtcRtmTokens(t *testing.T) {
+	tokens := make([]string, 0, 4)
+	for _, role := range []Role{RolePublisher, RoleSubscriber} {
+		token, err := BuildTokenWithRtm(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockAccount, role, DataMockExpire, DataMockExpire)
+		accesstoken.AssertNil(t, err)
+		tokens = append(tokens, token)
+
+		token, err = BuildTokenWithRtm2(DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockAccount, role, DataMockExpire,
+			1, 2, 3, 4, DataMockAccount, DataMockExpire)
+		accesstoken.AssertNil(t, err)
+		tokens = append(tokens, token)
+	}
+
+	for _, token := range tokens {
+		parsed := accesstoken.CreateAccessToken()
+		parsedOK, err := parsed.Parse(token)
+		accesstoken.AssertNil(t, err)
+		accesstoken.AssertEqual(t, true, parsedOK)
+		accesstoken.AssertEqual(t, 1, len(parsed.GetServices(accesstoken.ServiceTypeRtc)))
+		accesstoken.AssertEqual(t, 1, len(parsed.GetServices(accesstoken.ServiceTypeRtm)))
+	}
+}

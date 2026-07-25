@@ -1,10 +1,12 @@
 import os
 import sys
 import unittest
+from collections import OrderedDict
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.utils import *
+from src.Packer import *
 
 class UtilsTest(unittest.TestCase):
     def setUp(self) -> None:
@@ -17,3 +19,12 @@ class UtilsTest(unittest.TestCase):
         data = get_md5(self.__md5_source)
 
         self.assertEqual(data, self.__md5_data)
+
+    def test_string_map_packing(self):
+        """Round-trip maps containing length-prefixed byte strings."""
+        source = OrderedDict([(1, b'alpha'), (2, b'beta')])
+        packed = pack_map_string(source)
+        unpacked, remaining = unpack_map_string(packed + b'tail')
+
+        self.assertEqual(unpacked, source)
+        self.assertEqual(remaining, b'tail')

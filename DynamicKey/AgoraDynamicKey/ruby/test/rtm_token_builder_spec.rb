@@ -30,5 +30,26 @@ describe 'AgoraDynamicKey::RTMTokenBuilder' do
       result = token.build!
       expect(result).to eq(valid_token)
     end
+
+    # Rejects an omitted legacy RTM parameter set.
+    it 'rejects nil params' do
+      expect {
+        AgoraDynamicKey::RTMTokenBuilder.build_token(nil)
+      }.to raise_error(NameError)
+    end
+
+    # Rejects legacy RTM parameters omitted by filtering.
+    it 'rejects missing params' do
+      expect {
+        AgoraDynamicKey::RTMTokenBuilder.build_token(app_id: 'app')
+      }.to raise_error(NameError)
+    end
+
+    # Exercises the legacy RTM validator with a complete parameter set.
+    it 'validates complete params' do
+      expect {
+        AgoraDynamicKey::RTMTokenBuilder.build_token(rtm_token_params.transform_values(&:to_s))
+      }.to raise_error(TypeError)
+    end
   end
 end

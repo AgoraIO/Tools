@@ -304,6 +304,34 @@ void main() {
       expect(rtc.uid, uidString);
     });
 
+    // Verifies every legacy ServiceType factory and existing-service update path.
+    test('supports every legacy addPrivilege service type', () {
+      final serviceTypes = <int>[
+        Service.RTC,
+        Service.RTM,
+        Service.STREAMING,
+        Service.FPA,
+        Service.CHAT,
+        Service.FCDN,
+        Service.APAAS,
+        Service.RTM2,
+        999,
+      ];
+
+      for (final serviceType in serviceTypes) {
+        final token = AccessToken(appId, appCertificate, channelName, uid)
+          ..addPrivilege(serviceType, 1, tokenExpireSeconds)
+          ..addPrivilege(serviceType, 2, tokenExpireSeconds + 1);
+
+        expect(token.services, hasLength(1));
+        expect(token.services.single.serviceType, serviceType);
+        expect(token.services.single.privileges, {
+          1: tokenExpireSeconds,
+          2: tokenExpireSeconds + 1,
+        });
+      }
+    });
+
     // Verifies build validation, malformed input, and signature preconditions.
     test('rejects invalid token inputs and signatures', () {
       expect(AccessToken.empty().build(), isEmpty);

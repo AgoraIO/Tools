@@ -18,6 +18,10 @@ expiredts = 1446455471
 
 class DynamicKeyTest(unittest.TestCase):
 
+    def test_pack_int32(self):
+        """Pack a signed 32-bit integer in little-endian order."""
+        self.assertEqual(packInt32(-7), '\xf9\xff\xff\xff')
+
     def test_publicsharing(self):
         """Generate and validate a public sharing key."""
         expected = "005AwAoADc0QTk5RTVEQjI4MDk0NUI0NzUwNTk0MUFDMjM4MDU2NzIwREY3QjAQAJcMo13mDERkW7roohUGGzOwKDdW9buDA68oN1YAAA=="

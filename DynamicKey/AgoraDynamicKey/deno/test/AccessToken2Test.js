@@ -327,6 +327,30 @@ Deno.test('AccessToken_Test_stableServiceTypeOrdering', () => {
     assertStrictEquals(token.services[0], rtmService)
 })
 
+// Rejects invalid build fields, non-string tokens, and malformed Token007 payloads.
+Deno.test('AccessToken_Test_invalidBuildAndParseInputs', () => {
+    const empty = new AccessToken2(appID, appCertificate, ts, expire)
+    assertEquals(empty.build(), '')
+
+    const invalid = new AccessToken2('invalid', appCertificate, ts, expire)
+    invalid.add_service(createRtcService())
+    assertEquals(invalid.build(), '')
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    assertFalse(parsed.from_string(null))
+    assertFalse(parsed.from_string('00'))
+    assertFalse(parsed.from_string('007invalid'))
+})
+
+// Rejects verification when the parsed signature length is altered.
+Deno.test('AccessToken_Test_signatureLengthMismatch', () => {
+    const parsed = new AccessToken2('', '', 0, 0)
+    assert(parsed.from_string(createRtcRtmToken().build()))
+    parsed.__signature = new Uint8Array(1)
+
+    assertFalse(parsed.verifySignature(appCertificate))
+})
+
 // Creates a fully privileged RTC service for deterministic tests.
 function createRtcService() {
     const rtcService = new ServiceRtc(channel, uid)

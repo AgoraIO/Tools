@@ -113,6 +113,23 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.get_services(AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(nil)
   end
 
+  # Rejects malformed compressed payloads without retaining parsed state.
+  it 'test_parse_malformed_payload' do
+    access_token = AgoraDynamicKey2::AccessToken.new
+
+    expect(access_token.parse('007invalid')).to eq(false)
+    expect(access_token.verify_signature(app_certificate)).to eq(false)
+  end
+
+  # Returns false when the cryptographic comparison raises unexpectedly.
+  it 'test_verify_signature_crypto_failure' do
+    access_token = AgoraDynamicKey2::AccessToken.new
+    expect(access_token.parse(cpp_extended_token)).to eq(true)
+    allow(OpenSSL).to receive(:fixed_length_secure_compare).and_raise(StandardError)
+
+    expect(access_token.verify_signature(app_certificate)).to eq(false)
+  end
+
   # Parses a legacy multi-service Token007 token.
   it 'test_parse_Token_MultiService' do
     access_token = AgoraDynamicKey2::AccessToken.new

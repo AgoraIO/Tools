@@ -30,6 +30,30 @@ class AccessTokenTest(unittest.TestCase):
         result = key.build()
         self.assertEqual(expected, result)
 
+    def test_pack_and_parse_helpers(self):
+        """Round-trip legacy scalar, string, and map packing helpers."""
+        self.assertEqual(AccessToken.packInt32(-7), '\xf9\xff\xff\xff')
+        packed_map = AccessToken.packMap({1: 'one', 2: 'two'})
+        self.assertEqual(packed_map, '\x02\x00\x01\x00\x03\x00one\x02\x00\x03\x00two')
+
+        token = AccessToken.AccessToken(appID, appCertificate, channelName, uid)
+        token.salt = salt
+        token.ts = ts
+        token.addPrivilege(AccessToken.kJoinChannel, expireTimestamp)
+        encoded = token.build()
+
+        parsed = AccessToken.AccessToken()
+        self.assertTrue(parsed.fromString(encoded))
+        self.assertEqual(parsed.salt, salt)
+        self.assertEqual(parsed.ts, ts)
+        self.assertEqual(parsed.messages[AccessToken.kJoinChannel], expireTimestamp)
+
+    def test_parse_rejects_invalid_legacy_tokens(self):
+        """Reject legacy tokens with an unsupported version or malformed payload."""
+        parsed = AccessToken.AccessToken()
+        self.assertFalse(parsed.fromString('007'))
+        self.assertFalse(parsed.fromString('006' + appID + '!'))
+
         # test uid = 0
         expected = "006970CA35de60c44645bbae8a215061b33IACw1o7htY6ISdNRtku3p9tjTPi0jCKf9t49UHJhzCmL6bdIfRAAAAAAEAABAAAAR/QQAAEAAQCvKDdW"
 

@@ -1,6 +1,8 @@
 package accesstoken2
 
 import (
+	"bytes"
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -17,6 +19,110 @@ const (
 	DataMockUidStr              = "2882341273"
 	DataMockUserId              = "test_user"
 )
+
+type rejectedWriter struct{}
+
+// Write rejects every write to exercise serialization error propagation.
+func (rejectedWriter) Write([]byte) (int, error) { return 0, errors.New("write rejected") }
+
+// Test_AllServices_RoundTrip verifies every known service payload through build, parse, and verification.
+func Test_AllServices_RoundTrip(t *testing.T) {
+	permissions := NewRtm2Permissions()
+	permissions.Add(Rtm2ResourceMessageChannels, Rtm2PermissionRead, []string{"message-a", "message-b"})
+	permissions.Add(Rtm2ResourceUsers, Rtm2PermissionWrite, []string{"user-a"})
+
+	services := []IService{
+		NewServiceRtc("rtc-channel", "rtc-user"),
+		NewServiceRtm("rtm-user"),
+		NewServiceStreamingWithUid("stream-channel", DataMockUid),
+		NewServiceFpa(),
+		NewServiceChat("chat-user"),
+		NewServiceFCdnWithUid("fcdn-channel", DataMockUid),
+		NewServiceApaas("room-uuid", "user-uuid", 2),
+		NewServiceRtm2("rtm2-user", permissions),
+	}
+	for _, service := range services {
+		switch typed := service.(type) {
+		case *ServiceRtc:
+			typed.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
+		case *ServiceRtm:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		case *ServiceStreaming:
+			typed.AddPrivilege(PrivilegeStreamingPublishMixStream, DataMockExpire)
+		case *ServiceFpa:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		case *ServiceChat:
+			typed.AddPrivilege(PrivilegeChatUser, DataMockExpire)
+		case *ServiceFCdn:
+			typed.AddPrivilege(PrivilegeFCdnPublish, DataMockExpire)
+		case *ServiceApaas:
+			typed.AddPrivilege(PrivilegeApaasRoomUser, DataMockExpire)
+		case *ServiceRtm2:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		}
+	}
+
+	token := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+	token.IssueTs = DataMockIssueTs
+	token.Salt = DataMockSalt
+	for _, service := range services {
+		token.AddService(service)
+	}
+	encoded, err := token.Build()
+	AssertNil(t, err)
+
+	parsed := CreateAccessToken()
+	parsedOK, err := parsed.Parse(encoded)
+	AssertNil(t, err)
+	AssertEqual(t, true, parsedOK)
+	AssertEqual(t, len(services), len(parsed.Services))
+	verified, err := parsed.VerifySignature(DataMockAppCertificate)
+	AssertNil(t, err)
+	AssertEqual(t, true, verified)
+
+	parsedRtm2 := parsed.GetServices(ServiceTypeRtm2)[0].(*ServiceRtm2)
+	if !reflect.DeepEqual(permissions.Details, parsedRtm2.Permissions.Details) {
+		t.Fatalf("unexpected RTM2 permissions: %#v", parsedRtm2.Permissions.Details)
+	}
+	parsedApaas := parsed.GetServices(ServiceTypeApaas)[0].(*ServiceApaas)
+	AssertEqual(t, "room-uuid", parsedApaas.RoomUuid)
+	AssertEqual(t, int16(2), parsedApaas.Role)
+}
+
+// Test_ServicePackingErrors verifies that service serializers return writer failures.
+func Test_ServicePackingErrors(t *testing.T) {
+	services := []IService{
+		NewService(99),
+		NewServiceRtc("channel", "user"),
+		NewServiceRtm("user"),
+		NewServiceStreaming("channel", "account"),
+		NewServiceFpa(),
+		NewServiceChat("user"),
+		NewServiceFCdn("channel", "account"),
+		NewServiceApaas("room", "user", 1),
+		NewServiceRtm2("user", nil),
+	}
+	for _, service := range services {
+		if err := service.Pack(rejectedWriter{}); err == nil {
+			t.Fatalf("service %T ignored writer failure", service)
+		}
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	service := NewServiceFpa()
+	service.AddPrivilege(PrivilegeLogin, DataMockExpire)
+	if err := service.Pack(buffer); err != nil {
+		t.Fatal(err)
+	}
+	parsed := NewServiceFpa()
+	if err := parsed.UnPack(bytes.NewReader(buffer.Bytes()[2:])); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(service.Privileges, parsed.Privileges) {
+		t.Fatalf("unexpected FPA privileges: %#v", parsed.Privileges)
+	}
+	AssertEqual(t, "900150983cd24fb0d6963f7d28e17f72", Md5("abc"))
+}
 
 // Test_AccessToken_Build_Error_NoService verifies token generation rejects an empty service list.
 func Test_AccessToken_Build_Error_NoService(t *testing.T) {

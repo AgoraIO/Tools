@@ -769,3 +769,48 @@ TEST_F(AccessToken2_test, testUnknownServiceBeforeKnownService) { TestUnknownSer
 
 // Tests that a failed parse invalidates an earlier successful parse.
 TEST_F(AccessToken2_test, testFailedParseClearsVerificationState) { TestFailedParseClearsVerificationState(); }
+
+// Tests cloning every concrete service without losing its common state.
+TEST_F(AccessToken2_test, testCloneEveryKnownService) {
+  ServiceRtm2::Permissions permissions;
+  permissions.Add(ServiceRtm2::Permissions::kUsers, ServiceRtm2::Permissions::kRead, {"user"});
+  std::vector<std::unique_ptr<Service>> services;
+  services.emplace_back(new ServiceRtc("rtc", 123));
+  services.emplace_back(new ServiceRtm("rtm"));
+  services.emplace_back(new ServiceStreaming("stream", 123));
+  services.emplace_back(new ServiceFpa());
+  services.emplace_back(new ServiceChat("chat"));
+  services.emplace_back(new ServiceFCdn("fcdn", 123));
+  services.emplace_back(new ServiceApaas("room", "user", 2));
+  services.emplace_back(new ServiceRtm2("rtm2", permissions));
+
+  for (auto &service : services) {
+    service->AddPrivilege(1, 600);
+    auto clone = service->Clone();
+    ASSERT_NE(nullptr, clone);
+    EXPECT_EQ(service->type_, clone->type_);
+    EXPECT_EQ(service->privileges_, clone->privileges_);
+    EXPECT_EQ(service->PackService(), clone->PackService());
+  }
+}
+
+// Tests invalid Token007 build and parse inputs.
+TEST_F(AccessToken2_test, testInvalidBuildAndParseInputs) {
+  const std::string app_id = "970CA35de60c44645bbae8a215061b33";
+  const std::string app_certificate = "5CFd2fd1755d40ecb72977518be15d3b";
+  AccessToken2 invalid_app("invalid", app_certificate, 1111111, 600);
+  invalid_app.AddService(std::unique_ptr<Service>(new ServiceFpa()));
+  EXPECT_TRUE(invalid_app.Build().empty());
+
+  AccessToken2 invalid_certificate(app_id, "invalid", 1111111, 600);
+  invalid_certificate.AddService(std::unique_ptr<Service>(new ServiceFpa()));
+  EXPECT_TRUE(invalid_certificate.Build().empty());
+
+  AccessToken2 empty_services(app_id, app_certificate, 1111111, 600);
+  EXPECT_TRUE(empty_services.Build().empty());
+
+  AccessToken2 parser;
+  EXPECT_FALSE(parser.FromString("006invalid"));
+  EXPECT_FALSE(parser.FromString("007invalid"));
+  EXPECT_EQ(kTokenInvalid, parser.VerifySignature(app_certificate));
+}
