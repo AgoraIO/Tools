@@ -18,7 +18,6 @@ int main(int argc, char const *argv[]) {
   const char *env_app_certificate = getenv("AGORA_APP_CERTIFICATE");
   std::string app_certificate = env_app_certificate ? env_app_certificate : "";
 
-  std::string channel_name = "7d72365eb983485397e3e3f9d460bdda";
   std::string user_id = "test_user_id";
   uint32_t expiration_in_seconds = 3600;
 
@@ -34,6 +33,18 @@ int main(int argc, char const *argv[]) {
   auto result = RtmTokenBuilder2::BuildToken(app_id, app_certificate, user_id,
                                              expiration_in_seconds);
   std::cout << "RTM Token:" << result << std::endl;
+
+  ServiceRtm2::Permissions permissions;
+  permissions.Add(ServiceRtm2::Permissions::kMessageChannels,
+                  ServiceRtm2::Permissions::kRead,
+                  {"message-channel-a", "message-channel-b"});
+  permissions.Add(ServiceRtm2::Permissions::kStreamChannels,
+                  ServiceRtm2::Permissions::kWrite,
+                  {"stream-channel-a"});
+
+  result = RtmTokenBuilder2::BuildToken(app_id, app_certificate, user_id,
+                                        permissions, expiration_in_seconds);
+  std::cout << "RTM2 Token:" << result << std::endl;
 
   return 0;
 }

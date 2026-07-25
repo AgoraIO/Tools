@@ -111,6 +111,19 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_rtc->user_id_, r_rtc->user_id_);
   }
 
+  // Verifies Streaming-specific fields and privileges.
+  void VerifyServiceStreaming(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_streaming = dynamic_cast<ServiceStreaming *>(l);
+    auto r_streaming = dynamic_cast<ServiceStreaming *>(r);
+
+    ASSERT_NE(nullptr, l_streaming);
+    ASSERT_NE(nullptr, r_streaming);
+    EXPECT_EQ(l_streaming->channel_name_, r_streaming->channel_name_);
+    EXPECT_EQ(l_streaming->account_, r_streaming->account_);
+  }
+
   // Verifies FPA service privileges and concrete service types.
   void VerifyServiceFpa(Service *l, Service *r) {
     VerifyService(l, r);
@@ -129,6 +142,19 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_chat->user_id_, r_chat->user_id_);
   }
 
+  // Verifies FCDN-specific fields and privileges.
+  void VerifyServiceFCdn(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_fcdn = dynamic_cast<ServiceFCdn *>(l);
+    auto r_fcdn = dynamic_cast<ServiceFCdn *>(r);
+
+    ASSERT_NE(nullptr, l_fcdn);
+    ASSERT_NE(nullptr, r_fcdn);
+    EXPECT_EQ(l_fcdn->channel_name_, r_fcdn->channel_name_);
+    EXPECT_EQ(l_fcdn->account_, r_fcdn->account_);
+  }
+
   // Verifies APaaS-specific fields and privileges.
   void VerifyServiceApaas(Service *l, Service *r) {
     VerifyService(l, r);
@@ -139,6 +165,19 @@ class AccessToken2_test : public testing::Test {
     EXPECT_EQ(l_apaas->room_uuid_, r_apaas->room_uuid_);
     EXPECT_EQ(l_apaas->user_uuid_, r_apaas->user_uuid_);
     EXPECT_EQ(l_apaas->role_, r_apaas->role_);
+  }
+
+  // Verifies RTM2-specific fields, privileges, and resource permissions.
+  void VerifyServiceRtm2(Service *l, Service *r) {
+    VerifyService(l, r);
+
+    auto l_rtm2 = dynamic_cast<ServiceRtm2 *>(l);
+    auto r_rtm2 = dynamic_cast<ServiceRtm2 *>(r);
+
+    ASSERT_NE(nullptr, l_rtm2);
+    ASSERT_NE(nullptr, r_rtm2);
+    EXPECT_EQ(l_rtm2->user_id_, r_rtm2->user_id_);
+    EXPECT_EQ(l_rtm2->permissions_.details_, r_rtm2->permissions_.details_);
   }
 
   // Verifies deterministic generation and round-trip parsing of a token.
@@ -166,9 +205,14 @@ class AccessToken2_test : public testing::Test {
 
     using VerifyServiceHandler = void (AccessToken2_test::*)(Service *, Service *);
     static const std::map<uint16_t, VerifyServiceHandler> kVerifyServices = {
-        {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},     {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
-        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},     {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
+        {ServiceRtc::kServiceType, &AccessToken2_test::VerifyServiceRtc},
+        {ServiceRtm::kServiceType, &AccessToken2_test::VerifyServiceRtm},
+        {ServiceStreaming::kServiceType, &AccessToken2_test::VerifyServiceStreaming},
+        {ServiceFpa::kServiceType, &AccessToken2_test::VerifyServiceFpa},
+        {ServiceChat::kServiceType, &AccessToken2_test::VerifyServiceChat},
+        {ServiceFCdn::kServiceType, &AccessToken2_test::VerifyServiceFCdn},
         {ServiceApaas::kServiceType, &AccessToken2_test::VerifyServiceApaas},
+        {ServiceRtm2::kServiceType, &AccessToken2_test::VerifyServiceRtm2},
     };
 
     auto k7_it = k7.services_.begin();
@@ -389,6 +433,93 @@ class AccessToken2_test : public testing::Test {
 
     VerifyAccessToken2(expected, &key);
   }
+
+  // Tests byte-level compatibility with Streaming, FCDN, and RTM2 from the xuyang branch.
+  void TestXuyangExtendedServicesCompatibility() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> streaming(new ServiceStreaming(channel_name_, account_));
+    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream, expire_);
+    streaming->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream, expire_);
+    token.AddService(std::move(streaming));
+
+    std::unique_ptr<Service> fcdn(new ServiceFCdn(channel_name_, account_));
+    fcdn->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+    fcdn->AddPrivilege(ServiceFCdn::kPrivilegePlay, expire_);
+    token.AddService(std::move(fcdn));
+
+    ServiceRtm2::Permissions permissions;
+    permissions.Add(ServiceRtm2::Permissions::kMessageChannels, ServiceRtm2::Permissions::kRead, {"message-a", "message-b"});
+    permissions.Add(ServiceRtm2::Permissions::kStreamChannels, ServiceRtm2::Permissions::kWrite, {"stream-a"});
+    permissions.Add(ServiceRtm2::Permissions::kUsers, ServiceRtm2::Permissions::kRead, {"user-a"});
+
+    std::unique_ptr<Service> rtm2(new ServiceRtm2(user_id_, permissions));
+    rtm2->AddPrivilege(ServiceRtm2::kPrivilegeLogin, expire_);
+    token.AddService(std::move(rtm2));
+
+    const std::string xuyang_token =
+        "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkI"
+        "mYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUl"
+        "RamJubqJLGD1jAxsDCD9uokAO/VDvQ==";
+
+    VerifyAccessToken2(xuyang_token, &token);
+  }
+
+  // Tests numeric and wildcard user IDs for Streaming and FCDN services.
+  void TestExtendedServiceUidConversion() {
+    AccessToken2 token(app_id_, app_certificate_, issue_ts_, expire_);
+    token.salt_ = 1;
+
+    std::unique_ptr<Service> streaming_uid(new ServiceStreaming(channel_name_, uid_));
+    streaming_uid->AddPrivilege(ServiceStreaming::kPrivilegePublishMixStream, expire_);
+    token.AddService(std::move(streaming_uid));
+
+    std::unique_ptr<Service> streaming_wildcard(new ServiceStreaming(channel_name_, 0));
+    streaming_wildcard->AddPrivilege(ServiceStreaming::kPrivilegePublishRawStream, expire_);
+    token.AddService(std::move(streaming_wildcard));
+
+    std::unique_ptr<Service> fcdn_uid(new ServiceFCdn(channel_name_, uid_));
+    fcdn_uid->AddPrivilege(ServiceFCdn::kPrivilegePublish, expire_);
+    token.AddService(std::move(fcdn_uid));
+
+    std::unique_ptr<Service> fcdn_wildcard(new ServiceFCdn(channel_name_, 0));
+    fcdn_wildcard->AddPrivilege(ServiceFCdn::kPrivilegePlay, expire_);
+    token.AddService(std::move(fcdn_wildcard));
+
+    AccessToken2 parsed;
+    ASSERT_TRUE(parsed.FromString(token.Build()));
+    ASSERT_EQ(kTokenVerifySuccess, parsed.VerifySignature(app_certificate_));
+    ASSERT_EQ(2, parsed.services_.count(ServiceStreaming::kServiceType));
+    ASSERT_EQ(2, parsed.services_.count(ServiceFCdn::kServiceType));
+
+    auto streaming_range = parsed.services_.equal_range(ServiceStreaming::kServiceType);
+    auto streaming_it = streaming_range.first;
+    auto *parsed_streaming_uid = dynamic_cast<ServiceStreaming *>(streaming_it->second.get());
+    auto *parsed_streaming_wildcard = dynamic_cast<ServiceStreaming *>((++streaming_it)->second.get());
+    ASSERT_NE(nullptr, parsed_streaming_uid);
+    ASSERT_NE(nullptr, parsed_streaming_wildcard);
+    EXPECT_EQ(channel_name_, parsed_streaming_uid->channel_name_);
+    EXPECT_EQ(account_, parsed_streaming_uid->account_);
+    EXPECT_EQ(expire_, parsed_streaming_uid->privileges_.at(ServiceStreaming::kPrivilegePublishMixStream));
+    EXPECT_EQ(channel_name_, parsed_streaming_wildcard->channel_name_);
+    EXPECT_EQ("", parsed_streaming_wildcard->account_);
+    EXPECT_EQ(expire_, parsed_streaming_wildcard->privileges_.at(ServiceStreaming::kPrivilegePublishRawStream));
+
+    auto fcdn_range = parsed.services_.equal_range(ServiceFCdn::kServiceType);
+    auto fcdn_it = fcdn_range.first;
+    auto *parsed_fcdn_uid = dynamic_cast<ServiceFCdn *>(fcdn_it->second.get());
+    auto *parsed_fcdn_wildcard = dynamic_cast<ServiceFCdn *>((++fcdn_it)->second.get());
+    ASSERT_NE(nullptr, parsed_fcdn_uid);
+    ASSERT_NE(nullptr, parsed_fcdn_wildcard);
+    EXPECT_EQ(channel_name_, parsed_fcdn_uid->channel_name_);
+    EXPECT_EQ(account_, parsed_fcdn_uid->account_);
+    EXPECT_EQ(expire_, parsed_fcdn_uid->privileges_.at(ServiceFCdn::kPrivilegePublish));
+    EXPECT_EQ(channel_name_, parsed_fcdn_wildcard->channel_name_);
+    EXPECT_EQ("", parsed_fcdn_wildcard->account_);
+    EXPECT_EQ(expire_, parsed_fcdn_wildcard->privileges_.at(ServiceFCdn::kPrivilegePlay));
+  }
+
   // Tests generation, parsing, and verification with duplicate service types.
   void TestSameServiceMulti() {
     auto rtc_expire = expiredTs_;
@@ -568,6 +699,12 @@ TEST_F(AccessToken2_test, testAccessToken2ApaasApp) { TestAccessToken2ApaasApp()
 
 // Tests a token containing different service types.
 TEST_F(AccessToken2_test, testAccessToken2WithMultiService) { TestAccessToken2WithMultiService(); }
+
+// Tests byte-level compatibility with the extended services from the xuyang branch.
+TEST_F(AccessToken2_test, testXuyangExtendedServicesCompatibility) { TestXuyangExtendedServicesCompatibility(); }
+
+// Tests numeric and wildcard user IDs for Streaming and FCDN services.
+TEST_F(AccessToken2_test, testExtendedServiceUidConversion) { TestExtendedServiceUidConversion(); }
 
 // Tests a token containing duplicate service types.
 TEST_F(AccessToken2_test, testSameServiceMulti) { TestSameServiceMulti(); }
