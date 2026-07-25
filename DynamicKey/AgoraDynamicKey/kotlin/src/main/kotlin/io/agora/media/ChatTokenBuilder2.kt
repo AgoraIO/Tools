@@ -1,5 +1,6 @@
 package io.agora.media
 
+/** Builds Chat user and application Token007 tokens. */
 class ChatTokenBuilder2 {
     /**
      * Build the CHAT user token.

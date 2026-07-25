@@ -18,6 +18,7 @@ DART_CACHE = -e PUB_CACHE=/tmp/pub-cache -v "$(CACHE_PREFIX)-dart-pub:/tmp/pub-c
 DENO_CACHE = -e DENO_DIR=/tmp/deno-cache -v "$(CACHE_PREFIX)-deno:/tmp/deno-cache"
 GO_CACHE = -v "$(CACHE_PREFIX)-go-mod:/go/pkg/mod" -v "$(CACHE_PREFIX)-go-build:/root/.cache/go-build"
 JAVA_CACHE = -v "$(CACHE_PREFIX)-maven:/root/.m2"
+KOTLIN_CACHE = -v "$(CACHE_PREFIX)-gradle:/root/.gradle"
 NODEJS_CACHE = -v "$(CACHE_PREFIX)-npm:/root/.npm"
 PERL_CACHE = -e PERL5LIB=/tmp/perl-packages/lib/perl5 -e PATH=/tmp/perl-packages/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin -v "$(CACHE_PREFIX)-cpanm:/root/.cpanm" -v "$(CACHE_PREFIX)-perl-packages:/tmp/perl-packages"
 PYTHON_CACHE = -e PIP_CACHE_DIR=/tmp/pip-cache -e PYTHONUSERBASE=/tmp/python-packages -v "$(CACHE_PREFIX)-pip:/tmp/pip-cache" -v "$(CACHE_PREFIX)-python-packages:/tmp/python-packages"
@@ -47,6 +48,8 @@ DENO_IMAGE ?= denoland/deno:1.45.3
 GO_IMAGE ?= golang:1.22
 # Maven and Java 8 image for building and testing Java code.
 JAVA_IMAGE ?= maven:3.9.9-eclipse-temurin-8
+# Java 8 base image for the reusable Kotlin test image.
+KOTLIN_IMAGE ?= maven:3.9.9-eclipse-temurin-8
 # Lua and LuaRocks image for installing dependencies and running Lua code.
 LUA_IMAGE ?= nickblah/lua:5.4.7-luarocks-ubuntu
 # Node.js runtime image for installing dependencies and running Node.js code.
@@ -78,6 +81,14 @@ LUA_TEST_IMAGE ?= agora-dynamic-key-lua-test:local
 LUA_APT_MIRROR ?=
 # Reusable local image with Xdebug preinstalled for PHP coverage.
 PHP_TEST_IMAGE ?= agora-dynamic-key-php-test:local
+# Reusable local image with Gradle and Java 8 preinstalled for Kotlin tests.
+KOTLIN_TEST_IMAGE ?= agora-dynamic-key-kotlin-test:local
+# Gradle version installed in the reusable Kotlin test image.
+KOTLIN_GRADLE_VERSION ?= 8.1.1
+# Download URL used to install Gradle in the Kotlin test image.
+KOTLIN_GRADLE_DISTRIBUTION_URL ?= https://services.gradle.org/distributions/gradle-$(KOTLIN_GRADLE_VERSION)-bin.zip
+# SHA-256 checksum for the Gradle distribution installed in the Kotlin test image.
+KOTLIN_GRADLE_SHA256 ?= e111cb9948407e26351227dabce49822fb88c37ee72f1d1582a69c68af2e702f
 
 # Samples read Agora credentials from the environment and fall back to non-production values.
 SAMPLE_APP_ID ?= $(or $(AGORA_APP_ID),aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa)
@@ -91,6 +102,7 @@ TEST_TARGETS := \
 	test-deno \
 	test-go \
 	test-java \
+	test-kotlin \
 	test-lua \
 	test-nodejs \
 	test-perl \
@@ -107,6 +119,7 @@ RUN_SAMPLE_TARGETS := \
 	run-sample-deno \
 	run-sample-go \
 	run-sample-java \
+	run-sample-kotlin \
 	run-sample-lua \
 	run-sample-nodejs \
 	run-sample-perl \
@@ -118,11 +131,13 @@ RUN_SAMPLE_TARGETS := \
 
 BUILD_TEST_IMAGE_TARGETS := \
 	build-test-image-cpp \
+	build-test-image-kotlin \
 	build-test-image-lua \
 	build-test-image-php
 
 CHECK_TEST_IMAGE_TARGETS := \
 	check-test-image-cpp \
+	check-test-image-kotlin \
 	check-test-image-lua \
 	check-test-image-php
 
@@ -164,6 +179,10 @@ build-test-image-cpp: check-docker
 build-test-image-lua: check-docker
 	$(DOCKER) build --build-arg BASE_IMAGE=$(LUA_IMAGE) --build-arg APT_MIRROR="$(LUA_APT_MIRROR)" -f "$(ROOT_DIR)/.docker/test/lua/Dockerfile" -t $(LUA_TEST_IMAGE) "$(ROOT_DIR)/.docker/test"
 
+# Builds the reusable Kotlin test image.
+build-test-image-kotlin: check-docker
+	$(DOCKER) build --build-arg BASE_IMAGE=$(KOTLIN_IMAGE) --build-arg GRADLE_VERSION=$(KOTLIN_GRADLE_VERSION) --build-arg GRADLE_DISTRIBUTION_URL="$(KOTLIN_GRADLE_DISTRIBUTION_URL)" --build-arg GRADLE_SHA256=$(KOTLIN_GRADLE_SHA256) -f "$(ROOT_DIR)/.docker/test/kotlin/Dockerfile" -t $(KOTLIN_TEST_IMAGE) "$(ROOT_DIR)/.docker/test"
+
 # Builds the reusable PHP test image.
 build-test-image-php: check-docker
 	$(DOCKER) build --build-arg BASE_IMAGE=$(PHP_IMAGE) -f "$(ROOT_DIR)/.docker/test/php/Dockerfile" -t $(PHP_TEST_IMAGE) "$(ROOT_DIR)/.docker/test"
@@ -175,6 +194,10 @@ check-test-image-cpp: check-docker
 # Verifies that the reusable Lua test image has been built.
 check-test-image-lua: check-docker
 	@$(DOCKER) image inspect $(LUA_TEST_IMAGE) >/dev/null 2>&1 || { echo "$(LUA_TEST_IMAGE) is missing; run: make build-test-image-lua"; exit 1; }
+
+# Verifies that the reusable Kotlin test image has been built.
+check-test-image-kotlin: check-docker
+	@$(DOCKER) image inspect $(KOTLIN_TEST_IMAGE) >/dev/null 2>&1 || { echo "$(KOTLIN_TEST_IMAGE) is missing; run: make build-test-image-kotlin"; exit 1; }
 
 # Verifies that the reusable PHP test image has been built.
 check-test-image-php: check-docker
@@ -191,6 +214,7 @@ $(TEST_TARGETS) $(RUN_SAMPLE_TARGETS): check-docker
 
 # Ensures targets that need system packages have their reusable local image.
 test-cpp run-sample-cpp: check-test-image-cpp
+test-kotlin run-sample-kotlin: check-test-image-kotlin
 test-lua run-sample-lua: check-test-image-lua
 test-php: check-test-image-php
 
@@ -254,6 +278,16 @@ test-java:
 		cd /tmp/agora-java; \
 		mvn -B org.jacoco:jacoco-maven-plugin:0.8.12:prepare-agent test org.jacoco:jacoco-maven-plugin:0.8.12:report; \
 		awk -F, '\''NR > 1 { missed += $$8; covered += $$9 } END { total = missed + covered; if (total == 0) exit 1; printf "Java line coverage: %.2f%% (%d/%d)\n", covered * 100 / total, covered, total }'\'' target/site/jacoco/jacoco.csv'
+	$(TEST_PASS)
+
+# Runs the Kotlin unit tests with JaCoCo coverage.
+test-kotlin:
+	$(TEST_START)
+	$(DOCKER_RUN) $(KOTLIN_CACHE) -w /workspace/kotlin $(KOTLIN_TEST_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-kotlin; \
+		cd /tmp/agora-kotlin; \
+		gradle --no-daemon test jacocoTestReport; \
+		awk -F, '\''NR > 1 { missed += $$8; covered += $$9 } END { total = missed + covered; if (total == 0) exit 1; printf "Kotlin line coverage: %.2f%% (%d/%d)\n", covered * 100 / total, covered, total }'\'' build/reports/jacoco/test/jacocoTestReport.csv'
 	$(TEST_PASS)
 
 # Runs the Lua unit tests with LuaCov coverage.
@@ -395,6 +429,15 @@ run-sample-java:
 		cd /tmp/agora-java; \
 		mvn -B -DskipTests compile org.codehaus.mojo:exec-maven-plugin:3.5.0:java \
 			-Dexec.mainClass=io.agora.sample.RtcTokenBuilder2Sample'
+	$(SAMPLE_PASS)
+
+# Runs the Kotlin RTC Token Builder 2 sample.
+run-sample-kotlin:
+	$(SAMPLE_START)
+	$(DOCKER_RUN) $(KOTLIN_CACHE) $(SAMPLE_ENV) -w /workspace/kotlin $(KOTLIN_TEST_IMAGE) sh -ec '\
+		cp -R . /tmp/agora-kotlin; \
+		cd /tmp/agora-kotlin; \
+		gradle --no-daemon runSample'
 	$(SAMPLE_PASS)
 
 # Runs all Lua samples.

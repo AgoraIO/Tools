@@ -27,6 +27,7 @@ Debug/
 *.gz
 *.iso
 *.jar
+!kotlin/gradle/wrapper/gradle-wrapper.jar
 *.rar
 *.tar
 *.zip

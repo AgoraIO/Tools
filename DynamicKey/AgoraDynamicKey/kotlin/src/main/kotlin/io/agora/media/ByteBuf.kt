@@ -3,119 +3,131 @@ package io.agora.media
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
-import java.util.*
+import java.util.TreeMap
 
+/** Packs and unpacks Token007 values using little-endian byte order. */
 class ByteBuf {
-    var buffer: ByteBuffer = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN)
+    internal var buffer: ByteBuffer = ByteBuffer.allocate(INITIAL_CAPACITY).order(ByteOrder.LITTLE_ENDIAN)
 
+    /** Creates an empty byte buffer for packing values. */
     constructor()
 
+    /** Wraps existing bytes for unpacking values. */
     constructor(bytes: ByteArray) {
         buffer = ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN)
     }
 
+    /** Returns the packed bytes written to this buffer. */
     fun asBytes(): ByteArray {
-        val out = ByteArray(buffer.position())
-        buffer.rewind()
-        buffer.get(out, 0, out.size)
-        return out
+        val duplicate = buffer.duplicate()
+        duplicate.flip()
+        return ByteArray(duplicate.remaining()).also(duplicate::get)
     }
 
-    fun put(v: Short): ByteBuf {
-        ensureCapacity(2)
-        buffer.putShort(v)
+    /** Packs an unsigned 16-bit protocol value represented by a Kotlin Short. */
+    fun put(value: Short): ByteBuf {
+        ensureCapacity(Short.SIZE_BYTES)
+        buffer.putShort(value)
         return this
     }
 
-    fun put(v: ByteArray): ByteBuf {
-        ensureCapacity(2 + v.size)
-        put(v.size.toShort())
-        buffer.put(v)
+    /** Packs a length-prefixed byte array. */
+    fun put(value: ByteArray): ByteBuf {
+        put(value.size.toShort())
+        ensureCapacity(value.size)
+        buffer.put(value)
         return this
     }
 
-    fun put(v: Int): ByteBuf {
-        ensureCapacity(4)
-        buffer.putInt(v)
+    /** Appends bytes without a length prefix. */
+    fun copy(value: ByteArray): ByteBuf {
+        ensureCapacity(value.size)
+        buffer.put(value)
         return this
     }
 
-    fun put(v: Long): ByteBuf {
-        ensureCapacity(8)
-        buffer.putLong(v)
+    /** Packs an unsigned 32-bit protocol value represented by a Kotlin Int. */
+    fun put(value: Int): ByteBuf {
+        ensureCapacity(Int.SIZE_BYTES)
+        buffer.putInt(value)
         return this
     }
 
-    fun put(v: String): ByteBuf {
-        return put(v.toByteArray(StandardCharsets.UTF_8))
-    }
-
-    fun put(extra: TreeMap<Short, String>): ByteBuf {
-        put(extra.size.toShort())
-        for ((key, value) in extra) {
-            put(key)
-            put(value)
-        }
+    /** Packs a 64-bit integer. */
+    fun put(value: Long): ByteBuf {
+        ensureCapacity(Long.SIZE_BYTES)
+        buffer.putLong(value)
         return this
     }
 
-    fun putIntMap(extra: TreeMap<Short, Int>): ByteBuf {
-        put(extra.size.toShort())
-        for ((key, value) in extra) {
-            put(key)
-            put(value)
-        }
+    /** Packs a length-prefixed UTF-8 string. */
+    fun put(value: String): ByteBuf = put(value.toByteArray(StandardCharsets.UTF_8))
+
+    /** Packs a map of short keys and string values in numeric key order. */
+    fun put(values: TreeMap<Short, String>): ByteBuf {
+        put(values.size.toShort())
+        values.forEach { (key, value) -> put(key).put(value) }
         return this
     }
 
-    fun readShort(): Short {
-        return buffer.short
+    /** Packs a map of privilege identifiers and expiration timestamps. */
+    fun putIntMap(values: TreeMap<Short, Int>): ByteBuf {
+        put(values.size.toShort())
+        values.forEach { (key, value) -> put(key).put(value) }
+        return this
     }
 
-    fun readInt(): Int {
-        return buffer.int
-    }
+    /** Reads a 16-bit protocol value. */
+    fun readShort(): Short = buffer.short
 
+    /** Reads a 32-bit protocol value. */
+    fun readInt(): Int = buffer.int
+
+    /** Reads a length-prefixed byte array. */
     fun readBytes(): ByteArray {
-        val length = readShort().toInt()
-        val bytes = ByteArray(length)
-        buffer.get(bytes)
-        return bytes
+        val length = readShort().toInt() and 0xffff
+        return ByteArray(length).also(buffer::get)
     }
 
-    fun readString(): String {
-        return String(readBytes(), StandardCharsets.UTF_8)
-    }
+    /** Reads a length-prefixed UTF-8 string. */
+    fun readString(): String = String(readBytes(), StandardCharsets.UTF_8)
 
+    /** Reads a map of short keys and string values. */
     fun readMap(): TreeMap<Short, String> {
-        val map = TreeMap<Short, String>()
-        val length = readShort().toInt()
-        for (i in 0 until length) {
-            val k = readShort()
-            val v = readString()
-            map[k] = v
+        val result = TreeMap<Short, String>()
+        repeat(readShort().toInt() and 0xffff) {
+            result[readShort()] = readString()
         }
-        return map
+        return result
     }
 
+    /** Reads a map of privilege identifiers and expiration timestamps. */
     fun readIntMap(): TreeMap<Short, Int> {
-        val map = TreeMap<Short, Int>()
-        val length = readShort().toInt()
-        for (i in 0 until length) {
-            val k = readShort()
-            val v = readInt()
-            map[k] = v
+        val result = TreeMap<Short, Int>()
+        repeat(readShort().toInt() and 0xffff) {
+            result[readShort()] = readInt()
         }
-        return map
+        return result
     }
 
-    private fun ensureCapacity(capacity: Int) {
-        if (buffer.remaining() < capacity) {
-            val newCapacity = buffer.capacity() + Math.max(capacity, buffer.capacity())
-            val newBuffer = ByteBuffer.allocate(newCapacity).order(ByteOrder.LITTLE_ENDIAN)
-            buffer.rewind()
-            newBuffer.put(buffer)
-            buffer = newBuffer
+    /** Grows the packing buffer when the next value does not fit. */
+    private fun ensureCapacity(additionalLength: Int) {
+        val requiredLength = buffer.position() + additionalLength
+        if (requiredLength <= buffer.capacity()) {
+            return
         }
+
+        var newCapacity = buffer.capacity()
+        while (newCapacity < requiredLength) {
+            newCapacity *= 2
+        }
+        val expanded = ByteBuffer.allocate(newCapacity).order(ByteOrder.LITTLE_ENDIAN)
+        buffer.flip()
+        expanded.put(buffer)
+        buffer = expanded
+    }
+
+    private companion object {
+        const val INITIAL_CAPACITY = 1024
     }
 }

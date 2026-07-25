@@ -1,5 +1,6 @@
 plugins {
     kotlin("jvm") version "1.9.0"
+    jacoco
 }
 
 group = "io.agora"
@@ -10,7 +11,6 @@ repositories {
 }
 
 dependencies {
-    testImplementation(kotlin("test"))
     testImplementation("junit:junit:4.13.2")
 }
 
@@ -37,7 +37,41 @@ val sampleJar = task<Jar>("sampleJar") {
     from(sourceSets["sample"].allSource)
 }
 
-tasks.register<JavaExec>("runSample") {
-    mainClass.set("io.agora.sample.RtcTokenBuilder2Sample")
-    classpath = sourceSets["sample"].runtimeClasspath
+val sampleMainClasses = listOf(
+    "io.agora.sample.RtcTokenBuilder2Sample",
+    "io.agora.sample.RtmTokenBuilder2Sample",
+    "io.agora.sample.ChatTokenBuilder2Sample",
+    "io.agora.sample.ApaasTokenBuilderSample",
+    "io.agora.sample.EducationTokenBuilder2Sample",
+    "io.agora.sample.FpaTokenBuilderSample"
+)
+
+val sampleTasks = sampleMainClasses.map { sampleMainClass ->
+    val sampleName = sampleMainClass.substringAfterLast('.')
+    tasks.register<JavaExec>("run$sampleName") {
+        dependsOn(tasks.named("sampleClasses"))
+        mainClass.set(sampleMainClass)
+        classpath = sourceSets["sample"].runtimeClasspath
+    }
+}
+
+tasks.register("runSample") {
+    dependsOn(sampleTasks)
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        csv.required.set(true)
+        html.required.set(false)
+        xml.required.set(false)
+    }
 }

@@ -1,6 +1,8 @@
 # Agora Token Generator Kotlin
 
-This project provides the implementation of Agora AccessToken2 in Kotlin.
+This project provides the Kotlin implementation of Agora AccessToken2 and Token007 builders.
+It supports multiple services, duplicate service types, signature verification, Streaming,
+FCDN, RTM2 resource permissions, and RTC, RTM, Chat, APaaS, Education, and FPA builders.
 
 ## Project Structure
 
@@ -29,8 +31,6 @@ Then run:
 ```bash
 ./gradlew runSample
 ```
-
-(Note: You might need to add a `runSample` task to your `build.gradle.kts` if you want to run it via Gradle)
 
 ### Run Tests
 

@@ -1,6 +1,8 @@
 package io.agora.media
 
+/** Builds RTC and combined RTC/RTM Token007 tokens. */
 class RtcTokenBuilder2 {
+    /** RTC user roles used to assign publishing privileges. */
     enum class Role(val initValue: Int) {
         /**
          * RECOMMENDED. Use this role for a voice/video call or a live broadcast, if
@@ -35,7 +37,7 @@ class RtcTokenBuilder2 {
      * @param tokenExpire:      represented by the number of seconds elapsed since now. If, for example,
      *                          you want to access the Agora Service within 10 minutes after the token is generated,
      *                          set tokenExpire as 600(seconds).
-     * @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
+     * @param privilegeExpire:  represented by the number of seconds elapsed since now. If, for example,
      *                          you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
      * @return The RTC token.
      */
@@ -107,16 +109,16 @@ class RtcTokenBuilder2 {
 
     /**
      * Generates an RTC token with the specified privilege.
-     *
+     * <p>
      * This method supports generating a token with the following privileges:
      * - Joining an RTC channel.
      * - Publishing audio in an RTC channel.
      * - Publishing video in an RTC channel.
      * - Publishing data streams in an RTC channel.
-     *
+     * <p>
      * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
      * enabled co-host authentication.
-     *
+     * <p>
      * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
      * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
      * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
@@ -131,7 +133,12 @@ class RtcTokenBuilder2 {
      *
      * @param appId                        The App ID of your Agora project.
      * @param appCertificate               The App Certificate of your Agora project.
-     * @param channelName                  The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes.
+     * @param channelName                  The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     *                                     - All lowercase English letters: a to z.
+     *                                     - All uppercase English letters: A to Z.
+     *                                     - All numeric characters: 0 to 9.
+     *                                     - The space character.
+     *                                     - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param uid                          The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
      * @param tokenExpire                  represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                                     Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
@@ -171,16 +178,16 @@ class RtcTokenBuilder2 {
 
     /**
      * Generates an RTC token with the specified privilege.
-     *
+     * <p>
      * This method supports generating a token with the following privileges:
      * - Joining an RTC channel.
      * - Publishing audio in an RTC channel.
      * - Publishing video in an RTC channel.
      * - Publishing data streams in an RTC channel.
-     *
+     * <p>
      * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
      * enabled co-host authentication.
-     *
+     * <p>
      * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
      * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
      * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
@@ -195,7 +202,12 @@ class RtcTokenBuilder2 {
      *
      * @param appId                        The App ID of your Agora project.
      * @param appCertificate               The App Certificate of your Agora project.
-     * @param channelName                  The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes.
+     * @param channelName                  The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     *                                     - All lowercase English letters: a to z.
+     *                                     - All uppercase English letters: A to Z.
+     *                                     - All numeric characters: 0 to 9.
+     *                                     - The space character.
+     *                                     - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param account                      The user account.
      * @param tokenExpire                  represented by the number of seconds elapsed since now. If, for example, you want to access the
      *                                     Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).

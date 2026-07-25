@@ -2,6 +2,7 @@ package io.agora.sample
 
 import io.agora.media.RtcTokenBuilder2
 
+/** Demonstrates RTC Token007 generation with UID and user account identities. */
 object RtcTokenBuilder2Sample {
     // Need to set environment variable AGORA_APP_ID
     private val appId = System.getenv("AGORA_APP_ID")
@@ -19,11 +20,12 @@ object RtcTokenBuilder2Sample {
     private const val pubVideoPrivilegeExpireInSeconds = 3600
     private const val pubDataStreamPrivilegeExpireInSeconds = 3600
 
+    /** Generates and prints RTC sample tokens using environment-provided credentials. */
     @JvmStatic
     fun main(args: Array<String>) {
         println("App Id: $appId")
         println("App Certificate: $appCertificate")
-        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+        if (appId.isNullOrEmpty() || appCertificate.isNullOrEmpty()) {
             println("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
             return
         }
