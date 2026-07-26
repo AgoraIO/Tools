@@ -11,5 +11,5 @@ export const profileArray = [
 export const APP_ID = process.env.VUE_APP_AGORA_APP_ID || ''
 export const APP_CERTIFICATE = process.env.VUE_APP_AGORA_APP_CERTIFICATE || ''
 export const TOKEN_ENDPOINT = 'https://service.agora.io/toolbox-global/v2/token/generate'
-export const TOKEN_EXPIRE = Number(process.env.VUE_APP_TOKEN_EXPIRE || 86400)
+export const TOKEN_EXPIRE = Number(process.env.VUE_APP_TOKEN_EXPIRE || 3600)
 export const TOKEN_SRC = process.env.VUE_APP_TOKEN_SRC || 'web'
