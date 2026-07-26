@@ -6,8 +6,8 @@
 
 <script>
 export default {
+  name: 'LineChart',
   props: ['data', 'settings', 'grid']
 }
 </script>
-
 
