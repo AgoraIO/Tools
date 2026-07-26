@@ -42,3 +42,32 @@ exports.buildTokenWithPermissions = function (test) {
     test.equal(expire, service.__privileges[ServiceRtm2.kPrivilegeLogin]);
     test.done();
 };
+
+// Verifies that an RTM2 numeric user ID is encoded as its string representation.
+exports.buildTokenWithPermissionsAndNumericUserId = function (test) {
+    const numericUserId = 123;
+    const permissions = new Rtm2Permissions();
+    const token = RtmTokenBuilder.buildTokenWithPermissions(appId, appCertificate, numericUserId, permissions, expire);
+    const parsed = new AccessToken2("", "", 0, 0);
+
+    test.equal(true, parsed.from_string(token));
+    test.equal(true, parsed.verifySignature(appCertificate));
+    const service = parsed.getServices(kRtm2ServiceType)[0];
+    test.equal(String(numericUserId), service.__user_id.toString());
+    test.equal(expire, service.__privileges[ServiceRtm2.kPrivilegeLogin]);
+    test.done();
+};
+
+// Verifies that the numeric wildcard user ID is encoded as an empty string.
+exports.buildTokenWithPermissionsAndWildcardUserId = function (test) {
+    const permissions = new Rtm2Permissions();
+    const token = RtmTokenBuilder.buildTokenWithPermissions(appId, appCertificate, 0, permissions, expire);
+    const parsed = new AccessToken2("", "", 0, 0);
+
+    test.equal(true, parsed.from_string(token));
+    test.equal(true, parsed.verifySignature(appCertificate));
+    const service = parsed.getServices(kRtm2ServiceType)[0];
+    test.equal("", service.__user_id.toString());
+    test.equal(expire, service.__privileges[ServiceRtm2.kPrivilegeLogin]);
+    test.done();
+};

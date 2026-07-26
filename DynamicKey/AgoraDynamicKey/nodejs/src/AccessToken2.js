@@ -291,7 +291,7 @@ class ServiceRtm2 extends Service {
     // Creates an RTM2 service for a user and permission set.
     constructor(userId, permissions) {
         super(kRtm2ServiceType)
-        this.__user_id = userId || ''
+        this.__user_id = userId === 0 || userId == null ? '' : String(userId)
         this.__permissions = permissions || new Rtm2Permissions()
     }
 
