@@ -56,6 +56,6 @@ export default {
   'cloudProxy_mode': '设置代理模式',
   'cloudProxy_default': '默认',
   'cloudProxy_fix': '固定TCP443',
-  'cloudProxy_tips': '若使用固定端口，调用云代理API时，请使用startProxyServer(2)，详见：',
+  'cloudProxy_tips': '若使用固定端口，调用云代理API时，请使用startProxyServer(5)，详见：',
   'cloudProxy_tips_link': '文档'
 }

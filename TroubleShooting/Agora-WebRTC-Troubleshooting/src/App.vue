@@ -41,7 +41,7 @@
               </v-card-text>
               <v-card-text class="proxy" v-if="isEnableCloudProxy">
                 <v-label>{{text.cloudProxy_mode}}</v-label>
-                <v-btn-toggle v-model.lazy="fixProxyPort"rounded>
+                <v-btn-toggle v-model.lazy="fixProxyPort" rounded>
                   <v-btn :value=false @click.native="toggleProxyMode(false)">{{text.cloudProxy_default}}</v-btn>
                   <v-btn :value=true @click.native="toggleProxyMode(true)">{{text.cloudProxy_fix}}</v-btn>
                 </v-btn-toggle>
@@ -78,7 +78,9 @@
                     <span>{{t(item.label)}}</span>
                   </v-list-tile>
                   <v-list-tile>
-                    <v-list-tile-content v-html="item.extra"></v-list-tile-content>
+                    <v-list-tile-content>
+                      <span v-html="item.extra"></span>
+                    </v-list-tile-content>
                   </v-list-tile>
                 </v-list-group>
               </v-list>
@@ -329,22 +331,27 @@
 </template>
 
 <script>
-import  VConsole  from  'vconsole'
-import AgoraRtc from "agora-rtc-sdk";
+import AgoraRtc from "agora-rtc-sdk-ng";
+import LineChart from "./components/linechart.vue";
 const langs = ['zh', 'en'];
-import { profileArray, APP_ID } from "./utils/settings";
+import {
+  APP_CERTIFICATE,
+  APP_ID,
+  TOKEN_ENDPOINT,
+  TOKEN_EXPIRE,
+  TOKEN_SRC,
+  profileArray
+} from "./utils/settings";
 import * as i18n from './utils/i18n'
 
-const log = console.log.bind(console)
-
 // If need mobile phone terminal debugging
-// let vConsole = new VConsole()
-// log("testVConsole")
+// import VConsole from 'vconsole'
+// new VConsole()
 
 export default {
   name: "App",
   components: {
-    linechart: () => import("./components/linechart.vue")
+    linechart: LineChart
   },
   mounted() {
     document.title = this.text.toolbar_title
@@ -424,6 +431,15 @@ export default {
         ]
       },
       errMsgForTry: "",
+      sendClient: null,
+      recvClient: null,
+      sendStream: null,
+      sendAudioTrack: null,
+      sendVideoTrack: null,
+      sendTracks: [],
+      recvAudioTrack: null,
+      recvVideoTrack: null,
+      connectivityFinished: false,
       ProfileForTry: [
         {
           resolution: "480p_1",
@@ -495,8 +511,8 @@ export default {
       this.sendClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
       this.recvClient = AgoraRtc.createClient({ mode: 'live', codec: 'h264' });
       if(this.isEnableCloudProxy && this.fixProxyPort){
-        this.sendClient.startProxyServer(2);
-        this.recvClient.startProxyServer(2);
+        this.sendClient.startProxyServer(5);
+        this.recvClient.startProxyServer(5);
       }
       else if(this.isEnableCloudProxy && !this.fixProxyPort){
         this.sendClient.startProxyServer();
@@ -504,122 +520,124 @@ export default {
       }
     },
 
-    initSendClient() {
-      return new Promise((resolve, reject) => {
-        this.sendStream = AgoraRtc.createStream({
-          streamID: this.sendId,
-          video: true,
-          audio: true,
-          screen: false
-        });
-        this.sendStream.setVideoProfile("720p_2");
-        this.sendClient.init(
-          APP_ID,
-          () => {
-            this.sendStream.init(
-              () => {
-                this.sendClient.join(
-                  null,
-                  this.channel,
-                  this.sendId,
-                  () => {
-                    this.sendClient.publish(this.sendStream, err => {
-                      reject(err);
-                    });
-                    setTimeout(() => {
-                      resolve();
-                    });
-                  },
-                  err => {
-                    reject(err);
-                  }
-                );
-              },
-              err => {
-                reject(err);
-              }
-            );
-          },
-          err => {
-            reject(err);
-          }
-        );
-      });
+    async initSendClient() {
+      const token = await this.generateRtcToken(this.sendId);
+      const tracks = await AgoraRtc.createMicrophoneAndCameraTracks(
+        {},
+        { encoderConfig: "720p_2" }
+      );
+      this.sendAudioTrack = tracks[0];
+      this.sendVideoTrack = tracks[1];
+      this.sendTracks = tracks;
+      this.sendStream = this.sendVideoTrack;
+      await this.sendClient.join(APP_ID, this.channel, token, this.sendId);
+      await this.sendClient.setClientRole("host");
+      await this.sendClient.publish(this.sendTracks);
     },
 
-    initRecvClient() {
-      return new Promise((resolve, reject) => {
-        this.recvClient.init(
-          APP_ID,
-          () => {
-            this.recvClient.join(
-              null,
-              this.channel,
-              this.recvId,
-              () => {
-                this.recvClient.on("stream-added", evt => {
-                  this.recvClient.subscribe(evt.stream, err => {
-                    clearInterval(this.detectInterval);
-                    this.bitrateData = {};
-                    this.packetsData = {};
-                    this.testSuites["4"].notError = false;
-                    this.testSuites["4"].extra = err.msg;
-                    this.destructAll();
-                    this.currentTestSuite = "5";
-                  });
-                });
-                this.recvClient.on("stream-removed", () => {
-                  clearInterval(this.detectInterval);
-                  this.bitrateData = {};
-                  this.packetsData = {};
-                  this.testSuites["4"].notError = false;
-                  this.testSuites["4"].extra = "Disconnected";
-                  this.destructAll();
-                  this.currentTestSuite = "5";
-                });
-                this.recvClient.on("stream-subscribed", evt => {
-                  this.recvStream = evt.stream;
-                  this.recvStream.disableAudio();
-                  this.recvStream.play("test-recv");
-                  let i = 1;
-                  this.detectInterval = setInterval(() => {
-                    this.recvStream.getStats(e => {
-                      this.bitrateData.rows.push({
-                        index: i,
-                        tVideoBitrate: this._calcBitrate(
-                          e.videoReceiveBytes, i
-                        ),
-                        tAudioBitrate: this._calcBitrate(
-                          e.audioReceiveBytes, i
-                        )
-                      });
-                      this.packetsData.rows.push({
-                        index: i,
-                        tVideoPacketLoss: this._calcPacketLoss(
-                          e.videoReceivePackets,
-                          e.videoReceivePacketsLost
-                        ),
-                        tAudioPacketLoss: this._calcPacketLoss(
-                          e.audioReceivePackets,
-                          e.audioReceivePacketsLost
-                        ),
-                      });
-                      i++;
-                    });
-                  }, 1000);
-                });
-                resolve();
-              },
-              err => {
-                reject(err);
-              }
-            );
-          },
-          err => {
-            reject(err);
+    async initRecvClient() {
+      const token = await this.generateRtcToken(this.recvId);
+      this.recvClient.on("user-published", async (user, mediaType) => {
+        try {
+          const track = await this.recvClient.subscribe(user, mediaType);
+          if (mediaType === "video") {
+            this.recvVideoTrack = track;
+            this.recvVideoTrack.play("test-recv");
+          } else if (mediaType === "audio") {
+            this.recvAudioTrack = track;
           }
-        );
+          this.startStatsDetection();
+        } catch (err) {
+          this.handleConnectivityError(err);
+        }
       });
+      this.recvClient.on("user-unpublished", () => {
+        this.handleConnectivityError(new Error("Disconnected"));
+      });
+      this.recvClient.on("user-left", () => {
+        this.handleConnectivityError(new Error("Disconnected"));
+      });
+      await this.recvClient.join(APP_ID, this.channel, token, this.recvId);
+    },
+
+    async generateRtcToken(uid) {
+      if (!APP_CERTIFICATE) {
+        return null;
+      }
+      const response = await fetch(TOKEN_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          appId: APP_ID,
+          appCertificate: APP_CERTIFICATE,
+          channelName: this.channel,
+          expire: TOKEN_EXPIRE,
+          src: TOKEN_SRC,
+          type: 1,
+          uid: String(uid)
+        })
+      });
+      if (!response.ok) {
+        throw new Error(`Token request failed: HTTP ${response.status}`);
+      }
+      const result = await response.json();
+      if (result.code !== 0) {
+        throw new Error(result.tip || result.msg || `Token request failed: code ${result.code}`);
+      }
+      if (!result.data || !result.data.token) {
+        throw new Error('Token response missing data.token');
+      }
+      return result.data.token;
+    },
+
+    errorMessage(err) {
+      return err && (err.msg || err.message) ? (err.msg || err.message) : String(err);
+    },
+
+    startStatsDetection() {
+      if (this.detectInterval || !this.recvAudioTrack || !this.recvVideoTrack) {
+        return;
+      }
+      let i = 1;
+      this.detectInterval = setInterval(() => {
+        const videoStatsMap = this.recvClient.getRemoteVideoStats();
+        const audioStatsMap = this.recvClient.getRemoteAudioStats();
+        const videoStats = videoStatsMap[String(this.sendId)] || Object.values(videoStatsMap)[0] || {};
+        const audioStats = audioStatsMap[String(this.sendId)] || Object.values(audioStatsMap)[0] || {};
+        this.bitrateData.rows.push({
+          index: i,
+          tVideoBitrate: Number(((videoStats.receiveBitrate || 0) / 1000).toFixed(2)),
+          tAudioBitrate: Number(((audioStats.receiveBitrate || 0) / 1000).toFixed(2))
+        });
+        this.packetsData.rows.push({
+          index: i,
+          tVideoPacketLoss: this._calcPacketLoss(
+            videoStats.receivePackets,
+            videoStats.receivePacketsLost
+          ),
+          tAudioPacketLoss: this._calcPacketLoss(
+            audioStats.receivePackets,
+            audioStats.receivePacketsLost
+          ),
+        });
+        i++;
+      }, 1000);
+    },
+
+    handleConnectivityError(err) {
+      if (this.connectivityFinished) {
+        return;
+      }
+      clearInterval(this.detectInterval);
+      this.detectInterval = null;
+      this.bitrateData = {};
+      this.packetsData = {};
+      this.testSuites["4"].notError = false;
+      this.testSuites["4"].extra = this.errorMessage(err);
+      this.destructAll();
+      this.currentTestSuite = "5";
     },
 
     /**
@@ -645,54 +663,81 @@ export default {
       return Number.parseFloat(recvBytes / seconds / 1000 * 8).toFixed(2);
     },
 
-    destructAll() {
+    closeLocalTrack(track) {
+      if (!track) {
+        return;
+      }
       try {
-        this.sendStream && this.sendStream.close();
-        this.recvStream && this.recvStream.close();
-        this.sendClient.unpublish(this.sendStream);
-        this.sendClient.leave();
-        this.recvClient.leave();
-        if(this.isEnableCloudProxy){
-          this.sendClient.stopProxyServer();
-          this.recvClient.stopProxyServer();
-        }
-        clearInterval(this.detectInterval);
+        track.stop && track.stop();
+        track.close && track.close();
       } catch (err) {
-        throw(err);
+        // Closing tracks is best-effort during cleanup.
       }
     },
 
-    checkProfile(profile) {
-      return new Promise((resolve, reject) => {
-        this.sendStream && this.sendStream.stop();
-        this.sendStream = AgoraRtc.createStream({
-          streamID: this.sendId,
-          video: true,
-          audio: true,
-          screen: false
-        });
-        this.sendStream.setVideoProfile(profile.resolution);
-        this.sendStream.init(
-          () => {
-            this.sendStream.play("test-send");
-            setTimeout(() => {
-              let videoElement = document.querySelector("#video" + this.sendId);
-              let videoArea = videoElement.videoWidth * videoElement.videoHeight
-              let profileArea = profile.width * profile.height
-              if (videoArea === profileArea) {
-                profile.status = "resolve";
-                resolve();
-              } else {
-                profile.status = "reject";
-                reject("Resolution mismatched");
-              }
-            }, 1000);
-          },
-          err => {
-            reject(err);
-          }
-        );
+    closeLocalTracks(tracks) {
+      (tracks || []).forEach(track => {
+        this.closeLocalTrack(track);
       });
+    },
+
+    closeRemoteTrack(track) {
+      try {
+        track && track.stop && track.stop();
+      } catch (err) {
+        // Remote playback cleanup is best-effort.
+      }
+    },
+
+    destructAll() {
+      clearInterval(this.detectInterval);
+      this.detectInterval = null;
+      this.closeLocalTracks(this.sendTracks);
+      this.closeLocalTrack(this.sendStream);
+      this.closeRemoteTrack(this.recvAudioTrack);
+      this.closeRemoteTrack(this.recvVideoTrack);
+      if (this.sendClient) {
+        this.sendClient.unpublish(this.sendTracks).catch(() => {});
+        this.sendClient.leave().catch(() => {});
+      }
+      if (this.recvClient) {
+        this.recvClient.leave().catch(() => {});
+      }
+      if(this.isEnableCloudProxy){
+        this.sendClient && this.sendClient.stopProxyServer();
+        this.recvClient && this.recvClient.stopProxyServer();
+      }
+      this.sendStream = null;
+      this.sendAudioTrack = null;
+      this.sendVideoTrack = null;
+      this.sendTracks = [];
+      this.recvAudioTrack = null;
+      this.recvVideoTrack = null;
+    },
+
+    async checkProfile(profile) {
+      this.closeLocalTrack(this.sendStream);
+      this.sendStream = await AgoraRtc.createCameraVideoTrack({
+        encoderConfig: profile.resolution
+      });
+      this.sendStream.play("test-send");
+      await this.wait(1000);
+      let videoElement = document.querySelector("#test-send video");
+      let settings = this.sendStream.getMediaStreamTrack().getSettings();
+      let actualWidth = videoElement && videoElement.videoWidth ? videoElement.videoWidth : settings.width;
+      let actualHeight = videoElement && videoElement.videoHeight ? videoElement.videoHeight : settings.height;
+      let videoArea = actualWidth * actualHeight;
+      let profileArea = profile.width * profile.height;
+      if (videoArea === profileArea) {
+        profile.status = "resolve";
+        return;
+      }
+      profile.status = "reject";
+      throw new Error("Resolution mismatched");
+    },
+
+    wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     },
 
     start() {
@@ -719,6 +764,7 @@ export default {
       this.inputVolume = 0
       this.renderChart = false
       this.testing = false
+      this.connectivityFinished = false
       this.profiles = profileArray.map(item => {
         item.status = "pending";
         return item;
@@ -757,50 +803,36 @@ export default {
       }, 3000);
     },
 
-    handleMicrophoneCheck() {
+    async handleMicrophoneCheck() {
       this.currentTestSuite = "1";
       let testSuite = this.testSuites["1"];
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: false,
-        audio: true,
-        screen: false
-      });
-      this.sendStream.init(
-        () => {
-          this.sendStream.play("test-send");
-          let totalVolume = 0;
-          this.microphoneCheckTimer = setInterval(() => {
-            this.inputVolume = Math.floor(
-              this.sendStream.getAudioLevel() * 100
-            );
-            totalVolume += this.inputVolume;
-          }, 100);
-          setTimeout(() => {
-            clearInterval(this.microphoneCheckTimer);
-            this.sendStream.close();
-            if (totalVolume < 60) {
-              testSuite.notError = false;
-              testSuite.extra = this.t("can_barely_hear_you");
-            } else {
-              testSuite.extra = this.t("microphone_works_well");
-            }
-            this.handleSpeakerCheck();
-          }, 7000);
-        },
-        err => {
-          // do next test
+      try {
+        this.sendStream = await AgoraRtc.createMicrophoneAudioTrack();
+        let totalVolume = 0;
+        this.microphoneCheckTimer = setInterval(() => {
+          this.inputVolume = Math.floor(
+            this.sendStream.getVolumeLevel() * 100
+          );
+          totalVolume += this.inputVolume;
+        }, 100);
+        await this.wait(7000);
+        clearInterval(this.microphoneCheckTimer);
+        this.closeLocalTrack(this.sendStream);
+        this.sendStream = null;
+        if (totalVolume < 60) {
           testSuite.notError = false;
-          testSuite.extra = err.msg;
-          try {
-            this.sendStream.close();
-          } catch (error) {
-            throw(error);
-          } finally {
-            this.handleSpeakerCheck();
-          }
+          testSuite.extra = this.t("can_barely_hear_you");
+        } else {
+          testSuite.extra = this.t("microphone_works_well");
         }
-      );
+      } catch (err) {
+        testSuite.notError = false;
+        testSuite.extra = this.errorMessage(err);
+        this.closeLocalTrack(this.sendStream);
+        this.sendStream = null;
+      } finally {
+        this.handleSpeakerCheck();
+      }
     },
 
     handleSpeakerCheck() {
@@ -840,14 +872,16 @@ export default {
       for (let item of this.profiles) {
         await this.checkProfile(item)
           .then(() => {
-            this.sendStream && this.sendStream.close();
+            this.closeLocalTrack(this.sendStream);
+            this.sendStream = null;
           })
           .catch(err => {
-            if (err === "Resolution mismatched") {
+            if (err.message === "Resolution mismatched") {
               testSuite.notError = false;
-              testSuite.extra = err.msg;
-              this.sendStream && this.sendStream.close();
+              testSuite.extra = err.message;
             }
+            this.closeLocalTrack(this.sendStream);
+            this.sendStream = null;
           });
       }
 
@@ -870,13 +904,14 @@ export default {
     async handleConnectivityCheck() {
       this.currentTestSuite = "4";
       let testSuite = this.testSuites["4"];
+      this.connectivityFinished = false;
       // init client and stream
       try {
         await this.initRecvClient();
         await this.initSendClient();
         this.renderChart = true;
       } catch (err) {
-        testSuite.extra = err.msg;
+        testSuite.extra = this.errorMessage(err);
         testSuite.notError = false;
         setTimeout(() => {
           this.testing = false;
@@ -887,11 +922,15 @@ export default {
       }
       // go on
       setTimeout(() => {
+        this.connectivityFinished = true;
         this.destructAll();
         setTimeout(() => {
           this.testing = false;
           this.currentTestSuite = "5";
           this.snackbar = true;
+          if (!this.bitrateData.rows || !this.packetsData.rows) {
+            return;
+          }
           if (
             this.bitrateData.rows.length === 1 ||
             this.packetsData.rows.length === 1
@@ -942,10 +981,8 @@ export default {
     },
 
     retry(currentIndex) {
-      if (this.sendStream && this.sendStream.isPlaying()) {
-        this.sendStream.stop();
-        this.sendStream.close();
-      }
+      this.closeLocalTrack(this.sendStream);
+      this.sendStream = null;
       //If the resolution is equal to not supported, 1. Do not play video stream; 2. Give error prompt
       if (this.ProfileForTry[currentIndex].isSuccess) {
         this.showVideo = true
@@ -953,27 +990,22 @@ export default {
         this.showVideo = false
         return
       }
-      this.sendStream = AgoraRtc.createStream({
-        streamID: this.sendId,
-        video: true,
-        audio: true,
-        screen: false
-      });
-      this.sendStream.setVideoProfile(this.ProfileForTry[currentIndex].resolution);
-      this.sendStream.init(
-        () => {
+      AgoraRtc.createCameraVideoTrack({
+        encoderConfig: this.ProfileForTry[currentIndex].resolution
+      })
+        .then(track => {
+          this.sendStream = track;
           this.sendStream.play("modal-video");
-        },
-        err => {
-          this.errMsgForTry = err.msg;
-        }
-      );
+        })
+        .catch(err => {
+          this.errMsgForTry = this.errorMessage(err);
+        });
     },
 
     endTry() {
       this.dialog = false;
-      this.sendStream.stop();
-      this.sendStream.close();
+      this.closeLocalTrack(this.sendStream);
+      this.sendStream = null;
     }
   }
 };
@@ -1067,7 +1099,6 @@ export default {
   min-height: 48px!important;
   height: auto!important;
 }
-
   .proxy {
     font-size: 12px;
     margin-left: 16px;
