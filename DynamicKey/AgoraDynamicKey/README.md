@@ -28,6 +28,7 @@ Sample Code for generating AccessToken are available on the following platforms:
  + C++
  + Go
  + Java
+ + Kotlin
  + Node.js
  + Python
  + Python3
@@ -64,6 +65,11 @@ Sample Code for generating AccessToken are available on the following platforms:
 - Version 006
   + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtcTokenBuilderSample.java
   + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/java/src/main/java/io/agora/sample/RtmTokenBuilderSample.java
+
+### Kotlin
+
+- Version 007
+  + https://github.com/AgoraIO/Tools/blob/master/DynamicKey/AgoraDynamicKey/kotlin/src/sample/kotlin/io/agora/sample/RtcTokenBuilder2Sample.kt
 
 ### Node.js
 
@@ -355,6 +361,71 @@ public class RtcTokenBuilder2Sample {
                 joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
                 pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds);
         System.out.printf("Token with account and privilege: %s\n", result);
+    }
+}
+```
+
+### Kotlin
+```kotlin
+package io.agora.sample
+
+import io.agora.media.RtcTokenBuilder2
+
+object RtcTokenBuilder2Sample {
+    // Need to set environment variable AGORA_APP_ID
+    private val appId = System.getenv("AGORA_APP_ID")
+
+    // Need to set environment variable AGORA_APP_CERTIFICATE
+    private val appCertificate = System.getenv("AGORA_APP_CERTIFICATE")
+
+    private const val channelName = "7d72365eb983485397e3e3f9d460bdda"
+    private const val account = "2082341273"
+    private const val uid = 2082341273
+    private const val tokenExpirationInSeconds = 3600
+    private const val privilegeExpirationInSeconds = 3600
+    private const val joinChannelPrivilegeExpireInSeconds = 3600
+    private const val pubAudioPrivilegeExpireInSeconds = 3600
+    private const val pubVideoPrivilegeExpireInSeconds = 3600
+    private const val pubDataStreamPrivilegeExpireInSeconds = 3600
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        println("App Id: $appId")
+        println("App Certificate: $appCertificate")
+        if (appId == null || appId.isEmpty() || appCertificate == null || appCertificate.isEmpty()) {
+            println("Need to set environment variable AGORA_APP_ID and AGORA_APP_CERTIFICATE")
+            return
+        }
+
+        val tokenBuilder = RtcTokenBuilder2()
+        var result = tokenBuilder.buildTokenWithUid(
+            appId, appCertificate, channelName, uid, RtcTokenBuilder2.Role.ROLE_PUBLISHER,
+            tokenExpirationInSeconds, privilegeExpirationInSeconds
+        )
+        println("Token with uid: $result")
+
+        result = tokenBuilder.buildTokenWithUserAccount(
+            appId, appCertificate, channelName, account,
+            RtcTokenBuilder2.Role.ROLE_PUBLISHER,
+            tokenExpirationInSeconds, privilegeExpirationInSeconds
+        )
+        println("Token with account: $result")
+
+        result = tokenBuilder.buildTokenWithUid(
+            appId, appCertificate, channelName, uid, tokenExpirationInSeconds,
+            joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
+            pubVideoPrivilegeExpireInSeconds,
+            pubDataStreamPrivilegeExpireInSeconds
+        )
+        println("Token with uid and privilege: $result")
+
+        result = tokenBuilder.buildTokenWithUserAccount(
+            appId, appCertificate, channelName, account,
+            tokenExpirationInSeconds,
+            joinChannelPrivilegeExpireInSeconds, pubAudioPrivilegeExpireInSeconds,
+            pubVideoPrivilegeExpireInSeconds, pubDataStreamPrivilegeExpireInSeconds
+        )
+        println("Token with account and privilege: $result")
     }
 }
 ```

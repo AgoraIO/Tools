@@ -1,7 +1,8 @@
 use agora_token::access_token::{
-    self, AccessToken, ServiceApaas, ServiceChat, ServiceFpa, ServiceRtc, ServiceRtm, PRIVILEGE_APAAS_APP, PRIVILEGE_APAAS_ROOM_USER,
+    self, AccessToken, ServiceApaas, ServiceChat, ServiceFpa, ServiceRtc, ServiceRtm, ServiceRtm2, PRIVILEGE_APAAS_APP, PRIVILEGE_APAAS_ROOM_USER,
     PRIVILEGE_APAAS_USER, PRIVILEGE_CHAT_APP, PRIVILEGE_CHAT_USER, PRIVILEGE_JOIN_CHANNEL, PRIVILEGE_LOGIN, PRIVILEGE_PUBLISH_AUDIO_STREAM,
-    PRIVILEGE_PUBLISH_DATA_STREAM, PRIVILEGE_PUBLISH_VIDEO_STREAM, SERVICE_TYPE_APAAS, SERVICE_TYPE_CHAT, SERVICE_TYPE_FPA, SERVICE_TYPE_RTC, SERVICE_TYPE_RTM,
+    PRIVILEGE_PUBLISH_DATA_STREAM, PRIVILEGE_PUBLISH_VIDEO_STREAM, RTM2_PERMISSION_READ, RTM2_PERMISSION_WRITE, RTM2_RESOURCE_MESSAGE_CHANNELS,
+    RTM2_RESOURCE_STREAM_CHANNELS, SERVICE_TYPE_APAAS, SERVICE_TYPE_CHAT, SERVICE_TYPE_FPA, SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_RTM2,
 };
 use agora_token::{apaas_token_builder, chat_token_builder, education_token_builder, fpa_token_builder, rtc_token_builder, rtm_token_builder};
 
@@ -159,4 +160,22 @@ fn test_rtm_token_builder() {
     let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
     assert_eq!(USER_ID, rtm.user_id);
     assert_eq!(EXPIRE, rtm.service.privileges[&PRIVILEGE_LOGIN]);
+}
+
+/// Verifies RTM2 token generation, parsing, permissions, and signature validation.
+#[test]
+fn test_rtm2_token_builder() {
+    let mut permissions = access_token::new_rtm2_permissions();
+    permissions.add(
+        RTM2_RESOURCE_MESSAGE_CHANNELS,
+        RTM2_PERMISSION_READ,
+        vec!["message-a".to_string(), "message-b".to_string()],
+    );
+    permissions.add(RTM2_RESOURCE_STREAM_CHANNELS, RTM2_PERMISSION_WRITE, vec!["stream-a".to_string()]);
+    let parsed = parse_token(rtm_token_builder::build_token_with_permissions(APP_ID, APP_CERT, USER_ID, &permissions, EXPIRE).unwrap());
+    let rtm2 = get_service::<ServiceRtm2>(&parsed, SERVICE_TYPE_RTM2);
+
+    assert_eq!(USER_ID, rtm2.user_id);
+    assert_eq!(permissions, rtm2.permissions);
+    assert_eq!(EXPIRE, rtm2.service.privileges[&PRIVILEGE_LOGIN]);
 }

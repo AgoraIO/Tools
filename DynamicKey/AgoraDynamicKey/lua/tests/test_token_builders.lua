@@ -123,6 +123,35 @@ function test_rtm_token_builder()
     luaunit.assertEquals(EXPIRE, rtm.service.privileges[access_token.PRIVILEGE_LOGIN])
 end
 
+-- Verifies RTM2 Builder resource permissions and signature validation.
+function test_rtm2_token_builder()
+    local permissions = access_token.new_rtm2_permissions()
+    permissions:add(
+        access_token.RTM2_RESOURCE_MESSAGE_CHANNELS,
+        access_token.RTM2_PERMISSION_READ,
+        { "message-a", "message-b" }
+    )
+    permissions:add(
+        access_token.RTM2_RESOURCE_STREAM_CHANNELS,
+        access_token.RTM2_PERMISSION_WRITE,
+        { "stream-a" }
+    )
+
+    local token = rtm_token_builder.build_token_with_permissions(
+        APP_ID,
+        APP_CERTIFICATE,
+        USER_ID,
+        permissions,
+        EXPIRE
+    )
+    local parsed = parse_token(token)
+    local rtm2 = parsed:get_services(access_token.SERVICE_TYPE_RTM2)[1]
+
+    luaunit.assertEquals(USER_ID, rtm2.user_id)
+    luaunit.assertEquals(EXPIRE, rtm2.service.privileges[access_token.PRIVILEGE_LOGIN])
+    luaunit.assertEquals(permissions.details, rtm2.permissions.details)
+end
+
 -- Verifies Chat Builder user and app tokens.
 function test_chat_token_builder()
     local token = chat_token_builder.build_chat_user_token(APP_ID, APP_CERTIFICATE, UID_STRING, EXPIRE)

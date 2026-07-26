@@ -17,11 +17,14 @@ const (
 	VersionLength = 3
 
 	// Service type
-	ServiceTypeRtc   = 1
-	ServiceTypeRtm   = 2
-	ServiceTypeFpa   = 4
-	ServiceTypeChat  = 5
-	ServiceTypeApaas = 7
+	ServiceTypeRtc       = 1
+	ServiceTypeRtm       = 2
+	ServiceTypeStreaming = 3
+	ServiceTypeFpa       = 4
+	ServiceTypeChat      = 5
+	ServiceTypeFCdn      = 6
+	ServiceTypeApaas     = 7
+	ServiceTypeRtm2      = 8
 
 	// Rtc
 	PrivilegeJoinChannel        = 1
@@ -33,6 +36,14 @@ const (
 	// Fpa
 	PrivilegeLogin = 1
 
+	// Streaming
+	PrivilegeStreamingPublishMixStream = 1
+	PrivilegeStreamingPublishRawStream = 2
+
+	// FCDN
+	PrivilegeFCdnPublish = 1
+	PrivilegeFCdnPlay    = 2
+
 	// Chat
 	PrivilegeChatUser = 1
 	PrivilegeChatApp  = 2
@@ -41,6 +52,17 @@ const (
 	PrivilegeApaasRoomUser = 1
 	PrivilegeApaasUser     = 2
 	PrivilegeApaasApp      = 3
+
+	// RTM2 resource types
+	Rtm2ResourceMessageChannels = 0
+	Rtm2ResourceStreamChannels  = 1
+	Rtm2ResourceGroupChannels   = 2
+	Rtm2ResourceServerGroups    = 3
+	Rtm2ResourceUsers           = 4
+
+	// RTM2 permission types
+	Rtm2PermissionRead  = 0
+	Rtm2PermissionWrite = 1
 )
 
 type IService interface {
@@ -138,6 +160,46 @@ type ServiceRtm struct {
 	UserId string
 }
 
+type ServiceStreaming struct {
+	*Service
+	ChannelName string
+	Account     string
+}
+
+// NewServiceStreaming creates a Streaming service for a channel and user account.
+func NewServiceStreaming(channelName string, account string) *ServiceStreaming {
+	return &ServiceStreaming{Service: NewService(ServiceTypeStreaming), ChannelName: channelName, Account: account}
+}
+
+// NewServiceStreamingWithUid creates a Streaming service with a numeric user ID.
+func NewServiceStreamingWithUid(channelName string, uid uint32) *ServiceStreaming {
+	return NewServiceStreaming(channelName, GetUidStr(uid))
+}
+
+// Pack writes the Streaming service, channel name, and user account.
+func (serviceStreaming *ServiceStreaming) Pack(w io.Writer) (err error) {
+	if err = serviceStreaming.Service.Pack(w); err != nil {
+		return
+	}
+	if err = packString(w, serviceStreaming.ChannelName); err != nil {
+		return
+	}
+	err = packString(w, serviceStreaming.Account)
+	return
+}
+
+// UnPack reads the Streaming privileges, channel name, and user account.
+func (serviceStreaming *ServiceStreaming) UnPack(r io.Reader) (err error) {
+	if err = serviceStreaming.Service.UnPack(r); err != nil {
+		return
+	}
+	if serviceStreaming.ChannelName, err = unPackString(r); err != nil {
+		return
+	}
+	serviceStreaming.Account, err = unPackString(r)
+	return
+}
+
 // NewServiceRtm creates an RTM service for a user ID.
 func NewServiceRtm(userId string) (serviceRtm *ServiceRtm) {
 	serviceRtm = &ServiceRtm{UserId: userId, Service: NewService(ServiceTypeRtm)}
@@ -197,6 +259,46 @@ type ServiceChat struct {
 	UserId string
 }
 
+type ServiceFCdn struct {
+	*Service
+	ChannelName string
+	Account     string
+}
+
+// NewServiceFCdn creates an FCDN service for a channel and user account.
+func NewServiceFCdn(channelName string, account string) *ServiceFCdn {
+	return &ServiceFCdn{Service: NewService(ServiceTypeFCdn), ChannelName: channelName, Account: account}
+}
+
+// NewServiceFCdnWithUid creates an FCDN service with a numeric user ID.
+func NewServiceFCdnWithUid(channelName string, uid uint32) *ServiceFCdn {
+	return NewServiceFCdn(channelName, GetUidStr(uid))
+}
+
+// Pack writes the FCDN service, channel name, and user account.
+func (serviceFCdn *ServiceFCdn) Pack(w io.Writer) (err error) {
+	if err = serviceFCdn.Service.Pack(w); err != nil {
+		return
+	}
+	if err = packString(w, serviceFCdn.ChannelName); err != nil {
+		return
+	}
+	err = packString(w, serviceFCdn.Account)
+	return
+}
+
+// UnPack reads the FCDN privileges, channel name, and user account.
+func (serviceFCdn *ServiceFCdn) UnPack(r io.Reader) (err error) {
+	if err = serviceFCdn.Service.UnPack(r); err != nil {
+		return
+	}
+	if serviceFCdn.ChannelName, err = unPackString(r); err != nil {
+		return
+	}
+	serviceFCdn.Account, err = unPackString(r)
+	return
+}
+
 // NewServiceChat creates a Chat service for a user ID.
 func NewServiceChat(userId string) (serviceChat *ServiceChat) {
 	serviceChat = &ServiceChat{Service: NewService(ServiceTypeChat), UserId: userId}
@@ -228,6 +330,136 @@ type ServiceApaas struct {
 	RoomUuid string
 	UserUuid string
 	Role     int16
+}
+
+type Rtm2Permissions struct {
+	Details map[uint16]map[uint16][]string
+}
+
+// NewRtm2Permissions creates an empty RTM2 permission set.
+func NewRtm2Permissions() *Rtm2Permissions {
+	return &Rtm2Permissions{Details: make(map[uint16]map[uint16][]string)}
+}
+
+// Add adds or replaces resources for an RTM2 resource and permission type.
+func (permissions *Rtm2Permissions) Add(resourceType uint16, permissionType uint16, resources []string) {
+	if permissions.Details[resourceType] == nil {
+		permissions.Details[resourceType] = make(map[uint16][]string)
+	}
+	permissions.Details[resourceType][permissionType] = append([]string(nil), resources...)
+}
+
+type ServiceRtm2 struct {
+	*Service
+	UserId      string
+	Permissions *Rtm2Permissions
+}
+
+// NewServiceRtm2 creates an RTM2 service with resource-level permissions.
+func NewServiceRtm2(userId string, permissions *Rtm2Permissions) *ServiceRtm2 {
+	if permissions == nil {
+		permissions = NewRtm2Permissions()
+	}
+	return &ServiceRtm2{Service: NewService(ServiceTypeRtm2), UserId: userId, Permissions: permissions}
+}
+
+// Pack writes the RTM2 service, user ID, and resource permissions.
+func (serviceRtm2 *ServiceRtm2) Pack(w io.Writer) (err error) {
+	if err = serviceRtm2.Service.Pack(w); err != nil {
+		return
+	}
+	if err = packString(w, serviceRtm2.UserId); err != nil {
+		return
+	}
+
+	resourceTypes := make([]int, 0, len(serviceRtm2.Permissions.Details))
+	for resourceType := range serviceRtm2.Permissions.Details {
+		resourceTypes = append(resourceTypes, int(resourceType))
+	}
+	sort.Ints(resourceTypes)
+	if err = packUint16(w, uint16(len(resourceTypes))); err != nil {
+		return
+	}
+
+	for _, resourceTypeValue := range resourceTypes {
+		resourceType := uint16(resourceTypeValue)
+		if err = packUint16(w, resourceType); err != nil {
+			return
+		}
+
+		permissionMap := serviceRtm2.Permissions.Details[resourceType]
+		permissionTypes := make([]int, 0, len(permissionMap))
+		for permissionType := range permissionMap {
+			permissionTypes = append(permissionTypes, int(permissionType))
+		}
+		sort.Ints(permissionTypes)
+		if err = packUint16(w, uint16(len(permissionTypes))); err != nil {
+			return
+		}
+
+		for _, permissionTypeValue := range permissionTypes {
+			permissionType := uint16(permissionTypeValue)
+			resources := permissionMap[permissionType]
+			if err = packUint16(w, permissionType); err != nil {
+				return
+			}
+			if err = packUint16(w, uint16(len(resources))); err != nil {
+				return
+			}
+			for _, resource := range resources {
+				if err = packString(w, resource); err != nil {
+					return
+				}
+			}
+		}
+	}
+	return
+}
+
+// UnPack reads the RTM2 privileges, user ID, and resource permissions.
+func (serviceRtm2 *ServiceRtm2) UnPack(r io.Reader) (err error) {
+	if err = serviceRtm2.Service.UnPack(r); err != nil {
+		return
+	}
+	if serviceRtm2.UserId, err = unPackString(r); err != nil {
+		return
+	}
+
+	serviceRtm2.Permissions = NewRtm2Permissions()
+	var resourceCount uint16
+	if resourceCount, err = unPackUint16(r); err != nil {
+		return
+	}
+	for i := uint16(0); i < resourceCount; i++ {
+		var resourceType uint16
+		var permissionCount uint16
+		if resourceType, err = unPackUint16(r); err != nil {
+			return
+		}
+		if permissionCount, err = unPackUint16(r); err != nil {
+			return
+		}
+		for j := uint16(0); j < permissionCount; j++ {
+			var permissionType uint16
+			var resourceListCount uint16
+			if permissionType, err = unPackUint16(r); err != nil {
+				return
+			}
+			if resourceListCount, err = unPackUint16(r); err != nil {
+				return
+			}
+			resources := make([]string, 0, resourceListCount)
+			for k := uint16(0); k < resourceListCount; k++ {
+				var resource string
+				if resource, err = unPackString(r); err != nil {
+					return
+				}
+				resources = append(resources, resource)
+			}
+			serviceRtm2.Permissions.Add(resourceType, permissionType, resources)
+		}
+	}
+	return
 }
 
 // NewServiceApaas creates an APaaS service for a room, user, and role.
@@ -511,12 +743,18 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 		service = NewServiceRtc("", "")
 	case ServiceTypeRtm:
 		service = NewServiceRtm("")
+	case ServiceTypeStreaming:
+		service = NewServiceStreaming("", "")
 	case ServiceTypeFpa:
 		service = NewServiceFpa()
 	case ServiceTypeChat:
 		service = NewServiceChat("")
+	case ServiceTypeFCdn:
+		service = NewServiceFCdn("", "")
 	case ServiceTypeApaas:
 		service = NewServiceApaas("", "", -1)
+	case ServiceTypeRtm2:
+		service = NewServiceRtm2("", nil)
 	default:
 		service = nil
 	}

@@ -1,6 +1,9 @@
 package accesstoken2
 
 import (
+	"bytes"
+	"errors"
+	"reflect"
 	"testing"
 )
 
@@ -16,6 +19,110 @@ const (
 	DataMockUidStr              = "2882341273"
 	DataMockUserId              = "test_user"
 )
+
+type rejectedWriter struct{}
+
+// Write rejects every write to exercise serialization error propagation.
+func (rejectedWriter) Write([]byte) (int, error) { return 0, errors.New("write rejected") }
+
+// Test_AllServices_RoundTrip verifies every known service payload through build, parse, and verification.
+func Test_AllServices_RoundTrip(t *testing.T) {
+	permissions := NewRtm2Permissions()
+	permissions.Add(Rtm2ResourceMessageChannels, Rtm2PermissionRead, []string{"message-a", "message-b"})
+	permissions.Add(Rtm2ResourceUsers, Rtm2PermissionWrite, []string{"user-a"})
+
+	services := []IService{
+		NewServiceRtc("rtc-channel", "rtc-user"),
+		NewServiceRtm("rtm-user"),
+		NewServiceStreamingWithUid("stream-channel", DataMockUid),
+		NewServiceFpa(),
+		NewServiceChat("chat-user"),
+		NewServiceFCdnWithUid("fcdn-channel", DataMockUid),
+		NewServiceApaas("room-uuid", "user-uuid", 2),
+		NewServiceRtm2("rtm2-user", permissions),
+	}
+	for _, service := range services {
+		switch typed := service.(type) {
+		case *ServiceRtc:
+			typed.AddPrivilege(PrivilegeJoinChannel, DataMockExpire)
+		case *ServiceRtm:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		case *ServiceStreaming:
+			typed.AddPrivilege(PrivilegeStreamingPublishMixStream, DataMockExpire)
+		case *ServiceFpa:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		case *ServiceChat:
+			typed.AddPrivilege(PrivilegeChatUser, DataMockExpire)
+		case *ServiceFCdn:
+			typed.AddPrivilege(PrivilegeFCdnPublish, DataMockExpire)
+		case *ServiceApaas:
+			typed.AddPrivilege(PrivilegeApaasRoomUser, DataMockExpire)
+		case *ServiceRtm2:
+			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		}
+	}
+
+	token := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+	token.IssueTs = DataMockIssueTs
+	token.Salt = DataMockSalt
+	for _, service := range services {
+		token.AddService(service)
+	}
+	encoded, err := token.Build()
+	AssertNil(t, err)
+
+	parsed := CreateAccessToken()
+	parsedOK, err := parsed.Parse(encoded)
+	AssertNil(t, err)
+	AssertEqual(t, true, parsedOK)
+	AssertEqual(t, len(services), len(parsed.Services))
+	verified, err := parsed.VerifySignature(DataMockAppCertificate)
+	AssertNil(t, err)
+	AssertEqual(t, true, verified)
+
+	parsedRtm2 := parsed.GetServices(ServiceTypeRtm2)[0].(*ServiceRtm2)
+	if !reflect.DeepEqual(permissions.Details, parsedRtm2.Permissions.Details) {
+		t.Fatalf("unexpected RTM2 permissions: %#v", parsedRtm2.Permissions.Details)
+	}
+	parsedApaas := parsed.GetServices(ServiceTypeApaas)[0].(*ServiceApaas)
+	AssertEqual(t, "room-uuid", parsedApaas.RoomUuid)
+	AssertEqual(t, int16(2), parsedApaas.Role)
+}
+
+// Test_ServicePackingErrors verifies that service serializers return writer failures.
+func Test_ServicePackingErrors(t *testing.T) {
+	services := []IService{
+		NewService(99),
+		NewServiceRtc("channel", "user"),
+		NewServiceRtm("user"),
+		NewServiceStreaming("channel", "account"),
+		NewServiceFpa(),
+		NewServiceChat("user"),
+		NewServiceFCdn("channel", "account"),
+		NewServiceApaas("room", "user", 1),
+		NewServiceRtm2("user", nil),
+	}
+	for _, service := range services {
+		if err := service.Pack(rejectedWriter{}); err == nil {
+			t.Fatalf("service %T ignored writer failure", service)
+		}
+	}
+
+	buffer := bytes.NewBuffer(nil)
+	service := NewServiceFpa()
+	service.AddPrivilege(PrivilegeLogin, DataMockExpire)
+	if err := service.Pack(buffer); err != nil {
+		t.Fatal(err)
+	}
+	parsed := NewServiceFpa()
+	if err := parsed.UnPack(bytes.NewReader(buffer.Bytes()[2:])); err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(service.Privileges, parsed.Privileges) {
+		t.Fatalf("unexpected FPA privileges: %#v", parsed.Privileges)
+	}
+	AssertEqual(t, "900150983cd24fb0d6963f7d28e17f72", Md5("abc"))
+}
 
 // Test_AccessToken_Build_Error_NoService verifies token generation rejects an empty service list.
 func Test_AccessToken_Build_Error_NoService(t *testing.T) {
@@ -487,6 +594,83 @@ func Test_AccessToken_Parse_TokenChatApp(t *testing.T) {
 	AssertEqual(t, "", accessToken.GetServices(ServiceTypeChat)[0].(*ServiceChat).UserId)
 	AssertEqual(t, uint16(ServiceTypeChat), accessToken.GetServices(ServiceTypeChat)[0].(*ServiceChat).Type)
 	AssertEqual(t, DataMockExpire, accessToken.GetServices(ServiceTypeChat)[0].(*ServiceChat).Privileges[PrivilegeChatApp])
+}
+
+// Test_AccessToken_Parse_ExtendedServices_FromCpp verifies C++ Streaming, FCDN, and RTM2 compatibility.
+func Test_AccessToken_Parse_ExtendedServices_FromCpp(t *testing.T) {
+	const token = "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=="
+
+	accessToken := CreateAccessToken()
+	parsed, err := accessToken.Parse(token)
+	AssertNil(t, err)
+	AssertEqual(t, true, parsed)
+
+	verified, err := accessToken.VerifySignature(DataMockAppCertificate)
+	AssertNil(t, err)
+	AssertEqual(t, true, verified)
+
+	streaming := accessToken.GetServices(ServiceTypeStreaming)[0].(*ServiceStreaming)
+	AssertEqual(t, DataMockChannelName, streaming.ChannelName)
+	AssertEqual(t, DataMockUidStr, streaming.Account)
+	AssertEqual(t, DataMockExpire, streaming.Privileges[PrivilegeStreamingPublishMixStream])
+	AssertEqual(t, DataMockExpire, streaming.Privileges[PrivilegeStreamingPublishRawStream])
+
+	fcdn := accessToken.GetServices(ServiceTypeFCdn)[0].(*ServiceFCdn)
+	AssertEqual(t, DataMockChannelName, fcdn.ChannelName)
+	AssertEqual(t, DataMockUidStr, fcdn.Account)
+	AssertEqual(t, DataMockExpire, fcdn.Privileges[PrivilegeFCdnPublish])
+	AssertEqual(t, DataMockExpire, fcdn.Privileges[PrivilegeFCdnPlay])
+
+	rtm2 := accessToken.GetServices(ServiceTypeRtm2)[0].(*ServiceRtm2)
+	AssertEqual(t, DataMockUserId, rtm2.UserId)
+	AssertEqual(t, DataMockExpire, rtm2.Privileges[PrivilegeLogin])
+	AssertEqual(t, true, reflect.DeepEqual([]string{"message-a", "message-b"}, rtm2.Permissions.Details[Rtm2ResourceMessageChannels][Rtm2PermissionRead]))
+	AssertEqual(t, true, reflect.DeepEqual([]string{"stream-a"}, rtm2.Permissions.Details[Rtm2ResourceStreamChannels][Rtm2PermissionWrite]))
+	AssertEqual(t, true, reflect.DeepEqual([]string{"user-a"}, rtm2.Permissions.Details[Rtm2ResourceUsers][Rtm2PermissionRead]))
+}
+
+// Test_ExtendedServiceNumericUidConversion verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+func Test_ExtendedServiceNumericUidConversion(t *testing.T) {
+	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+	accessToken.IssueTs = DataMockIssueTs
+	accessToken.Salt = DataMockSalt
+	streamingUid := NewServiceStreamingWithUid(DataMockChannelName, DataMockUid)
+	streamingUid.AddPrivilege(PrivilegeStreamingPublishMixStream, DataMockExpire)
+	accessToken.AddService(streamingUid)
+	streamingWildcard := NewServiceStreamingWithUid(DataMockChannelName, 0)
+	streamingWildcard.AddPrivilege(PrivilegeStreamingPublishRawStream, DataMockExpire)
+	accessToken.AddService(streamingWildcard)
+	streamingAccount := NewServiceStreaming(DataMockChannelName, "stream-account")
+	streamingAccount.AddPrivilege(PrivilegeStreamingPublishMixStream, DataMockExpire)
+	streamingAccount.AddPrivilege(PrivilegeStreamingPublishRawStream, DataMockExpire)
+	accessToken.AddService(streamingAccount)
+	fcdnUid := NewServiceFCdnWithUid(DataMockChannelName, DataMockUid)
+	fcdnUid.AddPrivilege(PrivilegeFCdnPublish, DataMockExpire)
+	accessToken.AddService(fcdnUid)
+	fcdnWildcard := NewServiceFCdnWithUid(DataMockChannelName, 0)
+	fcdnWildcard.AddPrivilege(PrivilegeFCdnPlay, DataMockExpire)
+	accessToken.AddService(fcdnWildcard)
+	fcdnAccount := NewServiceFCdn(DataMockChannelName, "fcdn-account")
+	fcdnAccount.AddPrivilege(PrivilegeFCdnPublish, DataMockExpire)
+	fcdnAccount.AddPrivilege(PrivilegeFCdnPlay, DataMockExpire)
+	accessToken.AddService(fcdnAccount)
+
+	token, err := accessToken.Build()
+	AssertNil(t, err)
+	AssertEqual(t, "007eJxSYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwMzAyMIL5CgzmKeZGxmamqUmWFsYmFqbGluapxqnGaZYpJmYGSSkpiVwMRhYWRsYmhkbmxiB9TETqY2BgZmCC2kKsHj6G4pKi1MRc3cTk5PzSvBI2Mt3JRpI72Uh2Jw9DWnJKHsyVgAAAAP//SW9fVw==", token)
+	parsed := CreateAccessToken()
+	ok, err := parsed.Parse(token)
+	AssertNil(t, err)
+	AssertEqual(t, true, ok)
+
+	streaming := parsed.GetServices(ServiceTypeStreaming)
+	AssertEqual(t, DataMockUidStr, streaming[0].(*ServiceStreaming).Account)
+	AssertEqual(t, "", streaming[1].(*ServiceStreaming).Account)
+	AssertEqual(t, "stream-account", streaming[2].(*ServiceStreaming).Account)
+	fcdn := parsed.GetServices(ServiceTypeFCdn)
+	AssertEqual(t, DataMockUidStr, fcdn[0].(*ServiceFCdn).Account)
+	AssertEqual(t, "", fcdn[1].(*ServiceFCdn).Account)
+	AssertEqual(t, "fcdn-account", fcdn[2].(*ServiceFCdn).Account)
 }
 
 // Test_GetUidStr verifies numeric UID conversion, including the wildcard zero value.

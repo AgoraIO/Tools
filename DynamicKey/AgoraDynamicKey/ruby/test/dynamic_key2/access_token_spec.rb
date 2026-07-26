@@ -19,6 +19,9 @@ describe 'AgoraDynamicKey2::AccessToken' do
   let(:uid) { 2_882_341_273 }
   let(:uid_s) { '2882341273' }
   let(:user_id) { 'test_user' }
+  let(:cpp_extended_token) do
+    '007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=='
+  end
 
   # Verifies token generation rejects an empty service list.
   it 'test_build_rejects_empty_services' do
@@ -110,6 +113,23 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.get_services(AgoraDynamicKey2::ServiceRtc::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]).to eq(nil)
   end
 
+  # Rejects malformed compressed payloads without retaining parsed state.
+  it 'test_parse_malformed_payload' do
+    access_token = AgoraDynamicKey2::AccessToken.new
+
+    expect(access_token.parse('007invalid')).to eq(false)
+    expect(access_token.verify_signature(app_certificate)).to eq(false)
+  end
+
+  # Returns false when the cryptographic comparison raises unexpectedly.
+  it 'test_verify_signature_crypto_failure' do
+    access_token = AgoraDynamicKey2::AccessToken.new
+    expect(access_token.parse(cpp_extended_token)).to eq(true)
+    allow(OpenSSL).to receive(:fixed_length_secure_compare).and_raise(StandardError)
+
+    expect(access_token.verify_signature(app_certificate)).to eq(false)
+  end
+
   # Parses a legacy multi-service Token007 token.
   it 'test_parse_Token_MultiService' do
     access_token = AgoraDynamicKey2::AccessToken.new
@@ -147,6 +167,40 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(access_token.get_services(AgoraDynamicKey2::ServiceRtm::SERVICE_TYPE).first.privileges[AgoraDynamicKey2::ServiceRtm::PRIVILEGE_JOIN_LOGIN]).to eq(expire)
   end
 
+  # Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+  it 'test_parse_extended_services_from_cpp' do
+    access_token = AgoraDynamicKey2::AccessToken.new
+
+    expect(access_token.parse(cpp_extended_token)).to eq(true)
+    expect(access_token.verify_signature(app_certificate)).to eq(true)
+
+    streaming = access_token.get_services(AgoraDynamicKey2::ServiceStreaming::SERVICE_TYPE).first
+    expect(streaming.channel_name).to eq(channel_name)
+    expect(streaming.account).to eq(uid_s)
+    expect(streaming.privileges[AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM]).to eq(expire)
+    expect(streaming.privileges[AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM]).to eq(expire)
+
+    fcdn = access_token.get_services(AgoraDynamicKey2::ServiceFCdn::SERVICE_TYPE).first
+    expect(fcdn.channel_name).to eq(channel_name)
+    expect(fcdn.account).to eq(uid_s)
+    expect(fcdn.privileges[AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PUBLISH]).to eq(expire)
+    expect(fcdn.privileges[AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PLAY]).to eq(expire)
+
+    rtm2 = access_token.get_services(AgoraDynamicKey2::ServiceRtm2::SERVICE_TYPE).first
+    expect(rtm2.user_id).to eq(user_id)
+    expect(rtm2.permissions.details).to eq(
+      AgoraDynamicKey2::ServiceRtm2::Permissions::MESSAGE_CHANNELS => {
+        AgoraDynamicKey2::ServiceRtm2::Permissions::READ => %w[message-a message-b]
+      },
+      AgoraDynamicKey2::ServiceRtm2::Permissions::STREAM_CHANNELS => {
+        AgoraDynamicKey2::ServiceRtm2::Permissions::WRITE => ['stream-a']
+      },
+      AgoraDynamicKey2::ServiceRtm2::Permissions::USERS => {
+        AgoraDynamicKey2::ServiceRtm2::Permissions::READ => ['user-a']
+      }
+    )
+  end
+
   # Verifies numeric and string user ID conversion.
   it 'test_Service_fetch_uid' do
     service = AgoraDynamicKey2::Service.allocate
@@ -154,6 +208,42 @@ describe 'AgoraDynamicKey2::AccessToken' do
     expect(service.fetch_uid(0)).to eq('')
     expect(service.fetch_uid(uid)).to eq(uid_s)
     expect(service.fetch_uid(uid_s)).to eq(uid_s)
+  end
+
+  # Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+  it 'test_extended_service_numeric_uid_conversion' do
+    access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, expire)
+    access_token.issue_ts = issue_ts
+    access_token.salt = salt
+    streaming_uid = AgoraDynamicKey2::ServiceStreaming.new(channel_name, uid)
+    streaming_uid.add_privilege(AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM, expire)
+    access_token.add_service(streaming_uid)
+    streaming_wildcard = AgoraDynamicKey2::ServiceStreaming.new(channel_name, 0)
+    streaming_wildcard.add_privilege(AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM, expire)
+    access_token.add_service(streaming_wildcard)
+    streaming_account = AgoraDynamicKey2::ServiceStreaming.new(channel_name, 'stream-account')
+    streaming_account.add_privilege(AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_MIX_STREAM, expire)
+    streaming_account.add_privilege(AgoraDynamicKey2::ServiceStreaming::PRIVILEGE_PUBLISH_RAW_STREAM, expire)
+    access_token.add_service(streaming_account)
+    fcdn_uid = AgoraDynamicKey2::ServiceFCdn.new(channel_name, uid)
+    fcdn_uid.add_privilege(AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PUBLISH, expire)
+    access_token.add_service(fcdn_uid)
+    fcdn_wildcard = AgoraDynamicKey2::ServiceFCdn.new(channel_name, 0)
+    fcdn_wildcard.add_privilege(AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PLAY, expire)
+    access_token.add_service(fcdn_wildcard)
+    fcdn_account = AgoraDynamicKey2::ServiceFCdn.new(channel_name, 'fcdn-account')
+    fcdn_account.add_privilege(AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PUBLISH, expire)
+    fcdn_account.add_privilege(AgoraDynamicKey2::ServiceFCdn::PRIVILEGE_PLAY, expire)
+    access_token.add_service(fcdn_account)
+
+    encoded = access_token.build
+    expect(encoded).to eq('007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X')
+    parsed = AgoraDynamicKey2::AccessToken.new
+    expect(parsed.parse(encoded)).to eq(true)
+    expect(parsed.get_services(AgoraDynamicKey2::ServiceStreaming::SERVICE_TYPE).map(&:account))
+      .to eq([uid_s, '', 'stream-account'])
+    expect(parsed.get_services(AgoraDynamicKey2::ServiceFCdn::SERVICE_TYPE).map(&:account))
+      .to eq([uid_s, '', 'fcdn-account'])
   end
 
   # Preserves repeated service types and their insertion order after parsing.

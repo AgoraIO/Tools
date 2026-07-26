@@ -1,56 +1,46 @@
-﻿using System;
+using System;
 
 namespace AgoraIO.Media
 {
-    /// <summary>
-        /// 创建一个可变长的Byte数组方便Push数据和Pop数据
-        /// 数组的最大长度为1024,超过会产生溢出
-        /// 数组的最大长度由常量MAX_LENGTH设定
-        /// 
-        /// 注:由于实际需要,可能要从左到右取数据,所以这里
-        /// 定义的Pop函数并不是先进后出的函数,而是从0开始.
-        /// 
-        /// @Author: Red_angelX
-        /// </summary>
+    /// <summary>
+    /// Stores Token007 bytes in a dynamically growing buffer and reads them from left to right.
+    /// </summary>
     public class ByteBuffer
     {
-        //数组的最大长度
-        private const int MAX_LENGTH = 1024;
+        private const int INITIAL_CAPACITY = 1024;
 
-        //固定长度的中间数组
-        private byte[] TEMP_BYTE_ARRAY = new byte[MAX_LENGTH];
+        private byte[] TEMP_BYTE_ARRAY = new byte[INITIAL_CAPACITY];
 
-        //当前数组长度
+        // Stores the number of bytes currently written to the buffer.
         private int CURRENT_LENGTH = 0;
 
-        //当前Pop指针位置
-        private int CURRENT_POSITION = 0;
+        // Stores the current read position.
+        private int CURRENT_POSITION = 0;
 
-        //最后返回数组
-        private byte[] RETURN_ARRAY;
+        // Stores the byte array returned by ToByteArray.
+        private byte[] RETURN_ARRAY;
 
-        /// <summary>
-        /// 默认构造函数
-        /// </summary>
-        public ByteBuffer()
+        /// <summary>
+        /// Initializes an empty byte buffer.
+        /// </summary>
+        public ByteBuffer()
         {
             this.Initialize();
         }
 
-        /// <summary>
-        /// 重载的构造函数,用一个Byte数组来构造
-        /// </summary>
-        /// <param name="bytes">用于构造ByteBuffer的数组</param>
-        public ByteBuffer(byte[] bytes)
+        /// <summary>
+        /// Initializes a byte buffer with the specified bytes.
+        /// </summary>
+        /// <param name="bytes">The bytes used to initialize the buffer.</param>
+        public ByteBuffer(byte[] bytes)
         {
             this.Initialize();
             this.PushByteArray(bytes);
         }
 
-
-        /// <summary>
-                /// 获取当前ByteBuffer的长度
-                /// </summary>
+        /// <summary>
+        /// Gets the number of bytes currently stored in the buffer.
+        /// </summary>
         public int Length
         {
             get
@@ -59,10 +49,10 @@ namespace AgoraIO.Media
             }
         }
 
-        /// <summary>
-        /// 获取/设置当前出栈指针位置
-        /// </summary>
-        public int Position
+        /// <summary>
+        /// Gets or sets the current read position.
+        /// </summary>
+        public int Position
         {
             get
             {
@@ -74,117 +64,141 @@ namespace AgoraIO.Media
             }
         }
 
-        /// <summary>
-        /// 获取ByteBuffer所生成的数组
-        /// 长度必须小于 [MAXSIZE]
-        /// </summary>
-        /// <returns>Byte[]</returns>
-        public byte[] ToByteArray()
+        /// <summary>
+        /// Returns the bytes currently stored in the buffer.
+        /// </summary>
+        /// <returns>A byte array containing the stored data.</returns>
+        public byte[] ToByteArray()
         {
-            //分配大小
-            RETURN_ARRAY = new byte[CURRENT_LENGTH];
-            //调整指针
-            Array.Copy(TEMP_BYTE_ARRAY, 0, RETURN_ARRAY, 0, CURRENT_LENGTH);
+            // Allocate an array containing only the written bytes.
+            RETURN_ARRAY = new byte[CURRENT_LENGTH];
+            // Copy the written bytes into the result array.
+            Array.Copy(TEMP_BYTE_ARRAY, 0, RETURN_ARRAY, 0, CURRENT_LENGTH);
             return RETURN_ARRAY;
         }
 
-        /// <summary>
-        /// 初始化ByteBuffer的每一个元素,并把当前指针指向头一位
-        /// </summary>
-        public void Initialize()
+        /// <summary>
+        /// Clears the buffer and resets the read position.
+        /// </summary>
+        public void Initialize()
         {
             TEMP_BYTE_ARRAY.Initialize();
             CURRENT_LENGTH = 0;
             CURRENT_POSITION = 0;
         }
 
-        /// <summary>
-        /// 向ByteBuffer压入一个字节
-        /// </summary>
-        /// <param name="by">一位字节</param>
-        public void PushByte(byte by)
+        /// <summary>
+        /// Grows the backing array when the next value does not fit.
+        /// </summary>
+        private void EnsureCapacity(int additionalLength)
         {
+            int requiredLength = CURRENT_LENGTH + additionalLength;
+            if (requiredLength <= TEMP_BYTE_ARRAY.Length)
+            {
+                return;
+            }
+
+            int capacity = TEMP_BYTE_ARRAY.Length;
+            while (capacity < requiredLength)
+            {
+                capacity *= 2;
+            }
+
+            Array.Resize(ref TEMP_BYTE_ARRAY, capacity);
+        }
+
+        /// <summary>
+        /// Appends one byte to the buffer.
+        /// </summary>
+        /// <param name="by">The byte to append.</param>
+        public void PushByte(byte by)
+        {
+            EnsureCapacity(1);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = by;
         }
 
-        /// <summary>
-        /// 向ByteBuffer压入数组
-        /// </summary>
-        /// <param name="ByteArray">数组</param>
-        public void PushByteArray(byte[] ByteArray)
+        /// <summary>
+        /// Appends a byte array to the buffer.
+        /// </summary>
+        /// <param name="ByteArray">The byte array to append.</param>
+        public void PushByteArray(byte[] ByteArray)
         {
-            //把自己CopyTo目标数组
-            ByteArray.CopyTo(TEMP_BYTE_ARRAY, CURRENT_LENGTH);
-            //调整长度
-            CURRENT_LENGTH += ByteArray.Length;
+            EnsureCapacity(ByteArray.Length);
+            // Copy the source bytes into the backing array.
+            ByteArray.CopyTo(TEMP_BYTE_ARRAY, CURRENT_LENGTH);
+            // Advance the written length.
+            CURRENT_LENGTH += ByteArray.Length;
         }
 
-        /// <summary>
-        /// 向ByteBuffer压入两字节的Short
-        /// </summary>
-        /// <param name="Num">2字节Short</param>
-        public void PushUInt16(UInt16 Num)
+        /// <summary>
+        /// Appends a two-byte unsigned integer in little-endian order.
+        /// </summary>
+        /// <param name="Num">The UInt16 value to append.</param>
+        public void PushUInt16(UInt16 Num)
         {
+            EnsureCapacity(2);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)((Num & 0x00ff) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0xff00) >> 8) & 0xff);
         }
 
-        /// <summary>
-        /// 向ByteBuffer压入一个无符Int值
-        /// </summary>
-        /// <param name="Num">4字节UInt32</param>
-        public void PushInt(UInt32 Num)
+        /// <summary>
+        /// Appends a four-byte unsigned integer in little-endian order.
+        /// </summary>
+        /// <param name="Num">The UInt32 value to append.</param>
+        public void PushInt(UInt32 Num)
         {
+            EnsureCapacity(4);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)((Num & 0x000000ff) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0x0000ff00) >> 8) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0x00ff0000) >> 16) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0xff000000) >> 24) & 0xff);
         }
 
-        /// <summary>
-        /// 向ByteBuffer压入一个Long值
-        /// </summary>
-        /// <param name="Num">4字节Long</param>
-        public void PushLong(long Num)
+        /// <summary>
+        /// Appends the lower four bytes of a long value in little-endian order.
+        /// </summary>
+        /// <param name="Num">The long value to append.</param>
+        public void PushLong(long Num)
         {
+            EnsureCapacity(4);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)((Num & 0x000000ff) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0x0000ff00) >> 8) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0x00ff0000) >> 16) & 0xff);
             TEMP_BYTE_ARRAY[CURRENT_LENGTH++] = (byte)(((Num & 0xff000000) >> 24) & 0xff);
         }
 
-        /// <summary>
-        /// 从ByteBuffer的当前位置弹出一个Byte,并提升一位
-        /// </summary>
-        /// <returns>1字节Byte</returns>
-        public byte PopByte()
+        /// <summary>
+        /// Reads one byte and advances the read position by one byte.
+        /// </summary>
+        /// <returns>The next byte.</returns>
+        public byte PopByte()
         {
             byte ret = TEMP_BYTE_ARRAY[CURRENT_POSITION++];
             return ret;
         }
 
-        /// <summary>
-        /// 从ByteBuffer的当前位置弹出一个Short,并提升两位
-        /// </summary>
-        /// <returns>2字节Short</returns>
-        public UInt16 PopUInt16()
+        /// <summary>
+        /// Reads a UInt16 in little-endian order and advances the read position by two bytes.
+        /// </summary>
+        /// <returns>The next UInt16 value, or zero when insufficient bytes remain.</returns>
+        public UInt16 PopUInt16()
         {
-            //溢出
-            if (CURRENT_POSITION + 1 >= CURRENT_LENGTH)
+            // Return zero when insufficient bytes remain.
+            if (CURRENT_POSITION + 1 >= CURRENT_LENGTH)
             {
                 return 0;
             }
-            //UInt16 ret = (UInt16)(TEMP_BYTE_ARRAY[CURRENT_POSITION] << 8 | TEMP_BYTE_ARRAY[CURRENT_POSITION + 1]);
+            // UInt16 ret = (UInt16)(TEMP_BYTE_ARRAY[CURRENT_POSITION] << 8 | TEMP_BYTE_ARRAY[CURRENT_POSITION + 1]);
             UInt16 ret = (UInt16)(TEMP_BYTE_ARRAY[CURRENT_POSITION] | TEMP_BYTE_ARRAY[CURRENT_POSITION + 1] << 8);
             CURRENT_POSITION += 2;
             return ret;
         }
 
-        /// <summary>
-        /// 从ByteBuffer的当前位置弹出一个uint,并提升4位
-        /// </summary>
-        /// <returns>4字节UInt</returns>
-        public uint PopUInt()
+        /// <summary>
+        /// Reads a UInt32 in little-endian order and advances the read position by four bytes.
+        /// </summary>
+        /// <returns>The next UInt32 value, or zero when insufficient bytes remain.</returns>
+        public uint PopUInt()
         {
             if (CURRENT_POSITION + 3 >= CURRENT_LENGTH)
                 return 0;
@@ -193,11 +207,11 @@ namespace AgoraIO.Media
             return ret;
         }
 
-        /// <summary>
-        /// 从ByteBuffer的当前位置弹出一个long,并提升4位
-        /// </summary>
-        /// <returns>4字节Long</returns>
-        public long PopLong()
+        /// <summary>
+        /// Reads four bytes as a long value and advances the read position by four bytes.
+        /// </summary>
+        /// <returns>The next four-byte long value, or zero when insufficient bytes remain.</returns>
+        public long PopLong()
         {
             if (CURRENT_POSITION + 3 >= CURRENT_LENGTH)
                 return 0;
@@ -206,38 +220,42 @@ namespace AgoraIO.Media
             return ret;
         }
 
-        /// <summary>
-        /// 从ByteBuffer的当前位置弹出长度为Length的Byte数组,提升Length位
-        /// </summary>
-        /// <param name="Length">数组长度</param>
-        /// <returns>Length长度的byte数组</returns>
-        public byte[] PopByteArray(int Length)
+        /// <summary>
+        /// Reads the specified number of bytes and advances the read position.
+        /// </summary>
+        /// <param name="Length">The number of bytes to read.</param>
+        /// <returns>The requested bytes, or an empty array when insufficient bytes remain.</returns>
+        public byte[] PopByteArray(int Length)
         {
-            //溢出
-            if (CURRENT_POSITION + Length > CURRENT_LENGTH)
+            // Return an empty array when insufficient bytes remain.
+            if (CURRENT_POSITION + Length > CURRENT_LENGTH)
             {
                 return new byte[0];
             }
             byte[] ret = new byte[Length];
             Array.Copy(TEMP_BYTE_ARRAY, CURRENT_POSITION, ret, 0, Length);
-            //提升位置
-            CURRENT_POSITION += Length;
+            // Advance the read position.
+            CURRENT_POSITION += Length;
             return ret;
         }
 
+        /// <summary>
+        /// Reads bytes immediately before the current position and moves the position backward.
+        /// </summary>
+        /// <param name="Length">The number of bytes to read.</param>
+        /// <returns>The requested bytes, or an empty array when the position is too small.</returns>
         public byte[] PopByteArray2(int Length)
         {
-            //溢出
-            if (CURRENT_POSITION <= Length)
+            // Return an empty array when the position is too small.
+            if (CURRENT_POSITION <= Length)
             {
                 return new byte[0];
             }
             byte[] ret = new byte[Length];
             Array.Copy(TEMP_BYTE_ARRAY, CURRENT_POSITION - Length, ret, 0, Length);
-            //提升位置
-            CURRENT_POSITION -= Length;
+            // Move the read position backward.
+            CURRENT_POSITION -= Length;
             return ret;
         }
-
     }
 }

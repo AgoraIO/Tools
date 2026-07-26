@@ -124,3 +124,19 @@ TEST_F(AccessToken_test, testAccessTokenWithIntUidZero) {
 TEST_F(AccessToken_test, testAccessTokenWithStringUid) {
   testAccessTokenWithStringUid();
 }
+
+// Tests Token006 validation and malformed token handling.
+TEST_F(AccessToken_test, testInvalidInputs) {
+  const std::string app_id = "970CA35de60c44645bbae8a215061b33";
+  const std::string app_certificate = "5CFd2fd1755d40ecb72977518be15d3b";
+  const std::string channel_name = "7d72365eb983485397e3e3f9d460bdda";
+  AccessToken invalid_app("invalid", app_certificate, channel_name, 2882341273u);
+  EXPECT_TRUE(invalid_app.Build().empty());
+
+  AccessToken invalid_certificate(app_id, "invalid", channel_name, 2882341273u);
+  EXPECT_TRUE(invalid_certificate.Build().empty());
+
+  AccessToken parser;
+  EXPECT_FALSE(parser.FromString("007invalid"));
+  EXPECT_FALSE(parser.FromString("006" + app_id + "invalid"));
+}

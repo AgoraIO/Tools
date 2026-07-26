@@ -28,6 +28,7 @@ class AccessToken2Test(unittest.TestCase):
         self.__channel_name = "7d72365eb983485397e3e3f9d460bdda"
         self.__room_uuid = "123"
         self.__role = 1
+        self.__user_id = 'test_user'
         self.__uid = 2882341273
         self.__uid_str = '2882341273'
         self.__expire = 600
@@ -211,6 +212,69 @@ class AccessToken2Test(unittest.TestCase):
         self.assertTrue(parser.verify_signature(self.__app_cert))
         self.assertFalse(parser.verify_signature('a' * 32))
 
+    def test_parse_extended_services_from_cpp(self):
+        """Parse and verify C++ Streaming, FCDN, and RTM2 services."""
+        token = '007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=='
+        parser = AccessToken()
+
+        self.assertTrue(parser.from_string(token))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+        streaming = parser.get_services(ServiceStreaming.kServiceType)[0]
+        self.assertEqual(self.__channel_name.encode('utf-8'), streaming._ServiceStreaming__channel_name)
+        self.assertEqual(self.__uid_str.encode('utf-8'), streaming._ServiceStreaming__account)
+        self.assertEqual(self.__expire, streaming._Service__privileges[ServiceStreaming.kPrivilegePublishMixStream])
+        self.assertEqual(self.__expire, streaming._Service__privileges[ServiceStreaming.kPrivilegePublishRawStream])
+
+        fcdn = parser.get_services(ServiceFCdn.kServiceType)[0]
+        self.assertEqual(self.__channel_name.encode('utf-8'), fcdn._ServiceFCdn__channel_name)
+        self.assertEqual(self.__uid_str.encode('utf-8'), fcdn._ServiceFCdn__account)
+        self.assertEqual(self.__expire, fcdn._Service__privileges[ServiceFCdn.kPrivilegePublish])
+        self.assertEqual(self.__expire, fcdn._Service__privileges[ServiceFCdn.kPrivilegePlay])
+
+        rtm2 = parser.get_services(ServiceRtm2.kServiceType)[0]
+        self.assertEqual(self.__user_id, rtm2.get_user_id())
+        self.assertEqual(
+            {0: {0: ['message-a', 'message-b']}, 1: {1: ['stream-a']}, 4: {0: ['user-a']}},
+            rtm2.get_permissions().details)
+
+    def test_extended_service_numeric_uid_conversion(self):
+        """Verify deterministic Streaming and FCDN generation and UID conversion against C++."""
+        streaming_uid = ServiceStreaming(self.__channel_name, self.__uid)
+        streaming_uid.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, self.__expire)
+        self.__token.add_service(streaming_uid)
+        streaming_wildcard = ServiceStreaming(self.__channel_name, 0)
+        streaming_wildcard.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
+        self.__token.add_service(streaming_wildcard)
+        streaming_account = ServiceStreaming(self.__channel_name, 'stream-account')
+        streaming_account.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, self.__expire)
+        streaming_account.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, self.__expire)
+        self.__token.add_service(streaming_account)
+        fcdn_uid = ServiceFCdn(self.__channel_name, self.__uid)
+        fcdn_uid.add_privilege(ServiceFCdn.kPrivilegePublish, self.__expire)
+        self.__token.add_service(fcdn_uid)
+        fcdn_wildcard = ServiceFCdn(self.__channel_name, 0)
+        fcdn_wildcard.add_privilege(ServiceFCdn.kPrivilegePlay, self.__expire)
+        self.__token.add_service(fcdn_wildcard)
+        fcdn_account = ServiceFCdn(self.__channel_name, 'fcdn-account')
+        fcdn_account.add_privilege(ServiceFCdn.kPrivilegePublish, self.__expire)
+        fcdn_account.add_privilege(ServiceFCdn.kPrivilegePlay, self.__expire)
+        self.__token.add_service(fcdn_account)
+
+        token = self.__token.build()
+        self.assertEqual(
+            '007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X',
+            token)
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(token))
+        streaming = parser.get_services(ServiceStreaming.kServiceType)
+        self.assertEqual(
+            [self.__uid_str, '', 'stream-account'],
+            [service._ServiceStreaming__account.decode('utf-8') for service in streaming])
+        fcdn = parser.get_services(ServiceFCdn.kServiceType)
+        self.assertEqual(
+            [self.__uid_str, '', 'fcdn-account'],
+            [service._ServiceFCdn__account.decode('utf-8') for service in fcdn])
     def test_parse_unknown_service_type(self):
         """Keep known services parsed before an unknown service type."""
         rtc = ServiceRtc(self.__channel_name, self.__uid)

@@ -1,7 +1,22 @@
 /**
  * Run this test with: deno test test/AccessToken2Test.js
  */
-import { AccessToken2, kRtcServiceType, kRtmServiceType, Service, ServiceChat, ServiceRtc, ServiceRtm } from '../src/AccessToken2.js'
+import {
+    AccessToken2,
+    kFCdnServiceType,
+    kRtcServiceType,
+    kRtm2ServiceType,
+    kRtmServiceType,
+    kStreamingServiceType,
+    Rtm2Permissions,
+    Service,
+    ServiceChat,
+    ServiceFCdn,
+    ServiceRtc,
+    ServiceRtm,
+    ServiceRtm2,
+    ServiceStreaming,
+} from '../src/AccessToken2.js'
 import { assert, assertEquals, assertFalse, assertStrictEquals } from 'https://deno.land/std/testing/asserts.ts'
 
 const appID = '970CA35de60c44645bbae8a215061b33'
@@ -128,6 +143,100 @@ Deno.test('AccessToken_Test_repeatedServiceTypes', () => {
     assertFalse(parsed.verifySignature('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'))
 })
 
+// Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+Deno.test('AccessToken_Test_extendedServicesFromCpp', () => {
+    const encoded =
+        '007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=='
+    const parsed = new AccessToken2('', '', 0, 0)
+
+    assert(parsed.from_string(encoded))
+    assert(parsed.verifySignature(appCertificate))
+
+    const streaming = parsed.getServices(kStreamingServiceType)[0]
+    assertEquals(streaming.__channel_name, channel)
+    assertEquals(streaming.__account, uidStr)
+    assertEquals(streaming.__privileges[ServiceStreaming.kPrivilegePublishMixStream], expire)
+    assertEquals(streaming.__privileges[ServiceStreaming.kPrivilegePublishRawStream], expire)
+
+    const fcdn = parsed.getServices(kFCdnServiceType)[0]
+    assertEquals(fcdn.__channel_name, channel)
+    assertEquals(fcdn.__account, uidStr)
+    assertEquals(fcdn.__privileges[ServiceFCdn.kPrivilegePublish], expire)
+    assertEquals(fcdn.__privileges[ServiceFCdn.kPrivilegePlay], expire)
+
+    const rtm2 = parsed.getServices(kRtm2ServiceType)[0]
+    assertEquals(rtm2.__user_id, userID)
+    assertEquals(rtm2.__permissions.details, {
+        0: { 0: ['message-a', 'message-b'] },
+        1: { 1: ['stream-a'] },
+        4: { 0: ['user-a'] },
+    })
+    assertEquals(rtm2.__privileges[ServiceRtm2.kPrivilegeLogin], expire)
+})
+
+// Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+Deno.test('AccessToken_Test_extendedServiceNumericUidConversion', () => {
+    const token = new AccessToken2(appID, appCertificate, ts, expire)
+    token.salt = salt
+    const streamingUid = new ServiceStreaming(channel, uid)
+    streamingUid.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, expire)
+    token.add_service(streamingUid)
+    const streamingWildcard = new ServiceStreaming(channel, 0)
+    streamingWildcard.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, expire)
+    token.add_service(streamingWildcard)
+    const streamingAccount = new ServiceStreaming(channel, 'stream-account')
+    streamingAccount.add_privilege(ServiceStreaming.kPrivilegePublishMixStream, expire)
+    streamingAccount.add_privilege(ServiceStreaming.kPrivilegePublishRawStream, expire)
+    token.add_service(streamingAccount)
+    const fcdnUid = new ServiceFCdn(channel, uid)
+    fcdnUid.add_privilege(ServiceFCdn.kPrivilegePublish, expire)
+    token.add_service(fcdnUid)
+    const fcdnWildcard = new ServiceFCdn(channel, 0)
+    fcdnWildcard.add_privilege(ServiceFCdn.kPrivilegePlay, expire)
+    token.add_service(fcdnWildcard)
+    const fcdnAccount = new ServiceFCdn(channel, 'fcdn-account')
+    fcdnAccount.add_privilege(ServiceFCdn.kPrivilegePublish, expire)
+    fcdnAccount.add_privilege(ServiceFCdn.kPrivilegePlay, expire)
+    token.add_service(fcdnAccount)
+
+    const encoded = token.build()
+    assertEquals(
+        encoded,
+        '007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X',
+    )
+    const parsed = new AccessToken2('', '', 0, 0)
+    assert(parsed.from_string(encoded))
+    assertEquals(
+        parsed.getServices(kStreamingServiceType).map((service) => service.__account),
+        [uidStr, '', 'stream-account'],
+    )
+    assertEquals(
+        parsed.getServices(kFCdnServiceType).map((service) => service.__account),
+        [uidStr, '', 'fcdn-account'],
+    )
+})
+
+// Generates and parses an RTM2 token whose uncompressed payload exceeds the initial buffer capacity.
+Deno.test('AccessToken_Test_largeRtm2PermissionPayload', () => {
+    const resources = Array.from({ length: 160 }, (_, index) => `resource-${index.toString().padStart(4, '0')}`)
+    const permissions = new Rtm2Permissions()
+    permissions.add(Rtm2Permissions.kUsers, Rtm2Permissions.kRead, resources)
+
+    const token = new AccessToken2(appID, appCertificate, ts, expire)
+    token.salt = salt
+    const rtm2Service = new ServiceRtm2(userID, permissions)
+    rtm2Service.add_privilege(ServiceRtm2.kPrivilegeLogin, expire)
+    token.add_service(rtm2Service)
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    assert(parsed.from_string(token.build()))
+    assert(parsed.verifySignature(appCertificate))
+    assertEquals(
+        parsed.getServices(kRtm2ServiceType)[0].__permissions.details[Rtm2Permissions.kUsers][Rtm2Permissions.kRead],
+        resources,
+    )
+})
+
 // Keeps known services parsed before an unknown service type.
 Deno.test('AccessToken_Test_unknownServiceAfterKnownService', () => {
     const token = new AccessToken2(appID, appCertificate, ts, expire)
@@ -216,6 +325,30 @@ Deno.test('AccessToken_Test_stableServiceTypeOrdering', () => {
 
     assertEquals(token.build(), expected)
     assertStrictEquals(token.services[0], rtmService)
+})
+
+// Rejects invalid build fields, non-string tokens, and malformed Token007 payloads.
+Deno.test('AccessToken_Test_invalidBuildAndParseInputs', () => {
+    const empty = new AccessToken2(appID, appCertificate, ts, expire)
+    assertEquals(empty.build(), '')
+
+    const invalid = new AccessToken2('invalid', appCertificate, ts, expire)
+    invalid.add_service(createRtcService())
+    assertEquals(invalid.build(), '')
+
+    const parsed = new AccessToken2('', '', 0, 0)
+    assertFalse(parsed.from_string(null))
+    assertFalse(parsed.from_string('00'))
+    assertFalse(parsed.from_string('007invalid'))
+})
+
+// Rejects verification when the parsed signature length is altered.
+Deno.test('AccessToken_Test_signatureLengthMismatch', () => {
+    const parsed = new AccessToken2('', '', 0, 0)
+    assert(parsed.from_string(createRtcRtmToken().build()))
+    parsed.__signature = new Uint8Array(1)
+
+    assertFalse(parsed.verifySignature(appCertificate))
 })
 
 // Creates a fully privileged RTC service for deterministic tests.

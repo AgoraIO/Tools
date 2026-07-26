@@ -19,10 +19,13 @@ class RtcTokenBuilder2Test
     public function run()
     {
         $this->test_buildTokenWithUid_ROLE_PUBLISHER();
+        $this->test_buildTokenWithUid_ROLE_SUBSCRIBER();
         $this->test_buildTokenWithUserAccount_ROLE_PUBLISHER();
         $this->test_buildTokenWithUserAccount_ROLE_SUBSCRIBER();
         $this->test_buildTokenWithUidAndPrivilege();
         $this->test_buildTokenWithUserAccountAndPrivilege();
+        $this->test_buildTokenWithRtm();
+        $this->test_buildTokenWithRtm2();
     }
 
     /**
@@ -44,6 +47,20 @@ class RtcTokenBuilder2Test
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+    }
+
+    /**
+     * Verify subscriber token generation with a numeric user ID.
+     */
+    public function test_buildTokenWithUid_ROLE_SUBSCRIBER()
+    {
+        $token = RtcTokenBuilder2::buildTokenWithUid($this->appId, $this->appCertificate, $this->channelName, $this->uid, RtcTokenBuilder2::ROLE_SUBSCRIBER, $this->expire, $this->expire);
+        $accessToken = new AccessToken2();
+        $accessToken->parse($token);
+        $serviceRtc = $accessToken->getServices(ServiceRtc::SERVICE_TYPE)[0];
+
+        Util::assertEqual($this->uidStr, $serviceRtc->uid);
+        Util::assertEqual(1, count($serviceRtc->privileges));
     }
 
     /**
@@ -130,6 +147,47 @@ class RtcTokenBuilder2Test
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_AUDIO_STREAM]);
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_VIDEO_STREAM]);
         Util::assertEqual($this->expire, $serviceRtc->privileges[ServiceRtc::PRIVILEGE_PUBLISH_DATA_STREAM]);
+    }
+
+    /**
+     * Verify both role branches of the combined RTC and RTM builder.
+     */
+    public function test_buildTokenWithRtm()
+    {
+        foreach ([RtcTokenBuilder2::ROLE_PUBLISHER, RtcTokenBuilder2::ROLE_SUBSCRIBER] as $role) {
+            $token = RtcTokenBuilder2::buildTokenWithRtm($this->appId, $this->appCertificate, $this->channelName, $this->account, $role, $this->expire, $this->expire);
+            $accessToken = new AccessToken2();
+            Util::assertEqual(true, $accessToken->parse($token));
+            Util::assertEqual(1, count($accessToken->getServices(ServiceRtc::SERVICE_TYPE)));
+            Util::assertEqual(1, count($accessToken->getServices(ServiceRtm::SERVICE_TYPE)));
+        }
+    }
+
+    /**
+     * Verify both role branches of the explicit RTC and RTM builder.
+     */
+    public function test_buildTokenWithRtm2()
+    {
+        foreach ([RtcTokenBuilder2::ROLE_PUBLISHER, RtcTokenBuilder2::ROLE_SUBSCRIBER] as $role) {
+            $token = RtcTokenBuilder2::buildTokenWithRtm2(
+                $this->appId,
+                $this->appCertificate,
+                $this->channelName,
+                $this->account,
+                $role,
+                $this->expire,
+                1,
+                2,
+                3,
+                4,
+                $this->account,
+                $this->expire
+            );
+            $accessToken = new AccessToken2();
+            Util::assertEqual(true, $accessToken->parse($token));
+            Util::assertEqual(1, count($accessToken->getServices(ServiceRtc::SERVICE_TYPE)));
+            Util::assertEqual(1, count($accessToken->getServices(ServiceRtm::SERVICE_TYPE)));
+        }
     }
 }
 

@@ -10,7 +10,15 @@ sys.path.insert(0, os.path.abspath(
     os.path.join(os.path.dirname(__file__), '..', '..')))
 
 from parse import check_expire, get_expire_msg, parse_token
-from python3.src.AccessToken2 import AccessToken, Service, ServiceApaas, ServiceRtc
+from python3.src.AccessToken2 import (
+    AccessToken,
+    Service,
+    ServiceApaas,
+    ServiceFCdn,
+    ServiceRtc,
+    ServiceRtm2,
+    ServiceStreaming,
+)
 
 
 class ParseTest(unittest.TestCase):
@@ -80,6 +88,42 @@ class ParseTest(unittest.TestCase):
 
         self.assertIn('APaaS (ServiceType: 7)', result)
         self.assertIn('role           : 1', result)
+
+    def test_parse_extended_services(self):
+        """Display Streaming, FCDN, and RTM2 fields, privileges, and permissions."""
+        streaming = ServiceStreaming('streaming-channel', 2882341273)
+        streaming.add_privilege(
+            ServiceStreaming.kPrivilegePublishMixStream, self.expire)
+
+        fcdn = ServiceFCdn('fcdn-channel', 'fcdn-user')
+        fcdn.add_privilege(ServiceFCdn.kPrivilegePlay, self.expire)
+
+        permissions = ServiceRtm2.Permissions()
+        permissions.add(
+            ServiceRtm2.Permissions.kMessageChannels,
+            ServiceRtm2.Permissions.kRead,
+            ['message-a', 'message-b'])
+        permissions.add(
+            ServiceRtm2.Permissions.kStreamChannels,
+            ServiceRtm2.Permissions.kWrite,
+            [])
+        rtm2 = ServiceRtm2('rtm2-user', permissions)
+        rtm2.add_privilege(ServiceRtm2.kPrivilegeLogin, self.expire)
+
+        result = parse_token(self.create_token([streaming, fcdn, rtm2]))
+
+        self.assertIn('Streaming (ServiceType: 3)', result)
+        self.assertIn('publishMixStream (1): 600 seconds', result)
+        self.assertIn('account        : 2882341273', result)
+        self.assertIn('FCDN (ServiceType: 6)', result)
+        self.assertIn('play (2): 600 seconds', result)
+        self.assertIn('RTM2 (ServiceType: 8)', result)
+        self.assertIn('user_id        : rtm2-user', result)
+        self.assertIn('messageChannels (0):', result)
+        self.assertIn('read (0): message-a, message-b', result)
+        self.assertIn('streamChannels (1):', result)
+        self.assertIn('write (1): (none)', result)
+        self.assertNotIn('AccessToken2.ServiceRtm2.Permissions object', result)
 
     @patch('parse.time.time', return_value=100)
     def test_expiration_status(self, _):

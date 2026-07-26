@@ -27,6 +27,18 @@ class RtcTokenBuilderTest(unittest.TestCase):
         self.assertNotIn(kPublishAudioStream, parser.messages)
         self.assertNotIn(kPublishDataStream, parser.messages)
 
+    def test_build_token_with_publisher_account(self):
+        """Include all legacy publish privileges for a publisher account."""
+        token = RtcTokenBuilder.buildTokenWithAccount(
+            appID, appCertificate, channelName, str(uid), Role_Publisher, expireTimestamp)
+        parser = AccessToken()
+        self.assertTrue(parser.fromString(token))
+
+        self.assertEqual(parser.messages[kJoinChannel], expireTimestamp)
+        self.assertEqual(parser.messages[kPublishVideoStream], expireTimestamp)
+        self.assertEqual(parser.messages[kPublishAudioStream], expireTimestamp)
+        self.assertEqual(parser.messages[kPublishDataStream], expireTimestamp)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,9 +11,12 @@ import 'package:crypto/crypto.dart';
 class Service {
   static const int RTC = 1;
   static const int RTM = 2;
+  static const int STREAMING = 3;
   static const int FPA = 4;
   static const int CHAT = 5;
+  static const int FCDN = 6;
   static const int APAAS = 7;
+  static const int RTM2 = 8;
   static const int EDUCATION = APAAS;
 
   final int serviceType;
@@ -110,6 +113,42 @@ class ServiceRtm extends Service {
   }
 }
 
+/// Represents a Streaming service payload.
+class ServiceStreaming extends Service {
+  static const int privilegePublishMixStream = 1;
+  static const int privilegePublishRawStream = 2;
+
+  String channelName;
+  String account;
+
+  /// Creates a Streaming service for a channel and user account.
+  ServiceStreaming([this.channelName = '', this.account = ''])
+      : super(Service.STREAMING);
+
+  /// Creates a Streaming service for a channel and numeric user ID.
+  ServiceStreaming.withUid([this.channelName = '', int uid = 0])
+      : account = uid == 0 ? '' : uid.toString(),
+        super(Service.STREAMING);
+
+  /// Serializes the Streaming service payload.
+  @override
+  Uint8List pack() {
+    final writer = _ByteWriter()
+      ..putBytes(super.pack())
+      ..putString(channelName)
+      ..putString(account);
+    return writer.toBytes();
+  }
+
+  /// Deserializes the Streaming service payload.
+  @override
+  void _unpack(_ByteReader reader) {
+    super._unpack(reader);
+    channelName = reader.readString();
+    account = reader.readString();
+  }
+}
+
 /// Represents an FPA service payload.
 class ServiceFpa extends Service {
   static const int privilegeLogin = 1;
@@ -145,6 +184,42 @@ class ServiceChat extends Service {
   }
 }
 
+/// Represents an FCDN service payload.
+class ServiceFCdn extends Service {
+  static const int privilegePublish = 1;
+  static const int privilegePlay = 2;
+
+  String channelName;
+  String account;
+
+  /// Creates an FCDN service for a channel and user account.
+  ServiceFCdn([this.channelName = '', this.account = ''])
+      : super(Service.FCDN);
+
+  /// Creates an FCDN service for a channel and numeric user ID.
+  ServiceFCdn.withUid([this.channelName = '', int uid = 0])
+      : account = uid == 0 ? '' : uid.toString(),
+        super(Service.FCDN);
+
+  /// Serializes the FCDN service payload.
+  @override
+  Uint8List pack() {
+    final writer = _ByteWriter()
+      ..putBytes(super.pack())
+      ..putString(channelName)
+      ..putString(account);
+    return writer.toBytes();
+  }
+
+  /// Deserializes the FCDN service payload.
+  @override
+  void _unpack(_ByteReader reader) {
+    super._unpack(reader);
+    channelName = reader.readString();
+    account = reader.readString();
+  }
+}
+
 /// Represents an APaaS service payload.
 class ServiceApaas extends Service {
   static const int privilegeRoomUser = 1;
@@ -177,6 +252,94 @@ class ServiceApaas extends Service {
     roomUuid = reader.readString();
     userUuid = reader.readString();
     role = reader.readInt16();
+  }
+}
+
+/// Stores RTM2 resource-level permissions.
+class Rtm2Permissions {
+  static const int messageChannels = 0;
+  static const int streamChannels = 1;
+  static const int groupChannels = 2;
+  static const int serverGroups = 3;
+  static const int users = 4;
+
+  static const int read = 0;
+  static const int write = 1;
+
+  final Map<int, Map<int, List<String>>> details =
+      <int, Map<int, List<String>>>{};
+
+  /// Adds or replaces resources for a resource and permission type.
+  void add(int resourceType, int permissionType, List<String> resources) {
+    details.putIfAbsent(
+            resourceType, () => <int, List<String>>{})[permissionType] =
+        List<String>.from(resources);
+  }
+}
+
+/// Represents an RTM2 service payload.
+class ServiceRtm2 extends Service {
+  static const int privilegeLogin = 1;
+
+  String userId;
+  Rtm2Permissions permissions;
+
+  /// Creates an RTM2 service for a user and permission set.
+  ServiceRtm2([this.userId = '', Rtm2Permissions? permissions])
+      : permissions = permissions ?? Rtm2Permissions(),
+        super(Service.RTM2);
+
+  /// Serializes the RTM2 service payload.
+  @override
+  Uint8List pack() {
+    final writer = _ByteWriter()
+      ..putBytes(super.pack())
+      ..putString(userId);
+    final resourceTypes = permissions.details.keys.toList()..sort();
+    writer.putUint16(resourceTypes.length);
+    for (final resourceType in resourceTypes) {
+      final permissionMap = permissions.details[resourceType]!;
+      final permissionTypes = permissionMap.keys.toList()..sort();
+      writer
+        ..putUint16(resourceType)
+        ..putUint16(permissionTypes.length);
+      for (final permissionType in permissionTypes) {
+        final resources = permissionMap[permissionType]!;
+        writer
+          ..putUint16(permissionType)
+          ..putUint16(resources.length);
+        for (final resource in resources) {
+          writer.putString(resource);
+        }
+      }
+    }
+    return writer.toBytes();
+  }
+
+  /// Deserializes the RTM2 service payload.
+  @override
+  void _unpack(_ByteReader reader) {
+    super._unpack(reader);
+    userId = reader.readString();
+    permissions = Rtm2Permissions();
+    final resourceTypeCount = reader.readUint16();
+    for (var index = 0; index < resourceTypeCount; index++) {
+      final resourceType = reader.readUint16();
+      final permissionCount = reader.readUint16();
+      for (var permissionIndex = 0;
+          permissionIndex < permissionCount;
+          permissionIndex++) {
+        final permissionType = reader.readUint16();
+        final resourceCount = reader.readUint16();
+        final resources = <String>[];
+        for (var resourceIndex = 0;
+            resourceIndex < resourceCount;
+            resourceIndex++) {
+          resources.add(reader.readString());
+        }
+        permissions.add(resourceType, permissionType, resources);
+      }
+    }
   }
 }
 
@@ -388,12 +551,18 @@ class AccessToken {
         return ServiceRtc(_legacyChannelName, _legacyUid);
       case Service.RTM:
         return ServiceRtm(_legacyUid);
+      case Service.STREAMING:
+        return ServiceStreaming(_legacyChannelName, _legacyUid);
       case Service.FPA:
         return ServiceFpa();
       case Service.CHAT:
         return ServiceChat(_legacyUid);
+      case Service.FCDN:
+        return ServiceFCdn(_legacyChannelName, _legacyUid);
       case Service.APAAS:
         return ServiceApaas('', _legacyUid);
+      case Service.RTM2:
+        return ServiceRtm2(_legacyUid);
       default:
         return Service(serviceType);
     }
@@ -439,12 +608,18 @@ Service? _createKnownService(int serviceType) {
       return ServiceRtc();
     case Service.RTM:
       return ServiceRtm();
+    case Service.STREAMING:
+      return ServiceStreaming();
     case Service.FPA:
       return ServiceFpa();
     case Service.CHAT:
       return ServiceChat();
+    case Service.FCDN:
+      return ServiceFCdn();
     case Service.APAAS:
       return ServiceApaas();
+    case Service.RTM2:
+      return ServiceRtm2();
     default:
       return null;
   }

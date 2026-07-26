@@ -8,6 +8,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 
 #include "cpp/src/Packer.h"
 #include "cpp/src/utils.h"
@@ -172,6 +173,65 @@ class ServiceRtm : public Service {
   ServiceRtm &operator=(ServiceRtm &&) = default;
 };
 
+class ServiceStreaming : public Service {
+ public:
+  enum {
+    kServiceType = 3,
+
+    kPrivilegePublishMixStream = 1,
+    kPrivilegePublishRawStream = 2,
+  };
+
+ public:
+  // Creates a Streaming service with a numeric user ID.
+  ServiceStreaming(const std::string &channel_name = "", uint32_t uid = 0) : Service(kServiceType), channel_name_(channel_name) {
+    if (uid == 0) {
+      account_ = "";
+    } else {
+      account_ = std::to_string(uid);
+    }
+  }
+
+  // Creates a Streaming service with a string user account.
+  ServiceStreaming(const std::string &channel_name, const std::string &account)
+      : Service(kServiceType), channel_name_(channel_name), account_(account) {}
+
+  // Serializes the Streaming service payload.
+  virtual std::string PackService() override { return Pack(this); }
+
+  // Deserializes the Streaming service payload.
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  // Creates an independent copy of the Streaming service.
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceStreaming(*this)); }
+
+  // Serializes the Streaming privileges, channel name, and user account.
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceStreaming *x) {
+    p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
+    return p;
+  }
+
+  // Deserializes the Streaming privileges, channel name, and user account.
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceStreaming *x) {
+    p >> dynamic_cast<Service *>(x) >> x->channel_name_ >> x->account_;
+    return p;
+  }
+
+ public:
+  std::string channel_name_;
+  std::string account_;
+
+ protected:
+  // Uses the default copy constructor for Streaming service cloning.
+  ServiceStreaming(const ServiceStreaming &) = default;
+  // Uses the default move constructor for Streaming services.
+  ServiceStreaming(ServiceStreaming &&) = default;
+  // Uses the default copy assignment operator for Streaming services.
+  ServiceStreaming &operator=(const ServiceStreaming &) = default;
+  // Uses the default move assignment operator for Streaming services.
+  ServiceStreaming &operator=(ServiceStreaming &&) = default;
+};
+
 class ServiceFpa : public Service {
  public:
   enum {
@@ -245,6 +305,65 @@ class ServiceChat : public Service {
   std::string user_id_;
 };
 
+class ServiceFCdn : public Service {
+ public:
+  enum {
+    kServiceType = 6,
+
+    kPrivilegePublish = 1,
+    kPrivilegePlay = 2,
+  };
+
+ public:
+  // Creates an FCDN service with a numeric user ID.
+  ServiceFCdn(const std::string &channel_name = "", uint32_t uid = 0) : Service(kServiceType), channel_name_(channel_name) {
+    if (uid == 0) {
+      account_ = "";
+    } else {
+      account_ = std::to_string(uid);
+    }
+  }
+
+  // Creates an FCDN service with a string user account.
+  ServiceFCdn(const std::string &channel_name, const std::string &account)
+      : Service(kServiceType), channel_name_(channel_name), account_(account) {}
+
+  // Serializes the FCDN service payload.
+  virtual std::string PackService() override { return Pack(this); }
+
+  // Deserializes the FCDN service payload.
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  // Creates an independent copy of the FCDN service.
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceFCdn(*this)); }
+
+  // Serializes the FCDN privileges, channel name, and user account.
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceFCdn *x) {
+    p << dynamic_cast<const Service *>(x) << x->channel_name_ << x->account_;
+    return p;
+  }
+
+  // Deserializes the FCDN privileges, channel name, and user account.
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceFCdn *x) {
+    p >> dynamic_cast<Service *>(x) >> x->channel_name_ >> x->account_;
+    return p;
+  }
+
+ public:
+  std::string channel_name_;
+  std::string account_;
+
+ protected:
+  // Uses the default copy constructor for FCDN service cloning.
+  ServiceFCdn(const ServiceFCdn &) = default;
+  // Uses the default move constructor for FCDN services.
+  ServiceFCdn(ServiceFCdn &&) = default;
+  // Uses the default copy assignment operator for FCDN services.
+  ServiceFCdn &operator=(const ServiceFCdn &) = default;
+  // Uses the default move assignment operator for FCDN services.
+  ServiceFCdn &operator=(ServiceFCdn &&) = default;
+};
+
 class ServiceApaas : public Service {
  public:
   enum {
@@ -287,15 +406,94 @@ class ServiceApaas : public Service {
   int16_t role_;
 };
 
+class ServiceRtm2 : public Service {
+ public:
+  enum {
+    kServiceType = 8,
+
+    kPrivilegeLogin = 1,
+  };
+
+  using PermissionsDetail = std::map<uint16_t, std::map<uint16_t, std::vector<std::string>>>;
+  struct Permissions {
+    enum {
+      kMessageChannels = 0,
+      kStreamChannels = 1,
+      kGroupChannels = 2,
+      kServerGroups = 3,
+      kUsers = 4,
+    };
+    enum {
+      kRead = 0,
+      kWrite = 1,
+    };
+
+    // Creates an empty RTM2 permission set.
+    Permissions() : details_() {}
+
+    // Adds or replaces resources for a resource and permission type.
+    void Add(uint16_t resource_type, uint16_t permission_type, const std::vector<std::string> &resources) {
+      details_[resource_type][permission_type] = resources;
+    }
+
+    PermissionsDetail details_;
+  };
+
+ public:
+  // Creates an RTM2 service with resource-level permissions.
+  ServiceRtm2(const std::string &user_id = "", const Permissions &permissions = Permissions())
+      : Service(kServiceType), user_id_(user_id), permissions_(permissions) {}
+
+  // Serializes the RTM2 service payload.
+  virtual std::string PackService() override { return Pack(this); }
+
+  // Deserializes the RTM2 service payload.
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  // Creates an independent copy of the RTM2 service.
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceRtm2(*this)); }
+
+  // Serializes the RTM2 privileges, user ID, and resource permissions.
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceRtm2 *x) {
+    p << dynamic_cast<const Service *>(x) << x->user_id_ << x->permissions_.details_;
+    return p;
+  }
+
+  // Deserializes the RTM2 privileges, user ID, and resource permissions.
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceRtm2 *x) {
+    p >> dynamic_cast<Service *>(x) >> x->user_id_ >> x->permissions_.details_;
+    return p;
+  }
+
+ public:
+  std::string user_id_;
+  Permissions permissions_;
+
+ protected:
+  // Uses the default copy constructor for RTM2 service cloning.
+  ServiceRtm2(const ServiceRtm2 &) = default;
+  // Uses the default move constructor for RTM2 services.
+  ServiceRtm2(ServiceRtm2 &&) = default;
+  // Uses the default copy assignment operator for RTM2 services.
+  ServiceRtm2 &operator=(const ServiceRtm2 &) = default;
+  // Uses the default move assignment operator for RTM2 services.
+  ServiceRtm2 &operator=(ServiceRtm2 &&) = default;
+};
+
 template <class T>
 struct ServiceCreator {
   // Creates a service instance for the service factory registry.
   static Service *New() { return (new T()); }
 };
 static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
-    {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
-    {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
+    {ServiceRtc::kServiceType, ServiceCreator<ServiceRtc>::New},
+    {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
+    {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
+    {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},
+    {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
+    {ServiceFCdn::kServiceType, ServiceCreator<ServiceFCdn>::New},
     {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},
+    {ServiceRtm2::kServiceType, ServiceCreator<ServiceRtm2>::New},
 };
 
 enum TokenStatus {

@@ -4,7 +4,7 @@
  */
 import { AccessToken, priviledges as Priviledges } from '../src/AccessToken.js'
 import { assert } from 'https://deno.land/std/testing/asserts.ts'
-import { Role as RtcRole } from '../src/RtcTokenBuilder.js'
+import { Role as RtcRole, RtcTokenBuilder } from '../src/RtcTokenBuilder.js'
 
 const appID = '970CA35de60c44645bbae8a215061b33'
 const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b'
@@ -71,4 +71,29 @@ Deno.test('RtcTokenBuilder_Test', () => {
     }
     const actual = key.build()
     assert(expected === actual)
+})
+
+// Verifies legacy token parsing and malformed input handling.
+Deno.test('AccessToken_Parse_Test', () => {
+    const key = new AccessToken(appID, appCertificate, channel, uid)
+    key.salt = salt
+    key.ts = ts
+    key.addPriviledge(Priviledges.kJoinChannel, expireTimestamp)
+    const parsed = new AccessToken('', '', '', '')
+
+    assert(parsed.fromString(key.build()))
+    assert(parsed.messages[Priviledges.kJoinChannel] === expireTimestamp)
+    assert(!parsed.fromString('007invalid'))
+    assert(!parsed.fromString('006' + appID + '!'))
+})
+
+// Verifies both public legacy RTC builder entry points.
+Deno.test('RtcTokenBuilder_PublicMethods_Test', () => {
+    const uidToken = RtcTokenBuilder.buildTokenWithUid(
+        appID, appCertificate, channel, uid, RtcRole.PUBLISHER, expireTimestamp)
+    const accountToken = RtcTokenBuilder.buildTokenWithAccount(
+        appID, appCertificate, channel, String(uid), RtcRole.SUBSCRIBER, expireTimestamp)
+
+    assert(new AccessToken('', '', '', '').fromString(uidToken))
+    assert(new AccessToken('', '', '', '').fromString(accountToken))
 })

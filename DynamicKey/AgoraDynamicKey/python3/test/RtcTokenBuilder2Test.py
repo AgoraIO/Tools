@@ -128,3 +128,35 @@ class RtcTokenBuilder2Test(unittest.TestCase):
         self.assertIn(ServiceRtc.kPrivilegePublishAudioStream, parser_service._Service__privileges)
         self.assertIn(ServiceRtc.kPrivilegePublishVideoStream, parser_service._Service__privileges)
         self.assertIn(ServiceRtc.kPrivilegePublishDataStream, parser_service._Service__privileges)
+
+    def test_build_publisher_token(self):
+        """Include all RTC publish privileges for the publisher role."""
+        token = RtcTokenBuilder.build_token_with_user_account(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__account,
+            Role_Publisher, self.__expire, self.__expire)
+        parser = AccessToken()
+        self.assertTrue(parser.from_string(token))
+        service = parser.get_services(ServiceRtc.kServiceType)[0]
+
+        self.assertEqual(len(service._Service__privileges), 4)
+
+    def test_build_combined_rtc_rtm_tokens(self):
+        """Build legacy combined RTC and RTM tokens for subscriber and publisher roles."""
+        subscriber_token = RtcTokenBuilder.build_token_with_rtm(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__account,
+            Role_Subscriber, self.__expire, self.__expire)
+        publisher_legacy_token = RtcTokenBuilder.build_token_with_rtm(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__account,
+            Role_Publisher, self.__expire, self.__expire)
+        publisher_token = RtcTokenBuilder.build_token_with_rtm2(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__account,
+            Role_Publisher, self.__expire, self.__expire, self.__expire,
+            self.__expire, self.__expire, self.__account, self.__expire)
+
+        for token, privilege_count in ((subscriber_token, 1), (publisher_legacy_token, 4),
+                                       (publisher_token, 4)):
+            parser = AccessToken()
+            self.assertTrue(parser.from_string(token))
+            self.assertEqual(len(parser.get_services(ServiceRtc.kServiceType)[0]._Service__privileges),
+                             privilege_count)
+            self.assertEqual(len(parser.get_services(ServiceRtm.kServiceType)), 1)

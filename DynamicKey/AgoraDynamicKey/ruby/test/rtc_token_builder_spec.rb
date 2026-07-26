@@ -117,6 +117,18 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       token = access_token.build
       expect(AgoraDynamicKey::Sign.decode!(token)).to be_truthy
     end
+
+    # Returns false when legacy encoding receives unusable credentials.
+    it 'encode handles malformed payload' do
+      access_token = AgoraDynamicKey::AccessToken.new(token_payload.merge(app_certificate: nil))
+
+      expect(access_token.build).to eq(false)
+    end
+
+    # Returns false through the legacy non-raising decode wrapper.
+    it 'decode handles malformed token' do
+      expect(AgoraDynamicKey::Sign.decode('invalid')).to eq(false)
+    end
   end
 
   describe 'AccessToken' do
@@ -165,6 +177,13 @@ describe 'AgoraDynamicKey::RTCTokenBuilder' do
       access_token.salt = token_payload[:salt]
       access_token.expired_ts = token_payload[:token_expired_ts]
       expect(access_token.build).to eq(expected_result)
+    end
+
+    # Delegates legacy token parsing to the non-raising decoder.
+    it 'from_string handles malformed token' do
+      access_token = AgoraDynamicKey::AccessToken.new(token_payload)
+
+      expect(access_token.from_string('invalid')).to eq(false)
     end
 
   end

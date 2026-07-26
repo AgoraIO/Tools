@@ -1,4 +1,7 @@
 import unittest
+from collections import OrderedDict
+
+from src.Packer import *
 from src.utils import *
 
 
@@ -13,3 +16,12 @@ class UtilsTest(unittest.TestCase):
         data = get_md5(self.__md5_source)
 
         self.assertEqual(data, self.__md5_data)
+
+    def test_string_map_packing(self):
+        """Round-trip maps containing length-prefixed byte strings."""
+        source = OrderedDict([(1, b'alpha'), (2, b'beta')])
+        packed = pack_map_string(source)
+        unpacked, remaining = unpack_map_string(packed + b'tail')
+
+        self.assertEqual(unpacked, source)
+        self.assertEqual(remaining, b'tail')

@@ -17,6 +17,26 @@ local function build_token(app_id, app_certificate, user_id, expire)
     return token:build()
 end
 
+-- Builds an RTM2 token with resource-level permissions.
+--
+-- This special interface requires Agora assistance for proper usage.
+-- app_id:           The App ID issued to you by Agora.
+-- app_certificate:  Certificate of the application registered in the Agora Dashboard.
+-- user_id:          The user's account, max length is 64 bytes.
+-- permissions:      The RTM2 resource-level permissions.
+-- expire:           The number of seconds from now before the token expires.
+-- return The RTM2 token.
+local function build_token_with_permissions(app_id, app_certificate, user_id, permissions, expire)
+    local token = access_token.new_access_token(app_id, app_certificate, expire)
+
+    local service_rtm2 = access_token.new_service_rtm2(user_id, permissions)
+    service_rtm2.service:add_privilege(access_token.PRIVILEGE_LOGIN, expire)
+    token:add_service(service_rtm2)
+
+    return token:build()
+end
+
 return {
     build_token = build_token,
+    build_token_with_permissions = build_token_with_permissions,
 }

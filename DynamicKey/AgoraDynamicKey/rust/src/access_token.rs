@@ -11,9 +11,12 @@ pub const VERSION_LENGTH: usize = 3;
 // Service type
 pub const SERVICE_TYPE_RTC: u16 = 1;
 pub const SERVICE_TYPE_RTM: u16 = 2;
+pub const SERVICE_TYPE_STREAMING: u16 = 3;
 pub const SERVICE_TYPE_FPA: u16 = 4;
 pub const SERVICE_TYPE_CHAT: u16 = 5;
+pub const SERVICE_TYPE_FCDN: u16 = 6;
 pub const SERVICE_TYPE_APAAS: u16 = 7;
+pub const SERVICE_TYPE_RTM2: u16 = 8;
 
 // Rtc
 pub const PRIVILEGE_JOIN_CHANNEL: u16 = 1;
@@ -25,6 +28,14 @@ pub const PRIVILEGE_PUBLISH_DATA_STREAM: u16 = 4;
 // Fpa
 pub const PRIVILEGE_LOGIN: u16 = 1;
 
+// Streaming
+pub const PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM: u16 = 1;
+pub const PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM: u16 = 2;
+
+// FCDN
+pub const PRIVILEGE_FCDN_PUBLISH: u16 = 1;
+pub const PRIVILEGE_FCDN_PLAY: u16 = 2;
+
 // Chat
 pub const PRIVILEGE_CHAT_USER: u16 = 1;
 pub const PRIVILEGE_CHAT_APP: u16 = 2;
@@ -33,6 +44,17 @@ pub const PRIVILEGE_CHAT_APP: u16 = 2;
 pub const PRIVILEGE_APAAS_ROOM_USER: u16 = 1;
 pub const PRIVILEGE_APAAS_USER: u16 = 2;
 pub const PRIVILEGE_APAAS_APP: u16 = 3;
+
+// RTM2 resource types
+pub const RTM2_RESOURCE_MESSAGE_CHANNELS: u16 = 0;
+pub const RTM2_RESOURCE_STREAM_CHANNELS: u16 = 1;
+pub const RTM2_RESOURCE_GROUP_CHANNELS: u16 = 2;
+pub const RTM2_RESOURCE_SERVER_GROUPS: u16 = 3;
+pub const RTM2_RESOURCE_USERS: u16 = 4;
+
+// RTM2 permission types
+pub const RTM2_PERMISSION_READ: u16 = 0;
+pub const RTM2_PERMISSION_WRITE: u16 = 1;
 
 /// Defines the behavior shared by all Token007 services.
 pub trait IService {
@@ -171,6 +193,51 @@ impl IService for ServiceRtm {
 }
 
 #[derive(Debug)]
+/// Stores a Streaming service payload.
+pub struct ServiceStreaming {
+    pub service: Service,
+    pub channel_name: String,
+    pub account: String,
+}
+
+/// Creates a Streaming service for a channel and user account.
+pub fn new_service_streaming(channel_name: &str, account: &str) -> ServiceStreaming {
+    ServiceStreaming {
+        service: new_service(SERVICE_TYPE_STREAMING),
+        channel_name: channel_name.to_string(),
+        account: account.to_string(),
+    }
+}
+
+/// Creates a Streaming service with a numeric user ID.
+pub fn new_service_streaming_with_uid(channel_name: &str, uid: u32) -> ServiceStreaming {
+    new_service_streaming(channel_name, &get_uid_str(uid))
+}
+
+impl IService for ServiceStreaming {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn get_service_type(&self) -> u16 {
+        self.service.service_type
+    }
+
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        self.service.pack(w)?;
+        utils::pack_string(w, &self.channel_name)?;
+        utils::pack_string(w, &self.account)
+    }
+
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.service.unpack(r)?;
+        self.channel_name = utils::unpack_string(r)?;
+        self.account = utils::unpack_string(r)?;
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
 /// Stores an FPA service payload.
 pub struct ServiceFpa {
     pub service: Service,
@@ -238,6 +305,51 @@ impl IService for ServiceChat {
 }
 
 #[derive(Debug)]
+/// Stores an FCDN service payload.
+pub struct ServiceFCdn {
+    pub service: Service,
+    pub channel_name: String,
+    pub account: String,
+}
+
+/// Creates an FCDN service for a channel and user account.
+pub fn new_service_fcdn(channel_name: &str, account: &str) -> ServiceFCdn {
+    ServiceFCdn {
+        service: new_service(SERVICE_TYPE_FCDN),
+        channel_name: channel_name.to_string(),
+        account: account.to_string(),
+    }
+}
+
+/// Creates an FCDN service with a numeric user ID.
+pub fn new_service_fcdn_with_uid(channel_name: &str, uid: u32) -> ServiceFCdn {
+    new_service_fcdn(channel_name, &get_uid_str(uid))
+}
+
+impl IService for ServiceFCdn {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn get_service_type(&self) -> u16 {
+        self.service.service_type
+    }
+
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        self.service.pack(w)?;
+        utils::pack_string(w, &self.channel_name)?;
+        utils::pack_string(w, &self.account)
+    }
+
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.service.unpack(r)?;
+        self.channel_name = utils::unpack_string(r)?;
+        self.account = utils::unpack_string(r)?;
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
 /// Stores an APaaS service payload.
 pub struct ServiceApaas {
     pub service: Service,
@@ -278,6 +390,111 @@ impl IService for ServiceApaas {
         self.user_uuid = utils::unpack_string(r)?;
         self.role = utils::unpack_int16(r)?;
         Ok(())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+/// Stores RTM2 resources by resource type and permission type.
+pub struct Rtm2Permissions {
+    pub details: HashMap<u16, HashMap<u16, Vec<String>>>,
+}
+
+/// Creates an empty RTM2 resource permission set.
+pub fn new_rtm2_permissions() -> Rtm2Permissions {
+    Rtm2Permissions { details: HashMap::new() }
+}
+
+impl Rtm2Permissions {
+    /// Adds or replaces resources for a resource and permission type.
+    pub fn add(&mut self, resource_type: u16, permission_type: u16, resources: Vec<String>) {
+        self.details.entry(resource_type).or_default().insert(permission_type, resources);
+    }
+
+    /// Serializes permission keys in numeric order and preserves resource order.
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        let mut resource_types: Vec<u16> = self.details.keys().copied().collect();
+        resource_types.sort_unstable();
+        utils::pack_uint16(w, resource_types.len() as u16)?;
+
+        for resource_type in resource_types {
+            let permission_map = &self.details[&resource_type];
+            let mut permission_types: Vec<u16> = permission_map.keys().copied().collect();
+            permission_types.sort_unstable();
+            utils::pack_uint16(w, resource_type)?;
+            utils::pack_uint16(w, permission_types.len() as u16)?;
+
+            for permission_type in permission_types {
+                let resources = &permission_map[&permission_type];
+                utils::pack_uint16(w, permission_type)?;
+                utils::pack_uint16(w, resources.len() as u16)?;
+                for resource in resources {
+                    utils::pack_string(w, resource)?;
+                }
+            }
+        }
+
+        Ok(())
+    }
+
+    /// Deserializes RTM2 resource permissions.
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.details.clear();
+        let resource_count = utils::unpack_uint16(r)?;
+
+        for _ in 0..resource_count {
+            let resource_type = utils::unpack_uint16(r)?;
+            let permission_count = utils::unpack_uint16(r)?;
+            for _ in 0..permission_count {
+                let permission_type = utils::unpack_uint16(r)?;
+                let resource_count = utils::unpack_uint16(r)?;
+                let mut resources = Vec::with_capacity(resource_count as usize);
+                for _ in 0..resource_count {
+                    resources.push(utils::unpack_string(r)?);
+                }
+                self.add(resource_type, permission_type, resources);
+            }
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Debug)]
+/// Stores an RTM2 service payload and resource-level permissions.
+pub struct ServiceRtm2 {
+    pub service: Service,
+    pub user_id: String,
+    pub permissions: Rtm2Permissions,
+}
+
+/// Creates an RTM2 service with resource-level permissions.
+pub fn new_service_rtm2(user_id: &str, permissions: Option<Rtm2Permissions>) -> ServiceRtm2 {
+    ServiceRtm2 {
+        service: new_service(SERVICE_TYPE_RTM2),
+        user_id: user_id.to_string(),
+        permissions: permissions.unwrap_or_else(new_rtm2_permissions),
+    }
+}
+
+impl IService for ServiceRtm2 {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn get_service_type(&self) -> u16 {
+        self.service.service_type
+    }
+
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        self.service.pack(w)?;
+        utils::pack_string(w, &self.user_id)?;
+        self.permissions.pack(w)
+    }
+
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.service.unpack(r)?;
+        self.user_id = utils::unpack_string(r)?;
+        self.permissions.unpack(r)
     }
 }
 
@@ -473,9 +690,12 @@ fn create_service(service_type: u16) -> Option<Box<dyn IService>> {
     match service_type {
         SERVICE_TYPE_RTC => Some(Box::new(new_service_rtc("", ""))),
         SERVICE_TYPE_RTM => Some(Box::new(new_service_rtm(""))),
+        SERVICE_TYPE_STREAMING => Some(Box::new(new_service_streaming("", ""))),
         SERVICE_TYPE_FPA => Some(Box::new(new_service_fpa())),
         SERVICE_TYPE_CHAT => Some(Box::new(new_service_chat(""))),
+        SERVICE_TYPE_FCDN => Some(Box::new(new_service_fcdn("", ""))),
         SERVICE_TYPE_APAAS => Some(Box::new(new_service_apaas("", "", -1))),
+        SERVICE_TYPE_RTM2 => Some(Box::new(new_service_rtm2("", None))),
         _ => None,
     }
 }
@@ -514,6 +734,7 @@ mod tests {
     const EXPIRE: u32 = 600;
     const SALT: u32 = 1;
     const ISSUE_TS: u32 = 1111111;
+    const CPP_EXTENDED_TOKEN: &str = "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ==";
 
     /// Creates a token with deterministic timestamp and salt values.
     fn deterministic_token() -> AccessToken {
@@ -572,6 +793,85 @@ mod tests {
         } else {
             panic!("expected RTC service");
         }
+    }
+
+    /// Parses and verifies C++ Streaming, FCDN, and RTM2 services.
+    #[test]
+    fn test_parse_extended_services_from_cpp() {
+        let mut access_token = create_access_token();
+
+        assert!(access_token.parse(CPP_EXTENDED_TOKEN).unwrap());
+        assert!(access_token.verify_signature(APP_CERT));
+
+        let streaming = access_token.get_services(SERVICE_TYPE_STREAMING)[0].as_any().downcast_ref::<ServiceStreaming>().unwrap();
+        assert_eq!(CHANNEL_NAME, streaming.channel_name);
+        assert_eq!(UID, streaming.account);
+        assert_eq!(EXPIRE, streaming.service.privileges[&PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM]);
+        assert_eq!(EXPIRE, streaming.service.privileges[&PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM]);
+
+        let fcdn = access_token.get_services(SERVICE_TYPE_FCDN)[0].as_any().downcast_ref::<ServiceFCdn>().unwrap();
+        assert_eq!(CHANNEL_NAME, fcdn.channel_name);
+        assert_eq!(UID, fcdn.account);
+        assert_eq!(EXPIRE, fcdn.service.privileges[&PRIVILEGE_FCDN_PUBLISH]);
+        assert_eq!(EXPIRE, fcdn.service.privileges[&PRIVILEGE_FCDN_PLAY]);
+
+        let rtm2 = access_token.get_services(SERVICE_TYPE_RTM2)[0].as_any().downcast_ref::<ServiceRtm2>().unwrap();
+        assert_eq!(USER_ID, rtm2.user_id);
+        assert_eq!(
+            vec!["message-a".to_string(), "message-b".to_string()],
+            rtm2.permissions.details[&RTM2_RESOURCE_MESSAGE_CHANNELS][&RTM2_PERMISSION_READ]
+        );
+        assert_eq!(
+            vec!["stream-a".to_string()],
+            rtm2.permissions.details[&RTM2_RESOURCE_STREAM_CHANNELS][&RTM2_PERMISSION_WRITE]
+        );
+        assert_eq!(
+            vec!["user-a".to_string()],
+            rtm2.permissions.details[&RTM2_RESOURCE_USERS][&RTM2_PERMISSION_READ]
+        );
+    }
+
+    /// Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+    #[test]
+    fn test_extended_service_numeric_uid_conversion() {
+        let mut access_token = deterministic_token();
+        let mut streaming_uid = new_service_streaming_with_uid(CHANNEL_NAME, 2_882_341_273);
+        streaming_uid.service.add_privilege(PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM, EXPIRE);
+        access_token.add_service(Box::new(streaming_uid));
+        let mut streaming_wildcard = new_service_streaming_with_uid(CHANNEL_NAME, 0);
+        streaming_wildcard.service.add_privilege(PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM, EXPIRE);
+        access_token.add_service(Box::new(streaming_wildcard));
+        let mut streaming_account = new_service_streaming(CHANNEL_NAME, "stream-account");
+        streaming_account.service.add_privilege(PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM, EXPIRE);
+        streaming_account.service.add_privilege(PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM, EXPIRE);
+        access_token.add_service(Box::new(streaming_account));
+        let mut fcdn_uid = new_service_fcdn_with_uid(CHANNEL_NAME, 2_882_341_273);
+        fcdn_uid.service.add_privilege(PRIVILEGE_FCDN_PUBLISH, EXPIRE);
+        access_token.add_service(Box::new(fcdn_uid));
+        let mut fcdn_wildcard = new_service_fcdn_with_uid(CHANNEL_NAME, 0);
+        fcdn_wildcard.service.add_privilege(PRIVILEGE_FCDN_PLAY, EXPIRE);
+        access_token.add_service(Box::new(fcdn_wildcard));
+        let mut fcdn_account = new_service_fcdn(CHANNEL_NAME, "fcdn-account");
+        fcdn_account.service.add_privilege(PRIVILEGE_FCDN_PUBLISH, EXPIRE);
+        fcdn_account.service.add_privilege(PRIVILEGE_FCDN_PLAY, EXPIRE);
+        access_token.add_service(Box::new(fcdn_account));
+
+        let encoded = access_token.build().unwrap();
+        assert_eq!(
+            "007eJydjjsOAVEYRn8jmUJERIR2Cq1k5v73NZWIQmIDFJp7514aj8SjtAZRiEpHLERpCbMCjcoCDKGfUX35ipNzPIgvvWNlPDlsWvasG7d+fKrd9/Xd8FG6VnvbPfEgFH6njcxY7keUcsq0VlYqEjCfBxqx+yzDwAHIAYAL+WRzn++BMIIgZ1aHEqlkGAqLFkehodzXxqgCECkJ0oAIfHNOSg4Si/O1pGVKsFwtrJo2VRTN17OV+2enm6nTzdxZhFFkZr/KF0lvX1c=",
+            encoded
+        );
+        let mut parsed = create_access_token();
+        assert!(parsed.parse(&encoded).unwrap());
+        let streaming: Vec<&str> = parsed
+            .get_services(SERVICE_TYPE_STREAMING)
+            .iter()
+            .map(|service| service.as_any().downcast_ref::<ServiceStreaming>().unwrap().account.as_str())
+            .collect();
+        assert_eq!(vec![UID, "", "stream-account"], streaming);
+        let fcdn: Vec<&str> =
+            parsed.get_services(SERVICE_TYPE_FCDN).iter().map(|service| service.as_any().downcast_ref::<ServiceFCdn>().unwrap().account.as_str()).collect();
+        assert_eq!(vec![UID, "", "fcdn-account"], fcdn);
     }
 
     /// Preserves repeated service types and their insertion order after parsing.

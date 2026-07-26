@@ -79,4 +79,22 @@ function test_digest_helpers()
     )
 end
 
+-- Verifies recursive diagnostic table output handles nested and scalar values.
+function test_print_table()
+    local output = {}
+    local original_write = io.write
+    local original_print = print
+    io.write = function(value) table.insert(output, value) end
+    print = function(value) table.insert(output, value == nil and "\n" or tostring(value) .. "\n") end
+
+    utils.print_table({ outer = { inner = "value" }, scalar = 7 })
+
+    io.write = original_write
+    print = original_print
+    local rendered = table.concat(output)
+    luaunit.assertStrContains(rendered, "outer: ")
+    luaunit.assertStrContains(rendered, "  inner: value")
+    luaunit.assertStrContains(rendered, "scalar: 7")
+end
+
 os.exit(luaunit.LuaUnit.run())

@@ -3,7 +3,7 @@ import unittest
 import os
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from src.RtcTokenBuilder import RtcTokenBuilder,Role_Attendee,Role_Subscriber
+from src.RtcTokenBuilder import RtcTokenBuilder, Role_Publisher, Role_Subscriber
 from src.AccessToken import AccessToken,kJoinChannel,kPublishVideoStream,kPublishAudioStream,kPublishDataStream
 
 appID = "970CA35de60c44645bbae8a215061b33"
@@ -41,3 +41,16 @@ class RtcTokenBuilderTest(unittest.TestCase):
         self.assertNotIn(kPublishVideoStream, parser.messages)
         self.assertNotIn(kPublishAudioStream, parser.messages)
         self.assertNotIn(kPublishDataStream, parser.messages)
+
+    def test_build_token_with_publisher_account(self):
+        """Include all legacy publish privileges for a publisher account."""
+        token = RtcTokenBuilder.buildTokenWithAccount(
+            self.appID, self.appCertificate, self.channelName, str(self.uid), Role_Publisher,
+            self.expireTimestamp)
+        parser = AccessToken()
+        self.assertTrue(parser.fromString(token))
+
+        self.assertEqual(parser.messages[kJoinChannel], self.expireTimestamp)
+        self.assertEqual(parser.messages[kPublishVideoStream], self.expireTimestamp)
+        self.assertEqual(parser.messages[kPublishAudioStream], self.expireTimestamp)
+        self.assertEqual(parser.messages[kPublishDataStream], self.expireTimestamp)

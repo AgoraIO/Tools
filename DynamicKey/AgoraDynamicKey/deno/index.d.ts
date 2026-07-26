@@ -1,3 +1,19 @@
+/** Stores RTM2 resource-level permissions. */
+export class Rtm2Permissions {
+    static readonly kMessageChannels: number
+    static readonly kStreamChannels: number
+    static readonly kGroupChannels: number
+    static readonly kServerGroups: number
+    static readonly kUsers: number
+    static readonly kRead: number
+    static readonly kWrite: number
+
+    details: { [resourceType: number]: { [permissionType: number]: string[] } }
+
+    /** Adds or replaces resources for a resource and permission type. */
+    add(resourceType: number, permissionType: number, resources: string[]): void
+}
+
 export namespace ApaasTokenBuilder {
     /**
      * build user room token
@@ -416,4 +432,24 @@ export namespace RtmTokenBuilder {
      * @return The RTM token.
      */
     export function buildToken(appId: string, appCertificate: string, userId: string, expire: number): string
+
+    /**
+     * Build an RTM2 token with resource-level permissions.
+     *
+     * This special interface requires Agora assistance for proper usage.
+     *
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param userId The user's account, max length is 64 bytes.
+     * @param permissions The RTM2 resource-level permissions.
+     * @param expire The number of seconds from now before the token expires.
+     * @return The RTM2 token.
+     */
+    export function buildTokenWithPermissions(
+        appId: string,
+        appCertificate: string,
+        userId: string,
+        permissions: Rtm2Permissions,
+        expire: number
+    ): string
 }

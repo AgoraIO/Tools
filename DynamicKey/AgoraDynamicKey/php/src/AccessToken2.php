@@ -49,6 +49,7 @@ class Service
     {
         $this->privileges = Util::unpackMapUint32($data);
     }
+
 }
 
 /**
@@ -130,6 +131,46 @@ class ServiceRtm extends Service
 }
 
 /**
+ * Represent Streaming channel and account privileges.
+ */
+class ServiceStreaming extends Service
+{
+    const SERVICE_TYPE = 3;
+    const PRIVILEGE_PUBLISH_MIX_STREAM = 1;
+    const PRIVILEGE_PUBLISH_RAW_STREAM = 2;
+    public $channelName;
+    public $account;
+
+    /**
+     * Create a Streaming service for a channel and numeric user ID or string account.
+     */
+    public function __construct($channelName = "", $account = "")
+    {
+        parent::__construct(self::SERVICE_TYPE);
+        $this->channelName = $channelName;
+        $this->account = $account === 0 ? "" : (string)$account;
+    }
+
+    /**
+     * Serialize the Streaming service payload.
+     */
+    public function pack()
+    {
+        return parent::pack() . Util::packString($this->channelName) . Util::packString($this->account);
+    }
+
+    /**
+     * Deserialize the Streaming service payload.
+     */
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+        $this->channelName = Util::unpackString($data);
+        $this->account = Util::unpackString($data);
+    }
+}
+
+/**
  * Represent FPA login privileges.
  */
 class ServiceFpa extends Service
@@ -200,6 +241,46 @@ class ServiceChat extends Service
 }
 
 /**
+ * Represent FCDN channel and account privileges.
+ */
+class ServiceFCdn extends Service
+{
+    const SERVICE_TYPE = 6;
+    const PRIVILEGE_PUBLISH = 1;
+    const PRIVILEGE_PLAY = 2;
+    public $channelName;
+    public $account;
+
+    /**
+     * Create an FCDN service for a channel and numeric user ID or string account.
+     */
+    public function __construct($channelName = "", $account = "")
+    {
+        parent::__construct(self::SERVICE_TYPE);
+        $this->channelName = $channelName;
+        $this->account = $account === 0 ? "" : (string)$account;
+    }
+
+    /**
+     * Serialize the FCDN service payload.
+     */
+    public function pack()
+    {
+        return parent::pack() . Util::packString($this->channelName) . Util::packString($this->account);
+    }
+
+    /**
+     * Deserialize the FCDN service payload.
+     */
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+        $this->channelName = Util::unpackString($data);
+        $this->account = Util::unpackString($data);
+    }
+}
+
+/**
  * Represent APaaS room, user, and application privileges.
  */
 class ServiceApaas extends Service
@@ -241,6 +322,100 @@ class ServiceApaas extends Service
         $this->roomUuid = Util::unpackString($data);
         $this->userUuid = Util::unpackString($data);
         $this->role = Util::unpackInt16($data);
+    }
+}
+
+/**
+ * Store RTM2 resource-level permissions.
+ */
+class Rtm2Permissions
+{
+    const MESSAGE_CHANNELS = 0;
+    const STREAM_CHANNELS = 1;
+    const GROUP_CHANNELS = 2;
+    const SERVER_GROUPS = 3;
+    const USERS = 4;
+
+    const READ = 0;
+    const WRITE = 1;
+
+    public $details = [];
+
+    /**
+     * Add or replace resources for a resource and permission type.
+     */
+    public function add($resourceType, $permissionType, $resources)
+    {
+        if (!isset($this->details[$resourceType])) {
+            $this->details[$resourceType] = [];
+        }
+        $this->details[$resourceType][$permissionType] = array_values($resources);
+    }
+}
+
+/**
+ * Represent RTM2 login and resource-level permissions.
+ */
+class ServiceRtm2 extends Service
+{
+    const SERVICE_TYPE = 8;
+    const PRIVILEGE_LOGIN = 1;
+    public $userId;
+    public $permissions;
+
+    /**
+     * Create an RTM2 service for a user and permission set.
+     */
+    public function __construct($userId = "", $permissions = null)
+    {
+        parent::__construct(self::SERVICE_TYPE);
+        $this->userId = $userId;
+        $this->permissions = $permissions === null ? new Rtm2Permissions() : $permissions;
+    }
+
+    /**
+     * Serialize the RTM2 service payload.
+     */
+    public function pack()
+    {
+        $details = $this->permissions->details;
+        ksort($details, SORT_NUMERIC);
+        $data = Util::packUint16(count($details));
+        foreach ($details as $resourceType => $permissionMap) {
+            ksort($permissionMap, SORT_NUMERIC);
+            $data .= Util::packUint16($resourceType) . Util::packUint16(count($permissionMap));
+            foreach ($permissionMap as $permissionType => $resources) {
+                $data .= Util::packUint16($permissionType) . Util::packUint16(count($resources));
+                foreach ($resources as $resource) {
+                    $data .= Util::packString($resource);
+                }
+            }
+        }
+        return parent::pack() . Util::packString($this->userId) . $data;
+    }
+
+    /**
+     * Deserialize the RTM2 service payload.
+     */
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+        $this->userId = Util::unpackString($data);
+        $this->permissions = new Rtm2Permissions();
+        $resourceTypeCount = Util::unpackUint16($data);
+        for ($i = 0; $i < $resourceTypeCount; $i++) {
+            $resourceType = Util::unpackUint16($data);
+            $permissionCount = Util::unpackUint16($data);
+            for ($j = 0; $j < $permissionCount; $j++) {
+                $permissionType = Util::unpackUint16($data);
+                $resourceCount = Util::unpackUint16($data);
+                $resources = [];
+                for ($k = 0; $k < $resourceCount; $k++) {
+                    $resources[] = Util::unpackString($data);
+                }
+                $this->permissions->add($resourceType, $permissionType, $resources);
+            }
+        }
     }
 }
 
@@ -375,9 +550,12 @@ class AccessToken2
         $serviceClasses = [
             ServiceRtc::SERVICE_TYPE => "ServiceRtc",
             ServiceRtm::SERVICE_TYPE => "ServiceRtm",
+            ServiceStreaming::SERVICE_TYPE => "ServiceStreaming",
             ServiceFpa::SERVICE_TYPE => "ServiceFpa",
             ServiceChat::SERVICE_TYPE => "ServiceChat",
+            ServiceFCdn::SERVICE_TYPE => "ServiceFCdn",
             ServiceApaas::SERVICE_TYPE => "ServiceApaas",
+            ServiceRtm2::SERVICE_TYPE => "ServiceRtm2",
         ];
         for ($i = 0; $i < $serviceNum; $i++) {
             $serviceType = Util::unpackUint16($data);

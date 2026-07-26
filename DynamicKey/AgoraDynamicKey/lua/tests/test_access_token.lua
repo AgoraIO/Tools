@@ -12,6 +12,8 @@ local ROLE = 1
 local EXPIRE = 600
 local ISSUE_TS = 1111111
 local SALT = 1
+local CPP_EXTENDED_TOKEN =
+    "007eJxTYPj86Lzdz79M25wNn/lMfvu+TkfmdpiviKvChm8ZV3SWndytwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs7P5FgCGCiYGBkYGBgRkImYAsEJ8JTCowmKeYGxmbmaYmWVoYm1iYGluapxqnGqdZppiYGSSlpCRyMRhZWBgZmxgamRuzUaSbA6gXopuToSS1uCS+tDi1iJkB4jQmoGBuanFxYnqqbiKCmcTIAIEcDMUlRamJubqJLGD1jAxsDCD9uokAO/VDvQ=="
 
 -- Creates a deterministic AccessToken2 instance.
 local function create_token()
@@ -175,6 +177,106 @@ function test_all_known_service_payloads()
     luaunit.assertEquals(ROLE, parsed_apaas.role)
 end
 
+-- Verifies parsing and signature validation for C++ extended services.
+function test_parse_extended_services_from_cpp()
+    local parsed = access_token.create_access_token()
+
+    luaunit.assertTrue(parsed:parse(CPP_EXTENDED_TOKEN))
+    luaunit.assertTrue(parsed:verify_signature(APP_CERTIFICATE))
+
+    local streaming = parsed:get_services(access_token.SERVICE_TYPE_STREAMING)[1]
+    luaunit.assertEquals(CHANNEL_NAME, streaming.channel_name)
+    luaunit.assertEquals(UID_STRING, streaming.account)
+    luaunit.assertEquals(
+        EXPIRE,
+        streaming.service.privileges[access_token.PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM]
+    )
+    luaunit.assertEquals(
+        EXPIRE,
+        streaming.service.privileges[access_token.PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM]
+    )
+
+    local fcdn = parsed:get_services(access_token.SERVICE_TYPE_FCDN)[1]
+    luaunit.assertEquals(CHANNEL_NAME, fcdn.channel_name)
+    luaunit.assertEquals(UID_STRING, fcdn.account)
+    luaunit.assertEquals(EXPIRE, fcdn.service.privileges[access_token.PRIVILEGE_FCDN_PUBLISH])
+    luaunit.assertEquals(EXPIRE, fcdn.service.privileges[access_token.PRIVILEGE_FCDN_PLAY])
+
+    local rtm2 = parsed:get_services(access_token.SERVICE_TYPE_RTM2)[1]
+    luaunit.assertEquals("test_user", rtm2.user_id)
+    luaunit.assertEquals({
+        [access_token.RTM2_RESOURCE_MESSAGE_CHANNELS] = {
+            [access_token.RTM2_PERMISSION_READ] = { "message-a", "message-b" },
+        },
+        [access_token.RTM2_RESOURCE_STREAM_CHANNELS] = {
+            [access_token.RTM2_PERMISSION_WRITE] = { "stream-a" },
+        },
+        [access_token.RTM2_RESOURCE_USERS] = {
+            [access_token.RTM2_PERMISSION_READ] = { "user-a" },
+        },
+    }, rtm2.permissions.details)
+end
+
+-- Verifies deterministic Streaming and FCDN generation and UID conversion against C++.
+function test_extended_service_numeric_uid_conversion()
+    local token = create_token()
+    local streaming_uid = access_token.new_service_streaming(CHANNEL_NAME, UID)
+    streaming_uid.service:add_privilege(access_token.PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM, EXPIRE)
+    token:add_service(streaming_uid)
+    local streaming_wildcard = access_token.new_service_streaming(CHANNEL_NAME, 0)
+    streaming_wildcard.service:add_privilege(access_token.PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM, EXPIRE)
+    token:add_service(streaming_wildcard)
+    local streaming_account = access_token.new_service_streaming(CHANNEL_NAME, "stream-account")
+    streaming_account.service:add_privilege(access_token.PRIVILEGE_STREAMING_PUBLISH_MIX_STREAM, EXPIRE)
+    streaming_account.service:add_privilege(access_token.PRIVILEGE_STREAMING_PUBLISH_RAW_STREAM, EXPIRE)
+    token:add_service(streaming_account)
+    local fcdn_uid = access_token.new_service_fcdn(CHANNEL_NAME, UID)
+    fcdn_uid.service:add_privilege(access_token.PRIVILEGE_FCDN_PUBLISH, EXPIRE)
+    token:add_service(fcdn_uid)
+    local fcdn_wildcard = access_token.new_service_fcdn(CHANNEL_NAME, 0)
+    fcdn_wildcard.service:add_privilege(access_token.PRIVILEGE_FCDN_PLAY, EXPIRE)
+    token:add_service(fcdn_wildcard)
+    local fcdn_account = access_token.new_service_fcdn(CHANNEL_NAME, "fcdn-account")
+    fcdn_account.service:add_privilege(access_token.PRIVILEGE_FCDN_PUBLISH, EXPIRE)
+    fcdn_account.service:add_privilege(access_token.PRIVILEGE_FCDN_PLAY, EXPIRE)
+    token:add_service(fcdn_account)
+
+    local encoded = token:build()
+    luaunit.assertEquals(
+        "007eJxTYLi93GuuUHrO9Fr71KVJKqfDby8RezlVfGLMO77DIl79U40UGCzNDZwdjU1TUs0Mkk1MzExMk5ISUy0SjQxNDcwMk4yN3b8IMEQwMTAwMjAwsDEwA2lGMF+BwTzF3MjYzDQ1ydLC2MTC1NjSPNU41TjNMsXEzCApJSWRi8HIwsLI2MTQyNwYpI+JSH0MQFuYoLYQq4ePobikKDUxVzcxOTm/NK+EjUx3spHkTjaS3cnDkJackgdzJQBJb19X",
+        encoded
+    )
+    local parsed = access_token.create_access_token()
+    luaunit.assertTrue(parsed:parse(encoded))
+    local streaming = parsed:get_services(access_token.SERVICE_TYPE_STREAMING)
+    luaunit.assertEquals(UID_STRING, streaming[1].account)
+    luaunit.assertEquals("", streaming[2].account)
+    luaunit.assertEquals("stream-account", streaming[3].account)
+    local fcdn = parsed:get_services(access_token.SERVICE_TYPE_FCDN)
+    luaunit.assertEquals(UID_STRING, fcdn[1].account)
+    luaunit.assertEquals("", fcdn[2].account)
+    luaunit.assertEquals("fcdn-account", fcdn[3].account)
+end
+
+-- Verifies omitted Streaming and FCDN accounts use wildcard account encoding.
+function test_extended_service_default_accounts()
+    local streaming = access_token.new_service_streaming(CHANNEL_NAME)
+    local fcdn = access_token.new_service_fcdn(CHANNEL_NAME)
+
+    luaunit.assertEquals("", streaming.account)
+    luaunit.assertEquals("", fcdn.account)
+end
+
+-- Verifies build rejects malformed application credentials.
+function test_build_rejects_invalid_credentials()
+    local token = access_token.new_access_token("invalid", APP_CERTIFICATE, EXPIRE)
+    token:add_service(create_rtc_service())
+
+    luaunit.assertErrorMsgContains("check appId or appCertificate", function()
+        token:build()
+    end)
+end
+
 -- Verifies malformed tokens and invalid signatures are rejected.
 function test_invalid_token_inputs_and_signatures()
     local parsed = access_token.create_access_token()
@@ -189,6 +291,9 @@ function test_invalid_token_inputs_and_signatures()
     luaunit.assertFalse(parsed:verify_signature(WRONG_APP_CERTIFICATE))
     luaunit.assertFalse(parsed:verify_signature("invalid"))
     luaunit.assertTrue(parsed:verify_signature(APP_CERTIFICATE))
+
+    parsed.signature = 1
+    luaunit.assertFalse(parsed:verify_signature(APP_CERTIFICATE))
 
     luaunit.assertFalse(parsed:parse("006invalid"))
     luaunit.assertFalse(parsed:verify_signature(APP_CERTIFICATE))

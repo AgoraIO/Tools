@@ -9,7 +9,8 @@ import java.util.TreeMap;
  * Packs and unpacks Token007 values using little-endian byte order.
  */
 public class ByteBuf {
-    ByteBuffer buffer = ByteBuffer.allocate(1024).order(ByteOrder.LITTLE_ENDIAN);
+    private static final int INITIAL_CAPACITY = 1024;
+    ByteBuffer buffer = ByteBuffer.allocate(INITIAL_CAPACITY).order(ByteOrder.LITTLE_ENDIAN);
 
     /**
      * Creates an empty byte buffer for packing values.
@@ -35,9 +36,30 @@ public class ByteBuf {
     }
 
     /**
+     * Grows the packing buffer when the next value does not fit.
+     */
+    private void ensureCapacity(int additionalLength) {
+        int requiredLength = buffer.position() + additionalLength;
+        if (requiredLength <= buffer.capacity()) {
+            return;
+        }
+
+        int capacity = buffer.capacity();
+        while (capacity < requiredLength) {
+            capacity *= 2;
+        }
+
+        ByteBuffer expanded = ByteBuffer.allocate(capacity).order(ByteOrder.LITTLE_ENDIAN);
+        buffer.flip();
+        expanded.put(buffer);
+        buffer = expanded;
+    }
+
+    /**
      * Packs an unsigned 16-bit protocol value represented by a Java short.
      */
     public ByteBuf put(short v) {
+        ensureCapacity(Short.BYTES);
         buffer.putShort(v);
         return this;
     }
@@ -47,6 +69,16 @@ public class ByteBuf {
      */
     public ByteBuf put(byte[] v) {
         put((short)v.length);
+        ensureCapacity(v.length);
+        buffer.put(v);
+        return this;
+    }
+
+    /**
+     * Appends bytes without a length prefix.
+     */
+    public ByteBuf copy(byte[] v) {
+        ensureCapacity(v.length);
         buffer.put(v);
         return this;
     }
@@ -55,6 +87,7 @@ public class ByteBuf {
      * Packs an unsigned 32-bit protocol value represented by a Java int.
      */
     public ByteBuf put(int v) {
+        ensureCapacity(Integer.BYTES);
         buffer.putInt(v);
         return this;
     }
@@ -63,6 +96,7 @@ public class ByteBuf {
      * Packs a 64-bit integer.
      */
     public ByteBuf put(long v) {
+        ensureCapacity(Long.BYTES);
         buffer.putLong(v);
         return this;
     }

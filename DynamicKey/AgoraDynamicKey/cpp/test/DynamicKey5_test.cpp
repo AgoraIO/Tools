@@ -187,3 +187,15 @@ TEST_F(DynamicKey5_test, test_InChannelPermission)
 {
     test_InChannelPermission();
 }
+
+// Tests DynamicKey5 validation and malformed key handling.
+TEST_F(DynamicKey5_test, test_InvalidInputs)
+{
+    EXPECT_TRUE(DynamicKey5::generateMediaChannelKey("invalid", appCertificate, channelName, unixTs, randomInt, uid, expiredTs).empty());
+    EXPECT_TRUE(DynamicKey5::generateMediaChannelKey(appID, "invalid", channelName, unixTs, randomInt, uid, expiredTs).empty());
+
+    DynamicKey5 key;
+    EXPECT_FALSE(key.fromString("004invalid"));
+    EXPECT_FALSE(key.fromString("005"));
+    EXPECT_FALSE(key.fromString("005invalid"));
+}

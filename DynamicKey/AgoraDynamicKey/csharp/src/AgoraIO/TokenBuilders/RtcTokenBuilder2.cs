@@ -48,16 +48,16 @@
 
         /**
          * Generates an RTC token with the specified privilege.
-         * <p>
+         *
          * This method supports generating a token with the following privileges:
          * - Joining an RTC channel.
          * - Publishing audio in an RTC channel.
          * - Publishing video in an RTC channel.
          * - Publishing data streams in an RTC channel.
-         * <p>
+         *
          * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
          * enabled co-host authentication.
-         * <p>
+         *
          * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
          * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
          * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
@@ -136,16 +136,16 @@
 
         /**
          * Generates an RTC token with the specified privilege.
-         * <p>
+         *
          * This method supports generating a token with the following privileges:
          * - Joining an RTC channel.
          * - Publishing audio in an RTC channel.
          * - Publishing video in an RTC channel.
          * - Publishing data streams in an RTC channel.
-         * <p>
+         *
          * The privileges for publishing audio, video, and data streams in an RTC channel apply only if you have
          * enabled co-host authentication.
-         * <p>
+         *
          * A user can have multiple privileges. Each privilege is valid for a maximum of 24 hours.
          * The SDK triggers the onTokenPrivilegeWillExpire and onRequestToken callbacks when the token is about to expire
          * or has expired. The callbacks do not report the specific privilege affected, and you need to maintain
