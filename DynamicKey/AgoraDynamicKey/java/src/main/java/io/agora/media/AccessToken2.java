@@ -151,6 +151,8 @@ public class AccessToken2 {
     public static final short SERVICE_TYPE_FCDN = 6;
     public static final short SERVICE_TYPE_APAAS = 7;
     public static final short SERVICE_TYPE_RTM2 = 8;
+    public static final short SERVICE_TYPE_CONVOAI = 9;
+    public static final short SERVICE_TYPE_STT = 10;
 
     public String appCert = "";
     public String appId = "";
@@ -240,6 +242,12 @@ public class AccessToken2 {
         }
         if (serviceType == SERVICE_TYPE_FPA) {
             return new ServiceFpa();
+        }
+        if (serviceType == SERVICE_TYPE_CONVOAI) {
+            return new ServiceConvoAI();
+        }
+        if (serviceType == SERVICE_TYPE_STT) {
+            return new ServiceStt();
         }
         if (serviceType == SERVICE_TYPE_CHAT) {
             return new ServiceChat();
@@ -636,6 +644,58 @@ public class AccessToken2 {
 
         /**
          * Deserializes the FPA service payload.
+         */
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+        }
+    }
+
+    /**
+     * Represents ConvoAI service membership.
+     */
+    public static class ServiceConvoAI extends Service {
+        /**
+         * Creates a ConvoAI service.
+         */
+        public ServiceConvoAI() {
+            this.type = SERVICE_TYPE_CONVOAI;
+        }
+
+        /**
+         * Serializes the ConvoAI service payload.
+         */
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf);
+        }
+
+        /**
+         * Deserializes the ConvoAI service payload.
+         */
+        public void unpack(ByteBuf byteBuf) {
+            super.unpack(byteBuf);
+        }
+    }
+
+    /**
+     * Represents STT service membership.
+     */
+    public static class ServiceStt extends Service {
+        /**
+         * Creates an STT service.
+         */
+        public ServiceStt() {
+            this.type = SERVICE_TYPE_STT;
+        }
+
+        /**
+         * Serializes the STT service payload.
+         */
+        public ByteBuf pack(ByteBuf buf) {
+            return super.pack(buf);
+        }
+
+        /**
+         * Deserializes the STT service payload.
          */
         public void unpack(ByteBuf byteBuf) {
             super.unpack(byteBuf);
