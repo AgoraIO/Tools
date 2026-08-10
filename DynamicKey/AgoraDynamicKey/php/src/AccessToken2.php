@@ -16,6 +16,7 @@ class Service
     public function __construct($serviceType)
     {
         $this->type = $serviceType;
+        $this->privileges = [];
     }
 
     /**
@@ -196,6 +197,70 @@ class ServiceFpa extends Service
 
     /**
      * Deserialize the FPA service payload.
+     */
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+    }
+}
+
+/**
+ * Represent ConvoAI service membership.
+ */
+class ServiceConvoAI extends Service
+{
+    const SERVICE_TYPE = 9;
+
+    /**
+     * Create a ConvoAI service.
+     */
+    public function __construct()
+    {
+        parent::__construct(self::SERVICE_TYPE);
+    }
+
+    /**
+     * Serialize the ConvoAI service payload.
+     */
+    public function pack()
+    {
+        return parent::pack();
+    }
+
+    /**
+     * Deserialize the ConvoAI service payload.
+     */
+    public function unpack(&$data)
+    {
+        parent::unpack($data);
+    }
+}
+
+/**
+ * Represent STT service membership.
+ */
+class ServiceStt extends Service
+{
+    const SERVICE_TYPE = 10;
+
+    /**
+     * Create an STT service.
+     */
+    public function __construct()
+    {
+        parent::__construct(self::SERVICE_TYPE);
+    }
+
+    /**
+     * Serialize the STT service payload.
+     */
+    public function pack()
+    {
+        return parent::pack();
+    }
+
+    /**
+     * Deserialize the STT service payload.
      */
     public function unpack(&$data)
     {
@@ -552,6 +617,8 @@ class AccessToken2
             ServiceRtm::SERVICE_TYPE => "ServiceRtm",
             ServiceStreaming::SERVICE_TYPE => "ServiceStreaming",
             ServiceFpa::SERVICE_TYPE => "ServiceFpa",
+            ServiceConvoAI::SERVICE_TYPE => "ServiceConvoAI",
+            ServiceStt::SERVICE_TYPE => "ServiceStt",
             ServiceChat::SERVICE_TYPE => "ServiceChat",
             ServiceFCdn::SERVICE_TYPE => "ServiceFCdn",
             ServiceApaas::SERVICE_TYPE => "ServiceApaas",
