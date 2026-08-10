@@ -418,6 +418,72 @@ export namespace RtcTokenBuilder {
     ): string
 }
 
+export namespace ConvoAITokenBuilder {
+    /**
+     * Builds a Token007 that carries RTC, RTM, and ConvoAI services.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the AgoraRTC session in the string format.
+     * @param rtcAccount The RTC user's account, max length is 255 bytes.
+     * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
+     * @param rtcTokenExpire Represented by the number of seconds elapsed since now.
+     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param rtmUserId The RTM user's account, max length is 255 bytes.
+     * @param rtmTokenExpire Represented by the number of seconds elapsed since now.
+     * @return The RTC, RTM, and ConvoAI token.
+     */
+    export function buildToken(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        rtcAccount: string | number,
+        rtcRole: number,
+        rtcTokenExpire: number,
+        joinChannelPrivilegeExpire: number,
+        pubAudioPrivilegeExpire: number,
+        pubVideoPrivilegeExpire: number,
+        pubDataStreamPrivilegeExpire: number,
+        rtmUserId: string | number,
+        rtmTokenExpire: number
+    ): string
+}
+
+export namespace SttTokenBuilder {
+    /**
+     * Builds a Token007 that carries RTC, RTM, and STT services.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the AgoraRTC session in the string format.
+     * @param rtcAccount The RTC user's account, max length is 255 bytes.
+     * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
+     * @param rtcTokenExpire Represented by the number of seconds elapsed since now.
+     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param rtmUserId The RTM user's account, max length is 255 bytes.
+     * @param rtmTokenExpire Represented by the number of seconds elapsed since now.
+     * @return The RTC, RTM, and STT token.
+     */
+    export function buildToken(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        rtcAccount: string | number,
+        rtcRole: number,
+        rtcTokenExpire: number,
+        joinChannelPrivilegeExpire: number,
+        pubAudioPrivilegeExpire: number,
+        pubVideoPrivilegeExpire: number,
+        pubDataStreamPrivilegeExpire: number,
+        rtmUserId: string | number,
+        rtmTokenExpire: number
+    ): string
+}
+
 export namespace RtmTokenBuilder {
     /**
      * Build the RTM token.
