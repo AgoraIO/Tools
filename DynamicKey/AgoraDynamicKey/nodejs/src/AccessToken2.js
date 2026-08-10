@@ -168,6 +168,46 @@ class ServiceFpa extends Service {
 
 ServiceFpa.kPrivilegeLogin = 1
 
+const kConvoAIServiceType = 9
+
+// Represents a ConvoAI service payload.
+class ServiceConvoAI extends Service {
+    // Creates a ConvoAI service.
+    constructor() {
+        super(kConvoAIServiceType)
+    }
+
+    // Serializes the ConvoAI service payload.
+    pack() {
+        return super.pack()
+    }
+
+    // Deserializes the ConvoAI service payload.
+    unpack(buffer) {
+        return super.unpack(buffer)
+    }
+}
+
+const kSttServiceType = 10
+
+// Represents an STT service payload.
+class ServiceStt extends Service {
+    // Creates an STT service.
+    constructor() {
+        super(kSttServiceType)
+    }
+
+    // Serializes the STT service payload.
+    pack() {
+        return super.pack()
+    }
+
+    // Deserializes the STT service payload.
+    unpack(buffer) {
+        return super.unpack(buffer)
+    }
+}
+
 const kChatServiceType = 5
 
 // Represents a Chat service payload.
@@ -678,25 +718,31 @@ AccessToken2.kServices[kRtcServiceType] = ServiceRtc
 AccessToken2.kServices[kRtmServiceType] = ServiceRtm
 AccessToken2.kServices[kRtm2ServiceType] = ServiceRtm2
 AccessToken2.kServices[kStreamingServiceType] = ServiceStreaming
+AccessToken2.kServices[kConvoAIServiceType] = ServiceConvoAI
+AccessToken2.kServices[kSttServiceType] = ServiceStt
 
 module.exports = {
     AccessToken2,
     kApaasServiceType,
     kChatServiceType,
+    kConvoAIServiceType,
     kFCdnServiceType,
     kFpaServiceType,
     kRtcServiceType,
     kRtmServiceType,
     kRtm2ServiceType,
+    kSttServiceType,
     kStreamingServiceType,
     Rtm2Permissions,
     Service,
     ServiceApaas,
     ServiceChat,
+    ServiceConvoAI,
     ServiceFCdn,
     ServiceFpa,
     ServiceRtc,
     ServiceRtm,
     ServiceRtm2,
+    ServiceStt,
     ServiceStreaming
 }

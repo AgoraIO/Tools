@@ -1,10 +1,12 @@
 module.exports = {
     ApaasTokenBuilder: require('./src/ApaasTokenBuilder').ApaasTokenBuilder,
     ChatTokenBuilder: require('./src/ChatTokenBuilder').ChatTokenBuilder,
+    ConvoAITokenBuilder: require('./src/ConvoAITokenBuilder').ConvoAITokenBuilder,
     EducationTokenBuilder: require('./src/EducationTokenBuilder').EducationTokenBuilder,
     FpaTokenBuilder: require('./src/FpaTokenBuilder').FpaTokenBuilder,
     RtcRole: require('./src/RtcTokenBuilder2').Role,
     RtcTokenBuilder: require('./src/RtcTokenBuilder2').RtcTokenBuilder,
     RtmTokenBuilder: require('./src/RtmTokenBuilder2').RtmTokenBuilder,
-    Rtm2Permissions: require('./src/AccessToken2').Rtm2Permissions
+    Rtm2Permissions: require('./src/AccessToken2').Rtm2Permissions,
+    SttTokenBuilder: require('./src/SttTokenBuilder').SttTokenBuilder
 }
