@@ -58,6 +58,8 @@ namespace AgoraIO.Media
         public static short SERVICE_TYPE_FCDN = 6;
         public static short SERVICE_TYPE_APAAS = 7;
         public static short SERVICE_TYPE_RTM2 = 8;
+        public static short SERVICE_TYPE_CONVOAI = 9;
+        public static short SERVICE_TYPE_STT = 10;
 
         // Converts a numeric user ID to the account representation used by Token007.
         private static string getAccountFromUid(uint uid)
@@ -83,6 +85,14 @@ namespace AgoraIO.Media
             if (serviceType == SERVICE_TYPE_FPA)
             {
                 return new ServiceFpa();
+            }
+            if (serviceType == SERVICE_TYPE_CONVOAI)
+            {
+                return new ServiceConvoAI();
+            }
+            if (serviceType == SERVICE_TYPE_STT)
+            {
+                return new ServiceStt();
             }
             if (serviceType == SERVICE_TYPE_CHAT)
             {
@@ -257,6 +267,14 @@ namespace AgoraIO.Media
             {
                 return new ServiceFpa();
             }
+            if (serviceType == SERVICE_TYPE_CONVOAI)
+            {
+                return new ServiceConvoAI();
+            }
+            if (serviceType == SERVICE_TYPE_STT)
+            {
+                return new ServiceStt();
+            }
             if (serviceType == SERVICE_TYPE_CHAT)
             {
                 return new ServiceChat();
@@ -298,6 +316,14 @@ namespace AgoraIO.Media
         public enum PrivilegeFpaEnum
         {
             PRIVILEGE_LOGIN = 1
+        }
+
+        public enum PrivilegeConvoAIEnum
+        {
+        }
+
+        public enum PrivilegeSttEnum
+        {
         }
 
         public enum PrivilegeChatEnum
@@ -360,6 +386,18 @@ namespace AgoraIO.Media
 
             // Adds an FPA privilege and its expiration timestamp.
             public void addPrivilegeFpa(PrivilegeFpaEnum privilege, uint expire)
+            {
+                _privileges.Add((ushort)privilege, expire);
+            }
+
+            // Adds a ConvoAI privilege and its expiration timestamp.
+            public void addPrivilegeConvoAI(PrivilegeConvoAIEnum privilege, uint expire)
+            {
+                _privileges.Add((ushort)privilege, expire);
+            }
+
+            // Adds an STT privilege and its expiration timestamp.
+            public void addPrivilegeStt(PrivilegeSttEnum privilege, uint expire)
             {
                 _privileges.Add((ushort)privilege, expire);
             }
@@ -555,6 +593,48 @@ namespace AgoraIO.Media
             }
 
             // Unpacks the FPA service payload from the token buffer.
+            public new void unpack(ByteBuf byteBuf)
+            {
+                base.unpack(byteBuf);
+            }
+        }
+
+        public class ServiceConvoAI : Service
+        {
+            // Creates a ConvoAI service.
+            public ServiceConvoAI()
+            {
+                setServiceType(SERVICE_TYPE_CONVOAI);
+            }
+
+            // Packs the ConvoAI service payload into the token buffer.
+            public new ByteBuf pack(ByteBuf buf)
+            {
+                return base.pack(buf);
+            }
+
+            // Unpacks the ConvoAI service payload from the token buffer.
+            public new void unpack(ByteBuf byteBuf)
+            {
+                base.unpack(byteBuf);
+            }
+        }
+
+        public class ServiceStt : Service
+        {
+            // Creates an STT service.
+            public ServiceStt()
+            {
+                setServiceType(SERVICE_TYPE_STT);
+            }
+
+            // Packs the STT service payload into the token buffer.
+            public new ByteBuf pack(ByteBuf buf)
+            {
+                return base.pack(buf);
+            }
+
+            // Unpacks the STT service payload from the token buffer.
             public new void unpack(ByteBuf byteBuf)
             {
                 base.unpack(byteBuf);
