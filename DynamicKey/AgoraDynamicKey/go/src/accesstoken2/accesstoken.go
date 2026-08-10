@@ -25,6 +25,8 @@ const (
 	ServiceTypeFCdn      = 6
 	ServiceTypeApaas     = 7
 	ServiceTypeRtm2      = 8
+	ServiceTypeConvoAI   = 9
+	ServiceTypeStt       = 10
 
 	// Rtc
 	PrivilegeJoinChannel        = 1
@@ -248,6 +250,60 @@ func (serviceFpa *ServiceFpa) Pack(w io.Writer) (err error) {
 // UnPack reads the FPA privileges.
 func (serviceFpa *ServiceFpa) UnPack(r io.Reader) (err error) {
 	err = serviceFpa.Service.UnPack(r)
+	if err != nil {
+		return
+	}
+	return
+}
+
+type ServiceConvoAI struct {
+	*Service
+}
+
+// NewServiceConvoAI creates a ConvoAI service.
+func NewServiceConvoAI() *ServiceConvoAI {
+	return &ServiceConvoAI{Service: NewService(ServiceTypeConvoAI)}
+}
+
+// Pack writes the ConvoAI service and privileges.
+func (serviceConvoAI *ServiceConvoAI) Pack(w io.Writer) (err error) {
+	err = serviceConvoAI.Service.Pack(w)
+	if err != nil {
+		return
+	}
+	return
+}
+
+// UnPack reads the ConvoAI privileges.
+func (serviceConvoAI *ServiceConvoAI) UnPack(r io.Reader) (err error) {
+	err = serviceConvoAI.Service.UnPack(r)
+	if err != nil {
+		return
+	}
+	return
+}
+
+type ServiceStt struct {
+	*Service
+}
+
+// NewServiceStt creates an STT service.
+func NewServiceStt() *ServiceStt {
+	return &ServiceStt{Service: NewService(ServiceTypeStt)}
+}
+
+// Pack writes the STT service and privileges.
+func (serviceStt *ServiceStt) Pack(w io.Writer) (err error) {
+	err = serviceStt.Service.Pack(w)
+	if err != nil {
+		return
+	}
+	return
+}
+
+// UnPack reads the STT privileges.
+func (serviceStt *ServiceStt) UnPack(r io.Reader) (err error) {
+	err = serviceStt.Service.UnPack(r)
 	if err != nil {
 		return
 	}
@@ -755,6 +811,10 @@ func (accessToken *AccessToken) newService(serviceType uint16) (service IService
 		service = NewServiceApaas("", "", -1)
 	case ServiceTypeRtm2:
 		service = NewServiceRtm2("", nil)
+	case ServiceTypeConvoAI:
+		service = NewServiceConvoAI()
+	case ServiceTypeStt:
+		service = NewServiceStt()
 	default:
 		service = nil
 	}

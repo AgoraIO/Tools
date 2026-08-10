@@ -36,6 +36,8 @@ func Test_AllServices_RoundTrip(t *testing.T) {
 		NewServiceRtm("rtm-user"),
 		NewServiceStreamingWithUid("stream-channel", DataMockUid),
 		NewServiceFpa(),
+		NewServiceConvoAI(),
+		NewServiceStt(),
 		NewServiceChat("chat-user"),
 		NewServiceFCdnWithUid("fcdn-channel", DataMockUid),
 		NewServiceApaas("room-uuid", "user-uuid", 2),
@@ -51,6 +53,8 @@ func Test_AllServices_RoundTrip(t *testing.T) {
 			typed.AddPrivilege(PrivilegeStreamingPublishMixStream, DataMockExpire)
 		case *ServiceFpa:
 			typed.AddPrivilege(PrivilegeLogin, DataMockExpire)
+		case *ServiceConvoAI:
+		case *ServiceStt:
 		case *ServiceChat:
 			typed.AddPrivilege(PrivilegeChatUser, DataMockExpire)
 		case *ServiceFCdn:
@@ -87,6 +91,36 @@ func Test_AllServices_RoundTrip(t *testing.T) {
 	parsedApaas := parsed.GetServices(ServiceTypeApaas)[0].(*ServiceApaas)
 	AssertEqual(t, "room-uuid", parsedApaas.RoomUuid)
 	AssertEqual(t, int16(2), parsedApaas.Role)
+	AssertEqual(t, 1, len(parsed.GetServices(ServiceTypeConvoAI)))
+	AssertEqual(t, 1, len(parsed.GetServices(ServiceTypeStt)))
+	AssertEqual(t, 0, len(parsed.GetServices(ServiceTypeConvoAI)[0].(*ServiceConvoAI).Privileges))
+	AssertEqual(t, 0, len(parsed.GetServices(ServiceTypeStt)[0].(*ServiceStt).Privileges))
+}
+
+// Test_AccessToken_BuildAndParse_ConvoAIAndStt verifies the new service types round trip without privileges.
+func Test_AccessToken_BuildAndParse_ConvoAIAndStt(t *testing.T) {
+	accessToken := NewAccessToken(DataMockAppId, DataMockAppCertificate, DataMockExpire)
+	accessToken.IssueTs = DataMockIssueTs
+	accessToken.Salt = DataMockSalt
+
+	serviceConvoAI := NewServiceConvoAI()
+	serviceStt := NewServiceStt()
+	accessToken.AddService(serviceStt)
+	accessToken.AddService(serviceConvoAI)
+
+	token, err := accessToken.Build()
+	AssertNil(t, err)
+
+	parsed := CreateAccessToken()
+	res, err := parsed.Parse(token)
+	AssertNil(t, err)
+	AssertEqual(t, true, res)
+	AssertEqual(t, 1, len(parsed.GetServices(ServiceTypeConvoAI)))
+	AssertEqual(t, 1, len(parsed.GetServices(ServiceTypeStt)))
+	AssertEqual(t, uint16(ServiceTypeConvoAI), parsed.GetServices(ServiceTypeConvoAI)[0].(*ServiceConvoAI).Type)
+	AssertEqual(t, uint16(ServiceTypeStt), parsed.GetServices(ServiceTypeStt)[0].(*ServiceStt).Type)
+	AssertEqual(t, 0, len(parsed.GetServices(ServiceTypeConvoAI)[0].(*ServiceConvoAI).Privileges))
+	AssertEqual(t, 0, len(parsed.GetServices(ServiceTypeStt)[0].(*ServiceStt).Privileges))
 }
 
 // Test_ServicePackingErrors verifies that service serializers return writer failures.
