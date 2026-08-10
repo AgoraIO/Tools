@@ -129,6 +129,40 @@ class ServiceFpa(Service):
         return buffer
 
 
+class ServiceConvoAI(Service):
+    kServiceType = 9
+
+    def __init__(self):
+        """Create a ConvoAI service with an empty privilege map."""
+        super(ServiceConvoAI, self).__init__(ServiceConvoAI.kServiceType)
+
+    def pack(self):
+        """Serialize the ConvoAI service and privileges."""
+        return super(ServiceConvoAI, self).pack()
+
+    def unpack(self, buffer):
+        """Deserialize ConvoAI privileges and return the remaining buffer."""
+        buffer = super(ServiceConvoAI, self).unpack(buffer)
+        return buffer
+
+
+class ServiceStt(Service):
+    kServiceType = 10
+
+    def __init__(self):
+        """Create an STT service with an empty privilege map."""
+        super(ServiceStt, self).__init__(ServiceStt.kServiceType)
+
+    def pack(self):
+        """Serialize the STT service and privileges."""
+        return super(ServiceStt, self).pack()
+
+    def unpack(self, buffer):
+        """Deserialize STT privileges and return the remaining buffer."""
+        buffer = super(ServiceStt, self).unpack(buffer)
+        return buffer
+
+
 class ServiceChat(Service):
     kServiceType = 5
 
@@ -282,6 +316,8 @@ class AccessToken:
         ServiceRtm.kServiceType: ServiceRtm,
         ServiceStreaming.kServiceType: ServiceStreaming,
         ServiceFpa.kServiceType: ServiceFpa,
+        ServiceConvoAI.kServiceType: ServiceConvoAI,
+        ServiceStt.kServiceType: ServiceStt,
         ServiceChat.kServiceType: ServiceChat,
         ServiceFCdn.kServiceType: ServiceFCdn,
         ServiceApaas.kServiceType: ServiceApaas,
