@@ -267,6 +267,70 @@ class ServiceFpa : public Service {
   ServiceFpa &operator=(ServiceFpa &&) = default;
 };
 
+class ServiceConvoAI : public Service {
+ public:
+  enum {
+    kServiceType = 9,
+  };
+
+ public:
+  // Creates a ConvoAI service.
+  ServiceConvoAI() : Service(kServiceType) {}
+
+  // Serializes the ConvoAI service payload.
+  virtual std::string PackService() override { return Pack(this); }
+
+  // Deserializes the ConvoAI service payload.
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  // Creates an independent copy of the ConvoAI service.
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceConvoAI(*this)); }
+
+  // Serializes the ConvoAI privileges.
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceConvoAI *x) { return p << dynamic_cast<const Service *>(x); }
+
+  // Deserializes the ConvoAI privileges.
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceConvoAI *x) { return p >> dynamic_cast<Service *>(x); }
+
+ protected:
+  ServiceConvoAI(const ServiceConvoAI &) = default;
+  ServiceConvoAI(ServiceConvoAI &&) = default;
+  ServiceConvoAI &operator=(const ServiceConvoAI &) = default;
+  ServiceConvoAI &operator=(ServiceConvoAI &&) = default;
+};
+
+class ServiceStt : public Service {
+ public:
+  enum {
+    kServiceType = 10,
+  };
+
+ public:
+  // Creates an STT service.
+  ServiceStt() : Service(kServiceType) {}
+
+  // Serializes the STT service payload.
+  virtual std::string PackService() override { return Pack(this); }
+
+  // Deserializes the STT service payload.
+  virtual void UnpackService(Unpacker *unpacker) override { *unpacker >> this; }
+
+  // Creates an independent copy of the STT service.
+  virtual std::unique_ptr<Service> Clone() const override { return std::unique_ptr<Service>(new ServiceStt(*this)); }
+
+  // Serializes the STT privileges.
+  friend agora::tools::Packer &operator<<(agora::tools::Packer &p, const ServiceStt *x) { return p << dynamic_cast<const Service *>(x); }
+
+  // Deserializes the STT privileges.
+  friend agora::tools::Unpacker &operator>>(agora::tools::Unpacker &p, ServiceStt *x) { return p >> dynamic_cast<Service *>(x); }
+
+ protected:
+  ServiceStt(const ServiceStt &) = default;
+  ServiceStt(ServiceStt &&) = default;
+  ServiceStt &operator=(const ServiceStt &) = default;
+  ServiceStt &operator=(ServiceStt &&) = default;
+};
+
 class ServiceChat : public Service {
  public:
   enum {
@@ -490,6 +554,8 @@ static const std::map<uint16_t, Service *(*)()> kServiceCreator = {
     {ServiceRtm::kServiceType, ServiceCreator<ServiceRtm>::New},
     {ServiceStreaming::kServiceType, ServiceCreator<ServiceStreaming>::New},
     {ServiceFpa::kServiceType, ServiceCreator<ServiceFpa>::New},
+    {ServiceConvoAI::kServiceType, ServiceCreator<ServiceConvoAI>::New},
+    {ServiceStt::kServiceType, ServiceCreator<ServiceStt>::New},
     {ServiceChat::kServiceType, ServiceCreator<ServiceChat>::New},
     {ServiceFCdn::kServiceType, ServiceCreator<ServiceFCdn>::New},
     {ServiceApaas::kServiceType, ServiceCreator<ServiceApaas>::New},

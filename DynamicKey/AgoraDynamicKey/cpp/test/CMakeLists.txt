@@ -16,6 +16,7 @@ add_executable(test.exe
     AccessToken2_test.cpp
     ApaasTokenBuilder_test.cpp
     ChatTokenBuilder2_test.cpp
+    ConvoAITokenBuilder_test.cpp
     DynamicKey_test.cpp
     DynamicKey2_test.cpp
     DynamicKey3_test.cpp
@@ -26,7 +27,7 @@ add_executable(test.exe
     RtcTokenBuilder2_test.cpp
     RtmTokenBuilder_test.cpp
     RtmTokenBuilder2_test.cpp
+    SttTokenBuilder_test.cpp
     ../src/md5/md5.cpp
     main.cpp
 )
-
