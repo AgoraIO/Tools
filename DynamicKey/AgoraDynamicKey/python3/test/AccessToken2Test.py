@@ -238,6 +238,71 @@ class AccessToken2Test(unittest.TestCase):
             {0: {0: ['message-a', 'message-b']}, 1: {1: ['stream-a']}, 4: {0: ['user-a']}},
             rtm2.get_permissions().details)
 
+    def test_service_convoai(self):
+        """Build and parse a ConvoAI service."""
+        service = ServiceConvoAI()
+
+        self.__token.add_service(service)
+        parser = AccessToken()
+
+        token = self.__token.build()
+        self.assertTrue(parser.from_string(token))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+        services = parser.get_services(ServiceConvoAI.kServiceType)
+        self.assertEqual(1, len(services))
+        self.assertEqual({}, services[0]._Service__privileges)
+
+    def test_service_stt(self):
+        """Build and parse an STT service."""
+        service = ServiceStt()
+
+        self.__token.add_service(service)
+        parser = AccessToken()
+
+        token = self.__token.build()
+        self.assertTrue(parser.from_string(token))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+
+        services = parser.get_services(ServiceStt.kServiceType)
+        self.assertEqual(1, len(services))
+        self.assertEqual({}, services[0]._Service__privileges)
+
+    def test_multi_service_with_convoai_and_stt_sorted(self):
+        """Verify ConvoAI and STT services are parsed after type-based sorting."""
+        stt = ServiceStt()
+        convoai = ServiceConvoAI()
+
+        self.__token.add_service(stt)
+        self.__token.add_service(convoai)
+
+        parser = AccessToken()
+        token = self.__token.build()
+
+        self.assertTrue(parser.from_string(token))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+        self.assertEqual(
+            [ServiceConvoAI.kServiceType, ServiceStt.kServiceType],
+            [service.service_type() for service in parser.services])
+        self.assertEqual({}, parser.get_services(ServiceConvoAI.kServiceType)[0]._Service__privileges)
+        self.assertEqual({}, parser.get_services(ServiceStt.kServiceType)[0]._Service__privileges)
+
+    def test_rtm2_permissions_replace_same_resource_type(self):
+        """Verify RTM2 permissions reuse the same resource type bucket."""
+        permissions = ServiceRtm2.Permissions()
+
+        permissions.add(ServiceRtm2.Permissions.kUsers, ServiceRtm2.Permissions.kRead, ['user-a'])
+        permissions.add(ServiceRtm2.Permissions.kUsers, ServiceRtm2.Permissions.kWrite, ['user-b'])
+
+        self.assertEqual(
+            {
+                ServiceRtm2.Permissions.kUsers: {
+                    ServiceRtm2.Permissions.kRead: ['user-a'],
+                    ServiceRtm2.Permissions.kWrite: ['user-b'],
+                }
+            },
+            permissions.details)
+
     def test_extended_service_numeric_uid_conversion(self):
         """Verify deterministic Streaming and FCDN generation and UID conversion against C++."""
         streaming_uid = ServiceStreaming(self.__channel_name, self.__uid)
@@ -275,6 +340,7 @@ class AccessToken2Test(unittest.TestCase):
         self.assertEqual(
             [self.__uid_str, '', 'fcdn-account'],
             [service._ServiceFCdn__account.decode('utf-8') for service in fcdn])
+
     def test_parse_unknown_service_type(self):
         """Keep known services parsed before an unknown service type."""
         rtc = ServiceRtc(self.__channel_name, self.__uid)

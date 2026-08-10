@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+__copyright__ = "Copyright (c) 2014-2026 Agora.io, Inc."
+
+import os
+import sys
+import unittest
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from src.convoai_token_builder import *
+from src.RtcTokenBuilder2 import Role_Publisher, Role_Subscriber
+
+
+class TestConvoAITokenBuilder(unittest.TestCase):
+    def setUp(self) -> None:
+        """Create ConvoAI token fixtures shared by each test."""
+        self.__app_id = '970CA35de60c44645bbae8a215061b33'
+        self.__app_cert = '5CFd2fd1755d40ecb72977518be15d3b'
+        self.__channel_name = 'convoai-channel'
+        self.__rtc_account = 'convoai-rtc-user'
+        self.__rtm_user_id = 'convoai-rtm-user'
+        self.__rtc_token_expire = 3600
+        self.__join_channel_privilege_expire = 1800
+        self.__pub_audio_privilege_expire = 1700
+        self.__pub_video_privilege_expire = 1600
+        self.__pub_data_stream_privilege_expire = 1500
+        self.__rtm_token_expire = 1400
+
+    def test_build_token(self):
+        """Build and parse a publisher ConvoAI token."""
+        token = ConvoAITokenBuilder.build_token(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account,
+            Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
+            self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
+            self.__pub_data_stream_privilege_expire, self.__rtm_user_id, self.__rtm_token_expire)
+        parser = AccessToken()
+
+        self.assertTrue(parser.from_string(token))
+        self.assertTrue(parser.verify_signature(self.__app_cert))
+        self.assertEqual(parser._AccessToken__app_id, self.__app_id.encode('utf-8'))
+        self.assertEqual(parser._AccessToken__expire, self.__rtc_token_expire)
+
+        rtc_services = parser.get_services(ServiceRtc.kServiceType)
+        self.assertEqual(1, len(rtc_services))
+        self.assertEqual(self.__channel_name.encode('utf-8'), rtc_services[0]._ServiceRtc__channel_name)
+        self.assertEqual(self.__rtc_account.encode('utf-8'), rtc_services[0]._ServiceRtc__uid)
+        self.assertEqual(
+            self.__join_channel_privilege_expire,
+            rtc_services[0]._Service__privileges[ServiceRtc.kPrivilegeJoinChannel])
+        self.assertEqual(
+            self.__pub_audio_privilege_expire,
+            rtc_services[0]._Service__privileges[ServiceRtc.kPrivilegePublishAudioStream])
+        self.assertEqual(
+            self.__pub_video_privilege_expire,
+            rtc_services[0]._Service__privileges[ServiceRtc.kPrivilegePublishVideoStream])
+        self.assertEqual(
+            self.__pub_data_stream_privilege_expire,
+            rtc_services[0]._Service__privileges[ServiceRtc.kPrivilegePublishDataStream])
+
+        rtm_services = parser.get_services(ServiceRtm.kServiceType)
+        self.assertEqual(1, len(rtm_services))
+        self.assertEqual(self.__rtm_user_id.encode('utf-8'), rtm_services[0]._ServiceRtm__user_id)
+        self.assertEqual(self.__rtm_token_expire, rtm_services[0]._Service__privileges[ServiceRtm.kPrivilegeLogin])
+
+        convoai_services = parser.get_services(ServiceConvoAI.kServiceType)
+        self.assertEqual(1, len(convoai_services))
+        self.assertEqual(ServiceConvoAI.kServiceType, convoai_services[0].service_type())
+        self.assertEqual({}, convoai_services[0]._Service__privileges)
+
+    def test_build_subscriber_token(self):
+        """Build and parse a subscriber ConvoAI token."""
+        token = ConvoAITokenBuilder.build_token(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account,
+            Role_Subscriber, self.__rtc_token_expire, self.__join_channel_privilege_expire,
+            self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
+            self.__pub_data_stream_privilege_expire, self.__rtm_user_id, self.__rtm_token_expire)
+        parser = AccessToken()
+
+        self.assertTrue(parser.from_string(token))
+        rtc_service = parser.get_services(ServiceRtc.kServiceType)[0]
+        self.assertEqual(
+            {ServiceRtc.kPrivilegeJoinChannel: self.__join_channel_privilege_expire},
+            rtc_service._Service__privileges)
+
+        rtm_service = parser.get_services(ServiceRtm.kServiceType)[0]
+        self.assertEqual(self.__rtm_token_expire, rtm_service._Service__privileges[ServiceRtm.kPrivilegeLogin])
+
+    def test_build_token_with_invalid_credentials(self):
+        """Return an empty string when credentials are invalid."""
+        self.assertEqual(
+            '',
+            ConvoAITokenBuilder.build_token(
+                'invalid', self.__app_cert, self.__channel_name, self.__rtc_account,
+                Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
+                self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
+                self.__pub_data_stream_privilege_expire, self.__rtm_user_id, self.__rtm_token_expire))
+        self.assertEqual(
+            '',
+            ConvoAITokenBuilder.build_token(
+                self.__app_id, 'invalid', self.__channel_name, self.__rtc_account,
+                Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
+                self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
+                self.__pub_data_stream_privilege_expire, self.__rtm_user_id, self.__rtm_token_expire))

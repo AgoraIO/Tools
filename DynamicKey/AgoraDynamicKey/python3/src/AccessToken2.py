@@ -301,6 +301,40 @@ class ServiceRtm2(Service):
         return self.__permissions
 
 
+class ServiceConvoAI(Service):
+    kServiceType = 9
+
+    def __init__(self):
+        """Create a ConvoAI service with an empty privilege map."""
+        super(ServiceConvoAI, self).__init__(ServiceConvoAI.kServiceType)
+
+    def pack(self):
+        """Serialize the ConvoAI service and privileges."""
+        return super(ServiceConvoAI, self).pack()
+
+    def unpack(self, buffer):
+        """Deserialize ConvoAI privileges and return the remaining buffer."""
+        buffer = super(ServiceConvoAI, self).unpack(buffer)
+        return buffer
+
+
+class ServiceStt(Service):
+    kServiceType = 10
+
+    def __init__(self):
+        """Create an STT service with an empty privilege map."""
+        super(ServiceStt, self).__init__(ServiceStt.kServiceType)
+
+    def pack(self):
+        """Serialize the STT service and privileges."""
+        return super(ServiceStt, self).pack()
+
+    def unpack(self, buffer):
+        """Deserialize STT privileges and return the remaining buffer."""
+        buffer = super(ServiceStt, self).unpack(buffer)
+        return buffer
+
+
 class AccessToken:
     kServices = {
         ServiceRtc.kServiceType: ServiceRtc,
@@ -311,6 +345,8 @@ class AccessToken:
         ServiceFCdn.kServiceType: ServiceFCdn,
         ServiceApaas.kServiceType: ServiceApaas,
         ServiceRtm2.kServiceType: ServiceRtm2,
+        ServiceConvoAI.kServiceType: ServiceConvoAI,
+        ServiceStt.kServiceType: ServiceStt,
     }
 
     def __init__(self, app_id='', app_certificate='', issue_ts=0, expire=900):
