@@ -140,6 +140,46 @@ module AgoraDynamicKey2
     end
   end
 
+  # Stores a ConvoAI service payload.
+  class ServiceConvoAI < Service
+    SERVICE_TYPE = 9
+
+    # Creates a ConvoAI service.
+    def initialize
+      super(SERVICE_TYPE)
+    end
+
+    # Serializes the ConvoAI service payload.
+    def pack
+      super()
+    end
+
+    # Deserializes the ConvoAI service payload.
+    def unpack(data)
+      _, data = super(data)
+    end
+  end
+
+  # Stores an STT service payload.
+  class ServiceStt < Service
+    SERVICE_TYPE = 10
+
+    # Creates an STT service.
+    def initialize
+      super(SERVICE_TYPE)
+    end
+
+    # Serializes the STT service payload.
+    def pack
+      super()
+    end
+
+    # Deserializes the STT service payload.
+    def unpack(data)
+      _, data = super(data)
+    end
+  end
+
   # Stores a Chat service payload.
   class ServiceChat < Service
     attr_accessor :uid
@@ -325,6 +365,8 @@ module AgoraDynamicKey2
                  ServiceRtm::SERVICE_TYPE => ServiceRtm,
                  ServiceStreaming::SERVICE_TYPE => ServiceStreaming,
                  ServiceFpa::SERVICE_TYPE => ServiceFpa,
+                 ServiceConvoAI::SERVICE_TYPE => ServiceConvoAI,
+                 ServiceStt::SERVICE_TYPE => ServiceStt,
                  ServiceChat::SERVICE_TYPE => ServiceChat,
                  ServiceFCdn::SERVICE_TYPE => ServiceFCdn,
                  ServiceApaas::SERVICE_TYPE => ServiceApaas,
