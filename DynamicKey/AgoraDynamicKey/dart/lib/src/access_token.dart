@@ -17,6 +17,8 @@ class Service {
   static const int FCDN = 6;
   static const int APAAS = 7;
   static const int RTM2 = 8;
+  static const int CONVOAI = 9;
+  static const int STT = 10;
   static const int EDUCATION = APAAS;
 
   final int serviceType;
@@ -155,6 +157,18 @@ class ServiceFpa extends Service {
 
   /// Creates an FPA service.
   ServiceFpa() : super(Service.FPA);
+}
+
+/// Represents a ConvoAI service payload.
+class ServiceConvoAI extends Service {
+  /// Creates a ConvoAI service.
+  ServiceConvoAI() : super(Service.CONVOAI);
+}
+
+/// Represents an STT service payload.
+class ServiceStt extends Service {
+  /// Creates an STT service.
+  ServiceStt() : super(Service.STT);
 }
 
 /// Represents a Chat service payload.
@@ -563,6 +577,10 @@ class AccessToken {
         return ServiceApaas('', _legacyUid);
       case Service.RTM2:
         return ServiceRtm2(_legacyUid);
+      case Service.CONVOAI:
+        return ServiceConvoAI();
+      case Service.STT:
+        return ServiceStt();
       default:
         return Service(serviceType);
     }
@@ -620,6 +638,10 @@ Service? _createKnownService(int serviceType) {
       return ServiceApaas();
     case Service.RTM2:
       return ServiceRtm2();
+    case Service.CONVOAI:
+      return ServiceConvoAI();
+    case Service.STT:
+      return ServiceStt();
     default:
       return null;
   }
