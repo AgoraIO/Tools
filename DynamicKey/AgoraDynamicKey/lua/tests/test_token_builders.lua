@@ -2,10 +2,12 @@ local luaunit = require("luaunit")
 local access_token = require("agora_token.access_token")
 local apaas_token_builder = require("agora_token.apaas_token_builder")
 local chat_token_builder = require("agora_token.chat_token_builder")
+local convoai_token_builder = require("agora_token.convoai_token_builder")
 local education_token_builder = require("agora_token.education_token_builder")
 local fpa_token_builder = require("agora_token.fpa_token_builder")
 local rtc_token_builder = require("agora_token.rtc_token_builder")
 local rtm_token_builder = require("agora_token.rtm_token_builder")
+local stt_token_builder = require("agora_token.stt_token_builder")
 
 local APP_ID = "970CA35de60c44645bbae8a215061b33"
 local APP_CERTIFICATE = "5CFd2fd1755d40ecb72977518be15d3b"
@@ -241,6 +243,48 @@ function test_education_token_builder()
             access_token.PRIVILEGE_APAAS_APP
         ]
     )
+end
+
+-- Verifies ConvoAI Builder token contents.
+function test_convoai_token_builder()
+    local token = convoai_token_builder.build_token(
+        APP_ID,
+        APP_CERTIFICATE,
+        CHANNEL_NAME,
+        UID_STRING,
+        rtc_token_builder.ROLE_PUBLISHER,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        USER_ID,
+        EXPIRE
+    )
+    local parsed = parse_token(token)
+    luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_CONVOAI))
+    luaunit.assertEquals(USER_ID, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
+end
+
+-- Verifies STT Builder token contents.
+function test_stt_token_builder()
+    local token = stt_token_builder.build_token(
+        APP_ID,
+        APP_CERTIFICATE,
+        CHANNEL_NAME,
+        UID_STRING,
+        rtc_token_builder.ROLE_SUBSCRIBER,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        EXPIRE,
+        USER_ID,
+        EXPIRE
+    )
+    local parsed = parse_token(token)
+    luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_STT))
+    luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_RTM))
 end
 
 os.exit(luaunit.LuaUnit.run())

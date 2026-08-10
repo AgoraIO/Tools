@@ -12,6 +12,8 @@ local SERVICE_TYPE_CHAT = 5
 local SERVICE_TYPE_FCDN = 6
 local SERVICE_TYPE_APAAS = 7
 local SERVICE_TYPE_RTM2 = 8
+local SERVICE_TYPE_CONVOAI = 9
+local SERVICE_TYPE_STT = 10
 
 -- Rtc
 local PRIVILEGE_JOIN_CHANNEL = 1
@@ -229,6 +231,52 @@ end
 function ServiceChat:unpack(data)
     data = self.service:unpack(data)
     self.user_id, data = utils.unpack_string(data)
+    return data
+end
+
+local ServiceConvoAI = {}
+ServiceConvoAI.__index = ServiceConvoAI
+
+-- Creates a ConvoAI service.
+local function new_service_convoai()
+    local instance = {
+        service = new_service(SERVICE_TYPE_CONVOAI),
+    }
+    setmetatable(instance, ServiceConvoAI)
+    return instance
+end
+
+-- Packs a ConvoAI service payload.
+function ServiceConvoAI:pack()
+    return self.service:pack()
+end
+
+-- Unpacks a ConvoAI service payload and returns the remaining data.
+function ServiceConvoAI:unpack(data)
+    data = self.service:unpack(data)
+    return data
+end
+
+local ServiceStt = {}
+ServiceStt.__index = ServiceStt
+
+-- Creates an STT service.
+local function new_service_stt()
+    local instance = {
+        service = new_service(SERVICE_TYPE_STT),
+    }
+    setmetatable(instance, ServiceStt)
+    return instance
+end
+
+-- Packs an STT service payload.
+function ServiceStt:pack()
+    return self.service:pack()
+end
+
+-- Unpacks an STT service payload and returns the remaining data.
+function ServiceStt:unpack(data)
+    data = self.service:unpack(data)
     return data
 end
 
@@ -630,6 +678,10 @@ function AccessToken:new_service(service_type)
         return new_service_streaming("", "")
     elseif service_type == SERVICE_TYPE_FPA then
         return new_service_fpa()
+    elseif service_type == SERVICE_TYPE_CONVOAI then
+        return new_service_convoai()
+    elseif service_type == SERVICE_TYPE_STT then
+        return new_service_stt()
     elseif service_type == SERVICE_TYPE_CHAT then
         return new_service_chat("")
     elseif service_type == SERVICE_TYPE_FCDN then
@@ -673,6 +725,8 @@ return {
     new_service_rtm = new_service_rtm,
     new_service_streaming = new_service_streaming,
     new_service_fpa = new_service_fpa,
+    new_service_convoai = new_service_convoai,
+    new_service_stt = new_service_stt,
     new_service_chat = new_service_chat,
     new_service_fcdn = new_service_fcdn,
     new_service_apaas = new_service_apaas,
@@ -703,6 +757,8 @@ return {
     SERVICE_TYPE_RTM = SERVICE_TYPE_RTM,
     SERVICE_TYPE_STREAMING = SERVICE_TYPE_STREAMING,
     SERVICE_TYPE_FPA = SERVICE_TYPE_FPA,
+    SERVICE_TYPE_CONVOAI = SERVICE_TYPE_CONVOAI,
+    SERVICE_TYPE_STT = SERVICE_TYPE_STT,
     SERVICE_TYPE_CHAT = SERVICE_TYPE_CHAT,
     SERVICE_TYPE_FCDN = SERVICE_TYPE_FCDN,
     SERVICE_TYPE_APAAS = SERVICE_TYPE_APAAS,
@@ -711,6 +767,8 @@ return {
     ServiceRtm = ServiceRtm,
     ServiceStreaming = ServiceStreaming,
     ServiceFpa = ServiceFpa,
+    ServiceConvoAI = ServiceConvoAI,
+    ServiceStt = ServiceStt,
     ServiceChat = ServiceChat,
     ServiceFCdn = ServiceFCdn,
     ServiceApaas = ServiceApaas,
