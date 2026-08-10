@@ -17,6 +17,8 @@ pub const SERVICE_TYPE_CHAT: u16 = 5;
 pub const SERVICE_TYPE_FCDN: u16 = 6;
 pub const SERVICE_TYPE_APAAS: u16 = 7;
 pub const SERVICE_TYPE_RTM2: u16 = 8;
+pub const SERVICE_TYPE_CONVOAI: u16 = 9;
+pub const SERVICE_TYPE_STT: u16 = 10;
 
 // Rtc
 pub const PRIVILEGE_JOIN_CHANNEL: u16 = 1;
@@ -251,6 +253,68 @@ pub fn new_service_fpa() -> ServiceFpa {
 }
 
 impl IService for ServiceFpa {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn get_service_type(&self) -> u16 {
+        self.service.service_type
+    }
+
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        self.service.pack(w)
+    }
+
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.service.unpack(r)
+    }
+}
+
+#[derive(Debug)]
+/// Stores a ConvoAI service payload.
+pub struct ServiceConvoAI {
+    pub service: Service,
+}
+
+/// Creates a ConvoAI service.
+pub fn new_service_convoai() -> ServiceConvoAI {
+    ServiceConvoAI {
+        service: new_service(SERVICE_TYPE_CONVOAI),
+    }
+}
+
+impl IService for ServiceConvoAI {
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+
+    fn get_service_type(&self) -> u16 {
+        self.service.service_type
+    }
+
+    fn pack(&self, w: &mut dyn Write) -> Result<(), Error> {
+        self.service.pack(w)
+    }
+
+    fn unpack(&mut self, r: &mut dyn Read) -> Result<(), Error> {
+        self.service.unpack(r)
+    }
+}
+
+#[derive(Debug)]
+/// Stores an STT service payload.
+pub struct ServiceStt {
+    pub service: Service,
+}
+
+/// Creates an STT service.
+pub fn new_service_stt() -> ServiceStt {
+    ServiceStt {
+        service: new_service(SERVICE_TYPE_STT),
+    }
+}
+
+impl IService for ServiceStt {
     fn as_any(&self) -> &dyn Any {
         self
     }
@@ -692,6 +756,8 @@ fn create_service(service_type: u16) -> Option<Box<dyn IService>> {
         SERVICE_TYPE_RTM => Some(Box::new(new_service_rtm(""))),
         SERVICE_TYPE_STREAMING => Some(Box::new(new_service_streaming("", ""))),
         SERVICE_TYPE_FPA => Some(Box::new(new_service_fpa())),
+        SERVICE_TYPE_CONVOAI => Some(Box::new(new_service_convoai())),
+        SERVICE_TYPE_STT => Some(Box::new(new_service_stt())),
         SERVICE_TYPE_CHAT => Some(Box::new(new_service_chat(""))),
         SERVICE_TYPE_FCDN => Some(Box::new(new_service_fcdn("", ""))),
         SERVICE_TYPE_APAAS => Some(Box::new(new_service_apaas("", "", -1))),

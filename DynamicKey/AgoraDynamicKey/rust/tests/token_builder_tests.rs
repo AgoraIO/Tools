@@ -1,10 +1,11 @@
 use agora_token::access_token::{
-    self, AccessToken, ServiceApaas, ServiceChat, ServiceFpa, ServiceRtc, ServiceRtm, ServiceRtm2, PRIVILEGE_APAAS_APP, PRIVILEGE_APAAS_ROOM_USER,
+    self, AccessToken, ServiceApaas, ServiceChat, ServiceConvoAI, ServiceFpa, ServiceRtc, ServiceRtm, ServiceRtm2, ServiceStt, PRIVILEGE_APAAS_APP, PRIVILEGE_APAAS_ROOM_USER,
     PRIVILEGE_APAAS_USER, PRIVILEGE_CHAT_APP, PRIVILEGE_CHAT_USER, PRIVILEGE_JOIN_CHANNEL, PRIVILEGE_LOGIN, PRIVILEGE_PUBLISH_AUDIO_STREAM,
     PRIVILEGE_PUBLISH_DATA_STREAM, PRIVILEGE_PUBLISH_VIDEO_STREAM, RTM2_PERMISSION_READ, RTM2_PERMISSION_WRITE, RTM2_RESOURCE_MESSAGE_CHANNELS,
-    RTM2_RESOURCE_STREAM_CHANNELS, SERVICE_TYPE_APAAS, SERVICE_TYPE_CHAT, SERVICE_TYPE_FPA, SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_RTM2,
+    RTM2_RESOURCE_STREAM_CHANNELS, SERVICE_TYPE_APAAS, SERVICE_TYPE_CHAT, SERVICE_TYPE_CONVOAI, SERVICE_TYPE_FPA, SERVICE_TYPE_RTC, SERVICE_TYPE_RTM, SERVICE_TYPE_RTM2,
+    SERVICE_TYPE_STT,
 };
-use agora_token::{apaas_token_builder, chat_token_builder, education_token_builder, fpa_token_builder, rtc_token_builder, rtm_token_builder};
+use agora_token::{apaas_token_builder, chat_token_builder, convoai_token_builder, education_token_builder, fpa_token_builder, rtc_token_builder, rtm_token_builder, stt_token_builder};
 
 const APP_ID: &str = "970CA35de60c44645bbae8a215061b33";
 const APP_CERT: &str = "5CFd2fd1755d40ecb72977518be15d3b";
@@ -178,4 +179,63 @@ fn test_rtm2_token_builder() {
     assert_eq!(USER_ID, rtm2.user_id);
     assert_eq!(permissions, rtm2.permissions);
     assert_eq!(EXPIRE, rtm2.service.privileges[&PRIVILEGE_LOGIN]);
+}
+
+/// Verifies ConvoAI token generation with RTC and RTM services.
+#[test]
+fn test_convoai_token_builder() {
+    let parsed = parse_token(
+        convoai_token_builder::build_token(
+            APP_ID,
+            APP_CERT,
+            CHANNEL_NAME,
+            USER_ID,
+            rtc_token_builder::ROLE_PUBLISHER,
+            3600,
+            1800,
+            1700,
+            1600,
+            1500,
+            "convoai-rtm-user",
+            1400,
+        )
+        .unwrap(),
+    );
+
+    let rtc = get_service::<ServiceRtc>(&parsed, SERVICE_TYPE_RTC);
+    let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
+    let convoai = get_service::<ServiceConvoAI>(&parsed, SERVICE_TYPE_CONVOAI);
+    assert_eq!(USER_ID, rtc.uid);
+    assert_eq!("convoai-rtm-user", rtm.user_id);
+    assert!(convoai.service.privileges.is_empty());
+}
+
+/// Verifies STT token generation with RTC and RTM services.
+#[test]
+fn test_stt_token_builder() {
+    let parsed = parse_token(
+        stt_token_builder::build_token(
+            APP_ID,
+            APP_CERT,
+            CHANNEL_NAME,
+            USER_ID,
+            rtc_token_builder::ROLE_SUBSCRIBER,
+            3600,
+            1800,
+            1700,
+            1600,
+            1500,
+            "stt-rtm-user",
+            1400,
+        )
+        .unwrap(),
+    );
+
+    let rtc = get_service::<ServiceRtc>(&parsed, SERVICE_TYPE_RTC);
+    let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
+    let stt = get_service::<ServiceStt>(&parsed, SERVICE_TYPE_STT);
+    assert_eq!(USER_ID, rtc.uid);
+    assert_eq!(1, rtc.service.privileges.len());
+    assert_eq!("stt-rtm-user", rtm.user_id);
+    assert!(stt.service.privileges.is_empty());
 }
