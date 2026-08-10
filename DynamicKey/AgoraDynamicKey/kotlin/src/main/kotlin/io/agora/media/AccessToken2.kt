@@ -116,6 +116,8 @@ class AccessToken2 {
         SERVICE_TYPE_RTM -> ServiceRtm()
         SERVICE_TYPE_STREAMING -> ServiceStreaming()
         SERVICE_TYPE_FPA -> ServiceFpa()
+        SERVICE_TYPE_CONVOAI -> ServiceConvoAI()
+        SERVICE_TYPE_STT -> ServiceStt()
         SERVICE_TYPE_CHAT -> ServiceChat()
         SERVICE_TYPE_FCDN -> ServiceFCdn()
         SERVICE_TYPE_APAAS -> ServiceApaas()
@@ -312,6 +314,12 @@ class AccessToken2 {
     /** Represents FPA login privileges. */
     class ServiceFpa : Service(SERVICE_TYPE_FPA)
 
+    /** Represents ConvoAI service membership. */
+    class ServiceConvoAI : Service(SERVICE_TYPE_CONVOAI)
+
+    /** Represents STT service membership. */
+    class ServiceStt : Service(SERVICE_TYPE_STT)
+
     /** Represents Chat user or application privileges. */
     class ServiceChat(var userId: String = "") : Service(SERVICE_TYPE_CHAT) {
         /** Serializes the Chat service payload. */
@@ -427,6 +435,8 @@ class AccessToken2 {
         const val SERVICE_TYPE_RTM: Short = 2
         const val SERVICE_TYPE_STREAMING: Short = 3
         const val SERVICE_TYPE_FPA: Short = 4
+        const val SERVICE_TYPE_CONVOAI: Short = 9
+        const val SERVICE_TYPE_STT: Short = 10
         const val SERVICE_TYPE_CHAT: Short = 5
         const val SERVICE_TYPE_FCDN: Short = 6
         const val SERVICE_TYPE_APAAS: Short = 7
