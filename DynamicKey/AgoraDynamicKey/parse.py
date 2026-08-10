@@ -78,6 +78,14 @@ service = {
             0: {'name': 'read'},
             1: {'name': 'write'}
         }
+    },
+    9: {
+        'name': 'ConvoAI',
+        'privilege': {}
+    },
+    10: {
+        'name': 'STT',
+        'privilege': {}
     }
 }
 
@@ -185,6 +193,9 @@ def parse_token(token):
             lines.append('    %-15s: %s' % (field_name, field_value))
 
         lines.append('    privileges:')
+        if not item._Service__privileges:
+            lines.append('      (none)')
+
         for privilege, privilege_expire in item._Service__privileges.items():
             privilege_info = service_info['privilege'].get(privilege)
             privilege_name = privilege_info['name'] if privilege_info else 'unknown'
@@ -201,6 +212,7 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         token = sys.argv[1]
     else:
-        token = '007eJxTYNi/pqL4zazPf+P2/HDX+9fA/KLX+6oIz5O5Wzw2vzTSPdqtwGBpbuDsaGyakmpmkGxiYmZimpSUmGqRaGRoamBmmGRs/P87S7IAHwOD/mEfBlYGRgYWIAbxmcAkM5hkAZMKDOYp5kbGZqapSZYWxiYWpsaW5qnGqcZplikmZgZJKSmJXAxGFhZGxiaGRubGTEBzICYhi7LARVkZmFBsQlbFDrQX0xV8DEX5+bnxpaWZKfElqcUlfAylxalFCP7//wBAqz0L'
+        print('Usage: python3 parse.py YOUR_TOKEN')
+        sys.exit(2)
 
     print(parse_token(token))

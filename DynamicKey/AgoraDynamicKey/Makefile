@@ -160,7 +160,8 @@ help:
 # Parses the token supplied through the token variable.
 parse:
 	@echo ">> parse token"
-	python3 parse.py $(token)
+	@[ -n "$(token)" ] || { echo 'usage: make parse token=YOUR_TOKEN'; exit 2; }
+	python3 parse.py "$(token)"
 	@echo ">> done"
 
 # Verifies that the Docker CLI and daemon are available.

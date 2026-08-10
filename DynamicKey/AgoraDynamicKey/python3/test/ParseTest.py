@@ -14,9 +14,11 @@ from python3.src.AccessToken2 import (
     AccessToken,
     Service,
     ServiceApaas,
+    ServiceConvoAI,
     ServiceFCdn,
     ServiceRtc,
     ServiceRtm2,
+    ServiceStt,
     ServiceStreaming,
 )
 
@@ -124,6 +126,17 @@ class ParseTest(unittest.TestCase):
         self.assertIn('streamChannels (1):', result)
         self.assertIn('write (1): (none)', result)
         self.assertNotIn('AccessToken2.ServiceRtm2.Permissions object', result)
+
+    def test_parse_convoai_and_stt_services(self):
+        """Display ConvoAI and STT services as known empty-privilege services."""
+        result = parse_token(self.create_token([ServiceConvoAI(), ServiceStt()]))
+
+        self.assertIn('ConvoAI (ServiceType: 9)', result)
+        self.assertIn('STT (ServiceType: 10)', result)
+        self.assertEqual(2, result.count('    privileges:'))
+        self.assertEqual(2, result.count('      (none)'))
+        self.assertNotIn('Unknown (ServiceType: 9)', result)
+        self.assertNotIn('Unknown (ServiceType: 10)', result)
 
     @patch('parse.time.time', return_value=100)
     def test_expiration_status(self, _):
