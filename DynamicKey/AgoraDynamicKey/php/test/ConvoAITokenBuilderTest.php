@@ -7,15 +7,15 @@ class ConvoAITokenBuilderTest
 {
     public $appId = "970CA35de60c44645bbae8a215061b33";
     public $appCertificate = "5CFd2fd1755d40ecb72977518be15d3b";
-    public $channelName = "convoai-channel";
-    public $rtcAccount = "convoai-rtc-user";
-    public $rtmUserId = "convoai-rtm-user";
-    public $rtcTokenExpire = 3600;
-    public $joinChannelPrivilegeExpire = 1800;
-    public $pubAudioPrivilegeExpire = 1700;
-    public $pubVideoPrivilegeExpire = 1600;
-    public $pubDataStreamPrivilegeExpire = 1500;
-    public $rtmTokenExpire = 1400;
+    public $channelName = "7d72365eb983485397e3e3f9d460bdda";
+    public $rtcAccount = "2882341273";
+    public $rtmUserId = "2882341273";
+    public $rtcTokenExpire = 600;
+    public $joinChannelPrivilegeExpire = 600;
+    public $pubAudioPrivilegeExpire = 600;
+    public $pubVideoPrivilegeExpire = 600;
+    public $pubDataStreamPrivilegeExpire = 600;
+    public $rtmTokenExpire = 600;
 
     public function run()
     {

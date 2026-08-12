@@ -4,15 +4,15 @@ import 'package:agora_token_generator/agora_token_generator.dart';
 void main() {
   const appId = '970CA35de60c44645bbae8a215061b33';
   const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b';
-  const channelName = 'stt-channel';
-  const rtcAccount = 'stt-rtc-user';
-  const rtmUserId = 'stt-rtm-user';
-  const rtcTokenExpireSeconds = 3600;
-  const joinChannelPrivilegeExpire = 1800;
-  const publishAudioPrivilegeExpire = 1700;
-  const publishVideoPrivilegeExpire = 1600;
-  const publishDataPrivilegeExpire = 1500;
-  const rtmTokenExpireSeconds = 1400;
+  const channelName = '7d72365eb983485397e3e3f9d460bdda';
+  const rtcAccount = '2882341273';
+  const rtmUserId = '2882341273';
+  const rtcTokenExpireSeconds = 600;
+  const joinChannelPrivilegeExpire = 600;
+  const publishAudioPrivilegeExpire = 600;
+  const publishVideoPrivilegeExpire = 600;
+  const publishDataPrivilegeExpire = 600;
+  const rtmTokenExpireSeconds = 600;
 
   test('builds a publisher STT token', () {
     final token = SttTokenBuilder.buildToken(

@@ -109,11 +109,11 @@ function test_rtc_token_builder_entry_points()
         EXPIRE,
         EXPIRE,
         EXPIRE,
-        USER_ID,
+        UID_STRING,
         EXPIRE
     )
     parsed = parse_token(token)
-    luaunit.assertEquals(USER_ID, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
+    luaunit.assertEquals(UID_STRING, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
 end
 
 -- Verifies RTM Builder token contents.
@@ -258,12 +258,12 @@ function test_convoai_token_builder()
         EXPIRE,
         EXPIRE,
         EXPIRE,
-        USER_ID,
+        UID_STRING,
         EXPIRE
     )
     local parsed = parse_token(token)
     luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_CONVOAI))
-    luaunit.assertEquals(USER_ID, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
+    luaunit.assertEquals(UID_STRING, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
 end
 
 -- Verifies STT Builder token contents.
@@ -279,7 +279,7 @@ function test_stt_token_builder()
         EXPIRE,
         EXPIRE,
         EXPIRE,
-        USER_ID,
+        UID_STRING,
         EXPIRE
     )
     local parsed = parse_token(token)

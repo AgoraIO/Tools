@@ -4,15 +4,15 @@ require_relative '../../lib/dynamic_key2'
 describe 'AgoraDynamicKey2::ConvoAITokenBuilder' do
   let(:app_id) { '970CA35de60c44645bbae8a215061b33' }
   let(:app_certificate) { '5CFd2fd1755d40ecb72977518be15d3b' }
-  let(:channel_name) { 'convoai-channel' }
-  let(:rtc_account) { 'convoai-rtc-user' }
-  let(:rtm_user_id) { 'convoai-rtm-user' }
-  let(:rtc_token_expire) { 3600 }
-  let(:join_channel_privilege_expire) { 1800 }
-  let(:pub_audio_privilege_expire) { 1700 }
-  let(:pub_video_privilege_expire) { 1600 }
-  let(:pub_data_stream_privilege_expire) { 1500 }
-  let(:rtm_token_expire) { 1400 }
+  let(:channel_name) { '7d72365eb983485397e3e3f9d460bdda' }
+  let(:rtc_account) { '2882341273' }
+  let(:rtm_user_id) { '2882341273' }
+  let(:rtc_token_expire) { 600 }
+  let(:join_channel_privilege_expire) { 600 }
+  let(:pub_audio_privilege_expire) { 600 }
+  let(:pub_video_privilege_expire) { 600 }
+  let(:pub_data_stream_privilege_expire) { 600 }
+  let(:rtm_token_expire) { 600 }
 
   it 'builds a publisher token' do
     token = AgoraDynamicKey2::ConvoAITokenBuilder.build_token(

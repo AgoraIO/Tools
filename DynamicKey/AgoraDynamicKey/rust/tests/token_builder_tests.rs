@@ -191,13 +191,13 @@ fn test_convoai_token_builder() {
             CHANNEL_NAME,
             USER_ID,
             rtc_token_builder::ROLE_PUBLISHER,
-            3600,
-            1800,
-            1700,
-            1600,
-            1500,
-            "convoai-rtm-user",
-            1400,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            USER_ID,
+            EXPIRE,
         )
         .unwrap(),
     );
@@ -206,7 +206,7 @@ fn test_convoai_token_builder() {
     let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
     let convoai = get_service::<ServiceConvoAI>(&parsed, SERVICE_TYPE_CONVOAI);
     assert_eq!(USER_ID, rtc.uid);
-    assert_eq!("convoai-rtm-user", rtm.user_id);
+    assert_eq!(USER_ID, rtm.user_id);
     assert!(convoai.service.privileges.is_empty());
 }
 
@@ -220,13 +220,13 @@ fn test_stt_token_builder() {
             CHANNEL_NAME,
             USER_ID,
             rtc_token_builder::ROLE_SUBSCRIBER,
-            3600,
-            1800,
-            1700,
-            1600,
-            1500,
-            "stt-rtm-user",
-            1400,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            EXPIRE,
+            USER_ID,
+            EXPIRE,
         )
         .unwrap(),
     );
@@ -236,6 +236,6 @@ fn test_stt_token_builder() {
     let stt = get_service::<ServiceStt>(&parsed, SERVICE_TYPE_STT);
     assert_eq!(USER_ID, rtc.uid);
     assert_eq!(1, rtc.service.privileges.len());
-    assert_eq!("stt-rtm-user", rtm.user_id);
+    assert_eq!(USER_ID, rtm.user_id);
     assert!(stt.service.privileges.is_empty());
 }

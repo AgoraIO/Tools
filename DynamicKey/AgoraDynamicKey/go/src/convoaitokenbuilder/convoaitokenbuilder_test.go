@@ -10,15 +10,15 @@ import (
 const (
 	DataMockAppCertificate               = "5CFd2fd1755d40ecb72977518be15d3b"
 	DataMockAppId                        = "970CA35de60c44645bbae8a215061b33"
-	DataMockChannelName                  = "convoai-channel"
-	DataMockRtcAccount                   = "convoai-rtc-user"
-	DataMockRtmUserId                    = "convoai-rtm-user"
-	DataMockRtcTokenExpire               = uint32(3600)
-	DataMockJoinChannelPrivilegeExpire   = uint32(1800)
-	DataMockPubAudioPrivilegeExpire      = uint32(1700)
-	DataMockPubVideoPrivilegeExpire      = uint32(1600)
-	DataMockPubDataStreamPrivilegeExpire = uint32(1500)
-	DataMockRtmTokenExpire               = uint32(1400)
+	DataMockChannelName                  = "7d72365eb983485397e3e3f9d460bdda"
+	DataMockRtcAccount                   = "2882341273"
+	DataMockRtmUserId                    = "2882341273"
+	DataMockRtcTokenExpire               = uint32(600)
+	DataMockJoinChannelPrivilegeExpire   = uint32(600)
+	DataMockPubAudioPrivilegeExpire      = uint32(600)
+	DataMockPubVideoPrivilegeExpire      = uint32(600)
+	DataMockPubDataStreamPrivilegeExpire = uint32(600)
+	DataMockRtmTokenExpire               = uint32(600)
 )
 
 // Test_BuildToken verifies publisher privileges and the ConvoAI service payload.

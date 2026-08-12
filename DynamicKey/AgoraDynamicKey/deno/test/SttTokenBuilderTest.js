@@ -5,15 +5,15 @@ import { assert, assertEquals } from 'https://deno.land/std/testing/asserts.ts'
 
 const appId = '970CA35de60c44645bbae8a215061b33'
 const appCertificate = '5CFd2fd1755d40ecb72977518be15d3b'
-const channelName = 'stt-channel'
-const rtcAccount = 'stt-rtc-user'
-const rtmUserId = 'stt-rtm-user'
-const rtcTokenExpire = 3600
-const joinChannelPrivilegeExpire = 1800
-const pubAudioPrivilegeExpire = 1700
-const pubVideoPrivilegeExpire = 1600
-const pubDataStreamPrivilegeExpire = 1500
-const rtmTokenExpire = 1400
+const channelName = '7d72365eb983485397e3e3f9d460bdda'
+const rtcAccount = '2882341273'
+const rtmUserId = '2882341273'
+const rtcTokenExpire = 600
+const joinChannelPrivilegeExpire = 600
+const pubAudioPrivilegeExpire = 600
+const pubVideoPrivilegeExpire = 600
+const pubDataStreamPrivilegeExpire = 600
+const rtmTokenExpire = 600
 
 Deno.test('SttTokenBuilder publisher token', () => {
   const token = SttTokenBuilder.buildToken(

@@ -16,15 +16,15 @@ class TestSttTokenBuilder(unittest.TestCase):
         """Create STT token fixtures shared by each test."""
         self.__app_id = '970CA35de60c44645bbae8a215061b33'
         self.__app_cert = '5CFd2fd1755d40ecb72977518be15d3b'
-        self.__channel_name = 'stt-channel'
-        self.__rtc_account = 'stt-rtc-user'
-        self.__rtm_user_id = 'stt-rtm-user'
-        self.__rtc_token_expire = 3600
-        self.__join_channel_privilege_expire = 1800
-        self.__pub_audio_privilege_expire = 1700
-        self.__pub_video_privilege_expire = 1600
-        self.__pub_data_stream_privilege_expire = 1500
-        self.__rtm_token_expire = 1400
+        self.__channel_name = '7d72365eb983485397e3e3f9d460bdda'
+        self.__rtc_account = '2882341273'
+        self.__rtm_user_id = '2882341273'
+        self.__rtc_token_expire = 600
+        self.__join_channel_privilege_expire = 600
+        self.__pub_audio_privilege_expire = 600
+        self.__pub_video_privilege_expire = 600
+        self.__pub_data_stream_privilege_expire = 600
+        self.__rtm_token_expire = 600
 
     def test_build_token(self):
         """Build and parse a publisher STT token."""
