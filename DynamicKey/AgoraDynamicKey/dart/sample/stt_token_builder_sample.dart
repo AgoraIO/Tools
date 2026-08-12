@@ -6,15 +6,15 @@ void main() {
   final appId = Platform.environment['AGORA_APP_ID'];
   final appCertificate = Platform.environment['AGORA_APP_CERTIFICATE'];
 
-  const channelName = 'stt-channel';
-  const rtcAccount = 'stt-rtc-user';
+  const channelName = '7d72365eb983485397e3e3f9d460bdda';
+  const rtcAccount = '2882341273';
   const rtcRole = RtcRole.publisher;
   const rtcTokenExpireSeconds = 3600;
   const joinChannelPrivilegeExpire = 3600;
   const publishAudioPrivilegeExpire = 3600;
   const publishVideoPrivilegeExpire = 3600;
   const publishDataPrivilegeExpire = 3600;
-  const rtmUserId = 'stt-rtm-user';
+  const rtmUserId = '2882341273';
   const rtmTokenExpireSeconds = 3600;
 
   print('App Id: $appId');

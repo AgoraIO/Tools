@@ -8,14 +8,14 @@ public class ConvoAITokenBuilderSample {
         String appId = System.getenv("AGORA_APP_ID");
         String appCertificate = System.getenv("AGORA_APP_CERTIFICATE");
 
-        String channelName = "convoai-channel";
-        String rtcAccount = "convoai-rtc-user";
+        String channelName = "7d72365eb983485397e3e3f9d460bdda";
+        String rtcAccount = "2082341273";
         int rtcTokenExpire = 3600;
         int joinChannelPrivilegeExpire = 3600;
         int pubAudioPrivilegeExpire = 3600;
         int pubVideoPrivilegeExpire = 3600;
         int pubDataStreamPrivilegeExpire = 3600;
-        String rtmUserId = "convoai-rtm-user";
+        String rtmUserId = "2082341273";
         int rtmTokenExpire = 3600;
 
         System.out.println("App Id: " + appId);

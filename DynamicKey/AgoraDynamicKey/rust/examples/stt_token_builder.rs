@@ -6,15 +6,15 @@ fn main() {
     let app_id = env::var("AGORA_APP_ID").unwrap_or_default();
     let app_certificate = env::var("AGORA_APP_CERTIFICATE").unwrap_or_default();
 
-    let channel_name = "stt-channel";
-    let rtc_account = "stt-rtc-user";
+    let channel_name = "7d72365eb983485397e3e3f9d460bdda";
+    let rtc_account = "2882341273";
     let rtc_role = rtc_token_builder::ROLE_PUBLISHER;
     let rtc_token_expire = 3600;
     let join_channel_privilege_expire = 3600;
     let pub_audio_privilege_expire = 3600;
     let pub_video_privilege_expire = 3600;
     let pub_data_stream_privilege_expire = 3600;
-    let rtm_user_id = "stt-rtm-user";
+    let rtm_user_id = "2882341273";
     let rtm_token_expire = 3600;
 
     println!("App Id: {}", app_id);

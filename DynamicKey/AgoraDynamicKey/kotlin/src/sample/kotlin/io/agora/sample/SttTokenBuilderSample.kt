@@ -16,15 +16,15 @@ fun main() {
     val token = SttTokenBuilder.buildToken(
         appId,
         appCertificate,
-        "stt-channel",
-        "stt-rtc-user",
+        "7d72365eb983485397e3e3f9d460bdda",
+        "2082341273",
         RtcTokenBuilder2.Role.ROLE_PUBLISHER,
         3600,
         3600,
         3600,
         3600,
         3600,
-        "stt-rtm-user",
+        "2082341273",
         3600
     )
     println("STT token: $token")

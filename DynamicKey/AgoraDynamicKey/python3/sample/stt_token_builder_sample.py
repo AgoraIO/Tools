@@ -14,15 +14,15 @@ def main():
     """Read credentials from environment variables and build an STT token."""
     app_id = os.environ.get("AGORA_APP_ID")
     app_certificate = os.environ.get("AGORA_APP_CERTIFICATE")
-    channel_name = "stt-channel"
-    rtc_account = "stt-rtc-user"
+    channel_name = "7d72365eb983485397e3e3f9d460bdda"
+    rtc_account = "2882341273"
     rtc_role = Role_Publisher
     rtc_token_expire = 3600
     join_channel_privilege_expire = 3600
     pub_audio_privilege_expire = 3600
     pub_video_privilege_expire = 3600
     pub_data_stream_privilege_expire = 3600
-    rtm_user_id = "stt-rtm-user"
+    rtm_user_id = "2882341273"
     rtm_token_expire = 3600
 
     print("App Id: %s" % app_id)

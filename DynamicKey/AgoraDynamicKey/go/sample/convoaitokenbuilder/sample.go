@@ -12,15 +12,15 @@ func main() {
 	appId := os.Getenv("AGORA_APP_ID")
 	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
 
-	channelName := "convoai-channel"
-	rtcAccount := "convoai-rtc-user"
+	channelName := "7d72365eb983485397e3e3f9d460bdda"
+	rtcAccount := "2882341273"
 	rtcRole := rtctokenbuilder.Role(rtctokenbuilder.RolePublisher)
 	rtcTokenExpire := uint32(3600)
 	joinChannelPrivilegeExpire := uint32(3600)
 	pubAudioPrivilegeExpire := uint32(3600)
 	pubVideoPrivilegeExpire := uint32(3600)
 	pubDataStreamPrivilegeExpire := uint32(3600)
-	rtmUserId := "convoai-rtm-user"
+	rtmUserId := "2882341273"
 	rtmTokenExpire := uint32(3600)
 
 	fmt.Println("App Id:", appId)

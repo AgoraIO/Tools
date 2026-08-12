@@ -20,8 +20,8 @@ int main() {
   }
 
   std::string token = ConvoAITokenBuilder::BuildToken(
-      app_id, app_certificate, "convoai-channel", "convoai-rtc-user", UserRole::kRolePublisher,
-      3600, 3600, 3600, 3600, 3600, "convoai-rtm-user", 3600);
+      app_id, app_certificate, "7d72365eb983485397e3e3f9d460bdda", "2882341273", UserRole::kRolePublisher,
+      3600, 3600, 3600, 3600, 3600, "2882341273", 3600);
   std::cout << "ConvoAI token:" << token << std::endl;
   return 0;
 }

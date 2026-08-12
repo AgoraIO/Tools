@@ -4,15 +4,15 @@ local stt_token_builder = require("agora_token.stt_token_builder")
 local app_id = os.getenv("AGORA_APP_ID") or ""
 local app_certificate = os.getenv("AGORA_APP_CERTIFICATE") or ""
 
-local channel_name = "stt-channel"
-local rtc_account = "stt-rtc-user"
+local channel_name = "7d72365eb983485397e3e3f9d460bdda"
+local rtc_account = "2882341273"
 local rtc_role = rtc_token_builder.ROLE_PUBLISHER
 local rtc_token_expire = 3600
 local join_channel_privilege_expire = 3600
 local pub_audio_privilege_expire = 3600
 local pub_video_privilege_expire = 3600
 local pub_data_stream_privilege_expire = 3600
-local rtm_user_id = "stt-rtm-user"
+local rtm_user_id = "2882341273"
 local rtm_token_expire = 3600
 
 print("App Id: " .. app_id)

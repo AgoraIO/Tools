@@ -4,15 +4,15 @@ include("../src/SttTokenBuilder.php");
 $appId = getenv("AGORA_APP_ID");
 $appCertificate = getenv("AGORA_APP_CERTIFICATE");
 
-$channelName = "stt-channel";
-$rtcAccount = "stt-rtc-user";
+$channelName = "7d72365eb983485397e3e3f9d460bdda";
+$rtcAccount = "2882341273";
 $rtcRole = RtcTokenBuilder2::ROLE_PUBLISHER;
 $rtcTokenExpire = 3600;
 $joinChannelPrivilegeExpire = 3600;
 $pubAudioPrivilegeExpire = 3600;
 $pubVideoPrivilegeExpire = 3600;
 $pubDataStreamPrivilegeExpire = 3600;
-$rtmUserId = "stt-rtm-user";
+$rtmUserId = "2882341273";
 $rtmTokenExpire = 3600;
 
 echo "App Id: " . $appId . PHP_EOL;
