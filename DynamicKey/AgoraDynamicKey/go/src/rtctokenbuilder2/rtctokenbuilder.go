@@ -33,9 +33,11 @@ const (
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set tokenExpire as 600(seconds).
+// set tokenExpire as 600(seconds). This is the whole token expiration. The whole token is invalid after this
+// time, even if a privilege expiration time is later.
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+// exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
 //
 // return The RTC token.
 func BuildTokenWithUid(appId string, appCertificate string, channelName string, uid uint32, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
@@ -54,9 +56,11 @@ func BuildTokenWithUid(appId string, appCertificate string, channelName string, 
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set tokenExpire as 600(seconds).
+// set tokenExpire as 600(seconds). This is the whole token expiration. The whole token is invalid after this
+// time, even if a privilege expiration time is later.
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+// exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
 //
 // return The RTC token.
 func BuildTokenWithUserAccount(appId string, appCertificate string, channelName string, account string, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
@@ -108,15 +112,25 @@ func BuildTokenWithUserAccount(appId string, appCertificate string, channelName 
 // - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
 // @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
 // @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is the
+// whole token expiration. The whole token is invalid after this time, even if a privilege expiration time is
+// later.
 // @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+// joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish data stream privilege for 10 minutes, set
+// pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 //
 // return The RTC token.
 func BuildTokenWithUidAndPrivilege(appId string, appCertificate string, channelName string, uid uint32,
@@ -159,15 +173,25 @@ func BuildTokenWithUidAndPrivilege(appId string, appCertificate string, channelN
 // - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
 // @param account The user account.
 // @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+// Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is the
+// whole token expiration. The whole token is invalid after this time, even if a privilege expiration time is
+// later.
 // @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+// joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish data stream privilege for 10 minutes, set
+// pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 //
 // return The RTC token.
 func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, channelName string, account string,
@@ -196,9 +220,11 @@ func BuildTokenWithUserAccountAndPrivilege(appId string, appCertificate string, 
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param tokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set tokenExpire as 600(seconds).
+// set tokenExpire as 600(seconds). This is the whole token expiration. The whole token is invalid after this
+// time, even if a privilege expiration time is later.
 // @param privilegeExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+// you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+// exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
 //
 // return The RTC and RTM token.
 func BuildTokenWithRtm(appId string, appCertificate string, channelName string, account string, role Role, tokenExpire uint32, privilegeExpire uint32) (string, error) {
@@ -231,18 +257,30 @@ func BuildTokenWithRtm(appId string, appCertificate string, channelName string, 
 // @param rtcRole: RolePublisher: A broadcaster/host in a live-broadcast profile.
 // RoleSubscriber: An audience(default) in a live-broadcast profile.
 // @param rtcTokenExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to access the Agora Service within 10 minutes after the token is generated, set rtcTokenExpire as 600(seconds).
+// you want to access the Agora Service within 10 minutes after the token is generated, set rtcTokenExpire as
+// 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+// privilege expiration time is later.
 // @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+// If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+// joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as
+// 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is limited by
+// the token expiration time.
 // @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-// If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+// If, for example, you want to enable publish data stream privilege for 10 minutes, set
+// pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+// otherwise, the privilege is limited by the token expiration time.
 // @param rtmUserId: The RTM user's account, max length is 255 Bytes.
 // @param rtmTokenExpire: represented by the number of seconds elapsed since now. If, for example,
-// you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire as 600(seconds).
+// you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire as
+// 600(seconds). This value must not exceed the RTC token expiration value; otherwise, the RTM login privilege
+// is limited by the token expiration time.
 //
 // return The RTC and RTM token.
 func BuildTokenWithRtm2(appId string, appCertificate string, channelName string, rtcAccount string, rtcRole Role, rtcTokenExpire uint32,

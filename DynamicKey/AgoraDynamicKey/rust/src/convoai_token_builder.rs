@@ -2,6 +2,11 @@ use crate::access_token;
 use crate::rtc_token_builder::{Role, ROLE_PUBLISHER};
 
 /// Builds a Token007 that carries RTC, RTM, and ConvoAI services.
+///
+/// `rtc_token_expire` is the whole token expiration. The whole token is invalid
+/// after this time, even if a privilege expiration time is later. RTC privilege
+/// expiration values and `rtm_token_expire` must not exceed `rtc_token_expire`;
+/// otherwise, the privileges are limited by the token expiration time.
 pub fn build_token(
     app_id: &str,
     app_certificate: &str,

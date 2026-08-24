@@ -10,8 +10,11 @@ class RtmTokenBuilder2 {
      * @param appCertificate  Certificate of the application that you registered in
      *                        the Agora Dashboard. See Get an App Certificate.
      * @param userId          The user's account, max length is 64 Bytes.
-     * @param tokenExpire     represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                        Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+     * @param tokenExpire     represented by the number of seconds elapsed since now. If, for example,
+     *                        you want to access the Agora Service within 10 minutes after the token is
+     *                        generated, set tokenExpire as 600(seconds). This is the whole token
+     *                        expiration. The whole token is invalid after this time, even if a privilege
+     *                        expiration time is later.
      * @return The RTM token.
      */
     fun buildToken(appId: String, appCertificate: String, userId: String, tokenExpire: Int): String {
@@ -37,7 +40,9 @@ class RtmTokenBuilder2 {
      * @param appCertificate Certificate of the application registered in the Agora Dashboard.
      * @param userId         The user's account, max length is 64 bytes.
      * @param permissions    The RTM2 resource-level permissions.
-     * @param expire         The number of seconds from now before the token expires.
+     * @param expire         The number of seconds from now before the token expires. This value is the
+     *                       whole token expiration and the service privilege expiration. The whole token
+     *                       is invalid after this time.
      * @return The RTM2 token.
      */
     fun buildTokenWithPermissions(

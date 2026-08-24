@@ -8,7 +8,7 @@ class FpaTokenBuilder {
      * Agora Dashboard if it is missing from your kit. See Get an App ID.
      * @param appCertificate Certificate of the application that you registered in
      * the Agora Dashboard. See Get an App Certificate.
-     * @return The FPA token.
+     * @return The FPA token. The token expires 24 hours after generation.
      */
     static buildToken(appId, appCertificate) {
         let token = new AccessToken(appId, appCertificate, 0, 24 * 3600)

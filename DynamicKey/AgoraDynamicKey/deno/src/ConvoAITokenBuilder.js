@@ -9,13 +9,20 @@ class ConvoAITokenBuilder {
      * @param {*} channelName The unique channel name for the AgoraRTC session in the string format.
      * @param {*} rtcAccount The RTC user's account, max length is 255 bytes.
      * @param {*} rtcRole Role.PUBLISHER for a broadcaster or Role.SUBSCRIBER for an audience member.
-     * @param {*} rtcTokenExpire Represented by the number of seconds elapsed since now.
-     * @param {*} joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param {*} pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param {*} pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param {*} pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param {*} rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole
+     * token expiration. The whole token is invalid after this time, even if a privilege expiration time is
+     * later.
+     * @param {*} joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now. This
+     * value must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+     * @param {*} pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+     * @param {*} pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+     * @param {*} pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now. This
+     * value must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
      * @param {*} rtmUserId The RTM user's account, max length is 255 bytes.
-     * @param {*} rtmTokenExpire Represented by the number of seconds elapsed since now.
+     * @param {*} rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
+     * exceed rtcTokenExpire; otherwise, the RTM login privilege is limited by the token expiration time.
      * @return The RTC, RTM, and ConvoAI token.
      */
     static buildToken(

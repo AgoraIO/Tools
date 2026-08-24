@@ -11,13 +11,25 @@
          * @param rtcAccount The RTC user's account, max length is 255 Bytes.
          * @param rtcRole ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
          *                ROLE_SUBSCRIBER: An audience member in a live-broadcast profile.
-         * @param rtcTokenExpire Represented by the number of seconds elapsed since now.
-         * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
-         * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
-         * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
-         * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+         * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole
+         * token expiration. The whole token is invalid after this time, even if a privilege expiration time
+         * is later.
+         * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now. This
+         * value must not exceed the token expiration value; otherwise, the privilege is limited by the token
+         * expiration time.
+         * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+         * must not exceed the token expiration value; otherwise, the privilege is limited by the token
+         * expiration time.
+         * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+         * must not exceed the token expiration value; otherwise, the privilege is limited by the token
+         * expiration time.
+         * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now. This
+         * value must not exceed the token expiration value; otherwise, the privilege is limited by the token
+         * expiration time.
          * @param rtmUserId The RTM user's account, max length is 255 Bytes.
-         * @param rtmTokenExpire Represented by the number of seconds elapsed since now.
+         * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
+         * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
+         * expiration time.
          * @return The RTC, RTM, and STT token.
          */
         public static string buildToken(string appId, string appCertificate, string channelName, string rtcAccount, RtcTokenBuilder2.Role rtcRole,

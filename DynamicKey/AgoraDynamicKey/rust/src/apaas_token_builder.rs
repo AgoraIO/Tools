@@ -8,7 +8,9 @@ use crate::utils;
 // room_uuid: The room's id, must be unique.
 // user_uuid: The user's id, must be unique.
 // role: The user's role.
-// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
+// Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is the
+// whole token expiration and the service privilege expiration. The whole token is invalid after this time.
 // return The room user token.
 pub fn build_room_user_token(
     app_id: &str, app_certificate: &str, room_uuid: &str, user_uuid: &str, role: i16, expire: u32,
@@ -36,7 +38,9 @@ pub fn build_room_user_token(
 // app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing from your kit. See Get an App ID.
 // app_certificate: Certificate of the application that you registered in the Agora Dashboard. See Get an App Certificate.
 // user_uuid: The user's id, must be unique.
-// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
+// Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is the
+// whole token expiration and the service privilege expiration. The whole token is invalid after this time.
 // return The user token.
 pub fn build_user_token(app_id: &str, app_certificate: &str, user_uuid: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut token = access_token::new_access_token(app_id, app_certificate, expire);
@@ -52,7 +56,9 @@ pub fn build_user_token(app_id: &str, app_certificate: &str, user_uuid: &str, ex
 //
 // app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing from your kit. See Get an App ID.
 // app_certificate: Certificate of the application that you registered in the Agora Dashboard. See Get an App Certificate.
-// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// expire: represented by the number of seconds elapsed since now. If, for example, you want to access the
+// Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is the
+// whole token expiration and the service privilege expiration. The whole token is invalid after this time.
 // return The app token.
 pub fn build_app_token(app_id: &str, app_certificate: &str, expire: u32) -> Result<String, Box<dyn std::error::Error>> {
     let mut token = access_token::new_access_token(app_id, app_certificate, expire);

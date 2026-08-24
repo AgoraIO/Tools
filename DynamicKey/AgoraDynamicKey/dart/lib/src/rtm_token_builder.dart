@@ -8,6 +8,8 @@ class RtmTokenBuilder {
   /// [appCertificate] is the certificate of the application registered in Agora Dashboard.
   /// [userId] is the user's account and must not exceed 64 bytes.
   /// [tokenExpireSeconds] is the expiration time in seconds from now; use `600` for 10 minutes.
+  /// This value is the whole token expiration and the service privilege expiration.
+  /// The whole token is invalid after this time.
   ///
   /// Returns the generated RTM token.
   static String buildToken({
@@ -36,6 +38,8 @@ class RtmTokenBuilder {
   /// [userId] is the user's account and must not exceed 64 bytes.
   /// [permissions] contains the RTM2 resource-level permissions.
   /// [tokenExpireSeconds] is the expiration time in seconds from now.
+  /// This value is the whole token expiration and the service privilege expiration.
+  /// The whole token is invalid after this time.
   static String buildTokenWithPermissions({
     required String appId,
     required String appCertificate,

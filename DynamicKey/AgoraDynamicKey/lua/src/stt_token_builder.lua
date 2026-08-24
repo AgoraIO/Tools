@@ -2,6 +2,8 @@ local access_token = require("agora_token.access_token")
 local rtc_token_builder = require("agora_token.rtc_token_builder")
 
 -- Builds a Token007 that carries RTC, RTM, and STT services.
+-- rtc_token_expire is the whole token expiration. The whole token is invalid after this time.
+-- RTC privilege expiration values and rtm_token_expire must not exceed rtc_token_expire.
 local function build_token(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
                            join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
                            pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire)

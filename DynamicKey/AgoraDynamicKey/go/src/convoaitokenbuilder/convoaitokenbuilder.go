@@ -17,23 +17,29 @@ import (
 // RoleSubscriber: An audience member in a live-broadcast profile.
 // @param rtcTokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set rtcTokenExpire as 600(seconds).
+// set rtcTokenExpire as 600(seconds). This is the whole token expiration. The whole token is
+// invalid after this time, even if a privilege expiration time is later.
 // @param joinChannelPrivilegeExpire: represented by the number of seconds elapsed since now.
 // If, for example, you want to join channel and expect stay in the channel for 10 minutes,
-// set joinChannelPrivilegeExpire as 600(seconds).
+// set joinChannelPrivilegeExpire as 600(seconds). This value must not exceed rtcTokenExpire;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubAudioPrivilegeExpire: represented by the number of seconds elapsed since now.
 // If, for example, you want to enable publish audio privilege for 10 minutes,
-// set pubAudioPrivilegeExpire as 600(seconds).
+// set pubAudioPrivilegeExpire as 600(seconds). This value must not exceed rtcTokenExpire;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubVideoPrivilegeExpire: represented by the number of seconds elapsed since now.
 // If, for example, you want to enable publish video privilege for 10 minutes,
-// set pubVideoPrivilegeExpire as 600(seconds).
+// set pubVideoPrivilegeExpire as 600(seconds). This value must not exceed rtcTokenExpire;
+// otherwise, the privilege is limited by the token expiration time.
 // @param pubDataStreamPrivilegeExpire: represented by the number of seconds elapsed since now.
 // If, for example, you want to enable publish data stream privilege for 10 minutes,
-// set pubDataStreamPrivilegeExpire as 600(seconds).
+// set pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed rtcTokenExpire;
+// otherwise, the privilege is limited by the token expiration time.
 // @param rtmUserId: The RTM user's account, max length is 255 Bytes.
 // @param rtmTokenExpire: represented by the number of seconds elapsed since now. If, for example,
 // you want to access the Agora Service within 10 minutes after the token is generated,
-// set rtmTokenExpire as 600(seconds).
+// set rtmTokenExpire as 600(seconds). This value must not exceed rtcTokenExpire; otherwise,
+// the RTM login privilege is limited by the token expiration time.
 //
 // return The RTC, RTM, and ConvoAI token.
 func BuildToken(appId string, appCertificate string, channelName string, rtcAccount string, rtcRole rtctokenbuilder.Role, rtcTokenExpire uint32,

@@ -24,7 +24,7 @@ class FpaTokenBuilder {
    @param app_id The App ID issued to you by Agora.
    @param app_certificate Certificate of the application that you registered in
    the Agora Dashboard.
-   @return The new Token. Token is available for 24 hours after generation
+   @return The new Token. The token expires 24 hours after generation.
    */
    static std::string BuildToken(
        const std::string& app_id,

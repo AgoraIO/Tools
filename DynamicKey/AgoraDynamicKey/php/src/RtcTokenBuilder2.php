@@ -33,8 +33,13 @@ class RtcTokenBuilder2
      *                          uid must be unique.
      * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
-     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
+     * @param $tokenExpire : Represented by the number of seconds elapsed since now. If, for example, you want
+     * to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC token.
      */
     public static function buildTokenWithUid($appId, $appCertificate, $channelName, $uid, $role, $tokenExpire, $privilegeExpire = 0)
@@ -53,8 +58,13 @@ class RtcTokenBuilder2
      * @param $account :        The user's account, max length is 255 Bytes.
      * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
-     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
+     * @param $tokenExpire : Represented by the number of seconds elapsed since now. If, for example, you want
+     * to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC token.
      */
     public static function buildTokenWithUserAccount($appId, $appCertificate, $channelName, $account, $role, $tokenExpire, $privilegeExpire = 0)
@@ -108,15 +118,25 @@ class RtcTokenBuilder2
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param $uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
      * @param $tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
      * @param $joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set $joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * $joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set $pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set
+     * $pubAudioPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set $pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set
+     * $pubVideoPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set $pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * $pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token
      */
     public static function buildTokenWithUidAndPrivilege(
@@ -178,15 +198,25 @@ class RtcTokenBuilder2
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param $account The user account.
      * @param $tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
      * @param $joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set $joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * $joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set $pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set
+     * $pubAudioPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set $pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set
+     * $pubVideoPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set $pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * $pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token
      */
     public static function buildTokenWithUserAccountAndPrivilege(
@@ -223,8 +253,13 @@ class RtcTokenBuilder2
      * @param $account :        The user's account, max length is 255 Bytes.
      * @param $role :           ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $tokenExpire :    Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
-     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds).
+     * @param $tokenExpire : Represented by the number of seconds elapsed since now. If, for example, you want
+     * to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param $privilegeExpire :Represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set $privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC and RTM token.
      */
     public static function buildTokenWithRtm($appId, $appCertificate, $channelName, $account, $role, $tokenExpire, $privilegeExpire = 0)
@@ -259,18 +294,31 @@ class RtcTokenBuilder2
      * @param $rtcAccount       The RTC user's account, max length is 255 Bytes.
      * @param $rtcRole          ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
      *                          ROLE_SUBSCRIBER: An audience(default) in a live-broadcast profile.
-     * @param $rtcTokenExpire   Represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set $tokenExpire as 600(seconds).
+     * @param $rtcTokenExpire Represented by the number of seconds elapsed since now. If, for example, you
+     * want to access the Agora Service within 10 minutes after the token is generated, set $rtcTokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
      * @param $joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set $joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * $joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set $pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set
+     * $pubAudioPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set $pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set
+     * $pubVideoPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set $pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * $pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param $rtmUserId The RTM user's account, max length is 255 Bytes.
      * @param $rtmTokenExpire represented by the number of seconds elapsed since now. If, for example,
-     * you want to access the Agora Service within 10 minutes after the token is generated, set $rtmTokenExpire as 600(seconds).
+     * you want to access the Agora Service within 10 minutes after the token is generated, set
+     * $rtmTokenExpire as 600(seconds). This value must not exceed the RTC token expiration value; otherwise,
+     * the RTM login privilege is limited by the token expiration time.
      * @return The RTC and RTM token.
      */
     public static function buildTokenWithRtm2(

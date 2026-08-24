@@ -25,7 +25,9 @@ export namespace ApaasTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user room token.
      */
     export function buildRoomUserToken(
@@ -45,7 +47,9 @@ export namespace ApaasTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user token.
      */
     export function buildUserToken(
@@ -62,7 +66,9 @@ export namespace ApaasTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                       Agora Service within 10 minutes after the token is generated, set expire as
+     *                       600(seconds). This value is the whole token expiration and the service privilege
+     *                       expiration. The whole token is invalid after this time.
      * @return The app token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -78,7 +84,9 @@ export namespace ChatTokenBuilder {
      * the Agora Dashboard. See Get an App Certificate.
      * @param userUuid The user's id, must be unique.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+     * the whole token expiration and the service privilege expiration. The whole token is invalid after this
+     * time.
      * @return The chat user token.
      */
     export function buildUserToken(
@@ -96,7 +104,9 @@ export namespace ChatTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      * the Agora Dashboard. See Get an App Certificate.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+     * the whole token expiration and the service privilege expiration. The whole token is invalid after this
+     * time.
      * @return The chat App token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -113,7 +123,9 @@ export namespace EducationTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user room token.
      */
     export function buildRoomUserToken(
@@ -133,7 +145,9 @@ export namespace EducationTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user token.
      */
     export function buildUserToken(
@@ -150,7 +164,9 @@ export namespace EducationTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                       Agora Service within 10 minutes after the token is generated, set expire as
+     *                       600(seconds). This value is the whole token expiration and the service privilege
+     *                       expiration. The whole token is invalid after this time.
      * @return The app token.
      */
     export function buildAppToken(appId: string, appCertificate: string, expire: number): string
@@ -163,7 +179,7 @@ export namespace FpaTokenBuilder {
      * Agora Dashboard if it is missing from your kit. See Get an App ID.
      * @param appCertificate Certificate of the application that you registered in
      * the Agora Dashboard. See Get an App Certificate.
-     * @return The FPA token.
+     * @return The FPA token. The token expires 24 hours after generation.
      */
     export function buildToken(appId: string, appCertificate: string): string
 }
@@ -188,8 +204,13 @@ export namespace RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
-     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @param {*} tokenExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token.
      */
     export function buildTokenWithUid(
@@ -216,8 +237,13 @@ export namespace RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
-     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @param {*} tokenExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token.
      */
     export function buildTokenWithUserAccount(
@@ -265,15 +291,25 @@ export namespace RtcTokenBuilder {
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param uid The user ID. A 32-bit unsigned integer with a value range from 1 to (2^32 - 1). It must be unique. Set uid as 0, if you do not want to authenticate the user ID, that is, any uid from the app client can join the channel.
      * @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
      * @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token
      */
     export function buildTokenWithUidAndPrivilege(
@@ -323,15 +359,25 @@ export namespace RtcTokenBuilder {
      * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param userAccount The user account.
      * @param tokenExpire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds). This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
      * @param joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @return The RTC Token.
      */
     export function BuildTokenWithUserAccountAndPrivilege(
@@ -360,8 +406,13 @@ export namespace RtcTokenBuilder {
      * @param {*} role See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} tokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
-     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds).
+     * @param {*} tokenExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
+     * @param {*} privilegeExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to enable your privilege for 10 minutes, set privilegeExpire as 600(seconds). This value must not
+     * exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
      * @return The RTC and RTM Token.
      */
     export function buildTokenWithRtm(
@@ -388,18 +439,31 @@ export namespace RtcTokenBuilder {
      * @param {*} rtcRole See #userRole.
      * - Role.PUBLISHER; RECOMMENDED. Use this role for a voice/video call or a live broadcast.
      * - Role.SUBSCRIBER: ONLY use this role if your live-broadcast scenario requires authentication for [Co-host](https://docs.agora.io/en/video-calling/get-started/authentication-workflow?#co-host-token-authentication). In order for this role to take effect, please contact our support team to enable authentication for Co-host for you. Otherwise, Role_Subscriber still has the same privileges as Role_Publisher.
-     * @param {*} rtcTokenExpire epresented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set tokenExpire as 600(seconds)
+     * @param {*} rtcTokenExpire represented by the number of seconds elapsed since now. If, for example, you
+     * want to access the Agora Service within 10 minutes after the token is generated, set rtcTokenExpire as
+     * 600(seconds). This is the whole token expiration. The whole token is invalid after this time, even if a
+     * privilege expiration time is later.
      * @param {*} joinChannelPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set joinChannelPrivilegeExpire as 600(seconds).
+     * If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+     * joinChannelPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param {*} pubAudioPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish audio privilege for 10 minutes, set pubAudioPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param {*} pubVideoPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish video privilege for 10 minutes, set pubVideoPrivilegeExpire
+     * as 600(seconds). This value must not exceed the token expiration value; otherwise, the privilege is
+     * limited by the token expiration time.
      * @param {*} pubDataStreamPrivilegeExpire represented by the number of seconds elapsed since now.
-     * If, for example, you want to enable publish data stream privilege for 10 minutes, set pubDataStreamPrivilegeExpire as 600(seconds).
+     * If, for example, you want to enable publish data stream privilege for 10 minutes, set
+     * pubDataStreamPrivilegeExpire as 600(seconds). This value must not exceed the token expiration value;
+     * otherwise, the privilege is limited by the token expiration time.
      * @param rtmUserId: The RTM user's account, max length is 255 Bytes.
      * @param rtmTokenExpire: represented by the number of seconds elapsed since now. If, for example,
-     * you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire as 600(seconds).
+     * you want to access the Agora Service within 10 minutes after the token is generated, set rtmTokenExpire
+     * as 600(seconds). This value must not exceed the RTC token expiration value; otherwise, the RTM login
+     * privilege is limited by the token expiration time.
      * * @return The RTC and RTM Token.
      */
     export function buildTokenWithRtm2(
@@ -426,13 +490,24 @@ export namespace ConvoAITokenBuilder {
      * @param channelName The unique channel name for the AgoraRTC session in the string format.
      * @param rtcAccount The RTC user's account, max length is 255 bytes.
      * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
-     * @param rtcTokenExpire Represented by the number of seconds elapsed since now.
-     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole token
+     * expiration. The whole token is invalid after this time, even if a privilege expiration time is later.
+     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now. This value must
+     * not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now. This value must
+     * not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
      * @param rtmUserId The RTM user's account, max length is 255 bytes.
-     * @param rtmTokenExpire Represented by the number of seconds elapsed since now.
+     * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
+     * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
+     * expiration time.
      * @return The RTC, RTM, and ConvoAI token.
      */
     export function buildToken(
@@ -459,13 +534,24 @@ export namespace SttTokenBuilder {
      * @param channelName The unique channel name for the AgoraRTC session in the string format.
      * @param rtcAccount The RTC user's account, max length is 255 bytes.
      * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
-     * @param rtcTokenExpire Represented by the number of seconds elapsed since now.
-     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now.
-     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now.
+     * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole token
+     * expiration. The whole token is invalid after this time, even if a privilege expiration time is later.
+     * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now. This value must
+     * not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now. This value must
+     * not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
+     * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+     * must not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+     * time.
      * @param rtmUserId The RTM user's account, max length is 255 bytes.
-     * @param rtmTokenExpire Represented by the number of seconds elapsed since now.
+     * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
+     * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
+     * expiration time.
      * @return The RTC, RTM, and STT token.
      */
     export function buildToken(
@@ -494,7 +580,9 @@ export namespace RtmTokenBuilder {
      * the Agora Dashboard. See Get an App Certificate.
      * @param userId The user's account, max length is 64 Bytes.
      * @param expire represented by the number of seconds elapsed since now. If, for example, you want to access the
-     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+     * the whole token expiration and the service privilege expiration. The whole token is invalid after this
+     * time.
      * @return The RTM token.
      */
     export function buildToken(appId: string, appCertificate: string, userId: string | number, expire: number): string
@@ -508,7 +596,8 @@ export namespace RtmTokenBuilder {
      * @param appCertificate Certificate of the application registered in the Agora Dashboard.
      * @param userId The user's account, max length is 64 bytes.
      * @param permissions The RTM2 resource-level permissions.
-     * @param expire The number of seconds from now before the token expires.
+     * @param expire The number of seconds from now before the token expires. This value is the whole token
+     * expiration and the service privilege expiration. The whole token is invalid after this time.
      * @return The RTM2 token.
      */
     export function buildTokenWithPermissions(

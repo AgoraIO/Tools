@@ -10,13 +10,25 @@ class SttTokenBuilder {
   /// [channelName] is the unique channel name for the RTC session.
   /// [rtcAccount] is the RTC user account and must not exceed 255 bytes.
   /// [rtcRole] is [RtcRole.publisher] for a broadcaster or [RtcRole.subscriber] for an audience member.
-  /// [rtcTokenExpireSeconds] is the number of seconds from now until the token expires.
-  /// [joinChannelPrivilegeExpire] is the number of seconds from now until the join privilege expires.
-  /// [publishAudioPrivilegeExpire] is the number of seconds from now until the audio publishing privilege expires.
-  /// [publishVideoPrivilegeExpire] is the number of seconds from now until the video publishing privilege expires.
-  /// [publishDataPrivilegeExpire] is the number of seconds from now until the data publishing privilege expires.
+  /// [rtcTokenExpireSeconds] is the number of seconds from now until the token expires. This is the whole
+  /// token expiration. The whole token is invalid after this time, even if a privilege expiration time is
+  /// later.
+  /// [joinChannelPrivilegeExpire] is the number of seconds from now until the join privilege expires. This
+  /// value must not exceed the token expiration value; otherwise, the privilege is limited by the token
+  /// expiration time.
+  /// [publishAudioPrivilegeExpire] is the number of seconds from now until the audio publishing privilege
+  /// expires. This value must not exceed the token expiration value; otherwise, the privilege is limited by
+  /// the token expiration time.
+  /// [publishVideoPrivilegeExpire] is the number of seconds from now until the video publishing privilege
+  /// expires. This value must not exceed the token expiration value; otherwise, the privilege is limited by
+  /// the token expiration time.
+  /// [publishDataPrivilegeExpire] is the number of seconds from now until the data publishing privilege
+  /// expires. This value must not exceed the token expiration value; otherwise, the privilege is limited by
+  /// the token expiration time.
   /// [rtmUserId] is the RTM user account and must not exceed 255 bytes.
-  /// [rtmTokenExpireSeconds] is the number of seconds from now until the RTM privilege expires.
+  /// [rtmTokenExpireSeconds] is the number of seconds from now until the RTM privilege expires. This value
+  /// must not exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the
+  /// token expiration time.
   ///
   /// Returns the generated RTC, RTM, and STT token.
   static String buildToken({

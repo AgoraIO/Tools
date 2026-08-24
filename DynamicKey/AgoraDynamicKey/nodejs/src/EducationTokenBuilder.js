@@ -16,7 +16,9 @@ class EducationTokenBuilder {
      * @param userUuid          The user's id, must be unique.
      * @param role              The user's role.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user room token.
      */
     static buildRoomUserToken(appId, appCertificate, roomUuid, userUuid, role, expire) {
@@ -45,7 +47,9 @@ class EducationTokenBuilder {
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param userUuid          The user's id, must be unique.
      * @param expire            represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The user token.
      */
     static buildUserToken(appId, appCertificate, userUuid, expire) {
@@ -64,7 +68,9 @@ class EducationTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                       Agora Service within 10 minutes after the token is generated, set expire as
+     *                       600(seconds). This value is the whole token expiration and the service privilege
+     *                       expiration. The whole token is invalid after this time.
      * @return The app token.
      */
     static buildAppToken(appId, appCertificate, expire) {

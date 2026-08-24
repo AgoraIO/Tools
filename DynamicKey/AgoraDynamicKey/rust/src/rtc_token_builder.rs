@@ -27,9 +27,12 @@ pub const ROLE_SUBSCRIBER: Role = 2;
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
-//     set token_expire as 600(seconds).
+//     set token_expire as 600(seconds). This is the whole token expiration. The whole token is invalid after
+//     this time, even if a privilege expiration time is later.
 // privilege_expire: represented by the number of seconds elapsed since now. If, for example,
-//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds). This value must
+//     not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+//     time.
 // return The RTC token.
 pub fn build_token_with_uid(
     app_id: &str, app_certificate: &str, channel_name: &str, uid: u32, role: Role, token_expire: u32, privilege_expire: u32,
@@ -57,9 +60,12 @@ pub fn build_token_with_uid(
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
-//     set token_expire as 600(seconds).
+//     set token_expire as 600(seconds). This is the whole token expiration. The whole token is invalid after
+//     this time, even if a privilege expiration time is later.
 // privilege_expire: represented by the number of seconds elapsed since now. If, for example,
-//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds). This value must
+//     not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+//     time.
 // return The RTC token.
 pub fn build_token_with_user_account(
     app_id: &str, app_certificate: &str, channel_name: &str, account: &str, role: Role, token_expire: u32, privilege_expire: u32,
@@ -168,9 +174,12 @@ pub fn build_token_with_user_account_and_privilege(
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // token_expire: represented by the number of seconds elapsed since now. If, for example,
 //     you want to access the Agora Service within 10 minutes after the token is generated,
-//     set token_expire as 600(seconds).
+//     set token_expire as 600(seconds). This is the whole token expiration. The whole token is invalid after
+//     this time, even if a privilege expiration time is later.
 // privilege_expire: represented by the number of seconds elapsed since now. If, for example,
-//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds).
+//     you want to enable your privilege for 10 minutes, set privilege_expire as 600(seconds). This value must
+//     not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+//     time.
 // return The RTC and RTM token.
 pub fn build_token_with_rtm(
     app_id: &str, app_certificate: &str, channel_name: &str, account: &str, role: Role, token_expire: u32, privilege_expire: u32,
@@ -204,18 +213,30 @@ pub fn build_token_with_rtm(
 // rtc_role: RolePublisher: A broadcaster/host in a live-broadcast profile.
 //     RoleSubscriber: An audience(default) in a live-broadcast profile.
 // rtc_token_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set rtc_token_expire as 600(seconds).
+//     If, for example, you want to access the Agora Service within 10 minutes after the token is generated,
+//     set rtc_token_expire as 600(seconds). This is the whole token expiration. The whole token is invalid
+//     after this time, even if a privilege expiration time is later.
 // join_channel_privilege_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to join channel and expect stay in the channel for 10 minutes, set join_channel_privilege_expire as 600(seconds).
+//     If, for example, you want to join channel and expect stay in the channel for 10 minutes, set
+//     join_channel_privilege_expire as 600(seconds). This value must not exceed the token expiration value;
+//     otherwise, the privilege is limited by the token expiration time.
 // pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to enable publish audio privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+//     If, for example, you want to enable publish audio privilege for 10 minutes, set
+//     pub_audio_privilege_expire as 600(seconds). This value must not exceed the token expiration value;
+//     otherwise, the privilege is limited by the token expiration time.
 // pub_video_privilege_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to enable publish video privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+//     If, for example, you want to enable publish video privilege for 10 minutes, set
+//     pub_video_privilege_expire as 600(seconds). This value must not exceed the token expiration value;
+//     otherwise, the privilege is limited by the token expiration time.
 // pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to enable publish data stream privilege for 10 minutes, set pub_data_stream_privilege_expire as 600(seconds).
+//     If, for example, you want to enable publish data stream privilege for 10 minutes, set
+//     pub_data_stream_privilege_expire as 600(seconds). This value must not exceed the token expiration
+//     value; otherwise, the privilege is limited by the token expiration time.
 // rtm_user_id: The RTM user's account, max length is 255 Bytes.
 // rtm_token_expire: represented by the number of seconds elapsed since now.
-//     If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set rtm_token_expire as 600(seconds).
+//     If, for example, you want to access the Agora Service within 10 minutes after the token is generated,
+//     set rtm_token_expire as 600(seconds). This value must not exceed the RTC token expiration value;
+//     otherwise, the RTM login privilege is limited by the token expiration time.
 // return The RTC and RTM token.
 pub fn build_token_with_rtm2(
     app_id: &str, app_certificate: &str, channel_name: &str, rtc_account: &str, rtc_role: Role, rtc_token_expire: u32, join_channel_privilege_expire: u32,

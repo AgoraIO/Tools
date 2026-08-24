@@ -5,6 +5,11 @@ class ConvoAITokenBuilder {
     companion object {
         /**
          * Build a Token007 that carries RTC, RTM, and ConvoAI services.
+         *
+         * rtcTokenExpire is the whole token expiration. The whole token is invalid after this time,
+         * even if a privilege expiration time is later. RTC privilege expiration values and
+         * rtmTokenExpire must not exceed rtcTokenExpire; otherwise, the privileges are limited by
+         * the token expiration time.
          */
         fun buildToken(
             appId: String,

@@ -14,6 +14,8 @@ class EducationTokenBuilder {
   /// [userUuid] is the user ID and must be unique.
   /// [role] is the user's role.
   /// [expireSeconds] is the expiration time in seconds from now; use `600` for 10 minutes.
+  /// This value is the whole token expiration and the service privilege expiration.
+  /// The whole token is invalid after this time.
   ///
   /// Returns the generated room-user token.
   static String buildRoomUserToken({
@@ -51,6 +53,8 @@ class EducationTokenBuilder {
   /// [appCertificate] is the certificate of the application registered in Agora Dashboard.
   /// [userUuid] is the user ID and must be unique.
   /// [expireSeconds] is the expiration time in seconds from now; use `600` for 10 minutes.
+  /// This value is the whole token expiration and the service privilege expiration.
+  /// The whole token is invalid after this time.
   ///
   /// Returns the generated user token.
   static String buildUserToken({
@@ -76,6 +80,8 @@ class EducationTokenBuilder {
   /// [appId] is the App ID issued by Agora; create one in Agora Dashboard if needed.
   /// [appCertificate] is the certificate of the application registered in Agora Dashboard.
   /// [expireSeconds] is the expiration time in seconds from now; use `600` for 10 minutes.
+  /// This value is the whole token expiration and the service privilege expiration.
+  /// The whole token is invalid after this time.
   ///
   /// Returns the generated application token.
   static String buildAppToken({

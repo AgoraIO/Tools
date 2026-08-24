@@ -9,7 +9,7 @@ class FpaTokenBuilder {
   /// [appId] is the App ID issued by Agora; create one in Agora Dashboard if needed.
   /// [appCertificate] is the certificate of the application registered in Agora Dashboard.
   ///
-  /// Returns the generated FPA token.
+  /// Returns the generated FPA token. The token expires 24 hours after generation.
   static String buildToken({
     required String appId,
     required String appCertificate,

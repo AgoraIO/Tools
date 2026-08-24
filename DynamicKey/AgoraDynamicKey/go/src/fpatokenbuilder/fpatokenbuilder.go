@@ -10,7 +10,7 @@ import (
 //                  Agora Dashboard if it is missing from your kit. See Get an App ID.
 // appCertificate:  Certificate of the application that you registered in
 //                  the Agora Dashboard. See Get an App Certificate.
-// return The FPA token.
+// return The FPA token. The token expires 24 hours after generation.
 func BuildToken(appId string, appCertificate string) (string, error) {
     token := accesstoken.NewAccessToken(appId, appCertificate, 24 * 3600)
 

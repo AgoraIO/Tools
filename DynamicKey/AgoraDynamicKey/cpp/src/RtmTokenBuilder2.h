@@ -22,7 +22,8 @@ class RtmTokenBuilder2 {
    @param user_id The user's account, max length is 64 Bytes.
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
-   token is generated, set expire as 600(seconds).
+   token is generated, set expire as 600(seconds). This value is the whole token expiration and the service
+   privilege expiration. The whole token is invalid after this time.
    @return The new Token.
    */
   static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_id, uint32_t expire = 0);
@@ -41,7 +42,8 @@ class RtmTokenBuilder2 {
    @param permissions The resource-level RTM2 permissions.
    @param expire represented by the number of seconds elapsed since now. If, for
    example, you want to access the Agora Service within 10 minutes after the
-   token is generated, set expire as 600(seconds).
+   token is generated, set expire as 600(seconds). This value is the whole token expiration and the service
+   privilege expiration. The whole token is invalid after this time.
    @return The new Token.
    */
   static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_id,

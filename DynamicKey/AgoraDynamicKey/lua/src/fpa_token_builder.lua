@@ -6,7 +6,7 @@ local access_token = require("agora_token.access_token")
 --                  Agora Dashboard if it is missing from your kit. See Get an App ID.
 -- app_certificate: Certificate of the application that you registered in
 --                  the Agora Dashboard. See Get an App Certificate.
--- return The FPA token.
+-- return The FPA token. The token expires 24 hours after generation.
 local function build_token(app_id, app_certificate)
     local token = access_token.new_access_token(app_id, app_certificate, 24 * 3600)
 

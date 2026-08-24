@@ -13,7 +13,9 @@ class ChatTokenBuilder2
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param $userId :         The user's unique id.
      * @param $expire :         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The Chat User token.
      */
     public static function buildUserToken($appId, $appCertificate, $userId, $expire)
@@ -35,7 +37,9 @@ class ChatTokenBuilder2
      * @param $appCertificate : Certificate of the application that you registered in
      *                          the Agora Dashboard. See Get an App Certificate.
      * @param $expire :         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                          Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     *                          Agora Service within 10 minutes after the token is generated, set expire as
+     *                          600(seconds). This value is the whole token expiration and the service
+     *                          privilege expiration. The whole token is invalid after this time.
      * @return The Chat App token.
      */
     public static function buildAppToken($appId, $appCertificate, $expire)

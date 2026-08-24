@@ -11,7 +11,10 @@ import (
 // @param roomUuid: The room's id, must be unique.
 // @param userUuid: The user's id, must be unique.
 // @param role: The user's role.
-// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access
+// the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+// the whole token expiration and the service privilege expiration. The whole token is invalid after this
+// time.
 //
 // return The Room User token.
 func BuildRoomUserToken(appId string, appCertificate string, roomUuid string, userUuid string, role int16, expire uint32) (string, error) {
@@ -38,7 +41,10 @@ func BuildRoomUserToken(appId string, appCertificate string, roomUuid string, us
 // @param appId: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing from your kit. See Get an App ID.
 // @param appCertificate: Certificate of the application that you registered in the Agora Dashboard. See Get an App Certificate.
 // @param userUuid: The user's id, must be unique.
-// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access
+// the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+// the whole token expiration and the service privilege expiration. The whole token is invalid after this
+// time.
 //
 // return The User token.
 func BuildUserToken(appId string, appCertificate string, userUuid string, expire uint32) (string, error) {
@@ -55,7 +61,10 @@ func BuildUserToken(appId string, appCertificate string, userUuid string, expire
 //
 // @param appId: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing from your kit. See Get an App ID.
 // @param appCertificate: Certificate of the application that you registered in the Agora Dashboard. See Get an App Certificate.
-// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+// @param expire: represented by the number of seconds elapsed since now. If, for example, you want to access
+// the Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is
+// the whole token expiration and the service privilege expiration. The whole token is invalid after this
+// time.
 //
 // return The App token.
 func BuildAppToken(appId string, appCertificate string, expire uint32) (string, error) {

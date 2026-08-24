@@ -25,7 +25,8 @@ class EducationTokenBuilder2 {
    @param role: The user's role.
    @param expire: represented by the number of seconds elapsed since now. If,
    for example, you want to access the Agora Service within 10 minutes after
-   the token is generated, set expire as 600(seconds).
+   the token is generated, set expire as 600(seconds). This value is the whole token expiration and the
+   service privilege expiration. The whole token is invalid after this time.
    @return: The user room token.
    */
   static std::string BuildRoomUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& room_uuid,
@@ -40,7 +41,8 @@ class EducationTokenBuilder2 {
   @param user_uuid: The user's id, must be unique.
   @param expire: represented by the number of seconds elapsed since now. If,
   for example, you want to access the Agora Service within 10 minutes after
-  the token is generated, set expire as 600(seconds).
+  the token is generated, set expire as 600(seconds). This value is the whole token expiration and the service
+  privilege expiration. The whole token is invalid after this time.
   @return: The user token.
    */
   static std::string BuildUserToken(const std::string& app_id, const std::string& app_certificate, const std::string& user_uuid, uint32_t expire);
@@ -53,7 +55,8 @@ class EducationTokenBuilder2 {
   the Agora Dashboard. See Get an App Certificate.
   @param expire: represented by the number of seconds elapsed since now. If,
   for example, you want to access the Agora Service within 10 minutes after the
-  token is generated, set expire as 600(seconds).
+  token is generated, set expire as 600(seconds). This value is the whole token expiration and the service
+  privilege expiration. The whole token is invalid after this time.
   @return: The app token.
    */
   static std::string BuildAppToken(const std::string& app_id, const std::string& app_certificate, uint32_t expire);

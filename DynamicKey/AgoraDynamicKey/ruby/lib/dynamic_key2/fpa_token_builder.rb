@@ -6,7 +6,7 @@ module AgoraDynamicKey2
     # from your kit. See Get an App ID.
     # @param app_certificate Certificate of the application that you registered in the Agora Dashboard.
     # See Get an App Certificate.
-    # @return The FPA token.
+    # @return The FPA token. The token expires 24 hours after generation.
     def self.build_token(app_id, app_certificate)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, 24 * 3600)
 

@@ -12,8 +12,11 @@ class ApaasTokenBuilder {
      * @param roomUuid       The room's id, must be unique.
      * @param userUuid       The user's id, must be unique.
      * @param role           The user's role.
-     * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * @param expire         represented by the number of seconds elapsed since now. If, for example,
+     *                       you want to access the Agora Service within 10 minutes after the token is
+     *                       generated, set expire as 600(seconds). This value is the whole token
+     *                       expiration and the service privilege expiration. The whole token is invalid
+     *                       after this time.
      * @return The user room token.
      */
     fun buildRoomUserToken(
@@ -49,8 +52,11 @@ class ApaasTokenBuilder {
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
      * @param userUuid       The user's id, must be unique.
-     * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * @param expire         represented by the number of seconds elapsed since now. If, for example,
+     *                       you want to access the Agora Service within 10 minutes after the token is
+     *                       generated, set expire as 600(seconds). This value is the whole token
+     *                       expiration and the service privilege expiration. The whole token is invalid
+     *                       after this time.
      * @return The user token.
      */
     fun buildUserToken(appId: String, appCertificate: String, userUuid: String, expire: Int): String {
@@ -68,8 +74,11 @@ class ApaasTokenBuilder {
      *                       Agora Dashboard if it is missing from your kit. See Get an App ID.
      * @param appCertificate Certificate of the application that you registered in
      *                       the Agora Dashboard. See Get an App Certificate.
-     * @param expire         represented by the number of seconds elapsed since now. If, for example, you want to access the
-     *                       Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+     * @param expire         represented by the number of seconds elapsed since now. If, for example,
+     *                       you want to access the Agora Service within 10 minutes after the token is
+     *                       generated, set expire as 600(seconds). This value is the whole token
+     *                       expiration and the service privilege expiration. The whole token is invalid
+     *                       after this time.
      * @return The app token.
      */
     fun buildAppToken(appId: String, appCertificate: String, expire: Int): String {

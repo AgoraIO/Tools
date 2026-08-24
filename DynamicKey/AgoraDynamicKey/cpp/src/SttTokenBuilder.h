@@ -34,27 +34,37 @@ class SttTokenBuilder {
    * voice/video call or a live broadcast.
    * - UserRole::kRoleSubscriber = 2: ONLY use this role if your live-broadcast
    * scenario requires authentication for co-host.
-   * @param rtc_token_expire represented by the number of seconds elapsed since
-   * now. If, for example, you want to access the Agora Service within 10
-   * minutes after the token is generated, set rtc_token_expire as 600(seconds).
+   * @param rtc_token_expire The token expiration time, represented by the
+   * number of seconds elapsed since now. The whole token is invalid after this
+   * time, even if a privilege expiration time is later. If, for example, you
+   * want to access the Agora Service within 10 minutes after the token is
+   * generated, set rtc_token_expire as 600(seconds).
    * @param join_channel_privilege_expire represented by the number of seconds
    * elapsed since now. If, for example, you want to join channel and expect to
    * stay in the channel for 10 minutes, set join_channel_privilege_expire as
-   * 600(seconds).
+   * 600(seconds). This value must not exceed rtc_token_expire; otherwise, the
+   * privilege is limited by the token expiration time.
    * @param pub_audio_privilege_expire represented by the number of seconds
    * elapsed since now. If, for example, you want to enable publish audio
    * privilege for 10 minutes, set pub_audio_privilege_expire as 600(seconds).
+   * This value must not exceed rtc_token_expire; otherwise, the privilege is
+   * limited by the token expiration time.
    * @param pub_video_privilege_expire represented by the number of seconds
    * elapsed since now. If, for example, you want to enable publish video
    * privilege for 10 minutes, set pub_video_privilege_expire as 600(seconds).
+   * This value must not exceed rtc_token_expire; otherwise, the privilege is
+   * limited by the token expiration time.
    * @param pub_data_stream_privilege_expire represented by the number of
    * seconds elapsed since now. If, for example, you want to enable publish data
    * stream privilege for 10 minutes, set pub_data_stream_privilege_expire as
-   * 600(seconds).
+   * 600(seconds). This value must not exceed rtc_token_expire; otherwise, the
+   * privilege is limited by the token expiration time.
    * @param rtm_user_id The RTM user's account, max length is 255 Bytes.
    * @param rtm_token_expire represented by the number of seconds elapsed since
    * now. If, for example, you want to access the Agora Service within 10
    * minutes after the token is generated, set rtm_token_expire as 600(seconds).
+   * This value must not exceed rtc_token_expire; otherwise, the RTM login
+   * privilege is limited by the token expiration time.
    * @return The STT token.
    */
   static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,

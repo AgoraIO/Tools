@@ -8,13 +8,20 @@ module AgoraDynamicKey2
     # rtc_account: The RTC user's account, max length is 255 Bytes.
     # rtc_role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience member in a live-broadcast profile.
-    # rtc_token_expire: represented by the number of seconds elapsed since now.
-    # join_channel_privilege_expire: represented by the number of seconds elapsed since now.
-    # pub_audio_privilege_expire: represented by the number of seconds elapsed since now.
-    # pub_video_privilege_expire: represented by the number of seconds elapsed since now.
-    # pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now.
+    # rtc_token_expire: represented by the number of seconds elapsed since now. This is the whole token
+    # expiration. The whole token is invalid after this time, even if a privilege expiration time is later.
+    # join_channel_privilege_expire: represented by the number of seconds elapsed since now. This value must
+    # not exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
+    # pub_audio_privilege_expire: represented by the number of seconds elapsed since now. This value must not
+    # exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
+    # pub_video_privilege_expire: represented by the number of seconds elapsed since now. This value must not
+    # exceed the token expiration value; otherwise, the privilege is limited by the token expiration time.
+    # pub_data_stream_privilege_expire: represented by the number of seconds elapsed since now. This value
+    # must not exceed the token expiration value; otherwise, the privilege is limited by the token expiration
+    # time.
     # rtm_user_id: The RTM user's account, max length is 255 Bytes.
-    # rtm_token_expire: represented by the number of seconds elapsed since now.
+    # rtm_token_expire: represented by the number of seconds elapsed since now. This value must not exceed the
+    # RTC token expiration value; otherwise, the RTM login privilege is limited by the token expiration time.
     # return: The RTC, RTM, and ConvoAI token.
     def self.build_token(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
                          join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,

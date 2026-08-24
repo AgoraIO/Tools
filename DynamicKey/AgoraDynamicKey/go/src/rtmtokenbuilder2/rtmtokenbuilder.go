@@ -17,7 +17,8 @@ import (
 // userId:          The user's account, max length is 64 Bytes.
 // expire:          represented by the number of seconds elapsed since now. If, for example, you want to access the
 //
-//	Agora Service within 10 minutes after the token is generated, set expire as 600(seconds).
+//	Agora Service within 10 minutes after the token is generated, set expire as 600(seconds). This value is the
+//	whole token expiration and the service privilege expiration. The whole token is invalid after this time.
 //
 // return The RTM token.
 func BuildToken(appId string, appCertificate string, userId string, expire uint32) (string, error) {

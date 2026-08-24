@@ -10,7 +10,15 @@ class SttTokenBuilder(object):
     def build_token(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
                     join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
                     pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire):
-        """Build a Token007 that carries RTC, RTM, and STT services."""
+        """
+        Build a Token007 that carries RTC, RTM, and STT services.
+
+        rtc_token_expire is the whole token expiration. The whole token is invalid after this time,
+        even if a privilege expiration time is later. The RTC privilege expiration values must not
+        exceed rtc_token_expire; otherwise, the privileges are limited by the token expiration time.
+        rtm_token_expire must not exceed rtc_token_expire; otherwise, the RTM login privilege is
+        limited by the token expiration time.
+        """
         token = AccessToken(app_id, app_certificate, expire=rtc_token_expire)
 
         rtc_service = ServiceRtc(channel_name, rtc_account)
