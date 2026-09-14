@@ -247,7 +247,12 @@ end
 
 -- Verifies ConvoAI Builder token contents.
 function test_convoai_token_builder()
-    local token = convoai_token_builder.build_token(
+    local token = convoai_token_builder.build_token(APP_ID, APP_CERTIFICATE, CHANNEL_NAME, UID_STRING)
+    local parsed = parse_token(token)
+    luaunit.assertEquals(86400, parsed.expire)
+    luaunit.assertEquals(UID_STRING, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
+
+    token = convoai_token_builder.build_token_with_privilege(
         APP_ID,
         APP_CERTIFICATE,
         CHANNEL_NAME,
@@ -261,14 +266,19 @@ function test_convoai_token_builder()
         UID_STRING,
         EXPIRE
     )
-    local parsed = parse_token(token)
+    parsed = parse_token(token)
     luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_CONVOAI))
     luaunit.assertEquals(UID_STRING, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
 end
 
 -- Verifies STT Builder token contents.
 function test_stt_token_builder()
-    local token = stt_token_builder.build_token(
+    local token = stt_token_builder.build_token(APP_ID, APP_CERTIFICATE, CHANNEL_NAME, UID_STRING)
+    local parsed = parse_token(token)
+    luaunit.assertEquals(86400, parsed.expire)
+    luaunit.assertEquals(UID_STRING, parsed:get_services(access_token.SERVICE_TYPE_RTM)[1].user_id)
+
+    token = stt_token_builder.build_token_with_privilege(
         APP_ID,
         APP_CERTIFICATE,
         CHANNEL_NAME,
@@ -282,7 +292,7 @@ function test_stt_token_builder()
         UID_STRING,
         EXPIRE
     )
-    local parsed = parse_token(token)
+    parsed = parse_token(token)
     luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_STT))
     luaunit.assertEquals(1, #parsed:get_services(access_token.SERVICE_TYPE_RTM))
 end

@@ -14,8 +14,26 @@ void main() {
   const publishDataPrivilegeExpire = 600;
   const rtmTokenExpireSeconds = 600;
 
-  test('builds a publisher ConvoAI token', () {
+  test('builds a simplified ConvoAI token with defaults', () {
     final token = ConvoAITokenBuilder.buildToken(
+      appId: appId,
+      appCertificate: appCertificate,
+      channelName: channelName,
+      account: rtcAccount,
+    );
+    final parsed = AccessToken.empty();
+    expect(parsed.parse(token), isTrue);
+    final rtc = parsed.getServices(Service.RTC).single as ServiceRtc;
+    final rtm = parsed.getServices(Service.RTM).single as ServiceRtm;
+    expect(parsed.expire, 86400);
+    expect(rtc.uid, rtcAccount);
+    expect(rtc.privileges[ServiceRtc.privilegePublishAudioStream], 0);
+    expect(rtm.userId, rtcAccount);
+    expect(rtm.privileges[ServiceRtm.privilegeLogin], 0);
+  });
+
+  test('builds a publisher ConvoAI token', () {
+    final token = ConvoAITokenBuilder.buildTokenWithPrivilege(
       appId: appId,
       appCertificate: appCertificate,
       channelName: channelName,
@@ -51,7 +69,7 @@ void main() {
   });
 
   test('builds a subscriber ConvoAI token', () {
-    final token = ConvoAITokenBuilder.buildToken(
+    final token = ConvoAITokenBuilder.buildTokenWithPrivilege(
       appId: appId,
       appCertificate: appCertificate,
       channelName: channelName,

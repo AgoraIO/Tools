@@ -19,13 +19,26 @@ class SttTokenBuilderTest
 
     public function run()
     {
+        $this->test_buildToken();
         $this->test_buildToken_ROLE_PUBLISHER();
         $this->test_buildToken_ROLE_SUBSCRIBER();
     }
 
-    public function test_buildToken_ROLE_PUBLISHER()
+    public function test_buildToken()
     {
         $token = SttTokenBuilder::buildToken(
+            $this->appId, $this->appCertificate, $this->channelName, $this->rtcAccount
+        );
+        $parser = new AccessToken2();
+        $parser->parse($token);
+
+        Util::assertEqual(86400, $parser->expire);
+        Util::assertEqual($this->rtcAccount, $parser->getServices(ServiceRtm::SERVICE_TYPE)[0]->userId);
+    }
+
+    public function test_buildToken_ROLE_PUBLISHER()
+    {
+        $token = SttTokenBuilder::buildTokenWithPrivilege(
             $this->appId, $this->appCertificate, $this->channelName, $this->rtcAccount,
             RtcTokenBuilder2::ROLE_PUBLISHER, $this->rtcTokenExpire, $this->joinChannelPrivilegeExpire,
             $this->pubAudioPrivilegeExpire, $this->pubVideoPrivilegeExpire, $this->pubDataStreamPrivilegeExpire,
@@ -43,7 +56,7 @@ class SttTokenBuilderTest
 
     public function test_buildToken_ROLE_SUBSCRIBER()
     {
-        $token = SttTokenBuilder::buildToken(
+        $token = SttTokenBuilder::buildTokenWithPrivilege(
             $this->appId, $this->appCertificate, $this->channelName, $this->rtcAccount,
             RtcTokenBuilder2::ROLE_SUBSCRIBER, $this->rtcTokenExpire, $this->joinChannelPrivilegeExpire,
             $this->pubAudioPrivilegeExpire, $this->pubVideoPrivilegeExpire, $this->pubDataStreamPrivilegeExpire,

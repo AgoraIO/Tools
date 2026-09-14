@@ -14,8 +14,17 @@ describe 'AgoraDynamicKey2::SttTokenBuilder' do
   let(:pub_data_stream_privilege_expire) { 600 }
   let(:rtm_token_expire) { 600 }
 
-  it 'builds a publisher token' do
+  it 'builds a simplified token with defaults' do
     token = AgoraDynamicKey2::SttTokenBuilder.build_token(
+      app_id, app_certificate, channel_name, rtc_account
+    )
+    access_token = AgoraDynamicKey2::AccessToken.new
+    expect(access_token.parse(token)).to eq(true)
+    expect(access_token.expire).to eq(86_400)
+  end
+
+  it 'builds a publisher token' do
+    token = AgoraDynamicKey2::SttTokenBuilder.build_token_with_privilege(
       app_id, app_certificate, channel_name, rtc_account, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER,
       rtc_token_expire, join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
       pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire

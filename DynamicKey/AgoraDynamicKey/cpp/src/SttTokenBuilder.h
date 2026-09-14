@@ -17,15 +17,36 @@ class SttTokenBuilder {
    * Builds an STT token with RTC and RTM services.
    *
    * @param app_id The App ID issued to you by Agora.
+   * @param app_certificate Certificate of the application registered in the Agora Dashboard.
+   * @param channel_name The unique channel name for the Agora RTC session in string format. The string length
+   * must be less than 64 bytes. The channel name may contain the following characters:
+   * - All lowercase English letters: a to z.
+   * - All uppercase English letters: A to Z.
+   * - All numeric characters: 0 to 9.
+   * - The space character.
+   * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+   * @param account The account used by both RTC and RTM, max length is 255 bytes.
+   * @param token_expire The whole token lifetime in seconds from now. Defaults to 86400 seconds.
+   * @param privilege_expire The RTC and RTM privilege lifetime in seconds from now. Defaults to 0 and must
+   * not exceed token_expire; otherwise, it is limited by the token expiration time.
+   * @return The STT token.
+   */
+  static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
+                                const std::string& account, uint32_t token_expire = 86400,
+                                uint32_t privilege_expire = 0);
+
+  /**
+   * Builds an STT token with RTC and RTM services.
+   *
+   * @param app_id The App ID issued to you by Agora.
    * @param app_certificate Certificate of the application that you registered
    * in the Agora Dashboard.
-   * @param channel_name Unique channel name for the Agora RTC session in the
-   * string format. The string length must be less than 64 bytes. Supported
-   * character scopes are:
-   * - The 26 lowercase English letters: a to z.
-   * - The 26 uppercase English letters: A to Z.
-   * - The 10 digits: 0 to 9.
-   * - The space.
+   * @param channel_name The unique channel name for the Agora RTC session in string format. The string length
+   * must be less than 64 bytes. The channel name may contain the following characters:
+   * - All lowercase English letters: a to z.
+   * - All uppercase English letters: A to Z.
+   * - All numeric characters: 0 to 9.
+   * - The space character.
    * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=",
    * ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
    * @param rtc_account The RTC user account.
@@ -67,18 +88,28 @@ class SttTokenBuilder {
    * privilege is limited by the token expiration time.
    * @return The STT token.
    */
-  static std::string BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
-                                const std::string& rtc_account, UserRole rtc_role, uint32_t rtc_token_expire,
-                                uint32_t join_channel_privilege_expire, uint32_t pub_audio_privilege_expire,
-                                uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
-                                const std::string& rtm_user_id, uint32_t rtm_token_expire);
+  static std::string BuildTokenWithPrivilege(const std::string& app_id, const std::string& app_certificate,
+                                             const std::string& channel_name, const std::string& rtc_account,
+                                             UserRole rtc_role, uint32_t rtc_token_expire,
+                                             uint32_t join_channel_privilege_expire, uint32_t pub_audio_privilege_expire,
+                                             uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
+                                             const std::string& rtm_user_id, uint32_t rtm_token_expire);
 };
 
-inline std::string SttTokenBuilder::BuildToken(const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
-                                               const std::string& rtc_account, UserRole rtc_role, uint32_t rtc_token_expire,
-                                               uint32_t join_channel_privilege_expire, uint32_t pub_audio_privilege_expire,
-                                               uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
-                                               const std::string& rtm_user_id, uint32_t rtm_token_expire) {
+inline std::string SttTokenBuilder::BuildToken(const std::string& app_id, const std::string& app_certificate,
+                                               const std::string& channel_name, const std::string& account,
+                                               uint32_t token_expire, uint32_t privilege_expire) {
+  return BuildTokenWithPrivilege(app_id, app_certificate, channel_name, account, UserRole::kRolePublisher,
+                                 token_expire, privilege_expire, privilege_expire, privilege_expire,
+                                 privilege_expire, account, privilege_expire);
+}
+
+inline std::string SttTokenBuilder::BuildTokenWithPrivilege(
+    const std::string& app_id, const std::string& app_certificate, const std::string& channel_name,
+    const std::string& rtc_account, UserRole rtc_role, uint32_t rtc_token_expire,
+    uint32_t join_channel_privilege_expire, uint32_t pub_audio_privilege_expire,
+    uint32_t pub_video_privilege_expire, uint32_t pub_data_stream_privilege_expire,
+    const std::string& rtm_user_id, uint32_t rtm_token_expire) {
   AccessToken2 token(app_id, app_certificate, 0, rtc_token_expire);
 
   std::unique_ptr<Service> rtc_service(new ServiceRtc(channel_name, rtc_account));

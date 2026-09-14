@@ -18,11 +18,9 @@ const pubVideoPrivilegeExpire = 600
 const pubDataStreamPrivilegeExpire = 600
 const rtmTokenExpire = 600
 
-exports.buildToken_PUBLISHER_Test = function (test) {
+exports.buildToken_Test = function (test) {
     const token = ConvoAITokenBuilder.buildToken(
-        appId, appCertificate, channelName, rtcAccount, Role.PUBLISHER, rtcTokenExpire,
-        joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
-        pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire)
+        appId, appCertificate, channelName, rtcAccount, rtcTokenExpire, joinChannelPrivilegeExpire)
     const parsed = new AccessToken2('', '', 0, 0)
     parsed.from_string(token)
 
@@ -35,17 +33,52 @@ exports.buildToken_PUBLISHER_Test = function (test) {
     test.equal(channelName, rtc.__channel_name)
     test.equal(rtcAccount, rtc.__uid)
     test.equal(joinChannelPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegeJoinChannel])
-    test.equal(pubAudioPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishAudioStream])
-    test.equal(pubVideoPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishVideoStream])
-    test.equal(pubDataStreamPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishDataStream])
-    test.equal(rtmUserId, rtm.__user_id)
-    test.equal(rtmTokenExpire, rtm.__privileges[ServiceRtm.kPrivilegeLogin])
+    test.equal(joinChannelPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishAudioStream])
+    test.equal(joinChannelPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishVideoStream])
+    test.equal(joinChannelPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishDataStream])
+    test.equal(rtcAccount, rtm.__user_id)
+    test.equal(joinChannelPrivilegeExpire, rtm.__privileges[ServiceRtm.kPrivilegeLogin])
     test.deepEqual({}, convoai.__privileges)
     test.done()
 }
 
-exports.buildToken_SUBSCRIBER_Test = function (test) {
-    const token = ConvoAITokenBuilder.buildToken(
+exports.buildToken_DefaultExpire_Test = function (test) {
+    const token = ConvoAITokenBuilder.buildToken(appId, appCertificate, channelName, rtcAccount)
+    const parsed = new AccessToken2('', '', 0, 0)
+    parsed.from_string(token)
+
+    const rtc = parsed.getServices(kRtcServiceType)[0]
+    const rtm = parsed.getServices(kRtmServiceType)[0]
+
+    test.equal(86400, parsed.expire)
+    test.deepEqual({
+        [ServiceRtc.kPrivilegeJoinChannel]: 0,
+        [ServiceRtc.kPrivilegePublishAudioStream]: 0,
+        [ServiceRtc.kPrivilegePublishVideoStream]: 0,
+        [ServiceRtc.kPrivilegePublishDataStream]: 0
+    }, rtc.__privileges)
+    test.equal(0, rtm.__privileges[ServiceRtm.kPrivilegeLogin])
+    test.done()
+}
+
+exports.buildTokenWithPrivilege_PUBLISHER_Test = function (test) {
+    const token = ConvoAITokenBuilder.buildTokenWithPrivilege(
+        appId, appCertificate, channelName, rtcAccount, Role.PUBLISHER, rtcTokenExpire,
+        joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
+        pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire)
+    const parsed = new AccessToken2('', '', 0, 0)
+    parsed.from_string(token)
+
+    const rtc = parsed.getServices(kRtcServiceType)[0]
+
+    test.equal(pubAudioPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishAudioStream])
+    test.equal(pubVideoPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishVideoStream])
+    test.equal(pubDataStreamPrivilegeExpire, rtc.__privileges[ServiceRtc.kPrivilegePublishDataStream])
+    test.done()
+}
+
+exports.buildTokenWithPrivilege_SUBSCRIBER_Test = function (test) {
+    const token = ConvoAITokenBuilder.buildTokenWithPrivilege(
         appId, appCertificate, channelName, rtcAccount, Role.SUBSCRIBER, rtcTokenExpire,
         joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
         pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire)

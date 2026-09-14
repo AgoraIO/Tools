@@ -28,7 +28,7 @@ class TestSttTokenBuilder(unittest.TestCase):
 
     def test_build_token(self):
         """Build and parse a publisher STT token."""
-        token = SttTokenBuilder.build_token(
+        token = SttTokenBuilder.build_token_with_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account,
             Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
             self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
@@ -67,9 +67,22 @@ class TestSttTokenBuilder(unittest.TestCase):
         self.assertEqual(ServiceStt.kServiceType, stt_services[0].service_type())
         self.assertEqual({}, stt_services[0]._Service__privileges)
 
+    def test_build_simplified_token(self):
+        """Build an STT token with the simplified interface and defaults.
+
+        """
+        token = SttTokenBuilder.build_token(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account)
+        parser = AccessToken()
+
+        self.assertTrue(parser.from_string(token))
+        self.assertEqual(86400, parser._AccessToken__expire)
+        rtm_service = parser.get_services(ServiceRtm.kServiceType)[0]
+        self.assertEqual(self.__rtc_account.encode('utf-8'), rtm_service._ServiceRtm__user_id)
+
     def test_build_subscriber_token(self):
         """Build and parse a subscriber STT token."""
-        token = SttTokenBuilder.build_token(
+        token = SttTokenBuilder.build_token_with_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account,
             Role_Subscriber, self.__rtc_token_expire, self.__join_channel_privilege_expire,
             self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
@@ -89,14 +102,14 @@ class TestSttTokenBuilder(unittest.TestCase):
         """Return an empty string when credentials are invalid."""
         self.assertEqual(
             '',
-            SttTokenBuilder.build_token(
+            SttTokenBuilder.build_token_with_privilege(
                 'invalid', self.__app_cert, self.__channel_name, self.__rtc_account,
                 Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
                 self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,
                 self.__pub_data_stream_privilege_expire, self.__rtm_user_id, self.__rtm_token_expire))
         self.assertEqual(
             '',
-            SttTokenBuilder.build_token(
+            SttTokenBuilder.build_token_with_privilege(
                 self.__app_id, 'invalid', self.__channel_name, self.__rtc_account,
                 Role_Publisher, self.__rtc_token_expire, self.__join_channel_privilege_expire,
                 self.__pub_audio_privilege_expire, self.__pub_video_privilege_expire,

@@ -6,8 +6,21 @@ import org.junit.Test
 
 class ConvoAITokenBuilderTest {
     @Test
-    fun buildTokenPublisher() {
+    fun buildSimplifiedToken() {
         val token = ConvoAITokenBuilder.buildToken(
+            "970CA35de60c44645bbae8a215061b33",
+            "5CFd2fd1755d40ecb72977518be15d3b",
+            "7d72365eb983485397e3e3f9d460bdda",
+            "2082341273"
+        )
+        val parsed = AccessToken2()
+        assertTrue(parsed.parse(token))
+        assertEquals(1, parsed.getServices(AccessToken2.SERVICE_TYPE_CONVOAI).size)
+    }
+
+    @Test
+    fun buildTokenPublisher() {
+        val token = ConvoAITokenBuilder.buildTokenWithPrivilege(
             "970CA35de60c44645bbae8a215061b33",
             "5CFd2fd1755d40ecb72977518be15d3b",
             "7d72365eb983485397e3e3f9d460bdda",

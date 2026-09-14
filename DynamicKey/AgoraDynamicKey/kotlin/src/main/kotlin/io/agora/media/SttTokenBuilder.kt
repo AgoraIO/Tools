@@ -1,17 +1,70 @@
 package io.agora.media
 
-/** Builds Token007 tokens for RTC, RTM, and STT services. */
+/** Builds STT tokens with RTC and RTM services. */
 class SttTokenBuilder {
     companion object {
         /**
-         * Build a Token007 that carries RTC, RTM, and STT services.
+         * Builds an STT token with RTC and RTM services.
          *
-         * rtcTokenExpire is the whole token expiration. The whole token is invalid after this time,
-         * even if a privilege expiration time is later. RTC privilege expiration values and
-         * rtmTokenExpire must not exceed rtcTokenExpire; otherwise, the privileges are limited by
-         * the token expiration time.
+         * @param appId The App ID issued to you by Agora.
+         * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+         * @param channelName The unique channel name for the Agora RTC session in string format. The string
+         * length must be less than 64 bytes. The channel name may contain the following characters:
+         * - All lowercase English letters: a to z.
+         * - All uppercase English letters: A to Z.
+         * - All numeric characters: 0 to 9.
+         * - The space character.
+         * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+         * @param account The account used by both RTC and RTM, max length is 255 bytes.
+         * @param tokenExpire The whole token lifetime in seconds from now. Defaults to 86400.
+         * @param privilegeExpire The RTC and RTM privilege lifetime in seconds from now. Defaults to 0 and
+         * must not exceed tokenExpire; otherwise, it is limited by the token expiration time.
+         * @return The STT token.
          */
         fun buildToken(
+            appId: String,
+            appCertificate: String,
+            channelName: String,
+            account: String,
+            tokenExpire: Int = 86400,
+            privilegeExpire: Int = 0
+        ): String = buildTokenWithPrivilege(
+            appId, appCertificate, channelName, account, RtcTokenBuilder2.Role.ROLE_PUBLISHER,
+            tokenExpire, privilegeExpire, privilegeExpire, privilegeExpire, privilegeExpire,
+            account, privilegeExpire
+        )
+
+        /**
+         * Builds an STT token with RTC and RTM services.
+         *
+         * @param appId The App ID issued to you by Agora.
+         * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+         * @param channelName The unique channel name for the Agora RTC session in string format. The string
+         * length must be less than 64 bytes. The channel name may contain the following characters:
+         * - All lowercase English letters: a to z.
+         * - All uppercase English letters: A to Z.
+         * - All numeric characters: 0 to 9.
+         * - The space character.
+         * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+         * @param rtcAccount The RTC user's account, max length is 255 bytes.
+         * @param rtcRole ROLE_PUBLISHER for a broadcaster or ROLE_SUBSCRIBER for an audience member.
+         * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole
+         * token expiration. The whole token is invalid after this time, even if a privilege expiration time
+         * is later.
+         * @param joinChannelPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+         * must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+         * @param pubAudioPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+         * must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+         * @param pubVideoPrivilegeExpire Represented by the number of seconds elapsed since now. This value
+         * must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+         * @param pubDataStreamPrivilegeExpire Represented by the number of seconds elapsed since now. This
+         * value must not exceed rtcTokenExpire; otherwise, the privilege is limited by the token expiration time.
+         * @param rtmUserId The RTM user's account, max length is 255 bytes.
+         * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
+         * exceed rtcTokenExpire; otherwise, the RTM login privilege is limited by the token expiration time.
+         * @return The STT token.
+         */
+        fun buildTokenWithPrivilege(
             appId: String,
             appCertificate: String,
             channelName: String,

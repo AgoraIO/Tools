@@ -7,6 +7,9 @@ void main() {
   final appCertificate = Platform.environment['AGORA_APP_CERTIFICATE'];
 
   const channelName = '7d72365eb983485397e3e3f9d460bdda';
+  const account = '2882341273';
+  const tokenExpireSeconds = 3600;
+  const privilegeExpireSeconds = 3600;
   const rtcAccount = '2882341273';
   const rtcRole = RtcRole.publisher;
   const rtcTokenExpireSeconds = 3600;
@@ -27,6 +30,16 @@ void main() {
     appId: appId,
     appCertificate: appCertificate,
     channelName: channelName,
+    account: account,
+    tokenExpireSeconds: tokenExpireSeconds,
+    privilegeExpireSeconds: privilegeExpireSeconds,
+  );
+  print('STT token: $token');
+
+  final tokenWithPrivilege = SttTokenBuilder.buildTokenWithPrivilege(
+    appId: appId,
+    appCertificate: appCertificate,
+    channelName: channelName,
     rtcAccount: rtcAccount,
     rtcRole: rtcRole,
     rtcTokenExpireSeconds: rtcTokenExpireSeconds,
@@ -37,5 +50,5 @@ void main() {
     rtmUserId: rtmUserId,
     rtmTokenExpireSeconds: rtmTokenExpireSeconds,
   );
-  print('STT token: $token');
+  print('STT token with privilege: $tokenWithPrivilege');
 }

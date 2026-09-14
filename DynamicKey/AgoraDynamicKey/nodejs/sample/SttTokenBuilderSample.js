@@ -1,8 +1,11 @@
-const { SttTokenBuilder, RtcRole } = require('..')
+const { RtcRole, SttTokenBuilder } = require('..')
 
 const appId = process.env.AGORA_APP_ID
 const appCertificate = process.env.AGORA_APP_CERTIFICATE
 const channelName = '7d72365eb983485397e3e3f9d460bdda'
+const account = '2882341273'
+const tokenExpire = 3600
+const privilegeExpire = 3600
 const rtcAccount = '2882341273'
 const rtcRole = RtcRole.PUBLISHER
 const rtcTokenExpire = 3600
@@ -23,6 +26,16 @@ const token = SttTokenBuilder.buildToken(
     appId,
     appCertificate,
     channelName,
+    account,
+    tokenExpire,
+    privilegeExpire
+)
+console.log('STT token:', token)
+
+const tokenWithPrivilege = SttTokenBuilder.buildTokenWithPrivilege(
+    appId,
+    appCertificate,
+    channelName,
     rtcAccount,
     rtcRole,
     rtcTokenExpire,
@@ -33,4 +46,4 @@ const token = SttTokenBuilder.buildToken(
     rtmUserId,
     rtmTokenExpire
 )
-console.log('STT token:', token)
+console.log('STT token with privilege:', tokenWithPrivilege)

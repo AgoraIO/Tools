@@ -4,6 +4,9 @@ app_id = ENV['AGORA_APP_ID']
 app_certificate = ENV['AGORA_APP_CERTIFICATE']
 
 channel_name = '7d72365eb983485397e3e3f9d460bdda'
+account = '2882341273'
+token_expire = 3600
+privilege_expire = 3600
 rtc_account = '2882341273'
 rtc_role = AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER
 rtc_token_expire = 3600
@@ -21,8 +24,13 @@ if app_id.nil? || app_id.empty? || app_certificate.nil? || app_certificate.empty
 end
 
 token = AgoraDynamicKey2::SttTokenBuilder.build_token(
+  app_id, app_certificate, channel_name, account, token_expire, privilege_expire
+)
+puts "STT token: #{token}"
+
+token_with_privilege = AgoraDynamicKey2::SttTokenBuilder.build_token_with_privilege(
   app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
   join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
   pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire
 )
-puts "STT token: #{token}"
+puts "STT token with privilege: #{token_with_privilege}"

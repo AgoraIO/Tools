@@ -11,6 +11,36 @@ class SttTokenBuilder:
             app_id,
             app_certificate,
             channel_name,
+            account,
+            token_expire=86400,
+            privilege_expire=0):
+        """Builds an STT token with RTC and RTM services.
+
+        :param app_id: The App ID issued to you by Agora.
+        :param app_certificate: Certificate of the application registered in the Agora Dashboard.
+        :param channel_name: The unique channel name for the Agora RTC session in string format. The string
+            length must be less than 64 bytes. The channel name may contain the following characters:
+            - All lowercase English letters: a to z.
+            - All uppercase English letters: A to Z.
+            - All numeric characters: 0 to 9.
+            - The space character.
+            - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+        :param account: The account used by both RTC and RTM, max length is 255 bytes.
+        :param token_expire: The whole token lifetime in seconds from now. Defaults to 86400.
+        :param privilege_expire: The RTC and RTM privilege lifetime in seconds from now. Defaults to 0 and
+            must not exceed token_expire; otherwise, it is limited by the token expiration time.
+        :return: The STT token.
+        """
+        return SttTokenBuilder.build_token_with_privilege(
+            app_id, app_certificate, channel_name, account, Role_Publisher, token_expire,
+            privilege_expire, privilege_expire, privilege_expire, privilege_expire,
+            account, privilege_expire)
+
+    @staticmethod
+    def build_token_with_privilege(
+            app_id,
+            app_certificate,
+            channel_name,
             rtc_account,
             rtc_role,
             rtc_token_expire,
@@ -21,12 +51,18 @@ class SttTokenBuilder:
             rtm_user_id,
             rtm_token_expire):
         """
-        Build a Token007 that carries RTC, RTM, and STT services.
+        Builds an STT token with RTC and RTM services.
         :param app_id: The App ID issued to you by Agora. Apply for a new App ID from Agora Dashboard if it is missing
             from your kit. See Get an App ID.
         :param app_certificate: Certificate of the application that you registered in the Agora Dashboard.
             See Get an App Certificate.
-        :param channel_name: Unique channel name for the AgoraRTC session in the string format.
+        :param channel_name: The unique channel name for the Agora RTC session in string format. The string
+            length must be less than 64 bytes. The channel name may contain the following characters:
+            - All lowercase English letters: a to z.
+            - All uppercase English letters: A to Z.
+            - All numeric characters: 0 to 9.
+            - The space character.
+            - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
         :param rtc_account: The RTC user's account, max length is 255 Bytes.
         :param rtc_role: Role_Publisher: A broadcaster or host in a live-broadcast profile.
             Role_Subscriber: An audience member in a live-broadcast profile.
@@ -55,7 +91,7 @@ class SttTokenBuilder:
             If, for example, you want to access the Agora Service within 10 minutes after the token is generated,
             set rtm_token_expire as 600(seconds). This value must not exceed the RTC token expiration value;
             otherwise, the RTM login privilege is limited by the token expiration time.
-        :return: The RTC, RTM, and STT token.
+        :return: The STT token.
         """
         token = AccessToken(app_id, app_certificate, expire=rtc_token_expire)
 

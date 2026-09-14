@@ -12,6 +12,19 @@ int main() {
   std::string app_id = env_app_id ? env_app_id : "";
   const char *env_app_certificate = getenv("AGORA_APP_CERTIFICATE");
   std::string app_certificate = env_app_certificate ? env_app_certificate : "";
+  std::string channel_name = "7d72365eb983485397e3e3f9d460bdda";
+  std::string account = "2882341273";
+  uint32_t token_expire = 3600;
+  uint32_t privilege_expire = 3600;
+  std::string rtc_account = "2882341273";
+  UserRole rtc_role = UserRole::kRolePublisher;
+  uint32_t rtc_token_expire = 3600;
+  uint32_t join_channel_privilege_expire = 3600;
+  uint32_t pub_audio_privilege_expire = 3600;
+  uint32_t pub_video_privilege_expire = 3600;
+  uint32_t pub_data_stream_privilege_expire = 3600;
+  std::string rtm_user_id = "2882341273";
+  uint32_t rtm_token_expire = 3600;
 
   std::cout << "App Id:" << app_id << std::endl;
   if (app_id.empty() || app_certificate.empty()) {
@@ -20,8 +33,13 @@ int main() {
   }
 
   std::string token = SttTokenBuilder::BuildToken(
-      app_id, app_certificate, "7d72365eb983485397e3e3f9d460bdda", "2882341273", UserRole::kRolePublisher,
-      3600, 3600, 3600, 3600, 3600, "2882341273", 3600);
+      app_id, app_certificate, channel_name, account, token_expire, privilege_expire);
   std::cout << "STT token:" << token << std::endl;
+
+  std::string token_with_privilege = SttTokenBuilder::BuildTokenWithPrivilege(
+      app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
+      join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
+      pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire);
+  std::cout << "STT token with privilege:" << token_with_privilege << std::endl;
   return 0;
 }

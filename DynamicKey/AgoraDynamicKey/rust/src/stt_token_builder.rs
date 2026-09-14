@@ -1,13 +1,86 @@
 use crate::access_token;
 use crate::rtc_token_builder::{Role, ROLE_PUBLISHER};
 
-/// Builds a Token007 that carries RTC, RTM, and STT services.
+/// Builds an STT token with RTC and RTM services.
 ///
-/// `rtc_token_expire` is the whole token expiration. The whole token is invalid
-/// after this time, even if a privilege expiration time is later. RTC privilege
-/// expiration values and `rtm_token_expire` must not exceed `rtc_token_expire`;
-/// otherwise, the privileges are limited by the token expiration time.
+/// # Arguments
+///
+/// * `app_id` - The App ID issued to you by Agora.
+/// * `app_certificate` - Certificate of the application registered in the Agora Dashboard.
+/// * `channel_name` - The unique channel name for the Agora RTC session in string format. The string length
+///   must be less than 64 bytes. The channel name may contain the following characters:
+///   - All lowercase English letters: a to z.
+///   - All uppercase English letters: A to Z.
+///   - All numeric characters: 0 to 9.
+///   - The space character.
+///   - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+/// * `account` - The account used by both RTC and RTM, max length is 255 bytes.
+/// * `token_expire` - The whole token lifetime in seconds from now.
+/// * `privilege_expire` - The RTC and RTM privilege lifetime in seconds from now. It must not exceed
+///   `token_expire`; otherwise, it is limited by the token expiration time.
+///
+/// Returns the STT token.
 pub fn build_token(
+    app_id: &str,
+    app_certificate: &str,
+    channel_name: &str,
+    account: &str,
+    token_expire: u32,
+    privilege_expire: u32,
+) -> Result<String, Box<dyn std::error::Error>> {
+    build_token_with_privilege(
+        app_id,
+        app_certificate,
+        channel_name,
+        account,
+        ROLE_PUBLISHER,
+        token_expire,
+        privilege_expire,
+        privilege_expire,
+        privilege_expire,
+        privilege_expire,
+        account,
+        privilege_expire,
+    )
+}
+
+/// Builds an STT token with RTC and RTM services.
+///
+/// # Arguments
+///
+/// * `app_id` - The App ID issued to you by Agora.
+/// * `app_certificate` - Certificate of the application registered in the Agora Dashboard.
+/// * `channel_name` - The unique channel name for the Agora RTC session in string format. The string length
+///   must be less than 64 bytes. The channel name may contain the following characters:
+///   - All lowercase English letters: a to z.
+///   - All uppercase English letters: A to Z.
+///   - All numeric characters: 0 to 9.
+///   - The space character.
+///   - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+/// * `rtc_account` - The RTC user's account, max length is 255 bytes.
+/// * `rtc_role` - `ROLE_PUBLISHER` for a broadcaster or `ROLE_SUBSCRIBER` for an audience member.
+/// * `rtc_token_expire` - Represented by the number of seconds elapsed since now. For example, set it to 600
+///   to access the Agora Service within 10 minutes after the token is generated. This is the whole token
+///   expiration. The whole token is invalid after this time, even if a privilege expiration time is later.
+/// * `join_channel_privilege_expire` - Represented by the number of seconds elapsed since now. For example,
+///   set it to 600 to join the channel and stay in it for 10 minutes. It must not exceed
+///   `rtc_token_expire`; otherwise, the privilege is limited by the token expiration time.
+/// * `pub_audio_privilege_expire` - Represented by the number of seconds elapsed since now. For example, set
+///   it to 600 to publish audio for 10 minutes. It must not exceed `rtc_token_expire`; otherwise, the
+///   privilege is limited by the token expiration time.
+/// * `pub_video_privilege_expire` - Represented by the number of seconds elapsed since now. For example, set
+///   it to 600 to publish video for 10 minutes. It must not exceed `rtc_token_expire`; otherwise, the
+///   privilege is limited by the token expiration time.
+/// * `pub_data_stream_privilege_expire` - Represented by the number of seconds elapsed since now. For
+///   example, set it to 600 to publish data streams for 10 minutes. It must not exceed `rtc_token_expire`;
+///   otherwise, the privilege is limited by the token expiration time.
+/// * `rtm_user_id` - The RTM user's account, max length is 255 bytes.
+/// * `rtm_token_expire` - Represented by the number of seconds elapsed since now. For example, set it to 600
+///   to access the Agora Service within 10 minutes after the token is generated. It must not exceed
+///   `rtc_token_expire`; otherwise, the RTM login privilege is limited by the token expiration time.
+///
+/// Returns the STT token.
+pub fn build_token_with_privilege(
     app_id: &str,
     app_certificate: &str,
     channel_name: &str,

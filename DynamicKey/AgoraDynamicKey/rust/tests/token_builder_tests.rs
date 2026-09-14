@@ -183,9 +183,20 @@ fn test_rtm2_token_builder() {
 
 /// Verifies ConvoAI token generation with RTC and RTM services.
 #[test]
+fn test_convoai_token_builder_simplified() {
+    let parsed = parse_token(
+        convoai_token_builder::build_token(APP_ID, APP_CERT, CHANNEL_NAME, USER_ID, EXPIRE, EXPIRE).unwrap(),
+    );
+    let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
+    assert_eq!(USER_ID, rtm.user_id);
+    assert_eq!(EXPIRE, rtm.service.privileges[&PRIVILEGE_LOGIN]);
+}
+
+/// Verifies ConvoAI token generation with independently configured privileges.
+#[test]
 fn test_convoai_token_builder() {
     let parsed = parse_token(
-        convoai_token_builder::build_token(
+        convoai_token_builder::build_token_with_privilege(
             APP_ID,
             APP_CERT,
             CHANNEL_NAME,
@@ -212,9 +223,20 @@ fn test_convoai_token_builder() {
 
 /// Verifies STT token generation with RTC and RTM services.
 #[test]
+fn test_stt_token_builder_simplified() {
+    let parsed = parse_token(
+        stt_token_builder::build_token(APP_ID, APP_CERT, CHANNEL_NAME, USER_ID, EXPIRE, EXPIRE).unwrap(),
+    );
+    let rtm = get_service::<ServiceRtm>(&parsed, SERVICE_TYPE_RTM);
+    assert_eq!(USER_ID, rtm.user_id);
+    assert_eq!(EXPIRE, rtm.service.privileges[&PRIVILEGE_LOGIN]);
+}
+
+/// Verifies STT token generation with independently configured privileges.
+#[test]
 fn test_stt_token_builder() {
     let parsed = parse_token(
-        stt_token_builder::build_token(
+        stt_token_builder::build_token_with_privilege(
             APP_ID,
             APP_CERT,
             CHANNEL_NAME,

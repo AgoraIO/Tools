@@ -9,6 +9,9 @@ public class SttTokenBuilderSample {
         String appCertificate = System.getenv("AGORA_APP_CERTIFICATE");
 
         String channelName = "7d72365eb983485397e3e3f9d460bdda";
+        String account = "2082341273";
+        int tokenExpire = 3600;
+        int privilegeExpire = 3600;
         String rtcAccount = "2082341273";
         int rtcTokenExpire = 3600;
         int joinChannelPrivilegeExpire = 3600;
@@ -28,16 +31,17 @@ public class SttTokenBuilderSample {
                 appId,
                 appCertificate,
                 channelName,
-                rtcAccount,
-                RtcTokenBuilder2.Role.ROLE_PUBLISHER,
-                rtcTokenExpire,
-                joinChannelPrivilegeExpire,
-                pubAudioPrivilegeExpire,
-                pubVideoPrivilegeExpire,
-                pubDataStreamPrivilegeExpire,
-                rtmUserId,
-                rtmTokenExpire
+                account,
+                tokenExpire,
+                privilegeExpire
         );
         System.out.println("STT token: " + token);
+
+        String tokenWithPrivilege = SttTokenBuilder.buildTokenWithPrivilege(
+                appId, appCertificate, channelName, rtcAccount, RtcTokenBuilder2.Role.ROLE_PUBLISHER,
+                rtcTokenExpire, joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
+                pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire
+        );
+        System.out.println("STT token with privilege: " + tokenWithPrivilege);
     }
 }

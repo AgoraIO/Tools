@@ -1,15 +1,85 @@
 package io.agora.media;
 
 /**
- * Builds Token007 tokens for RTC, RTM, and ConvoAI services.
+ * Builds ConvoAI tokens with RTC and RTM services.
  */
 public class ConvoAITokenBuilder {
     /**
-     * Build a Token007 that carries RTC, RTM, and ConvoAI services.
+     * Builds a ConvoAI token with RTC and RTM services using a token expiration of 86400 seconds and a
+     * privilege expiration of 0.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length
+     * must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param account The account used by both RTC and RTM, max length is 255 bytes.
+     * @return The ConvoAI token.
+     */
+    public static String buildToken(String appId, String appCertificate, String channelName, String account) {
+        return buildToken(appId, appCertificate, channelName, account, 86400, 0);
+    }
+
+    /**
+     * Builds a ConvoAI token with RTC and RTM services using a privilege expiration of 0.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length
+     * must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param account The account used by both RTC and RTM, max length is 255 bytes.
+     * @param tokenExpire The whole token lifetime in seconds from now.
+     * @return The ConvoAI token.
+     */
+    public static String buildToken(String appId, String appCertificate, String channelName, String account,
+                                    int tokenExpire) {
+        return buildToken(appId, appCertificate, channelName, account, tokenExpire, 0);
+    }
+
+    /**
+     * Builds a ConvoAI token with RTC and RTM services.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length
+     * must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param account The account used by both RTC and RTM, max length is 255 bytes.
+     * @param tokenExpire The whole token lifetime in seconds from now.
+     * @param privilegeExpire The RTC and RTM privilege lifetime in seconds from now. It must not exceed
+     * tokenExpire; otherwise, it is limited by the token expiration time.
+     * @return The ConvoAI token.
+     */
+    public static String buildToken(String appId, String appCertificate, String channelName, String account,
+                                    int tokenExpire, int privilegeExpire) {
+        return buildTokenWithPrivilege(
+                appId, appCertificate, channelName, account, RtcTokenBuilder2.Role.ROLE_PUBLISHER,
+                tokenExpire, privilegeExpire, privilegeExpire, privilegeExpire, privilegeExpire,
+                account, privilegeExpire);
+    }
+
+    /**
+     * Builds a ConvoAI token with RTC and RTM services.
      *
      * @param appId The App ID issued to you by Agora.
      * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
-     * @param channelName Unique channel name for the AgoraRTC session in the string format.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length
+     * must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param rtcAccount The RTC user's account, max length is 255 Bytes.
      * @param rtcRole ROLE_PUBLISHER: A broadcaster or host in a live-broadcast profile.
      *                ROLE_SUBSCRIBER: An audience member in a live-broadcast profile.
@@ -31,9 +101,9 @@ public class ConvoAITokenBuilder {
      * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
      * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
      * expiration time.
-     * @return The RTC, RTM, and ConvoAI token.
+     * @return The ConvoAI token.
      */
-    public static String buildToken(String appId, String appCertificate, String channelName, String rtcAccount,
+    public static String buildTokenWithPrivilege(String appId, String appCertificate, String channelName, String rtcAccount,
                                     RtcTokenBuilder2.Role rtcRole, int rtcTokenExpire, int joinChannelPrivilegeExpire,
                                     int pubAudioPrivilegeExpire, int pubVideoPrivilegeExpire, int pubDataStreamPrivilegeExpire,
                                     String rtmUserId, int rtmTokenExpire) {

@@ -484,10 +484,42 @@ export namespace RtcTokenBuilder {
 
 export namespace ConvoAITokenBuilder {
     /**
-     * Builds a Token007 that carries RTC, RTM, and ConvoAI services.
+     * Builds a ConvoAI token with RTC and RTM services.
      * @param appId The App ID issued to you by Agora.
      * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
-     * @param channelName The unique channel name for the AgoraRTC session in the string format.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param account The account used by both RTC and RTM, max length is 255 bytes.
+     * @param tokenExpire Represented by the number of seconds elapsed since now. Defaults to 86400. This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
+     * @param privilegeExpire Represented by the number of seconds elapsed since now. Defaults to 0. This value
+     * must not exceed tokenExpire; otherwise, the privilege is limited by the token expiration time.
+     * @return The ConvoAI token.
+     */
+    export function buildToken(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        account: string | number,
+        tokenExpire?: number,
+        privilegeExpire?: number
+    ): string
+
+    /**
+     * Builds a ConvoAI token with RTC and RTM services.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param rtcAccount The RTC user's account, max length is 255 bytes.
      * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
      * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole token
@@ -508,9 +540,9 @@ export namespace ConvoAITokenBuilder {
      * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
      * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
      * expiration time.
-     * @return The RTC, RTM, and ConvoAI token.
+     * @return The ConvoAI token.
      */
-    export function buildToken(
+    export function buildTokenWithPrivilege(
         appId: string,
         appCertificate: string,
         channelName: string,
@@ -528,10 +560,42 @@ export namespace ConvoAITokenBuilder {
 
 export namespace SttTokenBuilder {
     /**
-     * Builds a Token007 that carries RTC, RTM, and STT services.
+     * Builds an STT token with RTC and RTM services.
      * @param appId The App ID issued to you by Agora.
      * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
-     * @param channelName The unique channel name for the AgoraRTC session in the string format.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+     * @param account The account used by both RTC and RTM, max length is 255 bytes.
+     * @param tokenExpire Represented by the number of seconds elapsed since now. Defaults to 86400. This is
+     * the whole token expiration. The whole token is invalid after this time, even if a privilege expiration
+     * time is later.
+     * @param privilegeExpire Represented by the number of seconds elapsed since now. Defaults to 0. This value
+     * must not exceed tokenExpire; otherwise, the privilege is limited by the token expiration time.
+     * @return The STT token.
+     */
+    export function buildToken(
+        appId: string,
+        appCertificate: string,
+        channelName: string,
+        account: string | number,
+        tokenExpire?: number,
+        privilegeExpire?: number
+    ): string
+
+    /**
+     * Builds an STT token with RTC and RTM services.
+     * @param appId The App ID issued to you by Agora.
+     * @param appCertificate Certificate of the application that you registered in the Agora Dashboard.
+     * @param channelName The unique channel name for the Agora RTC session in string format. The string length must be less than 64 bytes. The channel name may contain the following characters:
+     * - All lowercase English letters: a to z.
+     * - All uppercase English letters: A to Z.
+     * - All numeric characters: 0 to 9.
+     * - The space character.
+     * - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
      * @param rtcAccount The RTC user's account, max length is 255 bytes.
      * @param rtcRole RtcRole.PUBLISHER for a broadcaster or RtcRole.SUBSCRIBER for an audience member.
      * @param rtcTokenExpire Represented by the number of seconds elapsed since now. This is the whole token
@@ -552,9 +616,9 @@ export namespace SttTokenBuilder {
      * @param rtmTokenExpire Represented by the number of seconds elapsed since now. This value must not
      * exceed the RTC token expiration value; otherwise, the RTM login privilege is limited by the token
      * expiration time.
-     * @return The RTC, RTM, and STT token.
+     * @return The STT token.
      */
-    export function buildToken(
+    export function buildTokenWithPrivilege(
         appId: string,
         appCertificate: string,
         channelName: string,

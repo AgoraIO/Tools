@@ -1,10 +1,40 @@
 module AgoraDynamicKey2
   class ConvoAITokenBuilder
-    # Build a Token007 that carries RTC, RTM, and ConvoAI services.
+    # Builds a ConvoAI token with RTC and RTM services.
+    #
+    # app_id: The App ID issued to you by Agora.
+    # app_certificate: Certificate of the application registered in the Agora Dashboard.
+    # channel_name: The unique channel name for the Agora RTC session in string format. The string length must
+    # be less than 64 bytes. The channel name may contain the following characters:
+    # - All lowercase English letters: a to z.
+    # - All uppercase English letters: A to Z.
+    # - All numeric characters: 0 to 9.
+    # - The space character.
+    # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+    # account: The account used by both RTC and RTM, max length is 255 bytes.
+    # token_expire: The whole token lifetime in seconds from now. Defaults to 86400.
+    # privilege_expire: The RTC and RTM privilege lifetime in seconds from now. Defaults to 0 and must not
+    # exceed token_expire; otherwise, it is limited by the token expiration time.
+    # return: The ConvoAI token.
+    def self.build_token(app_id, app_certificate, channel_name, account, token_expire = 86_400, privilege_expire = 0)
+      build_token_with_privilege(
+        app_id, app_certificate, channel_name, account, AgoraDynamicKey2::RtcTokenBuilder::ROLE_PUBLISHER,
+        token_expire, privilege_expire, privilege_expire, privilege_expire, privilege_expire,
+        account, privilege_expire
+      )
+    end
+
+    # Builds a ConvoAI token with RTC and RTM services.
     #
     # app_id: The App ID issued to you by Agora.
     # app_certificate: Certificate of the application that you registered in the Agora Dashboard.
-    # channel_name: Unique channel name for the AgoraRTC session in the string format.
+    # channel_name: The unique channel name for the Agora RTC session in string format. The string length must
+    # be less than 64 bytes. The channel name may contain the following characters:
+    # - All lowercase English letters: a to z.
+    # - All uppercase English letters: A to Z.
+    # - All numeric characters: 0 to 9.
+    # - The space character.
+    # - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
     # rtc_account: The RTC user's account, max length is 255 Bytes.
     # rtc_role: ROLE_PUBLISHER: A broadcaster/host in a live-broadcast profile.
     #     ROLE_SUBSCRIBER: An audience member in a live-broadcast profile.
@@ -22,8 +52,8 @@ module AgoraDynamicKey2
     # rtm_user_id: The RTM user's account, max length is 255 Bytes.
     # rtm_token_expire: represented by the number of seconds elapsed since now. This value must not exceed the
     # RTC token expiration value; otherwise, the RTM login privilege is limited by the token expiration time.
-    # return: The RTC, RTM, and ConvoAI token.
-    def self.build_token(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
+    # return: The ConvoAI token.
+    def self.build_token_with_privilege(app_id, app_certificate, channel_name, rtc_account, rtc_role, rtc_token_expire,
                          join_channel_privilege_expire, pub_audio_privilege_expire, pub_video_privilege_expire,
                          pub_data_stream_privilege_expire, rtm_user_id, rtm_token_expire)
       access_token = AgoraDynamicKey2::AccessToken.new(app_id, app_certificate, rtc_token_expire)

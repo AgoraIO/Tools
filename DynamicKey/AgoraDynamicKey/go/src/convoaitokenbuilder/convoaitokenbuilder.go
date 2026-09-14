@@ -5,13 +5,43 @@ import (
 	rtctokenbuilder "github.com/AgoraIO/Tools/DynamicKey/AgoraDynamicKey/go/src/rtctokenbuilder2"
 )
 
-// BuildToken builds a Token007 that carries RTC, RTM, and ConvoAI services.
+// BuildToken builds a ConvoAI token with RTC and RTM services.
+//
+// @param appId: The App ID issued to you by Agora.
+// @param appCertificate: Certificate of the application registered in the Agora Dashboard.
+// @param channelName: The unique channel name for the Agora RTC session in string format. The string length
+// must be less than 64 bytes. The channel name may contain the following characters:
+// - All lowercase English letters: a to z.
+// - All uppercase English letters: A to Z.
+// - All numeric characters: 0 to 9.
+// - The space character.
+// - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
+// @param account: The account used by both RTC and RTM, max length is 255 bytes.
+// @param tokenExpire: The whole token lifetime in seconds from now.
+// @param privilegeExpire: The RTC and RTM privilege lifetime in seconds from now. It must not exceed
+// tokenExpire; otherwise, it is limited by the token expiration time.
+//
+// return The ConvoAI token.
+func BuildToken(appId string, appCertificate string, channelName string, account string, tokenExpire uint32,
+	privilegeExpire uint32) (string, error) {
+	return BuildTokenWithPrivilege(
+		appId, appCertificate, channelName, account, rtctokenbuilder.RolePublisher, tokenExpire,
+		privilegeExpire, privilegeExpire, privilegeExpire, privilegeExpire, account, privilegeExpire)
+}
+
+// BuildTokenWithPrivilege builds a ConvoAI token with RTC and RTM services.
 //
 // @param appId: The App ID issued to you by Agora. Apply for a new App ID from
 // Agora Dashboard if it is missing from your kit. See Get an App ID.
 // @param appCertificate: Certificate of the application that you registered in
 // the Agora Dashboard. See Get an App Certificate.
-// @param channelName: Unique channel name for the AgoraRTC session in the string format.
+// @param channelName: The unique channel name for the Agora RTC session in string format. The string length
+// must be less than 64 bytes. The channel name may contain the following characters:
+// - All lowercase English letters: a to z.
+// - All uppercase English letters: A to Z.
+// - All numeric characters: 0 to 9.
+// - The space character.
+// - "!", "#", "$", "%", "&", "(", ")", "+", "-", ":", ";", "<", "=", ".", ">", "?", "@", "[", "]", "^", "_", " {", "}", "|", "~", ",".
 // @param rtcAccount: The RTC user's account, max length is 255 Bytes.
 // @param rtcRole: RolePublisher: A broadcaster or host in a live-broadcast profile.
 // RoleSubscriber: An audience member in a live-broadcast profile.
@@ -41,8 +71,8 @@ import (
 // set rtmTokenExpire as 600(seconds). This value must not exceed rtcTokenExpire; otherwise,
 // the RTM login privilege is limited by the token expiration time.
 //
-// return The RTC, RTM, and ConvoAI token.
-func BuildToken(appId string, appCertificate string, channelName string, rtcAccount string, rtcRole rtctokenbuilder.Role, rtcTokenExpire uint32,
+// return The ConvoAI token.
+func BuildTokenWithPrivilege(appId string, appCertificate string, channelName string, rtcAccount string, rtcRole rtctokenbuilder.Role, rtcTokenExpire uint32,
 	joinChannelPrivilegeExpire uint32, pubAudioPrivilegeExpire uint32, pubVideoPrivilegeExpire uint32, pubDataStreamPrivilegeExpire uint32,
 	rtmUserId string, rtmTokenExpire uint32) (string, error) {
 	token := accesstoken.NewAccessToken(appId, appCertificate, rtcTokenExpire)

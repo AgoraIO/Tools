@@ -5,6 +5,9 @@ $appId = getenv("AGORA_APP_ID");
 $appCertificate = getenv("AGORA_APP_CERTIFICATE");
 
 $channelName = "7d72365eb983485397e3e3f9d460bdda";
+$account = "2882341273";
+$tokenExpire = 3600;
+$privilegeExpire = 3600;
 $rtcAccount = "2882341273";
 $rtcRole = RtcTokenBuilder2::ROLE_PUBLISHER;
 $rtcTokenExpire = 3600;
@@ -25,6 +28,16 @@ $token = SttTokenBuilder::buildToken(
     $appId,
     $appCertificate,
     $channelName,
+    $account,
+    $tokenExpire,
+    $privilegeExpire
+);
+echo "STT token: " . $token . PHP_EOL;
+
+$tokenWithPrivilege = SttTokenBuilder::buildTokenWithPrivilege(
+    $appId,
+    $appCertificate,
+    $channelName,
     $rtcAccount,
     $rtcRole,
     $rtcTokenExpire,
@@ -35,4 +48,4 @@ $token = SttTokenBuilder::buildToken(
     $rtmUserId,
     $rtmTokenExpire
 );
-echo "STT token: " . $token . PHP_EOL;
+echo "STT token with privilege: " . $tokenWithPrivilege . PHP_EOL;

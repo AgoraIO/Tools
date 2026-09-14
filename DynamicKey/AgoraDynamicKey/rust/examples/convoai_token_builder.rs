@@ -7,6 +7,9 @@ fn main() {
     let app_certificate = env::var("AGORA_APP_CERTIFICATE").unwrap_or_default();
 
     let channel_name = "7d72365eb983485397e3e3f9d460bdda";
+    let account = "2882341273";
+    let token_expire = 3600;
+    let privilege_expire = 3600;
     let rtc_account = "2882341273";
     let rtc_role = rtc_token_builder::ROLE_PUBLISHER;
     let rtc_token_expire = 3600;
@@ -27,6 +30,18 @@ fn main() {
         &app_id,
         &app_certificate,
         channel_name,
+        account,
+        token_expire,
+        privilege_expire,
+    ) {
+        Ok(result) => println!("ConvoAI token: {}", result),
+        Err(err) => println!("{}", err),
+    }
+
+    match convoai_token_builder::build_token_with_privilege(
+        &app_id,
+        &app_certificate,
+        channel_name,
         rtc_account,
         rtc_role,
         rtc_token_expire,
@@ -37,7 +52,7 @@ fn main() {
         rtm_user_id,
         rtm_token_expire,
     ) {
-        Ok(result) => println!("ConvoAI token: {}", result),
+        Ok(result) => println!("ConvoAI token with privilege: {}", result),
         Err(err) => println!("{}", err),
     }
 }

@@ -18,3 +18,11 @@
 // EducationToken_buildRoomUserToken
 // EducationToken_buildUserToken
 // EducationToken_buildAppToken
+
+// The samples of ConvoAITokenBuilder refer to the functions in test/AgoraIO.Tests/ConvoAITokenBuilderTest.cs :
+// buildToken_Simplified
+// buildTokenWithPrivilege_Publisher
+
+// The samples of SttTokenBuilder refer to the functions in test/AgoraIO.Tests/SttTokenBuilderTest.cs :
+// buildToken_Simplified
+// buildTokenWithPrivilege_Publisher

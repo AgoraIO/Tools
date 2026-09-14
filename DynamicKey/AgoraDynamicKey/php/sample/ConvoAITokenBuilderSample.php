@@ -5,6 +5,9 @@ $appId = getenv("AGORA_APP_ID");
 $appCertificate = getenv("AGORA_APP_CERTIFICATE");
 
 $channelName = "7d72365eb983485397e3e3f9d460bdda";
+$account = "2882341273";
+$tokenExpire = 3600;
+$privilegeExpire = 3600;
 $rtcAccount = "2882341273";
 $rtcRole = RtcTokenBuilder2::ROLE_PUBLISHER;
 $rtcTokenExpire = 3600;
@@ -25,6 +28,16 @@ $token = ConvoAITokenBuilder::buildToken(
     $appId,
     $appCertificate,
     $channelName,
+    $account,
+    $tokenExpire,
+    $privilegeExpire
+);
+echo "ConvoAI token: " . $token . PHP_EOL;
+
+$tokenWithPrivilege = ConvoAITokenBuilder::buildTokenWithPrivilege(
+    $appId,
+    $appCertificate,
+    $channelName,
     $rtcAccount,
     $rtcRole,
     $rtcTokenExpire,
@@ -35,4 +48,4 @@ $token = ConvoAITokenBuilder::buildToken(
     $rtmUserId,
     $rtmTokenExpire
 );
-echo "ConvoAI token: " . $token . PHP_EOL;
+echo "ConvoAI token with privilege: " . $tokenWithPrivilege . PHP_EOL;

@@ -26,7 +26,7 @@ class TestConvoAITokenBuilder(unittest.TestCase):
         self.__rtm_token_expire = 600
 
     def test_build_token(self):
-        token = ConvoAITokenBuilder.build_token(
+        token = ConvoAITokenBuilder.build_token_with_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account, Role_Publisher,
             self.__rtc_token_expire, self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
             self.__pub_video_privilege_expire, self.__pub_data_stream_privilege_expire, self.__rtm_user_id,
@@ -40,8 +40,22 @@ class TestConvoAITokenBuilder(unittest.TestCase):
         self.assertEqual(self.__rtm_user_id.encode('utf-8'), parser.get_services(ServiceRtm.kServiceType)[0]._ServiceRtm__user_id)
         self.assertEqual({}, parser.get_services(ServiceConvoAI.kServiceType)[0]._Service__privileges)
 
-    def test_build_subscriber_token(self):
+    def test_build_simplified_token(self):
+        """Build a ConvoAI token with the simplified interface and defaults.
+
+        """
         token = ConvoAITokenBuilder.build_token(
+            self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account)
+        parser = AccessToken()
+        parser.from_string(token)
+
+        self.assertEqual(86400, parser._AccessToken__expire)
+        self.assertEqual(
+            self.__rtc_account.encode('utf-8'),
+            parser.get_services(ServiceRtm.kServiceType)[0]._ServiceRtm__user_id)
+
+    def test_build_subscriber_token(self):
+        token = ConvoAITokenBuilder.build_token_with_privilege(
             self.__app_id, self.__app_cert, self.__channel_name, self.__rtc_account, Role_Subscriber,
             self.__rtc_token_expire, self.__join_channel_privilege_expire, self.__pub_audio_privilege_expire,
             self.__pub_video_privilege_expire, self.__pub_data_stream_privilege_expire, self.__rtm_user_id,

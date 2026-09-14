@@ -15,8 +15,21 @@ const pubVideoPrivilegeExpire = 600
 const pubDataStreamPrivilegeExpire = 600
 const rtmTokenExpire = 600
 
+Deno.test('ConvoAITokenBuilder simplified token', () => {
+  const token = ConvoAITokenBuilder.buildToken(appId, appCertificate, channelName, rtcAccount)
+  const parsed = new AccessToken2('', '', 0, 0)
+  assert(parsed.from_string(token))
+  const rtc = parsed.getServices(kRtcServiceType)[0]
+  const rtm = parsed.getServices(kRtmServiceType)[0]
+  assertEquals(parsed.expire, 86400)
+  assertEquals(rtc.__uid, rtcAccount)
+  assertEquals(rtc.__privileges[ServiceRtc.kPrivilegePublishAudioStream], 0)
+  assertEquals(rtm.__user_id, rtcAccount)
+  assertEquals(rtm.__privileges[ServiceRtm.kPrivilegeLogin], 0)
+})
+
 Deno.test('ConvoAITokenBuilder publisher token', () => {
-  const token = ConvoAITokenBuilder.buildToken(
+  const token = ConvoAITokenBuilder.buildTokenWithPrivilege(
     appId, appCertificate, channelName, rtcAccount, Role.PUBLISHER, rtcTokenExpire,
     joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
     pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire,
@@ -40,7 +53,7 @@ Deno.test('ConvoAITokenBuilder publisher token', () => {
 })
 
 Deno.test('ConvoAITokenBuilder subscriber token', () => {
-  const token = ConvoAITokenBuilder.buildToken(
+  const token = ConvoAITokenBuilder.buildTokenWithPrivilege(
     appId, appCertificate, channelName, rtcAccount, Role.SUBSCRIBER, rtcTokenExpire,
     joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
     pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire,

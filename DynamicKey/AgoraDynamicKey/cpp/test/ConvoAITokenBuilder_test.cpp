@@ -5,8 +5,18 @@
 
 using namespace agora::tools;
 
-TEST(ConvoAITokenBuilder, BuildToken) {
+TEST(ConvoAITokenBuilder, BuildSimplifiedToken) {
   std::string token = ConvoAITokenBuilder::BuildToken(
+      "970CA35de60c44645bbae8a215061b33", "5CFd2fd1755d40ecb72977518be15d3b",
+      "7d72365eb983485397e3e3f9d460bdda", "2882341273");
+
+  AccessToken2 parser;
+  ASSERT_TRUE(parser.FromString(token));
+  EXPECT_EQ(1u, parser.services_.count(ServiceConvoAI::kServiceType));
+}
+
+TEST(ConvoAITokenBuilder, BuildToken) {
+  std::string token = ConvoAITokenBuilder::BuildTokenWithPrivilege(
       "970CA35de60c44645bbae8a215061b33",
       "5CFd2fd1755d40ecb72977518be15d3b",
       "7d72365eb983485397e3e3f9d460bdda",

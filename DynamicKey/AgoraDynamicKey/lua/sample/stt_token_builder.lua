@@ -5,6 +5,9 @@ local app_id = os.getenv("AGORA_APP_ID") or ""
 local app_certificate = os.getenv("AGORA_APP_CERTIFICATE") or ""
 
 local channel_name = "7d72365eb983485397e3e3f9d460bdda"
+local account = "2882341273"
+local token_expire = 3600
+local privilege_expire = 3600
 local rtc_account = "2882341273"
 local rtc_role = rtc_token_builder.ROLE_PUBLISHER
 local rtc_token_expire = 3600
@@ -25,6 +28,16 @@ local token = stt_token_builder.build_token(
     app_id,
     app_certificate,
     channel_name,
+    account,
+    token_expire,
+    privilege_expire
+)
+print("STT token: " .. token)
+
+local token_with_privilege = stt_token_builder.build_token_with_privilege(
+    app_id,
+    app_certificate,
+    channel_name,
     rtc_account,
     rtc_role,
     rtc_token_expire,
@@ -35,4 +48,4 @@ local token = stt_token_builder.build_token(
     rtm_user_id,
     rtm_token_expire
 )
-print("STT token: " .. token)
+print("STT token with privilege: " .. token_with_privilege)

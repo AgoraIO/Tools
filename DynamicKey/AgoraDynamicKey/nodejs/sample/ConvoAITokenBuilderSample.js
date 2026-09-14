@@ -3,6 +3,9 @@ const { ConvoAITokenBuilder, RtcRole } = require('..')
 const appId = process.env.AGORA_APP_ID
 const appCertificate = process.env.AGORA_APP_CERTIFICATE
 const channelName = '7d72365eb983485397e3e3f9d460bdda'
+const account = '2882341273'
+const tokenExpire = 3600
+const privilegeExpire = 3600
 const rtcAccount = '2882341273'
 const rtcRole = RtcRole.PUBLISHER
 const rtcTokenExpire = 3600
@@ -19,7 +22,10 @@ if (!appId || !appCertificate) {
     process.exit(0)
 }
 
-const token = ConvoAITokenBuilder.buildToken(
+const token = ConvoAITokenBuilder.buildToken(appId, appCertificate, channelName, account, tokenExpire, privilegeExpire)
+console.log('ConvoAI token:', token)
+
+const tokenWithPrivilege = ConvoAITokenBuilder.buildTokenWithPrivilege(
     appId,
     appCertificate,
     channelName,
@@ -33,4 +39,4 @@ const token = ConvoAITokenBuilder.buildToken(
     rtmUserId,
     rtmTokenExpire
 )
-console.log('ConvoAI token:', token)
+console.log('ConvoAI token with privilege:', tokenWithPrivilege)

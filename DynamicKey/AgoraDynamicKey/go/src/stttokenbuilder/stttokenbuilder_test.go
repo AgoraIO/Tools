@@ -21,9 +21,27 @@ const (
 	DataMockRtmTokenExpire               = uint32(600)
 )
 
+// Test_BuildToken_Simplified verifies the shared account and privilege expiration mapping.
+func Test_BuildToken_Simplified(t *testing.T) {
+	token, err := BuildToken(DataMockAppId, DataMockAppCertificate, DataMockChannelName,
+		DataMockRtcAccount, DataMockRtcTokenExpire, DataMockJoinChannelPrivilegeExpire)
+	accesstoken.AssertNil(t, err)
+
+	accessToken := accesstoken.CreateAccessToken()
+	parsedOK, err := accessToken.Parse(token)
+	accesstoken.AssertNil(t, err)
+	accesstoken.AssertEqual(t, true, parsedOK)
+	rtcService := accessToken.GetServices(accesstoken.ServiceTypeRtc)[0].(*accesstoken.ServiceRtc)
+	rtmService := accessToken.GetServices(accesstoken.ServiceTypeRtm)[0].(*accesstoken.ServiceRtm)
+	accesstoken.AssertEqual(t, DataMockRtcAccount, rtcService.Uid)
+	accesstoken.AssertEqual(t, DataMockJoinChannelPrivilegeExpire, rtcService.Privileges[accesstoken.PrivilegePublishAudioStream])
+	accesstoken.AssertEqual(t, DataMockRtcAccount, rtmService.UserId)
+	accesstoken.AssertEqual(t, DataMockJoinChannelPrivilegeExpire, rtmService.Privileges[accesstoken.PrivilegeLogin])
+}
+
 // Test_BuildToken verifies publisher privileges and the STT service payload.
 func Test_BuildToken(t *testing.T) {
-	token, err := BuildToken(
+	token, err := BuildTokenWithPrivilege(
 		DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockRtcAccount, rtctokenbuilder.RolePublisher,
 		DataMockRtcTokenExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire,
 		DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire, DataMockRtmUserId, DataMockRtmTokenExpire)
@@ -50,7 +68,7 @@ func Test_BuildToken(t *testing.T) {
 
 // Test_BuildToken_RoleSubscriber verifies subscriber privileges omit publishing access.
 func Test_BuildToken_RoleSubscriber(t *testing.T) {
-	token, err := BuildToken(
+	token, err := BuildTokenWithPrivilege(
 		DataMockAppId, DataMockAppCertificate, DataMockChannelName, DataMockRtcAccount, rtctokenbuilder.RoleSubscriber,
 		DataMockRtcTokenExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire,
 		DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire, DataMockRtmUserId, DataMockRtmTokenExpire)
@@ -71,14 +89,14 @@ func Test_BuildToken_RoleSubscriber(t *testing.T) {
 
 // Test_BuildToken_InvalidCredentials verifies invalid credentials return an error and an empty token.
 func Test_BuildToken_InvalidCredentials(t *testing.T) {
-	token, err := BuildToken(
+	token, err := BuildTokenWithPrivilege(
 		"invalid", DataMockAppCertificate, DataMockChannelName, DataMockRtcAccount, rtctokenbuilder.RolePublisher,
 		DataMockRtcTokenExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire,
 		DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire, DataMockRtmUserId, DataMockRtmTokenExpire)
 	accesstoken.AssertEqual(t, "check appId or appCertificate", err.Error())
 	accesstoken.AssertEqual(t, "", token)
 
-	token, err = BuildToken(
+	token, err = BuildTokenWithPrivilege(
 		DataMockAppId, "invalid", DataMockChannelName, DataMockRtcAccount, rtctokenbuilder.RolePublisher,
 		DataMockRtcTokenExpire, DataMockJoinChannelPrivilegeExpire, DataMockPubAudioPrivilegeExpire,
 		DataMockPubVideoPrivilegeExpire, DataMockPubDataStreamPrivilegeExpire, DataMockRtmUserId, DataMockRtmTokenExpire)

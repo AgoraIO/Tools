@@ -13,6 +13,9 @@ func main() {
 	appCertificate := os.Getenv("AGORA_APP_CERTIFICATE")
 
 	channelName := "7d72365eb983485397e3e3f9d460bdda"
+	account := "2882341273"
+	tokenExpire := uint32(3600)
+	privilegeExpire := uint32(3600)
 	rtcAccount := "2882341273"
 	rtcRole := rtctokenbuilder.Role(rtctokenbuilder.RolePublisher)
 	rtcTokenExpire := uint32(3600)
@@ -30,12 +33,20 @@ func main() {
 	}
 
 	result, err := stttokenbuilder.BuildToken(
+		appId, appCertificate, channelName, account, tokenExpire, privilegeExpire)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Printf("STT token: %s\n", result)
+	}
+
+	resultWithPrivilege, err := stttokenbuilder.BuildTokenWithPrivilege(
 		appId, appCertificate, channelName, rtcAccount, rtcRole, rtcTokenExpire,
 		joinChannelPrivilegeExpire, pubAudioPrivilegeExpire, pubVideoPrivilegeExpire,
 		pubDataStreamPrivilegeExpire, rtmUserId, rtmTokenExpire)
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Printf("STT token: %s\n", result)
+		fmt.Printf("STT token with privilege: %s\n", resultWithPrivilege)
 	}
 }

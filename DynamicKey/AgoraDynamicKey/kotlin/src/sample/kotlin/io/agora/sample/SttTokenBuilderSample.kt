@@ -18,6 +18,16 @@ fun main() {
         appCertificate,
         "7d72365eb983485397e3e3f9d460bdda",
         "2082341273",
+        3600,
+        3600
+    )
+    println("STT token: $token")
+
+    val tokenWithPrivilege = SttTokenBuilder.buildTokenWithPrivilege(
+        appId,
+        appCertificate,
+        "7d72365eb983485397e3e3f9d460bdda",
+        "2082341273",
         RtcTokenBuilder2.Role.ROLE_PUBLISHER,
         3600,
         3600,
@@ -27,5 +37,5 @@ fun main() {
         "2082341273",
         3600
     )
-    println("STT token: $token")
+    println("STT token with privilege: $tokenWithPrivilege")
 }
